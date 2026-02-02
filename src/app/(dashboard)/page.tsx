@@ -24,7 +24,7 @@ export default function DashboardPage() {
       />
 
       {/* Stats */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
           title="Total Pilgrims"
           value={totalPilgrims}
@@ -56,12 +56,14 @@ export default function DashboardPage() {
         />
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        {/* Action Center */}
-        <ActionCenter />
+      <div className="grid gap-6 xl:grid-cols-2">
+        {/* Action Center - with z-index fix */}
+        <div className="relative z-0">
+          <ActionCenter />
+        </div>
 
         {/* Upcoming Trips */}
-        <Card>
+        <Card className="h-fit">
           <CardHeader>
             <CardTitle>Upcoming Departures</CardTitle>
           </CardHeader>
@@ -70,12 +72,18 @@ export default function DashboardPage() {
               .filter((t) => t.status === 'preparing' || t.status === 'ready')
               .slice(0, 3)
               .map((trip) => (
-                <div key={trip.id} className="flex items-center justify-between rounded-[12px] border border-[var(--gray-border)] bg-white p-4">
+                <div key={trip.id} className="flex items-center justify-between rounded-[12px] border border-[var(--gray-border)] bg-[var(--gray-50)] p-4 hover:border-[var(--gezma-red-light)] transition-colors">
                   <div>
-                    <p className="font-medium text-sm text-[var(--charcoal)]">{trip.name}</p>
-                    <p className="text-sm text-[var(--gray-600)] mt-0.5">
-                      {formatShortDate(trip.departureDate)} • {trip.registeredCount}/{trip.capacity} pilgrims
-                    </p>
+                    <p className="font-bold text-sm text-[var(--charcoal)]">{trip.name}</p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-xs text-[var(--gray-600)] bg-white px-1.5 py-0.5 rounded border border-[var(--gray-200)]">
+                        {formatShortDate(trip.departureDate)}
+                      </span>
+                      <span className="text-xs text-[var(--gray-500)]">•</span>
+                      <span className="text-xs text-[var(--gray-600)]">
+                        {trip.registeredCount}/{trip.capacity} pax
+                      </span>
+                    </div>
                   </div>
                   <StatusBadge status={trip.status} size="sm" />
                 </div>
@@ -93,16 +101,17 @@ export default function DashboardPage() {
           <CardTitle>Recent Activity</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            {mockActivities.slice(0, 5).map((activity) => (
-              <div key={activity.id} className="flex gap-4">
-                <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-[var(--gray-100)]">
-                  <div className="h-2 w-2 rounded-full bg-[var(--gezma-red)]" />
-                </div>
-                <div className="flex-1">
+          <div className="space-y-0 relative">
+            {/* Timeline Line */}
+            <div className="absolute left-4 top-2 bottom-2 w-px bg-[var(--gray-200)]" />
+
+            {mockActivities.slice(0, 5).map((activity, i) => (
+              <div key={activity.id} className="flex gap-4 relative py-3 pl-2">
+                <div className={`flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full ring-4 ring-white z-10 ${i === 0 ? 'bg-[var(--gezma-red)]' : 'bg-[var(--gray-300)]'}`} />
+                <div className="flex-1 -mt-1">
                   <p className="text-sm font-medium text-[var(--charcoal)]">{activity.title}</p>
                   <p className="text-sm text-[var(--gray-600)]">{activity.description}</p>
-                  <p className="text-xs text-[var(--gray-400)] mt-1">
+                  <p className="text-xs text-[var(--gray-400)] mt-1 font-mono">
                     {formatShortDate(activity.timestamp)}
                   </p>
                 </div>

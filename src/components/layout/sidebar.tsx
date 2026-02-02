@@ -53,9 +53,11 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed top-0 left-0 z-50 h-full w-64 bg-white border-r border-[var(--gray-border)] transition-transform duration-300 ease-in-out",
-          "lg:translate-x-0",
-          isOpen ? "translate-x-0" : "-translate-x-full"
+          "fixed top-0 left-0 z-40 h-full w-64 bg-white border-r border-[var(--gray-border)] transition-transform duration-300 ease-in-out shadow-sm",
+          // Mobile: standard translate logic
+          isOpen ? "translate-x-0" : "-translate-x-full",
+          // Desktop: always visible (reset translate)
+          "lg:translate-x-0"
         )}
       >
         {/* Logo */}
@@ -98,7 +100,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                 )}
               >
                 <Icon className="h-5 w-5 flex-shrink-0" />
-                <span>{item.title}</span>
+                <span className="truncate">{item.title}</span>
                 {item.badge && (
                   <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-[var(--gezma-red)] px-1.5 text-xs text-white">
                     {item.badge}
