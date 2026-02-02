@@ -26,9 +26,9 @@ export default function AgencyPage() {
   const { t } = useLanguage();
   const { isMobile, isTablet } = useResponsive();
 
-  // Responsive grid columns
-  const mainGridColumns = isMobile ? '1fr' : isTablet ? 'repeat(2, 1fr)' : '1fr 1fr 1fr';
-  const bankGridColumns = isMobile ? '1fr' : isTablet ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)';
+  // Responsive grid columns - use auto-fill for better tablet support
+  const mainGridColumns = isMobile ? '1fr' : 'repeat(auto-fill, minmax(300px, 1fr))';
+  const bankGridColumns = isMobile ? '1fr' : 'repeat(auto-fill, minmax(280px, 1fr))';
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '16px' : '24px' }}>

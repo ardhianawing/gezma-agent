@@ -181,11 +181,26 @@ export function ActionCenter() {
                   </div>
 
                   {/* Content */}
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <p style={{ fontSize: '14px', fontWeight: '500', color: c.textPrimary, margin: 0 }}>
+                  <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
+                    <p style={{
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      color: c.textPrimary,
+                      margin: 0,
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                    }}>
                       {getAlertTitle(alert)}
                     </p>
-                    <p style={{ fontSize: '13px', color: c.textMuted, margin: '2px 0 0 0', whiteSpace: isMobile ? 'normal' : 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    <p style={{
+                      fontSize: '13px',
+                      color: c.textMuted,
+                      margin: '2px 0 0 0',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                    }}>
                       {getAlertDescription(alert)}
                     </p>
                   </div>

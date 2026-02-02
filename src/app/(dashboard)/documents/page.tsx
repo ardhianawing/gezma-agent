@@ -41,8 +41,8 @@ export default function DocumentsPage() {
   const expiringCount = DEFAULT_AGENCY.documents.filter(d => d.status === 'expiring').length;
   const expiredCount = DEFAULT_AGENCY.documents.filter(d => d.status === 'expired').length;
 
-  // Responsive grid columns
-  const statsGridColumns = isMobile ? '1fr' : 'repeat(3, 1fr)';
+  // Responsive grid columns - use auto-fit for better tablet support
+  const statsGridColumns = isMobile ? '1fr' : 'repeat(auto-fit, minmax(200px, 1fr))';
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '16px' : '24px' }}>

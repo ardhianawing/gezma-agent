@@ -35,7 +35,8 @@ export function useResponsive(): ResponsiveState {
       let breakpoint: Breakpoint = 'desktop';
       if (width < 640) {
         breakpoint = 'mobile';
-      } else if (width < 1024) {
+      } else if (width < 1280) {
+        // Include iPad landscape (1024-1194px) as tablet
         breakpoint = 'tablet';
       }
 

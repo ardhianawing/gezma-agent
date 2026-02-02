@@ -62,8 +62,8 @@ export function QuickActions() {
     },
   ];
 
-  // Responsive grid columns
-  const gridColumns = isMobile ? '1fr' : isTablet ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)';
+  // Responsive grid columns - use auto-fill for better tablet support
+  const gridColumns = isMobile ? '1fr' : 'repeat(auto-fill, minmax(280px, 1fr))';
 
   return (
     <div

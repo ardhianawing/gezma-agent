@@ -25,9 +25,9 @@ export default function DashboardPage() {
   const activeTrips = mockTrips.filter((trip) => trip.status === 'preparing' || trip.status === 'ready').length;
   const totalRevenue = mockPilgrims.reduce((sum, p) => sum + p.totalPaid, 0);
 
-  // Responsive grid columns
-  const statGridColumns = isMobile ? '1fr' : isTablet ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)';
-  const mainGridColumns = isMobile || isTablet ? '1fr' : '2fr 1fr';
+  // Responsive grid columns - use auto-fit for better tablet support
+  const statGridColumns = isMobile ? '1fr' : 'repeat(auto-fit, minmax(220px, 1fr))';
+  const mainGridColumns = isMobile || isTablet ? '1fr' : 'repeat(auto-fit, minmax(380px, 1fr))';
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '20px' : '32px' }}>
@@ -147,7 +147,6 @@ export default function DashboardPage() {
                       padding: '12px 0',
                       borderBottom: index < arr.length - 1 ? `1px solid ${c.borderLight}` : 'none',
                       cursor: 'pointer',
-                      flexWrap: isMobile ? 'wrap' : 'nowrap',
                     }}
                   >
                     {/* Icon */}
@@ -167,17 +166,32 @@ export default function DashboardPage() {
                     </div>
 
                     {/* Content */}
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{ fontSize: '14px', fontWeight: '500', color: c.textPrimary, margin: 0 }}>
+                    <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
+                      <p style={{
+                        fontSize: '14px',
+                        fontWeight: '500',
+                        color: c.textPrimary,
+                        margin: 0,
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                      }}>
                         {trip.name}
                       </p>
-                      <p style={{ fontSize: '13px', color: c.textMuted, margin: '2px 0 0 0' }}>
+                      <p style={{
+                        fontSize: '13px',
+                        color: c.textMuted,
+                        margin: '2px 0 0 0',
+                        whiteSpace: 'nowrap',
+                      }}>
                         {formatShortDate(trip.departureDate)} • {trip.registeredCount}/{trip.capacity} pax
                       </p>
                     </div>
 
                     {/* Status */}
-                    <StatusBadge status={trip.status} size="sm" />
+                    <div style={{ flexShrink: 0 }}>
+                      <StatusBadge status={trip.status} size="sm" />
+                    </div>
                   </div>
                 </Link>
               ))}

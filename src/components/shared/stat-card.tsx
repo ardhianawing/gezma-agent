@@ -37,15 +37,16 @@ export function StatCard({
       style={{
         backgroundColor: c.cardBg,
         borderRadius: '12px',
-        padding: '24px',
+        padding: '20px',
         border: `1px solid ${c.border}`,
         display: 'flex',
         flexDirection: 'column',
         gap: '8px',
-        minHeight: '140px',
+        minHeight: '130px',
         position: 'relative',
         cursor: href ? 'pointer' : 'default',
         transition: 'all 0.3s ease',
+        overflow: 'hidden',
       }}
     >
       {/* Icon - posisi absolute di kanan atas */}
@@ -53,23 +54,24 @@ export function StatCard({
         <div
           style={{
             position: 'absolute',
-            right: '24px',
-            top: '24px',
-            width: '48px',
-            height: '48px',
+            right: '16px',
+            top: '16px',
+            width: '40px',
+            height: '40px',
             borderRadius: '50%',
             backgroundColor: iconBgColor || c.primaryLight,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
+            flexShrink: 0,
           }}
         >
-          <Icon style={{ width: '24px', height: '24px', color: iconColor || c.primary }} />
+          <Icon style={{ width: '20px', height: '20px', color: iconColor || c.primary }} />
         </div>
       )}
 
       {/* Content */}
-      <div style={{ paddingRight: '60px' }}>
+      <div style={{ paddingRight: '50px', minWidth: 0 }}>
         <p
           style={{
             fontSize: '12px',
@@ -84,10 +86,13 @@ export function StatCard({
         </p>
         <p
           style={{
-            fontSize: '28px',
+            fontSize: '24px',
             fontWeight: '700',
             color: c.textPrimary,
             margin: '8px 0',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
           }}
         >
           {value}

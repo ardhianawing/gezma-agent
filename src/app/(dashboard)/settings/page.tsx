@@ -70,8 +70,8 @@ export default function SettingsPage() {
     },
   ];
 
-  // Responsive grid columns
-  const mainGridColumns = isMobile ? '1fr' : isTablet ? '1fr' : '2fr 1fr';
+  // Responsive grid columns - use auto-fit for better tablet support
+  const mainGridColumns = isMobile || isTablet ? '1fr' : 'repeat(auto-fit, minmax(320px, 1fr))';
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '16px' : '24px' }}>
