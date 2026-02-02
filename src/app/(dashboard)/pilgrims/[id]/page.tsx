@@ -125,7 +125,9 @@ export default function PilgrimDetailPage({ params }: { params: { id: string } }
               {pilgrim.documents.map((doc) => (
                 <div key={doc.id} className="rounded-[12px] border border-[var(--gray-border)] p-4">
                   <p className="text-sm font-medium text-[var(--charcoal)] uppercase">{doc.type.replace('_', ' ')}</p>
-                  <StatusBadge status={doc.status as any} size="sm" className="mt-2" />
+                  <div style={{ marginTop: '8px' }}>
+                    <StatusBadge status={doc.status as any} size="sm" />
+                  </div>
                   {doc.uploadedAt && (
                     <p className="text-xs text-[var(--gray-600)] mt-1">{formatDate(doc.uploadedAt)}</p>
                   )}
