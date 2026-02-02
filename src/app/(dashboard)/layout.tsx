@@ -14,7 +14,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const showSidebarOverlay = isMobile || isTablet;
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: c.pageBg, transition: 'background-color 0.3s ease' }}>
+    <div style={{ minHeight: '100vh', maxWidth: '100vw', overflowX: 'hidden', backgroundColor: c.pageBg, transition: 'background-color 0.3s ease' }}>
       {/* Sidebar */}
       <Sidebar
         isOpen={sidebarOpen}
@@ -29,7 +29,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           flexDirection: 'column',
           minHeight: '100vh',
           marginLeft: showSidebarOverlay ? 0 : '260px',
-          width: showSidebarOverlay ? '100%' : 'calc(100% - 260px)',
+          width: showSidebarOverlay ? '100vw' : 'calc(100vw - 260px)',
+          maxWidth: showSidebarOverlay ? '100vw' : 'calc(100vw - 260px)',
+          boxSizing: 'border-box',
+          overflowX: 'hidden',
           transition: 'all 0.3s ease',
         }}
       >
@@ -40,6 +43,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             padding: isMobile ? '16px' : isTablet ? '24px' : '32px',
             position: 'relative',
             zIndex: 0,
+            width: '100%',
+            maxWidth: '100%',
+            boxSizing: 'border-box',
+            overflowX: 'hidden',
           }}
         >
           {children}
