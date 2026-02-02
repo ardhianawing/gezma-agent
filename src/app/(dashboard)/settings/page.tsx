@@ -3,6 +3,7 @@
 import { PageHeader } from '@/components/layout/page-header';
 import { useTheme } from '@/lib/theme';
 import { useLanguage } from '@/lib/i18n';
+import { useResponsive } from '@/lib/hooks/use-responsive';
 import {
   Settings,
   Bell,
@@ -22,6 +23,7 @@ import {
 export default function SettingsPage() {
   const { theme, setTheme, c } = useTheme();
   const { t } = useLanguage();
+  const { isMobile, isTablet } = useResponsive();
 
   const settingsSections = [
     {
@@ -68,14 +70,17 @@ export default function SettingsPage() {
     },
   ];
 
+  // Responsive grid columns
+  const mainGridColumns = isMobile ? '1fr' : isTablet ? '1fr' : '2fr 1fr';
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '16px' : '24px' }}>
       <PageHeader
         title={t.settings.title}
         description={t.settings.description}
       />
 
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: mainGridColumns, gap: isMobile ? '16px' : '24px' }}>
         {/* Left Column - Settings Menu */}
         <div>
           <div
@@ -97,7 +102,7 @@ export default function SettingsPage() {
                     display: 'flex',
                     alignItems: 'center',
                     gap: '16px',
-                    padding: '20px',
+                    padding: isMobile ? '16px' : '20px',
                     backgroundColor: 'transparent',
                     border: 'none',
                     borderBottom: index < settingsSections.length - 1 ? `1px solid ${c.borderLight}` : 'none',
@@ -108,8 +113,8 @@ export default function SettingsPage() {
                 >
                   <div
                     style={{
-                      width: '48px',
-                      height: '48px',
+                      width: isMobile ? '40px' : '48px',
+                      height: isMobile ? '40px' : '48px',
                       borderRadius: '12px',
                       backgroundColor: section.bgColor,
                       display: 'flex',
@@ -118,17 +123,17 @@ export default function SettingsPage() {
                       flexShrink: 0,
                     }}
                   >
-                    <Icon style={{ width: '24px', height: '24px', color: section.color }} />
+                    <Icon style={{ width: isMobile ? '20px' : '24px', height: isMobile ? '20px' : '24px', color: section.color }} />
                   </div>
-                  <div style={{ flex: 1 }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
                     <h3 style={{ fontSize: '14px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>
                       {section.title}
                     </h3>
-                    <p style={{ fontSize: '14px', color: c.textMuted, margin: '4px 0 0 0' }}>
+                    <p style={{ fontSize: '14px', color: c.textMuted, margin: '4px 0 0 0', display: isMobile ? 'none' : 'block' }}>
                       {section.description}
                     </p>
                   </div>
-                  <ChevronRight style={{ width: '20px', height: '20px', color: c.textLight }} />
+                  <ChevronRight style={{ width: '20px', height: '20px', color: c.textLight, flexShrink: 0 }} />
                 </button>
               );
             })}
@@ -147,13 +152,13 @@ export default function SettingsPage() {
               transition: 'all 0.3s ease',
             }}
           >
-            <div style={{ padding: '20px', borderBottom: `1px solid ${c.borderLight}` }}>
+            <div style={{ padding: isMobile ? '16px' : '20px', borderBottom: `1px solid ${c.borderLight}` }}>
               <h3 style={{ fontSize: '14px', fontWeight: '600', color: c.textPrimary, margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <Palette style={{ width: '16px', height: '16px', color: c.textMuted }} />
                 {t.settings.appearance}
               </h3>
             </div>
-            <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <div style={{ padding: isMobile ? '16px' : '20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {/* Light Mode */}
               <button
                 onClick={() => setTheme('light')}
@@ -240,13 +245,13 @@ export default function SettingsPage() {
               transition: 'all 0.3s ease',
             }}
           >
-            <div style={{ padding: '20px', borderBottom: `1px solid ${c.borderLight}` }}>
+            <div style={{ padding: isMobile ? '16px' : '20px', borderBottom: `1px solid ${c.borderLight}` }}>
               <h3 style={{ fontSize: '14px', fontWeight: '600', color: c.textPrimary, margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <Bell style={{ width: '16px', height: '16px', color: c.textMuted }} />
                 {t.settings.quickNotifications}
               </h3>
             </div>
-            <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div style={{ padding: isMobile ? '16px' : '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
               {/* Email Alerts */}
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -317,23 +322,24 @@ export default function SettingsPage() {
             style={{
               background: 'linear-gradient(to bottom right, #111827, #374151)',
               borderRadius: '12px',
-              padding: '20px',
+              padding: isMobile ? '16px' : '20px',
               color: 'white',
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px' }}>
               <div
                 style={{
-                  width: '48px',
-                  height: '48px',
+                  width: isMobile ? '40px' : '48px',
+                  height: isMobile ? '40px' : '48px',
                   borderRadius: '50%',
                   backgroundColor: 'rgba(255, 255, 255, 0.1)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
+                  flexShrink: 0,
                 }}
               >
-                <span style={{ fontSize: '18px', fontWeight: '700' }}>BT</span>
+                <span style={{ fontSize: isMobile ? '14px' : '18px', fontWeight: '700' }}>BT</span>
               </div>
               <div>
                 <p style={{ fontSize: '14px', fontWeight: '600', margin: 0 }}>Barokah Travel</p>

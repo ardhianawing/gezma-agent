@@ -13,25 +13,31 @@ import { mockTrips } from '@/data/mock-trips';
 import { mockActivities } from '@/data/mock-activity';
 import { useLanguage } from '@/lib/i18n';
 import { useTheme } from '@/lib/theme';
+import { useResponsive } from '@/lib/hooks/use-responsive';
 
 export default function DashboardPage() {
   const { t } = useLanguage();
   const { c } = useTheme();
+  const { isMobile, isTablet } = useResponsive();
 
   // Calculate stats
   const totalPilgrims = mockPilgrims.length;
   const activeTrips = mockTrips.filter((trip) => trip.status === 'preparing' || trip.status === 'ready').length;
   const totalRevenue = mockPilgrims.reduce((sum, p) => sum + p.totalPaid, 0);
 
+  // Responsive grid columns
+  const statGridColumns = isMobile ? '1fr' : isTablet ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)';
+  const mainGridColumns = isMobile || isTablet ? '1fr' : '2fr 1fr';
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '20px' : '32px' }}>
       <PageHeader
         title={t.dashboard.title}
         description={t.dashboard.description}
       />
 
-      {/* Stat Cards Row - 4 equal columns */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px' }}>
+      {/* Stat Cards Row */}
+      <div style={{ display: 'grid', gridTemplateColumns: statGridColumns, gap: isMobile ? '12px' : '24px' }}>
         <StatCard
           title={t.dashboard.totalPilgrims}
           value={totalPilgrims}
@@ -73,10 +79,10 @@ export default function DashboardPage() {
         />
       </div>
 
-      {/* Main Content - 2 columns (2fr : 1fr) */}
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px', alignItems: 'start' }}>
+      {/* Main Content */}
+      <div style={{ display: 'grid', gridTemplateColumns: mainGridColumns, gap: isMobile ? '16px' : '24px', alignItems: 'start' }}>
         {/* Left Column */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '16px' : '24px' }}>
           {/* Action Center */}
           <ActionCenter />
         </div>
@@ -94,16 +100,18 @@ export default function DashboardPage() {
           {/* Header */}
           <div
             style={{
-              padding: '24px',
+              padding: isMobile ? '16px' : '24px',
               borderBottom: `1px solid ${c.borderLight}`,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '12px',
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Calendar style={{ width: '20px', height: '20px', color: c.textMuted }} />
-              <h2 style={{ fontSize: '18px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>
+              <h2 style={{ fontSize: isMobile ? '16px' : '18px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>
                 {t.dashboard.upcomingDepartures}
               </h2>
             </div>
@@ -125,7 +133,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Content */}
-          <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '0' }}>
+          <div style={{ padding: isMobile ? '16px' : '24px', display: 'flex', flexDirection: 'column', gap: '0' }}>
             {mockTrips
               .filter((trip) => trip.status === 'preparing' || trip.status === 'ready')
               .slice(0, 3)
@@ -139,6 +147,7 @@ export default function DashboardPage() {
                       padding: '12px 0',
                       borderBottom: index < arr.length - 1 ? `1px solid ${c.borderLight}` : 'none',
                       cursor: 'pointer',
+                      flexWrap: isMobile ? 'wrap' : 'nowrap',
                     }}
                   >
                     {/* Icon */}
@@ -190,19 +199,19 @@ export default function DashboardPage() {
         }}
       >
         {/* Header */}
-        <div style={{ padding: '24px', borderBottom: `1px solid ${c.borderLight}` }}>
-          <h2 style={{ fontSize: '18px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>
+        <div style={{ padding: isMobile ? '16px' : '24px', borderBottom: `1px solid ${c.borderLight}` }}>
+          <h2 style={{ fontSize: isMobile ? '16px' : '18px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>
             {t.dashboard.recentActivity}
           </h2>
         </div>
 
         {/* Content */}
-        <div style={{ padding: '24px', position: 'relative' }}>
+        <div style={{ padding: isMobile ? '16px' : '24px', position: 'relative' }}>
           {/* Timeline Line */}
           <div
             style={{
               position: 'absolute',
-              left: '43px',
+              left: isMobile ? '35px' : '43px',
               top: '36px',
               bottom: '36px',
               width: '2px',
@@ -216,15 +225,15 @@ export default function DashboardPage() {
                 key={activity.id}
                 style={{
                   display: 'flex',
-                  gap: '16px',
+                  gap: isMobile ? '12px' : '16px',
                   position: 'relative',
                   padding: '16px 0',
                 }}
               >
                 <div
                   style={{
-                    width: '40px',
-                    height: '40px',
+                    width: isMobile ? '32px' : '40px',
+                    height: isMobile ? '32px' : '40px',
                     borderRadius: '50%',
                     backgroundColor: i === 0 ? c.primary : c.cardBg,
                     border: i === 0 ? 'none' : `2px solid ${c.border}`,
@@ -237,18 +246,18 @@ export default function DashboardPage() {
                 >
                   <div
                     style={{
-                      width: '10px',
-                      height: '10px',
+                      width: isMobile ? '8px' : '10px',
+                      height: isMobile ? '8px' : '10px',
                       borderRadius: '50%',
                       backgroundColor: i === 0 ? 'white' : c.textLight,
                     }}
                   />
                 </div>
-                <div style={{ flex: 1, paddingTop: '8px' }}>
+                <div style={{ flex: 1, paddingTop: isMobile ? '4px' : '8px' }}>
                   <p style={{ fontSize: '14px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>
                     {activity.title}
                   </p>
-                  <p style={{ fontSize: '14px', color: c.textMuted, marginTop: '2px', marginBottom: 0 }}>
+                  <p style={{ fontSize: isMobile ? '13px' : '14px', color: c.textMuted, marginTop: '2px', marginBottom: 0 }}>
                     {activity.description}
                   </p>
                   <p style={{ fontSize: '12px', color: c.textLight, marginTop: '8px', marginBottom: 0 }}>

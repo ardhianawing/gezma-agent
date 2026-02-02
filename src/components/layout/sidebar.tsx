@@ -39,9 +39,10 @@ const menuItems: MenuItem[] = [
 interface SidebarProps {
   isOpen?: boolean;
   onClose?: () => void;
+  isOverlay?: boolean;
 }
 
-export function Sidebar({ isOpen, onClose }: SidebarProps) {
+export function Sidebar({ isOpen, onClose, isOverlay = false }: SidebarProps) {
   const pathname = usePathname();
   const { t } = useLanguage();
   const { theme, c } = useTheme();
@@ -53,10 +54,13 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     return pathname.startsWith(href);
   };
 
+  // Don't render sidebar on overlay mode when closed
+  const shouldShow = isOverlay ? isOpen : true;
+
   return (
     <>
-      {/* Mobile Overlay */}
-      {isOpen && (
+      {/* Mobile/Tablet Overlay */}
+      {isOverlay && isOpen && (
         <div
           style={{
             position: 'fixed',
@@ -79,11 +83,11 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           display: 'flex',
           flexDirection: 'column',
           position: 'fixed',
-          left: 0,
+          left: isOverlay && !isOpen ? '-260px' : 0,
           top: 0,
           zIndex: 50,
-          transform: isOpen ? 'translateX(0)' : undefined,
-          transition: 'transform 0.3s ease, background-color 0.3s ease',
+          transition: 'left 0.3s ease, background-color 0.3s ease',
+          boxShadow: isOverlay && isOpen ? '4px 0 20px rgba(0, 0, 0, 0.15)' : 'none',
         }}
       >
         {/* Logo */}
@@ -96,7 +100,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             justifyContent: 'space-between',
           }}
         >
-          <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '12px' }} onClick={onClose}>
             <Image
               src={theme === 'dark' ? '/logo-dark.png' : '/logo-light.png'}
               alt="Gezma Logo"
@@ -113,20 +117,24 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             </span>
           </Link>
 
-          {/* Close button for mobile */}
-          <button
-            onClick={onClose}
-            style={{
-              padding: '8px',
-              borderRadius: '8px',
-              border: 'none',
-              backgroundColor: 'transparent',
-              cursor: 'pointer',
-              display: 'none',
-            }}
-          >
-            <X style={{ width: '20px', height: '20px', color: c.textMuted }} />
-          </button>
+          {/* Close button for mobile/tablet */}
+          {isOverlay && (
+            <button
+              onClick={onClose}
+              style={{
+                padding: '8px',
+                borderRadius: '8px',
+                border: 'none',
+                backgroundColor: 'transparent',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <X style={{ width: '20px', height: '20px', color: c.textMuted }} />
+            </button>
+          )}
         </div>
 
         {/* Main Menu */}

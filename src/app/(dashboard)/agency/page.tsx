@@ -5,6 +5,7 @@ import { DEFAULT_AGENCY } from '@/data/mock-agencies';
 import { formatDate } from '@/lib/utils';
 import { useTheme } from '@/lib/theme';
 import { useLanguage } from '@/lib/i18n';
+import { useResponsive } from '@/lib/hooks/use-responsive';
 import {
   Building2,
   Mail,
@@ -23,9 +24,14 @@ import {
 export default function AgencyPage() {
   const { c } = useTheme();
   const { t } = useLanguage();
+  const { isMobile, isTablet } = useResponsive();
+
+  // Responsive grid columns
+  const mainGridColumns = isMobile ? '1fr' : isTablet ? 'repeat(2, 1fr)' : '1fr 1fr 1fr';
+  const bankGridColumns = isMobile ? '1fr' : isTablet ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)';
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '16px' : '24px' }}>
       <PageHeader
         title={t.agency.title}
         description={t.agency.description}
@@ -34,6 +40,7 @@ export default function AgencyPage() {
             style={{
               display: 'flex',
               alignItems: 'center',
+              justifyContent: 'center',
               gap: '8px',
               backgroundColor: c.primary,
               color: 'white',
@@ -42,6 +49,7 @@ export default function AgencyPage() {
               border: 'none',
               fontWeight: '500',
               cursor: 'pointer',
+              width: isMobile ? '100%' : 'auto',
             }}
           >
             <Edit2 style={{ width: '20px', height: '20px' }} />
@@ -63,15 +71,15 @@ export default function AgencyPage() {
         <div
           style={{
             background: 'linear-gradient(to right, #111827, #374151)',
-            padding: '24px',
+            padding: isMobile ? '20px' : '24px',
             color: 'white',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+          <div style={{ display: 'flex', alignItems: isMobile ? 'flex-start' : 'center', gap: isMobile ? '16px' : '24px', flexDirection: isMobile ? 'column' : 'row' }}>
             <div
               style={{
-                width: '80px',
-                height: '80px',
+                width: isMobile ? '64px' : '80px',
+                height: isMobile ? '64px' : '80px',
                 borderRadius: '16px',
                 backgroundColor: 'rgba(255, 255, 255, 0.1)',
                 backdropFilter: 'blur(4px)',
@@ -79,13 +87,14 @@ export default function AgencyPage() {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
+                flexShrink: 0,
               }}
             >
-              <Building2 style={{ width: '40px', height: '40px' }} />
+              <Building2 style={{ width: isMobile ? '32px' : '40px', height: isMobile ? '32px' : '40px' }} />
             </div>
             <div style={{ flex: 1 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-                <h2 style={{ fontSize: '24px', fontWeight: '700', margin: 0, color: 'white' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px', flexWrap: 'wrap' }}>
+                <h2 style={{ fontSize: isMobile ? '20px' : '24px', fontWeight: '700', margin: 0, color: 'white' }}>
                   {DEFAULT_AGENCY.name}
                 </h2>
                 {DEFAULT_AGENCY.isVerified && (
@@ -124,7 +133,7 @@ export default function AgencyPage() {
         {/* Address Bar */}
         <div
           style={{
-            padding: '20px 24px',
+            padding: isMobile ? '16px 20px' : '20px 24px',
             backgroundColor: c.cardBgHover,
             display: 'flex',
             alignItems: 'center',
@@ -133,13 +142,13 @@ export default function AgencyPage() {
             color: c.textSecondary,
           }}
         >
-          <MapPin style={{ width: '16px', height: '16px' }} />
-          {DEFAULT_AGENCY.address}, {DEFAULT_AGENCY.city}, {DEFAULT_AGENCY.province}
+          <MapPin style={{ width: '16px', height: '16px', flexShrink: 0 }} />
+          <span style={{ wordBreak: 'break-word' }}>{DEFAULT_AGENCY.address}, {DEFAULT_AGENCY.city}, {DEFAULT_AGENCY.province}</span>
         </div>
       </div>
 
       {/* 3-Column Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '24px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: mainGridColumns, gap: isMobile ? '16px' : '24px' }}>
         {/* PPIU License */}
         <div
           style={{
@@ -149,13 +158,13 @@ export default function AgencyPage() {
             overflow: 'hidden',
           }}
         >
-          <div style={{ padding: '20px', borderBottom: `1px solid ${c.borderLight}` }}>
+          <div style={{ padding: isMobile ? '16px' : '20px', borderBottom: `1px solid ${c.borderLight}` }}>
             <h3 style={{ fontSize: '14px', fontWeight: '600', color: c.textPrimary, margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Shield style={{ width: '16px', height: '16px', color: c.success }} />
               {t.agency.ppiuLicense}
             </h3>
           </div>
-          <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div style={{ padding: isMobile ? '16px' : '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
             {/* License Badge */}
             <div
               style={{
@@ -177,14 +186,14 @@ export default function AgencyPage() {
               >
                 {DEFAULT_AGENCY.ppiuStatus}
               </span>
-              <p style={{ fontSize: '18px', fontFamily: 'monospace', fontWeight: '700', color: c.textPrimary, marginTop: '12px', marginBottom: 0 }}>
+              <p style={{ fontSize: '18px', fontFamily: 'monospace', fontWeight: '700', color: c.textPrimary, marginTop: '12px', marginBottom: 0, wordBreak: 'break-all' }}>
                 {DEFAULT_AGENCY.ppiuNumber}
               </p>
             </div>
 
             {/* Dates */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: `1px solid ${c.borderLight}` }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: `1px solid ${c.borderLight}`, flexWrap: 'wrap', gap: '8px' }}>
                 <span style={{ fontSize: '14px', color: c.textMuted, display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <Calendar style={{ width: '16px', height: '16px' }} />
                   {t.agency.issued}
@@ -193,7 +202,7 @@ export default function AgencyPage() {
                   {formatDate(DEFAULT_AGENCY.ppiuIssueDate)}
                 </span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', flexWrap: 'wrap', gap: '8px' }}>
                 <span style={{ fontSize: '14px', color: c.textMuted, display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <Calendar style={{ width: '16px', height: '16px' }} />
                   {t.agency.expires}
@@ -215,13 +224,13 @@ export default function AgencyPage() {
             overflow: 'hidden',
           }}
         >
-          <div style={{ padding: '20px', borderBottom: `1px solid ${c.borderLight}` }}>
+          <div style={{ padding: isMobile ? '16px' : '20px', borderBottom: `1px solid ${c.borderLight}` }}>
             <h3 style={{ fontSize: '14px', fontWeight: '600', color: c.textPrimary, margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Users style={{ width: '16px', height: '16px', color: c.info }} />
               {t.agency.contactPersons}
             </h3>
           </div>
-          <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div style={{ padding: isMobile ? '16px' : '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
             {DEFAULT_AGENCY.contactPersons.map((contact) => (
               <div
                 key={contact.id}
@@ -232,7 +241,7 @@ export default function AgencyPage() {
                   border: contact.isPrimary ? `1px solid rgba(37, 99, 235, 0.2)` : `1px solid ${c.border}`,
                 }}
               >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px', flexWrap: 'wrap', gap: '8px' }}>
                   <div>
                     <p style={{ fontSize: '14px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>{contact.name}</p>
                     <p style={{ fontSize: '12px', color: c.textMuted, margin: '2px 0 0 0' }}>{contact.position}</p>
@@ -254,12 +263,12 @@ export default function AgencyPage() {
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '14px', color: c.textSecondary }}>
                   <p style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
-                    <Phone style={{ width: '14px', height: '14px' }} />
-                    {contact.phone}
+                    <Phone style={{ width: '14px', height: '14px', flexShrink: 0 }} />
+                    <span style={{ wordBreak: 'break-all' }}>{contact.phone}</span>
                   </p>
                   <p style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
-                    <Mail style={{ width: '14px', height: '14px' }} />
-                    {contact.email}
+                    <Mail style={{ width: '14px', height: '14px', flexShrink: 0 }} />
+                    <span style={{ wordBreak: 'break-all' }}>{contact.email}</span>
                   </p>
                 </div>
               </div>
@@ -276,17 +285,17 @@ export default function AgencyPage() {
             overflow: 'hidden',
           }}
         >
-          <div style={{ padding: '20px', borderBottom: `1px solid ${c.borderLight}` }}>
+          <div style={{ padding: isMobile ? '16px' : '20px', borderBottom: `1px solid ${c.borderLight}` }}>
             <h3 style={{ fontSize: '14px', fontWeight: '600', color: c.textPrimary, margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
               <QrCode style={{ width: '16px', height: '16px', color: c.textMuted }} />
               {t.agency.verification}
             </h3>
           </div>
-          <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div style={{ padding: isMobile ? '16px' : '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
             {/* QR Code */}
             <div
               style={{
-                padding: '24px',
+                padding: isMobile ? '20px' : '24px',
                 backgroundColor: c.cardBg,
                 borderRadius: '12px',
                 border: `2px dashed ${c.border}`,
@@ -297,17 +306,19 @@ export default function AgencyPage() {
               <div style={{ textAlign: 'center' }}>
                 <div
                   style={{
-                    width: '112px',
-                    height: '112px',
+                    width: isMobile ? '96px' : '112px',
+                    height: isMobile ? '96px' : '112px',
                     backgroundColor: '#111827',
                     borderRadius: '12px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     marginBottom: '12px',
+                    marginLeft: 'auto',
+                    marginRight: 'auto',
                   }}
                 >
-                  <QrCode style={{ width: '80px', height: '80px', color: 'white' }} />
+                  <QrCode style={{ width: isMobile ? '64px' : '80px', height: isMobile ? '64px' : '80px', color: 'white' }} />
                 </div>
                 <p style={{ fontSize: '12px', color: c.textMuted, margin: 0 }}>{t.agency.scanToVerify}</p>
               </div>
@@ -374,14 +385,14 @@ export default function AgencyPage() {
           overflow: 'hidden',
         }}
       >
-        <div style={{ padding: '20px', borderBottom: `1px solid ${c.borderLight}` }}>
+        <div style={{ padding: isMobile ? '16px' : '20px', borderBottom: `1px solid ${c.borderLight}` }}>
           <h3 style={{ fontSize: '14px', fontWeight: '600', color: c.textPrimary, margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
             <CreditCard style={{ width: '16px', height: '16px', color: c.warning }} />
             {t.agency.bankAccounts}
           </h3>
         </div>
-        <div style={{ padding: '20px' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
+        <div style={{ padding: isMobile ? '16px' : '20px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: bankGridColumns, gap: '16px' }}>
             {DEFAULT_AGENCY.bankAccounts.map((bank) => (
               <div
                 key={bank.id}
@@ -402,6 +413,7 @@ export default function AgencyPage() {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
+                      flexShrink: 0,
                     }}
                   >
                     <CreditCard style={{ width: '20px', height: '20px', color: bank.isPrimary ? c.warning : c.textMuted }} />
@@ -427,7 +439,7 @@ export default function AgencyPage() {
                   </div>
                 </div>
                 <div>
-                  <p style={{ fontSize: '18px', fontFamily: 'monospace', fontWeight: '700', color: c.textPrimary, margin: 0 }}>
+                  <p style={{ fontSize: isMobile ? '16px' : '18px', fontFamily: 'monospace', fontWeight: '700', color: c.textPrimary, margin: 0, wordBreak: 'break-all' }}>
                     {bank.accountNumber}
                   </p>
                   <p style={{ fontSize: '14px', color: c.textSecondary, marginTop: '4px', marginBottom: 0 }}>

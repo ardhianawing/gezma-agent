@@ -1,28 +1,34 @@
 'use client';
 
 import Link from 'next/link';
-import { Plus, Star, Plane, Clock, Users, ArrowRight } from 'lucide-react';
+import { Plus, Star, Plane, Clock, ArrowRight } from 'lucide-react';
 import { PageHeader } from '@/components/layout/page-header';
 import { mockPackages } from '@/data/mock-packages';
 import { formatCurrency } from '@/lib/utils';
 import { useTheme } from '@/lib/theme';
 import { useLanguage } from '@/lib/i18n';
+import { useResponsive } from '@/lib/hooks/use-responsive';
 
 export default function PackagesPage() {
   const { c } = useTheme();
   const { t } = useLanguage();
+  const { isMobile, isTablet } = useResponsive();
+
+  // Responsive grid columns
+  const gridColumns = isMobile ? '1fr' : isTablet ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)';
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '16px' : '24px' }}>
       <PageHeader
         title={t.packages.title}
         description={t.packages.description}
         actions={
-          <Link href="/packages/new">
+          <Link href="/packages/new" style={{ width: isMobile ? '100%' : 'auto', display: 'block' }}>
             <button
               style={{
                 display: 'flex',
                 alignItems: 'center',
+                justifyContent: 'center',
                 gap: '8px',
                 backgroundColor: c.primary,
                 color: 'white',
@@ -32,6 +38,7 @@ export default function PackagesPage() {
                 fontWeight: '500',
                 cursor: 'pointer',
                 transition: 'background-color 0.2s',
+                width: isMobile ? '100%' : 'auto',
               }}
             >
               <Plus style={{ width: '20px', height: '20px' }} />
@@ -44,8 +51,8 @@ export default function PackagesPage() {
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(3, 1fr)',
-          gap: '20px',
+          gridTemplateColumns: gridColumns,
+          gap: isMobile ? '16px' : '20px',
         }}
       >
         {mockPackages.map((pkg) => (
@@ -66,7 +73,7 @@ export default function PackagesPage() {
               {/* Header with gradient */}
               <div
                 style={{
-                  padding: '20px',
+                  padding: isMobile ? '16px' : '20px',
                   paddingBottom: '16px',
                   background: `linear-gradient(to bottom right, ${c.cardBgHover}, ${c.cardBg})`,
                   borderBottom: `1px solid ${c.borderLight}`,
@@ -137,7 +144,7 @@ export default function PackagesPage() {
               {/* Features */}
               <div
                 style={{
-                  padding: '20px',
+                  padding: isMobile ? '16px' : '20px',
                   display: 'flex',
                   flexDirection: 'column',
                   gap: '12px',
@@ -155,6 +162,7 @@ export default function PackagesPage() {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
+                      flexShrink: 0,
                     }}
                   >
                     <Clock style={{ width: '16px', height: '16px', color: c.info }} />
@@ -178,6 +186,7 @@ export default function PackagesPage() {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
+                      flexShrink: 0,
                     }}
                   >
                     <Plane style={{ width: '16px', height: '16px', color: c.success }} />
@@ -201,6 +210,7 @@ export default function PackagesPage() {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
+                      flexShrink: 0,
                     }}
                   >
                     <Star style={{ width: '16px', height: '16px', color: c.warning }} />
@@ -227,7 +237,7 @@ export default function PackagesPage() {
               {/* Footer with price */}
               <div
                 style={{
-                  padding: '20px',
+                  padding: isMobile ? '16px' : '20px',
                   paddingTop: '16px',
                   borderTop: `1px solid ${c.borderLight}`,
                   backgroundColor: c.cardBgHover,
@@ -237,8 +247,10 @@ export default function PackagesPage() {
                 <div
                   style={{
                     display: 'flex',
-                    alignItems: 'flex-end',
+                    alignItems: isMobile ? 'flex-start' : 'flex-end',
                     justifyContent: 'space-between',
+                    flexDirection: isMobile ? 'column' : 'row',
+                    gap: isMobile ? '12px' : '0',
                   }}
                 >
                   <div>
@@ -272,6 +284,7 @@ export default function PackagesPage() {
                     style={{
                       display: 'flex',
                       alignItems: 'center',
+                      justifyContent: 'center',
                       gap: '4px',
                       padding: '8px 12px',
                       fontSize: '14px',
@@ -281,6 +294,7 @@ export default function PackagesPage() {
                       border: `1px solid ${c.border}`,
                       borderRadius: '6px',
                       cursor: 'pointer',
+                      width: isMobile ? '100%' : 'auto',
                     }}
                   >
                     {t.packages.viewDetails}

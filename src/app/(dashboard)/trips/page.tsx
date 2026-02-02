@@ -8,22 +8,28 @@ import { mockTrips } from '@/data/mock-trips';
 import { formatShortDate } from '@/lib/utils';
 import { useTheme } from '@/lib/theme';
 import { useLanguage } from '@/lib/i18n';
+import { useResponsive } from '@/lib/hooks/use-responsive';
 
 export default function TripsPage() {
   const { c } = useTheme();
   const { t } = useLanguage();
+  const { isMobile, isTablet } = useResponsive();
+
+  // Responsive grid columns
+  const gridColumns = isMobile ? '1fr' : isTablet ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)';
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '16px' : '24px' }}>
       <PageHeader
         title={t.trips.title}
         description={t.trips.description}
         actions={
-          <Link href="/trips/new">
+          <Link href="/trips/new" style={{ width: isMobile ? '100%' : 'auto', display: 'block' }}>
             <button
               style={{
                 display: 'flex',
                 alignItems: 'center',
+                justifyContent: 'center',
                 gap: '8px',
                 backgroundColor: c.primary,
                 color: 'white',
@@ -33,6 +39,7 @@ export default function TripsPage() {
                 fontWeight: '500',
                 cursor: 'pointer',
                 transition: 'background-color 0.2s',
+                width: isMobile ? '100%' : 'auto',
               }}
             >
               <Plus style={{ width: '20px', height: '20px' }} />
@@ -45,7 +52,7 @@ export default function TripsPage() {
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(3, 1fr)',
+          gridTemplateColumns: gridColumns,
           gap: '16px',
         }}
       >
@@ -60,7 +67,7 @@ export default function TripsPage() {
                   backgroundColor: c.cardBg,
                   borderRadius: '12px',
                   border: `1px solid ${c.border}`,
-                  padding: '20px',
+                  padding: isMobile ? '16px' : '20px',
                   cursor: 'pointer',
                   transition: 'all 0.2s',
                   height: '100%',
@@ -75,9 +82,11 @@ export default function TripsPage() {
                     alignItems: 'flex-start',
                     justifyContent: 'space-between',
                     marginBottom: '16px',
+                    flexWrap: 'wrap',
+                    gap: '12px',
                   }}
                 >
-                  <div style={{ display: 'flex', gap: '12px' }}>
+                  <div style={{ display: 'flex', gap: '12px', flex: 1, minWidth: 0 }}>
                     <div
                       style={{
                         width: '40px',
@@ -92,7 +101,7 @@ export default function TripsPage() {
                     >
                       <Plane style={{ width: '20px', height: '20px', color: c.primary }} />
                     </div>
-                    <div>
+                    <div style={{ minWidth: 0 }}>
                       <h3
                         style={{
                           fontWeight: '700',

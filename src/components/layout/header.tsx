@@ -5,21 +5,24 @@ import { LanguageToggle } from '@/components/shared/language-toggle';
 import { ThemeToggle } from '@/components/shared/theme-toggle';
 import { useLanguage } from '@/lib/i18n';
 import { useTheme } from '@/lib/theme';
+import { useResponsive } from '@/lib/hooks/use-responsive';
 
 interface HeaderProps {
   onMenuClick?: () => void;
+  showMenuButton?: boolean;
 }
 
-export function Header({ onMenuClick }: HeaderProps) {
+export function Header({ onMenuClick, showMenuButton = false }: HeaderProps) {
   const { t } = useLanguage();
   const { c } = useTheme();
+  const { isMobile } = useResponsive();
 
   return (
     <header
       style={{
         position: 'sticky',
         top: 0,
-        zIndex: 50,
+        zIndex: 30,
         width: '100%',
         backgroundColor: c.headerBg,
         backdropFilter: 'blur(8px)',
@@ -30,70 +33,96 @@ export function Header({ onMenuClick }: HeaderProps) {
       <div
         style={{
           display: 'flex',
-          height: '72px',
+          height: isMobile ? '64px' : '72px',
           alignItems: 'center',
           justifyContent: 'space-between',
-          padding: '0 32px',
+          padding: isMobile ? '0 16px' : '0 32px',
+          gap: '12px',
         }}
       >
-        {/* Left side - Menu button (mobile) + Search */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flex: 1 }}>
-          {/* Mobile menu button - hidden on desktop */}
-          <button
-            onClick={onMenuClick}
-            style={{
-              padding: '10px',
-              borderRadius: '12px',
-              border: 'none',
-              backgroundColor: 'transparent',
-              cursor: 'pointer',
-              display: 'none',
-            }}
-          >
-            <Menu style={{ width: '20px', height: '20px', color: c.textMuted }} />
-          </button>
-
-          {/* Search */}
-          <div style={{ position: 'relative', width: '100%', maxWidth: '400px' }}>
-            <Search
+        {/* Left side - Menu button + Search */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1, minWidth: 0 }}>
+          {/* Mobile menu button */}
+          {showMenuButton && (
+            <button
+              onClick={onMenuClick}
               style={{
-                position: 'absolute',
-                left: '16px',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                width: '20px',
-                height: '20px',
-                color: c.textLight,
-                pointerEvents: 'none',
-              }}
-            />
-            <input
-              type="search"
-              placeholder={t.header.searchPlaceholder}
-              style={{
-                width: '100%',
-                height: '48px',
-                paddingLeft: '48px',
-                paddingRight: '16px',
+                padding: '10px',
                 borderRadius: '12px',
-                border: `1px solid ${c.border}`,
-                backgroundColor: c.inputBg,
-                fontSize: '14px',
-                color: c.textPrimary,
-                outline: 'none',
-                transition: 'all 0.2s ease',
+                border: 'none',
+                backgroundColor: c.cardBgHover,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
               }}
-            />
-          </div>
+            >
+              <Menu style={{ width: '20px', height: '20px', color: c.textMuted }} />
+            </button>
+          )}
+
+          {/* Search - hide on mobile */}
+          {!isMobile && (
+            <div style={{ position: 'relative', width: '100%', maxWidth: '400px' }}>
+              <Search
+                style={{
+                  position: 'absolute',
+                  left: '16px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  width: '20px',
+                  height: '20px',
+                  color: c.textLight,
+                  pointerEvents: 'none',
+                }}
+              />
+              <input
+                type="search"
+                placeholder={t.header.searchPlaceholder}
+                style={{
+                  width: '100%',
+                  height: '48px',
+                  paddingLeft: '48px',
+                  paddingRight: '16px',
+                  borderRadius: '12px',
+                  border: `1px solid ${c.border}`,
+                  backgroundColor: c.inputBg,
+                  fontSize: '14px',
+                  color: c.textPrimary,
+                  outline: 'none',
+                  transition: 'all 0.2s ease',
+                }}
+              />
+            </div>
+          )}
+
+          {/* Mobile search icon */}
+          {isMobile && (
+            <button
+              style={{
+                padding: '10px',
+                borderRadius: '12px',
+                border: 'none',
+                backgroundColor: 'transparent',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Search style={{ width: '20px', height: '20px', color: c.textMuted }} />
+            </button>
+          )}
         </div>
 
         {/* Right side - Theme Toggle + Language Toggle + Notifications + User */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '8px' : '12px', flexShrink: 0 }}>
           {/* Theme Toggle */}
           <ThemeToggle />
 
-          {/* Language Toggle */}
-          <LanguageToggle />
+          {/* Language Toggle - compact on mobile */}
+          {!isMobile && <LanguageToggle />}
 
           {/* Notifications */}
           <button
@@ -122,23 +151,25 @@ export function Header({ onMenuClick }: HeaderProps) {
             />
           </button>
 
-          {/* Divider */}
-          <div
-            style={{
-              height: '32px',
-              width: '1px',
-              backgroundColor: c.border,
-              margin: '0 8px',
-            }}
-          />
+          {/* Divider - hide on mobile */}
+          {!isMobile && (
+            <div
+              style={{
+                height: '32px',
+                width: '1px',
+                backgroundColor: c.border,
+                margin: '0 8px',
+              }}
+            />
+          )}
 
-          {/* User Menu */}
+          {/* User Menu - simplified on mobile */}
           <button
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '12px',
-              padding: '8px 12px',
+              gap: isMobile ? '0' : '12px',
+              padding: isMobile ? '4px' : '8px 12px',
               borderRadius: '12px',
               border: 'none',
               backgroundColor: 'transparent',
@@ -148,26 +179,31 @@ export function Header({ onMenuClick }: HeaderProps) {
           >
             <div
               style={{
-                width: '40px',
-                height: '40px',
+                width: isMobile ? '36px' : '40px',
+                height: isMobile ? '36px' : '40px',
                 borderRadius: '12px',
                 background: 'linear-gradient(135deg, #1F2937 0%, #374151 100%)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
+                flexShrink: 0,
               }}
             >
-              <span style={{ fontSize: '14px', fontWeight: '700', color: 'white' }}>AD</span>
+              <span style={{ fontSize: isMobile ? '12px' : '14px', fontWeight: '700', color: 'white' }}>AD</span>
             </div>
-            <div style={{ textAlign: 'left' }}>
-              <p style={{ fontSize: '14px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>
-                Admin
-              </p>
-              <p style={{ fontSize: '12px', color: c.textMuted, margin: 0 }}>
-                Barokah Travel
-              </p>
-            </div>
-            <ChevronDown style={{ width: '16px', height: '16px', color: c.textLight }} />
+            {!isMobile && (
+              <>
+                <div style={{ textAlign: 'left' }}>
+                  <p style={{ fontSize: '14px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>
+                    Admin
+                  </p>
+                  <p style={{ fontSize: '12px', color: c.textMuted, margin: 0 }}>
+                    Barokah Travel
+                  </p>
+                </div>
+                <ChevronDown style={{ width: '16px', height: '16px', color: c.textLight }} />
+              </>
+            )}
           </button>
         </div>
       </div>

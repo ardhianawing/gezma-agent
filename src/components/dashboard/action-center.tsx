@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { AlertCircle, FileX, ClipboardX, AlertTriangle } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n';
 import { useTheme } from '@/lib/theme';
+import { useResponsive } from '@/lib/hooks/use-responsive';
 
 interface Alert {
   id: string;
@@ -53,6 +54,7 @@ const iconMap = {
 export function ActionCenter() {
   const { t } = useLanguage();
   const { c } = useTheme();
+  const { isMobile } = useResponsive();
 
   const priorityColors = {
     critical: c.error,
@@ -101,18 +103,20 @@ export function ActionCenter() {
       {/* Header */}
       <div
         style={{
-          padding: '24px',
+          padding: isMobile ? '16px' : '24px',
           borderBottom: `1px solid ${c.borderLight}`,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '12px',
         }}
       >
         <div>
-          <h2 style={{ fontSize: '18px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>
+          <h2 style={{ fontSize: isMobile ? '16px' : '18px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>
             {t.dashboard.actionCenter}
           </h2>
-          <p style={{ fontSize: '14px', color: c.textMuted, marginTop: '4px', marginBottom: 0 }}>
+          <p style={{ fontSize: '14px', color: c.textMuted, marginTop: '4px', marginBottom: 0, display: isMobile ? 'none' : 'block' }}>
             {t.dashboard.actionCenterDesc}
           </p>
         </div>
@@ -128,6 +132,7 @@ export function ActionCenter() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
+            flexShrink: 0,
           }}
         >
           {mockAlerts.length}
@@ -135,7 +140,7 @@ export function ActionCenter() {
       </div>
 
       {/* Content */}
-      <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+      <div style={{ padding: isMobile ? '16px' : '24px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
         {mockAlerts.length === 0 ? (
           <p style={{ textAlign: 'center', fontSize: '14px', color: c.textMuted, padding: '24px 0' }}>
             All caught up! No actions required.
@@ -149,8 +154,8 @@ export function ActionCenter() {
                   style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '16px',
-                    padding: '16px',
+                    gap: isMobile ? '12px' : '16px',
+                    padding: isMobile ? '12px' : '16px',
                     backgroundColor: c.cardBg,
                     borderRadius: '8px',
                     border: `1px solid ${c.border}`,
@@ -162,8 +167,8 @@ export function ActionCenter() {
                   {/* Icon */}
                   <div
                     style={{
-                      width: '40px',
-                      height: '40px',
+                      width: isMobile ? '36px' : '40px',
+                      height: isMobile ? '36px' : '40px',
                       borderRadius: '8px',
                       backgroundColor: priorityBgColors[alert.priority],
                       display: 'flex',
@@ -172,7 +177,7 @@ export function ActionCenter() {
                       flexShrink: 0,
                     }}
                   >
-                    <Icon style={{ width: '20px', height: '20px', color: priorityColors[alert.priority] }} />
+                    <Icon style={{ width: isMobile ? '18px' : '20px', height: isMobile ? '18px' : '20px', color: priorityColors[alert.priority] }} />
                   </div>
 
                   {/* Content */}
@@ -180,7 +185,7 @@ export function ActionCenter() {
                     <p style={{ fontSize: '14px', fontWeight: '500', color: c.textPrimary, margin: 0 }}>
                       {getAlertTitle(alert)}
                     </p>
-                    <p style={{ fontSize: '13px', color: c.textMuted, margin: '2px 0 0 0' }}>
+                    <p style={{ fontSize: '13px', color: c.textMuted, margin: '2px 0 0 0', whiteSpace: isMobile ? 'normal' : 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                       {getAlertDescription(alert)}
                     </p>
                   </div>

@@ -6,18 +6,20 @@ import { StatusBadge } from '@/components/shared/status-badge';
 import { mockPilgrims } from '@/data/mock-pilgrims';
 import { useLanguage } from '@/lib/i18n';
 import { useTheme } from '@/lib/theme';
+import { useResponsive } from '@/lib/hooks/use-responsive';
 
 export default function PilgrimsPage() {
   const { t } = useLanguage();
   const { c } = useTheme();
+  const { isMobile, isTablet } = useResponsive();
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '16px' : '24px' }}>
 
       {/* ==================== HEADER ==================== */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
+      <div style={{ display: 'flex', alignItems: isMobile ? 'stretch' : 'flex-start', justifyContent: 'space-between', flexDirection: isMobile ? 'column' : 'row', gap: '16px' }}>
         <div>
-          <h1 style={{ fontSize: '28px', fontWeight: '700', color: c.textPrimary, margin: 0 }}>
+          <h1 style={{ fontSize: isMobile ? '24px' : '28px', fontWeight: '700', color: c.textPrimary, margin: 0 }}>
             {t.pilgrims.title}
           </h1>
           <p style={{ fontSize: '14px', color: c.textMuted, marginTop: '4px' }}>
@@ -26,11 +28,12 @@ export default function PilgrimsPage() {
         </div>
 
         {/* Button Add Pilgrim */}
-        <Link href="/pilgrims/new">
+        <Link href="/pilgrims/new" style={{ textDecoration: 'none' }}>
           <button
             style={{
               display: 'inline-flex',
               alignItems: 'center',
+              justifyContent: 'center',
               gap: '10px',
               backgroundColor: c.primary,
               color: 'white',
@@ -40,6 +43,7 @@ export default function PilgrimsPage() {
               borderRadius: '8px',
               border: 'none',
               cursor: 'pointer',
+              width: isMobile ? '100%' : 'auto',
             }}
           >
             <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
@@ -51,9 +55,9 @@ export default function PilgrimsPage() {
       </div>
 
       {/* ==================== SEARCH & FILTER ==================== */}
-      <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: '12px', flexDirection: isMobile ? 'column' : 'row' }}>
         {/* Search Input */}
-        <div style={{ position: 'relative', flex: 1, minWidth: '280px' }}>
+        <div style={{ position: 'relative', flex: 1 }}>
           <div
             style={{
               position: 'absolute',
@@ -93,6 +97,7 @@ export default function PilgrimsPage() {
           style={{
             display: 'inline-flex',
             alignItems: 'center',
+            justifyContent: 'center',
             gap: '8px',
             height: '44px',
             padding: '0 20px',
@@ -103,6 +108,7 @@ export default function PilgrimsPage() {
             border: `1px solid ${c.border}`,
             borderRadius: '8px',
             cursor: 'pointer',
+            width: isMobile ? '100%' : 'auto',
           }}
         >
           <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
@@ -121,23 +127,23 @@ export default function PilgrimsPage() {
           overflow: 'hidden'
         }}
       >
-        <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: isMobile ? '600px' : 'auto' }}>
             <thead>
               <tr style={{ backgroundColor: c.cardBgHover, borderBottom: `1px solid ${c.border}` }}>
-                <th style={{ textAlign: 'left', padding: '16px 24px', fontSize: '12px', fontWeight: '600', color: c.textSecondary, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                <th style={{ textAlign: 'left', padding: isMobile ? '12px 16px' : '16px 24px', fontSize: '12px', fontWeight: '600', color: c.textSecondary, textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>
                   {t.pilgrims.tableHeaders.pilgrim}
                 </th>
-                <th style={{ textAlign: 'left', padding: '16px', fontSize: '12px', fontWeight: '600', color: c.textSecondary, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                <th style={{ textAlign: 'left', padding: isMobile ? '12px' : '16px', fontSize: '12px', fontWeight: '600', color: c.textSecondary, textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>
                   {t.pilgrims.tableHeaders.contact}
                 </th>
-                <th style={{ textAlign: 'left', padding: '16px', fontSize: '12px', fontWeight: '600', color: c.textSecondary, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                <th style={{ textAlign: 'left', padding: isMobile ? '12px' : '16px', fontSize: '12px', fontWeight: '600', color: c.textSecondary, textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>
                   {t.pilgrims.tableHeaders.status}
                 </th>
-                <th style={{ textAlign: 'left', padding: '16px', fontSize: '12px', fontWeight: '600', color: c.textSecondary, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                <th style={{ textAlign: 'left', padding: isMobile ? '12px' : '16px', fontSize: '12px', fontWeight: '600', color: c.textSecondary, textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>
                   {t.pilgrims.tableHeaders.documents}
                 </th>
-                <th style={{ textAlign: 'left', padding: '16px 24px', fontSize: '12px', fontWeight: '600', color: c.textSecondary, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                <th style={{ textAlign: 'left', padding: isMobile ? '12px 16px' : '16px 24px', fontSize: '12px', fontWeight: '600', color: c.textSecondary, textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>
                   {t.pilgrims.tableHeaders.actions}
                 </th>
               </tr>
@@ -151,7 +157,7 @@ export default function PilgrimsPage() {
                   }}
                 >
                   {/* Pilgrim */}
-                  <td style={{ padding: '16px 24px' }}>
+                  <td style={{ padding: isMobile ? '12px 16px' : '16px 24px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                       <div
                         style={{
@@ -171,7 +177,7 @@ export default function PilgrimsPage() {
                         {pilgrim.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
                       </div>
                       <div>
-                        <p style={{ margin: 0, fontSize: '14px', fontWeight: '500', color: c.textPrimary }}>
+                        <p style={{ margin: 0, fontSize: '14px', fontWeight: '500', color: c.textPrimary, whiteSpace: 'nowrap' }}>
                           {pilgrim.name}
                         </p>
                         <p style={{ margin: 0, fontSize: '12px', color: c.textMuted }}>
@@ -182,8 +188,8 @@ export default function PilgrimsPage() {
                   </td>
 
                   {/* Contact */}
-                  <td style={{ padding: '16px' }}>
-                    <p style={{ margin: 0, fontSize: '14px', color: c.textPrimary }}>
+                  <td style={{ padding: isMobile ? '12px' : '16px' }}>
+                    <p style={{ margin: 0, fontSize: '14px', color: c.textPrimary, whiteSpace: 'nowrap' }}>
                       {pilgrim.email}
                     </p>
                     <p style={{ margin: 0, fontSize: '12px', color: c.textMuted }}>
@@ -192,12 +198,12 @@ export default function PilgrimsPage() {
                   </td>
 
                   {/* Status */}
-                  <td style={{ padding: '16px' }}>
+                  <td style={{ padding: isMobile ? '12px' : '16px' }}>
                     <StatusBadge status={pilgrim.status} size="sm" />
                   </td>
 
                   {/* Documents */}
-                  <td style={{ padding: '16px' }}>
+                  <td style={{ padding: isMobile ? '12px' : '16px' }}>
                     {(() => {
                       const completed = pilgrim.documents.filter(d => d.status === 'verified').length;
                       const total = 4;
@@ -214,7 +220,7 @@ export default function PilgrimsPage() {
                               }}
                             />
                           ))}
-                          <span style={{ marginLeft: '8px', fontSize: '12px', color: c.textSecondary }}>
+                          <span style={{ marginLeft: '8px', fontSize: '12px', color: c.textSecondary, whiteSpace: 'nowrap' }}>
                             {completed}/{total}
                           </span>
                         </div>
@@ -223,7 +229,7 @@ export default function PilgrimsPage() {
                   </td>
 
                   {/* Actions */}
-                  <td style={{ padding: '16px 24px' }}>
+                  <td style={{ padding: isMobile ? '12px 16px' : '16px 24px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                       <Link href={`/pilgrims/${pilgrim.id}`}>
                         <button
@@ -280,9 +286,11 @@ export default function PilgrimsPage() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            padding: '16px 24px',
+            padding: isMobile ? '12px 16px' : '16px 24px',
             borderTop: `1px solid ${c.border}`,
-            backgroundColor: c.cardBgHover
+            backgroundColor: c.cardBgHover,
+            flexWrap: 'wrap',
+            gap: '12px',
           }}
         >
           <p style={{ margin: 0, fontSize: '14px', color: c.textSecondary }}>

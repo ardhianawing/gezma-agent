@@ -4,10 +4,12 @@ import Link from 'next/link';
 import { UserPlus, Package, Plane, FileText, Building2, Settings } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n';
 import { useTheme } from '@/lib/theme';
+import { useResponsive } from '@/lib/hooks/use-responsive';
 
 export function QuickActions() {
   const { t } = useLanguage();
   const { c } = useTheme();
+  const { isMobile, isTablet } = useResponsive();
 
   const actions = [
     {
@@ -60,6 +62,9 @@ export function QuickActions() {
     },
   ];
 
+  // Responsive grid columns
+  const gridColumns = isMobile ? '1fr' : isTablet ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)';
+
   return (
     <div
       style={{
@@ -71,19 +76,19 @@ export function QuickActions() {
       }}
     >
       {/* Header */}
-      <div style={{ padding: '24px', borderBottom: `1px solid ${c.borderLight}` }}>
-        <h2 style={{ fontSize: '18px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>
+      <div style={{ padding: isMobile ? '16px' : '24px', borderBottom: `1px solid ${c.borderLight}` }}>
+        <h2 style={{ fontSize: isMobile ? '16px' : '18px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>
           {t.dashboard.quickActions}
         </h2>
       </div>
 
       {/* Content */}
-      <div style={{ padding: '24px' }}>
+      <div style={{ padding: isMobile ? '16px' : '24px' }}>
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
-            gap: '16px',
+            gridTemplateColumns: gridColumns,
+            gap: isMobile ? '12px' : '16px',
           }}
         >
           {actions.map((action) => (
@@ -93,7 +98,7 @@ export function QuickActions() {
                   display: 'flex',
                   alignItems: 'center',
                   gap: '12px',
-                  padding: '16px',
+                  padding: isMobile ? '14px' : '16px',
                   backgroundColor: c.cardBgHover,
                   borderRadius: '8px',
                   border: `1px solid ${c.border}`,
@@ -103,8 +108,8 @@ export function QuickActions() {
               >
                 <div
                   style={{
-                    width: '40px',
-                    height: '40px',
+                    width: isMobile ? '36px' : '40px',
+                    height: isMobile ? '36px' : '40px',
                     borderRadius: '8px',
                     backgroundColor: action.bgColor,
                     display: 'flex',
@@ -113,13 +118,13 @@ export function QuickActions() {
                     flexShrink: 0,
                   }}
                 >
-                  <action.icon style={{ width: '20px', height: '20px', color: action.color }} />
+                  <action.icon style={{ width: isMobile ? '18px' : '20px', height: isMobile ? '18px' : '20px', color: action.color }} />
                 </div>
-                <div>
+                <div style={{ minWidth: 0 }}>
                   <p style={{ fontSize: '14px', fontWeight: '500', color: c.textPrimary, margin: 0 }}>
                     {action.title}
                   </p>
-                  <p style={{ fontSize: '13px', color: c.textMuted, margin: '2px 0 0 0' }}>
+                  <p style={{ fontSize: '13px', color: c.textMuted, margin: '2px 0 0 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     {action.description}
                   </p>
                 </div>

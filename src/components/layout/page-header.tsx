@@ -2,6 +2,7 @@
 
 import { ReactNode } from 'react';
 import { useTheme } from '@/lib/theme';
+import { useResponsive } from '@/lib/hooks/use-responsive';
 
 interface PageHeaderProps {
   title: string;
@@ -11,13 +12,14 @@ interface PageHeaderProps {
 
 export function PageHeader({ title, description, actions }: PageHeaderProps) {
   const { c } = useTheme();
+  const { isMobile } = useResponsive();
 
   return (
     <div
       style={{
         display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
+        flexDirection: isMobile ? 'column' : 'row',
+        alignItems: isMobile ? 'stretch' : 'center',
         justifyContent: 'space-between',
         gap: '16px',
       }}
@@ -25,7 +27,7 @@ export function PageHeader({ title, description, actions }: PageHeaderProps) {
       <div>
         <h1
           style={{
-            fontSize: '28px',
+            fontSize: isMobile ? '24px' : '28px',
             fontWeight: '700',
             color: c.textPrimary,
             margin: 0,
