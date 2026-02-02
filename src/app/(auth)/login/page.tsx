@@ -31,15 +31,15 @@ export default function LoginPage() {
         </div>
 
         <div className="relative z-10">
-          <h1 className="text-4xl font-bold text-white leading-tight mb-4">
+          <h1 className="text-4xl font-bold leading-tight mb-4" style={{ color: '#ffffff' }}>
             Manage your Umrah travel agency with confidence.
           </h1>
-          <p className="text-[var(--gray-400)] text-lg max-w-md">
+          <p className="text-lg max-w-md" style={{ color: 'rgba(255, 255, 255, 0.9)' }}>
             The complete operating system for modern PPIU. Streamline operations, manage pilgrims, and grow your business.
           </p>
         </div>
 
-        <div className="relative z-10 text-sm text-[var(--gray-600)]">
+        <div className="relative z-10 text-sm" style={{ color: 'rgba(255, 255, 255, 0.6)' }}>
           &copy; 2024 GEZMA Technology. All rights reserved.
         </div>
 
