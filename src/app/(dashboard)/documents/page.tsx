@@ -1,161 +1,308 @@
 'use client';
 
 import { PageHeader } from '@/components/layout/page-header';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { FileText, Upload, Download, Eye, Calendar, AlertCircle, CheckCircle2, Clock } from 'lucide-react';
 import { DEFAULT_AGENCY } from '@/data/mock-agencies';
 import { formatDate } from '@/lib/utils';
-
-const getStatusIcon = (status: string) => {
-  switch (status) {
-    case 'valid':
-      return <CheckCircle2 className="h-5 w-5 text-[var(--success)]" />;
-    case 'expiring':
-      return <Clock className="h-5 w-5 text-[var(--warning)]" />;
-    case 'expired':
-      return <AlertCircle className="h-5 w-5 text-[var(--error)]" />;
-    default:
-      return <FileText className="h-5 w-5 text-[var(--gray-500)]" />;
-  }
-};
+import { useTheme } from '@/lib/theme';
+import { useLanguage } from '@/lib/i18n';
 
 export default function DocumentsPage() {
+  const { c } = useTheme();
+  const { t } = useLanguage();
+
+  const statusConfig = {
+    valid: {
+      color: c.success,
+      bgColor: c.successLight,
+      borderColor: `rgba(22, 163, 74, 0.2)`,
+      label: t.documents.valid,
+      Icon: CheckCircle2,
+    },
+    expiring: {
+      color: c.warning,
+      bgColor: c.warningLight,
+      borderColor: `rgba(217, 119, 6, 0.2)`,
+      label: t.documents.expiringSoon,
+      Icon: Clock,
+    },
+    expired: {
+      color: c.error,
+      bgColor: c.errorLight,
+      borderColor: `rgba(220, 38, 38, 0.2)`,
+      label: t.documents.expired,
+      Icon: AlertCircle,
+    },
+  };
+
+  const validCount = DEFAULT_AGENCY.documents.filter(d => d.status === 'valid').length;
+  const expiringCount = DEFAULT_AGENCY.documents.filter(d => d.status === 'expiring').length;
+  const expiredCount = DEFAULT_AGENCY.documents.filter(d => d.status === 'expired').length;
+
   return (
-    <div className="space-y-6">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       <PageHeader
-        title="Agency Documents"
-        description="Manage your agency legal documents and licenses"
+        title={t.documents.title}
+        description={t.documents.description}
         actions={
-          <Button>
-            <Upload className="h-4 w-4" />
-            Upload Document
-          </Button>
+          <button
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              backgroundColor: c.primary,
+              color: 'white',
+              padding: '10px 16px',
+              borderRadius: '8px',
+              border: 'none',
+              fontWeight: '500',
+              cursor: 'pointer',
+            }}
+          >
+            <Upload style={{ width: '20px', height: '20px' }} />
+            <span>{t.documents.uploadDocument}</span>
+          </button>
         }
       />
 
       {/* Stats Cards */}
-      <div className="grid gap-4 sm:grid-cols-3">
-        <Card className="bg-gradient-to-br from-[var(--success-light)] to-white border-[var(--success)]/20">
-          <CardContent className="p-5">
-            <div className="flex items-center gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--success)]/10">
-                <CheckCircle2 className="h-6 w-6 text-[var(--success)]" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-[var(--success)]">
-                  {DEFAULT_AGENCY.documents.filter(d => d.status === 'valid').length}
-                </p>
-                <p className="text-sm text-[var(--gray-600)]">Valid Documents</p>
-              </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
+        {/* Valid Documents */}
+        <div
+          style={{
+            backgroundColor: c.cardBg,
+            background: `linear-gradient(to bottom right, ${c.successLight}, ${c.cardBg})`,
+            borderRadius: '12px',
+            border: `1px solid rgba(22, 163, 74, 0.2)`,
+            padding: '20px',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <div
+              style={{
+                width: '48px',
+                height: '48px',
+                borderRadius: '12px',
+                backgroundColor: 'rgba(22, 163, 74, 0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <CheckCircle2 style={{ width: '24px', height: '24px', color: c.success }} />
             </div>
-          </CardContent>
-        </Card>
+            <div>
+              <p style={{ fontSize: '24px', fontWeight: '700', color: c.success, margin: 0 }}>
+                {validCount}
+              </p>
+              <p style={{ fontSize: '14px', color: c.textSecondary, margin: 0 }}>{t.documents.validDocuments}</p>
+            </div>
+          </div>
+        </div>
 
-        <Card className="bg-gradient-to-br from-[var(--warning-light)] to-white border-[var(--warning)]/20">
-          <CardContent className="p-5">
-            <div className="flex items-center gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--warning)]/10">
-                <Clock className="h-6 w-6 text-[var(--warning)]" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-[var(--warning)]">
-                  {DEFAULT_AGENCY.documents.filter(d => d.status === 'expiring').length}
-                </p>
-                <p className="text-sm text-[var(--gray-600)]">Expiring Soon</p>
-              </div>
+        {/* Expiring Soon */}
+        <div
+          style={{
+            backgroundColor: c.cardBg,
+            background: `linear-gradient(to bottom right, ${c.warningLight}, ${c.cardBg})`,
+            borderRadius: '12px',
+            border: `1px solid rgba(217, 119, 6, 0.2)`,
+            padding: '20px',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <div
+              style={{
+                width: '48px',
+                height: '48px',
+                borderRadius: '12px',
+                backgroundColor: 'rgba(217, 119, 6, 0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Clock style={{ width: '24px', height: '24px', color: c.warning }} />
             </div>
-          </CardContent>
-        </Card>
+            <div>
+              <p style={{ fontSize: '24px', fontWeight: '700', color: c.warning, margin: 0 }}>
+                {expiringCount}
+              </p>
+              <p style={{ fontSize: '14px', color: c.textSecondary, margin: 0 }}>{t.documents.expiringSoon}</p>
+            </div>
+          </div>
+        </div>
 
-        <Card className="bg-gradient-to-br from-[var(--error-light)] to-white border-[var(--error)]/20">
-          <CardContent className="p-5">
-            <div className="flex items-center gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--error)]/10">
-                <AlertCircle className="h-6 w-6 text-[var(--error)]" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-[var(--error)]">
-                  {DEFAULT_AGENCY.documents.filter(d => d.status === 'expired').length}
-                </p>
-                <p className="text-sm text-[var(--gray-600)]">Expired</p>
-              </div>
+        {/* Expired */}
+        <div
+          style={{
+            backgroundColor: c.cardBg,
+            background: `linear-gradient(to bottom right, ${c.errorLight}, ${c.cardBg})`,
+            borderRadius: '12px',
+            border: `1px solid rgba(220, 38, 38, 0.2)`,
+            padding: '20px',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <div
+              style={{
+                width: '48px',
+                height: '48px',
+                borderRadius: '12px',
+                backgroundColor: 'rgba(220, 38, 38, 0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <AlertCircle style={{ width: '24px', height: '24px', color: c.error }} />
             </div>
-          </CardContent>
-        </Card>
+            <div>
+              <p style={{ fontSize: '24px', fontWeight: '700', color: c.error, margin: 0 }}>
+                {expiredCount}
+              </p>
+              <p style={{ fontSize: '14px', color: c.textSecondary, margin: 0 }}>{t.documents.expired}</p>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Documents List */}
-      <Card>
-        <div className="p-5 border-b border-[var(--gray-100)]">
-          <h3 className="text-lg font-semibold text-[var(--charcoal)]">All Documents</h3>
-          <p className="text-sm text-[var(--gray-500)] mt-1">Manage and track your agency's legal documents</p>
+      <div
+        style={{
+          backgroundColor: c.cardBg,
+          borderRadius: '12px',
+          border: `1px solid ${c.border}`,
+          overflow: 'hidden',
+        }}
+      >
+        {/* Header */}
+        <div style={{ padding: '20px', borderBottom: `1px solid ${c.borderLight}` }}>
+          <h3 style={{ fontSize: '18px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>
+            {t.documents.allDocuments}
+          </h3>
+          <p style={{ fontSize: '14px', color: c.textMuted, marginTop: '4px', marginBottom: 0 }}>
+            {t.documents.manageDocuments}
+          </p>
         </div>
-        <CardContent className="p-0">
-          <div className="divide-y divide-[var(--gray-100)]">
-            {DEFAULT_AGENCY.documents.map((doc) => (
+
+        {/* Document Items */}
+        <div>
+          {DEFAULT_AGENCY.documents.map((doc, index) => {
+            const config = statusConfig[doc.status as keyof typeof statusConfig];
+            return (
               <div
                 key={doc.id}
-                className="flex items-center gap-4 p-5 hover:bg-[var(--gray-50)] transition-colors group"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '16px',
+                  padding: '20px',
+                  borderBottom: index < DEFAULT_AGENCY.documents.length - 1 ? `1px solid ${c.borderLight}` : 'none',
+                  transition: 'background-color 0.2s',
+                }}
               >
-                <div className={`flex h-14 w-14 items-center justify-center rounded-xl ${
-                  doc.status === 'valid' ? 'bg-[var(--success-light)]' :
-                  doc.status === 'expiring' ? 'bg-[var(--warning-light)]' :
-                  'bg-[var(--error-light)]'
-                }`}>
-                  <FileText className={`h-7 w-7 ${
-                    doc.status === 'valid' ? 'text-[var(--success)]' :
-                    doc.status === 'expiring' ? 'text-[var(--warning)]' :
-                    'text-[var(--error)]'
-                  }`} />
+                {/* Icon */}
+                <div
+                  style={{
+                    width: '56px',
+                    height: '56px',
+                    borderRadius: '12px',
+                    backgroundColor: config.bgColor,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                  }}
+                >
+                  <FileText style={{ width: '28px', height: '28px', color: config.color }} />
                 </div>
 
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-3 mb-1">
-                    <h4 className="font-semibold text-[var(--charcoal)]">{doc.name}</h4>
-                    <Badge
-                      variant={
-                        doc.status === 'valid' ? 'success' :
-                        doc.status === 'expiring' ? 'warning' : 'error'
-                      }
+                {/* Content */}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '4px' }}>
+                    <h4 style={{ fontSize: '14px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>
+                      {doc.name}
+                    </h4>
+                    <span
+                      style={{
+                        backgroundColor: config.bgColor,
+                        color: config.color,
+                        fontSize: '12px',
+                        fontWeight: '500',
+                        padding: '4px 10px',
+                        borderRadius: '12px',
+                      }}
                     >
-                      {doc.status === 'valid' ? 'Valid' :
-                       doc.status === 'expiring' ? 'Expiring Soon' : 'Expired'}
-                    </Badge>
+                      {config.label}
+                    </span>
                   </div>
                   {doc.number && (
-                    <p className="text-sm font-mono text-[var(--gray-500)] mb-2">{doc.number}</p>
+                    <p
+                      style={{
+                        fontSize: '14px',
+                        fontFamily: 'monospace',
+                        color: c.textMuted,
+                        marginBottom: '8px',
+                      }}
+                    >
+                      {doc.number}
+                    </p>
                   )}
-                  <div className="flex items-center gap-4 text-xs text-[var(--gray-500)]">
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '16px', fontSize: '12px', color: c.textMuted }}>
                     {doc.issueDate && (
-                      <span className="flex items-center gap-1">
-                        <Calendar className="h-3.5 w-3.5" />
-                        Issued: {formatDate(doc.issueDate)}
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <Calendar style={{ width: '14px', height: '14px' }} />
+                        {t.documents.issued}: {formatDate(doc.issueDate)}
                       </span>
                     )}
                     {doc.expiryDate && (
-                      <span className="flex items-center gap-1">
-                        <Clock className="h-3.5 w-3.5" />
-                        Expires: {formatDate(doc.expiryDate)}
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <Clock style={{ width: '14px', height: '14px' }} />
+                        {t.documents.expires}: {formatDate(doc.expiryDate)}
                       </span>
                     )}
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <Button variant="ghost" size="icon" className="h-9 w-9">
-                    <Eye className="h-4 w-4" />
-                  </Button>
-                  <Button variant="ghost" size="icon" className="h-9 w-9">
-                    <Download className="h-4 w-4" />
-                  </Button>
+                {/* Actions */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <button
+                    style={{
+                      width: '36px',
+                      height: '36px',
+                      borderRadius: '8px',
+                      border: 'none',
+                      backgroundColor: 'transparent',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <Eye style={{ width: '16px', height: '16px', color: c.textMuted }} />
+                  </button>
+                  <button
+                    style={{
+                      width: '36px',
+                      height: '36px',
+                      borderRadius: '8px',
+                      border: 'none',
+                      backgroundColor: 'transparent',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <Download style={{ width: '16px', height: '16px', color: c.textMuted }} />
+                  </button>
                 </div>
               </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 }

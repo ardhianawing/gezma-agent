@@ -1,0 +1,207 @@
+export const en = {
+  // Common
+  common: {
+    search: 'Search',
+    save: 'Save',
+    cancel: 'Cancel',
+    delete: 'Delete',
+    edit: 'Edit',
+    view: 'View',
+    add: 'Add',
+    create: 'Create',
+    update: 'Update',
+    back: 'Back',
+    next: 'Next',
+    previous: 'Previous',
+    loading: 'Loading...',
+    noData: 'No data available',
+    actions: 'Actions',
+    status: 'Status',
+    all: 'All',
+    filter: 'Filter',
+    export: 'Export',
+    import: 'Import',
+    download: 'Download',
+    upload: 'Upload',
+    signOut: 'Sign Out',
+    viewAll: 'View All',
+  },
+
+  // Navigation / Sidebar
+  nav: {
+    menu: 'Menu',
+    support: 'Support',
+    dashboard: 'Dashboard',
+    pilgrims: 'Pilgrims',
+    packages: 'Packages',
+    trips: 'Trips',
+    documents: 'Documents',
+    agency: 'Agency',
+    settings: 'Settings',
+    helpCenter: 'Help Center',
+  },
+
+  // Dashboard
+  dashboard: {
+    title: 'Dashboard',
+    description: "Welcome back! Here's what's happening with your agency.",
+    totalPilgrims: 'Total Pilgrims',
+    activeTrips: 'Active Trips',
+    totalRevenue: 'Total Revenue',
+    packages: 'Packages',
+    registeredThisYear: 'Registered this year',
+    inPreparation: 'In preparation',
+    thisMonth: 'This month',
+    availablePackages: 'Available packages',
+    vsLastMonth: 'vs last month',
+    actionCenter: 'Action Center',
+    actionCenterDesc: 'Items requiring your attention',
+    quickActions: 'Quick Actions',
+    upcomingDepartures: 'Upcoming Departures',
+    recentActivity: 'Recent Activity',
+    missingDocuments: 'Missing Documents',
+    pilgrimsIncomplete: 'pilgrims have incomplete documents',
+    incompleteManifest: 'Incomplete Trip Manifest',
+    needsConfirmation: 'needs confirmation',
+    licenseExpiring: 'PPIU License Expiring',
+    licenseExpiresIn: 'License expires in',
+    days: 'days',
+  },
+
+  // Pilgrims
+  pilgrims: {
+    title: 'Pilgrims',
+    description: 'Manage your pilgrims data and track their journey',
+    addPilgrim: 'Add Pilgrim',
+    searchPlaceholder: 'Search by name, email, or phone...',
+    tableHeaders: {
+      pilgrim: 'Pilgrim',
+      contact: 'Contact',
+      status: 'Status',
+      documents: 'Documents',
+      actions: 'Actions',
+    },
+    registerNew: 'Register a new pilgrim',
+    showing: 'Showing',
+    pilgrimsLabel: 'pilgrims',
+  },
+
+  // Packages
+  packages: {
+    title: 'Packages',
+    description: 'Manage your umrah packages and itineraries',
+    createPackage: 'Create Package',
+    duration: 'Duration',
+    airline: 'Airline',
+    hotelRating: 'Hotel Rating',
+    startingFrom: 'Starting from',
+    viewDetails: 'View Details',
+    days: 'Days',
+    buildNew: 'Build a new umrah package',
+  },
+
+  // Trips
+  trips: {
+    title: 'Trips',
+    description: 'Manage departures and trip manifests',
+    createTrip: 'Create Trip',
+    departure: 'Departure',
+    seatAvailability: 'Seat Availability',
+    confirmed: 'Confirmed',
+    left: 'left',
+    scheduleNew: 'Schedule a departure',
+    pax: 'pax',
+  },
+
+  // Documents
+  documents: {
+    title: 'Agency Documents',
+    description: 'Manage your agency legal documents and licenses',
+    uploadDocument: 'Upload Document',
+    validDocuments: 'Valid Documents',
+    expiringSoon: 'Expiring Soon',
+    expired: 'Expired',
+    allDocuments: 'All Documents',
+    allDocumentsDesc: "Manage and track your agency's legal documents",
+    issued: 'Issued',
+    expires: 'Expires',
+    valid: 'Valid',
+    manageAgencyDocs: 'Manage agency docs',
+    manageDocuments: "Manage and track your agency's legal documents",
+  },
+
+  // Agency
+  agency: {
+    title: 'Agency Profile',
+    description: 'View and manage your agency information',
+    editProfile: 'Edit Profile',
+    ppiuLicense: 'PPIU License',
+    contactPersons: 'Contact Persons',
+    verification: 'Verification',
+    bankAccounts: 'Bank Accounts',
+    verificationCode: 'Verification Code',
+    scanToVerify: 'Scan to verify agency',
+    agencyVerified: 'Agency Verified',
+    primary: 'Primary',
+    updateCompanyInfo: 'Update company info',
+    issued: 'Issued',
+    expires: 'Expires',
+    verified: 'Verified',
+  },
+
+  // Settings
+  settings: {
+    title: 'Settings',
+    description: 'Manage your application settings and preferences',
+    general: 'General',
+    generalDesc: 'Basic application settings and preferences',
+    notifications: 'Notifications',
+    notificationsDesc: 'Configure how you receive notifications',
+    security: 'Security',
+    securityDesc: 'Password, 2FA, and security settings',
+    billing: 'Billing',
+    billingDesc: 'Manage subscription and payment methods',
+    team: 'Team',
+    teamDesc: 'Manage team members and permissions',
+    languageRegion: 'Language & Region',
+    languageRegionDesc: 'Set your preferred language and timezone',
+    appearance: 'Appearance',
+    lightMode: 'Light Mode',
+    darkMode: 'Dark Mode',
+    quickNotifications: 'Quick Notifications',
+    emailAlerts: 'Email alerts',
+    pushNotifications: 'Push notifications',
+    storageUsed: 'Storage used',
+    upgradePlan: 'Upgrade Plan',
+    configureSystem: 'Configure system',
+  },
+
+  // Quick Actions
+  quickActions: {
+    addPilgrim: 'Add Pilgrim',
+    createPackage: 'Create Package',
+    newTrip: 'New Trip',
+    documents: 'Documents',
+    agencyProfile: 'Agency Profile',
+    settings: 'Settings',
+  },
+
+  // Status
+  status: {
+    registered: 'Registered',
+    documentsComplete: 'Docs Complete',
+    confirmed: 'Confirmed',
+    cancelled: 'Cancelled',
+    preparing: 'Preparing',
+    ready: 'Ready',
+    departed: 'Departed',
+    completed: 'Completed',
+  },
+
+  // Header
+  header: {
+    searchPlaceholder: 'Search pilgrims, packages, trips...',
+  },
+};
+
+export type Translations = typeof en;

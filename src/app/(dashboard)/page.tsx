@@ -6,157 +6,260 @@ import { PageHeader } from '@/components/layout/page-header';
 import { StatCard } from '@/components/shared/stat-card';
 import { ActionCenter } from '@/components/dashboard/action-center';
 import { QuickActions } from '@/components/dashboard/quick-actions';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { StatusBadge } from '@/components/shared/status-badge';
-import { Button } from '@/components/ui/button';
 import { formatCurrency, formatShortDate } from '@/lib/utils';
 import { mockPilgrims } from '@/data/mock-pilgrims';
 import { mockTrips } from '@/data/mock-trips';
 import { mockActivities } from '@/data/mock-activity';
+import { useLanguage } from '@/lib/i18n';
+import { useTheme } from '@/lib/theme';
 
 export default function DashboardPage() {
+  const { t } = useLanguage();
+  const { c } = useTheme();
+
   // Calculate stats
   const totalPilgrims = mockPilgrims.length;
-  const activeTrips = mockTrips.filter((t) => t.status === 'preparing' || t.status === 'ready').length;
+  const activeTrips = mockTrips.filter((trip) => trip.status === 'preparing' || trip.status === 'ready').length;
   const totalRevenue = mockPilgrims.reduce((sum, p) => sum + p.totalPaid, 0);
 
   return (
-    <div className="flex flex-col gap-8">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
       <PageHeader
-        title="Dashboard"
-        description="Welcome back! Here's what's happening with your agency."
+        title={t.dashboard.title}
+        description={t.dashboard.description}
       />
 
-      {/* Stats - Grid Structure: 4 Equal Columns, Gap 24px */}
-      <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
+      {/* Stat Cards Row - 4 equal columns */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px' }}>
         <StatCard
-          title="Total Pilgrims"
+          title={t.dashboard.totalPilgrims}
           value={totalPilgrims}
-          description="Registered this year"
+          description={t.dashboard.registeredThisYear}
           icon={Users}
-          iconColor="var(--info)"
-          iconBgColor="var(--info-light)"
+          iconColor={c.info}
+          iconBgColor={c.infoLight}
           trend={{ value: 12, isPositive: true }}
+          trendLabel={t.dashboard.vsLastMonth}
           href="/pilgrims"
         />
         <StatCard
-          title="Active Trips"
+          title={t.dashboard.activeTrips}
           value={activeTrips}
-          description="In preparation"
+          description={t.dashboard.inPreparation}
           icon={Plane}
-          iconColor="var(--warning)"
-          iconBgColor="var(--warning-light)"
+          iconColor={c.warning}
+          iconBgColor={c.warningLight}
           href="/trips"
         />
         <StatCard
-          title="Total Revenue"
+          title={t.dashboard.totalRevenue}
           value={formatCurrency(totalRevenue)}
-          description="This month"
+          description={t.dashboard.thisMonth}
           icon={TrendingUp}
-          iconColor="var(--success)"
-          iconBgColor="var(--success-light)"
+          iconColor={c.success}
+          iconBgColor={c.successLight}
           trend={{ value: 8, isPositive: true }}
+          trendLabel={t.dashboard.vsLastMonth}
         />
         <StatCard
-          title="Packages"
+          title={t.dashboard.packages}
           value="6"
-          description="Available packages"
+          description={t.dashboard.availablePackages}
           icon={Package}
-          iconColor="var(--gezma-red)"
-          iconBgColor="var(--gezma-red-light)"
+          iconColor={c.primary}
+          iconBgColor={c.primaryLight}
           href="/packages"
         />
       </div>
 
-      {/* Middle Section: 2:1 Ratio (Action Center : Upcoming), Gap 32px */}
-      <div className="grid gap-8 xl:grid-cols-3 items-start">
-        {/* Action Center - Spans 2 Columns */}
-        <div className="relative z-0 h-full xl:col-span-2">
+      {/* Main Content - 2 columns (2fr : 1fr) */}
+      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px', alignItems: 'start' }}>
+        {/* Left Column */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          {/* Action Center */}
           <ActionCenter />
         </div>
 
-        {/* Upcoming Trips - Spans 1 Column */}
-        <Card className="h-full xl:col-span-1 rounded-xl shadow-sm">
-          <CardHeader className="p-6 pb-6">
-            <CardTitle className="flex items-center gap-2">
-              <Calendar className="h-5 w-5 text-[var(--gray-500)]" />
-              Upcoming Departures
-            </CardTitle>
-            <Link href="/trips">
-              <Button variant="ghost" size="sm" className="text-[var(--gezma-red)]">
-                View All
-                <ArrowRight className="h-4 w-4 ml-1" />
-              </Button>
+        {/* Right Column - Upcoming Departures */}
+        <div
+          style={{
+            backgroundColor: c.cardBg,
+            borderRadius: '12px',
+            border: `1px solid ${c.border}`,
+            overflow: 'hidden',
+            transition: 'background-color 0.3s ease, border-color 0.3s ease',
+          }}
+        >
+          {/* Header */}
+          <div
+            style={{
+              padding: '24px',
+              borderBottom: `1px solid ${c.borderLight}`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Calendar style={{ width: '20px', height: '20px', color: c.textMuted }} />
+              <h2 style={{ fontSize: '18px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>
+                {t.dashboard.upcomingDepartures}
+              </h2>
+            </div>
+            <Link href="/trips" style={{ textDecoration: 'none' }}>
+              <span
+                style={{
+                  fontSize: '14px',
+                  color: c.primary,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  cursor: 'pointer',
+                }}
+              >
+                {t.common.viewAll}
+                <ArrowRight style={{ width: '16px', height: '16px' }} />
+              </span>
             </Link>
-          </CardHeader>
-          <CardContent className="p-6 pt-0 space-y-4">
+          </div>
+
+          {/* Content */}
+          <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '0' }}>
             {mockTrips
-              .filter((t) => t.status === 'preparing' || t.status === 'ready')
+              .filter((trip) => trip.status === 'preparing' || trip.status === 'ready')
               .slice(0, 3)
-              .map((trip) => (
-                <Link key={trip.id} href={`/trips/${trip.id}`}>
-                  <div className="flex items-center justify-between rounded-xl border border-[var(--gray-200)] bg-[var(--gray-50)] p-5 hover:border-[var(--gezma-red)] hover:bg-white transition-all cursor-pointer group">
-                    <div className="flex items-center gap-4">
-                      <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[var(--gezma-red-light)] group-hover:bg-[var(--gezma-red)] transition-colors">
-                        <Plane className="h-5 w-5 text-[var(--gezma-red)] group-hover:text-white transition-colors" />
-                      </div>
-                      <div>
-                        <p className="font-semibold text-sm text-[var(--charcoal)]">{trip.name}</p>
-                        <div className="flex items-center gap-2 mt-1">
-                          <span className="text-xs text-[var(--gray-500)]">
-                            {formatShortDate(trip.departureDate)}
-                          </span>
-                          <span className="text-xs text-[var(--gray-300)]">•</span>
-                          <span className="text-xs text-[var(--gray-500)]">
-                            {trip.registeredCount}/{trip.capacity} pax
-                          </span>
-                        </div>
-                      </div>
+              .map((trip, index, arr) => (
+                <Link key={trip.id} href={`/trips/${trip.id}`} style={{ textDecoration: 'none' }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '12px',
+                      padding: '12px 0',
+                      borderBottom: index < arr.length - 1 ? `1px solid ${c.borderLight}` : 'none',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {/* Icon */}
+                    <div
+                      style={{
+                        width: '40px',
+                        height: '40px',
+                        borderRadius: '50%',
+                        backgroundColor: c.primaryLight,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexShrink: 0,
+                      }}
+                    >
+                      <Plane style={{ width: '20px', height: '20px', color: c.primary }} />
                     </div>
+
+                    {/* Content */}
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p style={{ fontSize: '14px', fontWeight: '500', color: c.textPrimary, margin: 0 }}>
+                        {trip.name}
+                      </p>
+                      <p style={{ fontSize: '13px', color: c.textMuted, margin: '2px 0 0 0' }}>
+                        {formatShortDate(trip.departureDate)} • {trip.registeredCount}/{trip.capacity} pax
+                      </p>
+                    </div>
+
+                    {/* Status */}
                     <StatusBadge status={trip.status} size="sm" />
                   </div>
                 </Link>
               ))}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
 
       {/* Quick Actions */}
       <QuickActions />
 
       {/* Recent Activity */}
-      <Card className="rounded-xl shadow-sm">
-        <CardHeader className="p-6 pb-6">
-          <CardTitle className="text-xl font-bold">Recent Activity</CardTitle>
-        </CardHeader>
-        <CardContent className="p-6 pt-0">
-          <div className="space-y-0 relative">
-            {/* Timeline Line */}
-            <div className="absolute left-[19px] top-3 bottom-3 w-0.5 bg-gradient-to-b from-[var(--gezma-red)] via-[var(--gray-200)] to-transparent" />
+      <div
+        style={{
+          backgroundColor: c.cardBg,
+          borderRadius: '12px',
+          border: `1px solid ${c.border}`,
+          overflow: 'hidden',
+          transition: 'background-color 0.3s ease, border-color 0.3s ease',
+        }}
+      >
+        {/* Header */}
+        <div style={{ padding: '24px', borderBottom: `1px solid ${c.borderLight}` }}>
+          <h2 style={{ fontSize: '18px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>
+            {t.dashboard.recentActivity}
+          </h2>
+        </div>
 
+        {/* Content */}
+        <div style={{ padding: '24px', position: 'relative' }}>
+          {/* Timeline Line */}
+          <div
+            style={{
+              position: 'absolute',
+              left: '43px',
+              top: '36px',
+              bottom: '36px',
+              width: '2px',
+              background: `linear-gradient(to bottom, ${c.primary}, ${c.border}, transparent)`,
+            }}
+          />
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
             {mockActivities.slice(0, 5).map((activity, i) => (
-              <div key={activity.id} className="flex gap-4 relative py-4 group">
-                <div className={`
-                  flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full z-10 transition-transform group-hover:scale-110
-                  ${i === 0
-                    ? 'bg-gradient-to-br from-[var(--gezma-red)] to-[var(--gezma-red-hover)] shadow-md'
-                    : 'bg-white border-2 border-[var(--gray-200)]'
-                  }
-                `}>
-                  <div className={`h-2.5 w-2.5 rounded-full ${i === 0 ? 'bg-white' : 'bg-[var(--gray-300)]'}`} />
+              <div
+                key={activity.id}
+                style={{
+                  display: 'flex',
+                  gap: '16px',
+                  position: 'relative',
+                  padding: '16px 0',
+                }}
+              >
+                <div
+                  style={{
+                    width: '40px',
+                    height: '40px',
+                    borderRadius: '50%',
+                    backgroundColor: i === 0 ? c.primary : c.cardBg,
+                    border: i === 0 ? 'none' : `2px solid ${c.border}`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                    zIndex: 10,
+                  }}
+                >
+                  <div
+                    style={{
+                      width: '10px',
+                      height: '10px',
+                      borderRadius: '50%',
+                      backgroundColor: i === 0 ? 'white' : c.textLight,
+                    }}
+                  />
                 </div>
-                <div className="flex-1 pt-2">
-                  <p className="text-sm font-semibold text-[var(--charcoal)]">{activity.title}</p>
-                  <p className="text-sm text-[var(--gray-500)] mt-0.5">{activity.description}</p>
-                  <p className="text-xs text-[var(--gray-400)] mt-2">
+                <div style={{ flex: 1, paddingTop: '8px' }}>
+                  <p style={{ fontSize: '14px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>
+                    {activity.title}
+                  </p>
+                  <p style={{ fontSize: '14px', color: c.textMuted, marginTop: '2px', marginBottom: 0 }}>
+                    {activity.description}
+                  </p>
+                  <p style={{ fontSize: '12px', color: c.textLight, marginTop: '8px', marginBottom: 0 }}>
                     {formatShortDate(activity.timestamp)}
                   </p>
                 </div>
               </div>
             ))}
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }

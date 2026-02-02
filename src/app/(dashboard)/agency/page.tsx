@@ -1,11 +1,10 @@
 'use client';
 
 import { PageHeader } from '@/components/layout/page-header';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { DEFAULT_AGENCY } from '@/data/mock-agencies';
 import { formatDate } from '@/lib/utils';
+import { useTheme } from '@/lib/theme';
+import { useLanguage } from '@/lib/i18n';
 import {
   Building2,
   Mail,
@@ -22,219 +21,424 @@ import {
 } from 'lucide-react';
 
 export default function AgencyPage() {
+  const { c } = useTheme();
+  const { t } = useLanguage();
+
   return (
-    <div className="space-y-6">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       <PageHeader
-        title="Agency Profile"
-        description="View and manage your agency information"
+        title={t.agency.title}
+        description={t.agency.description}
         actions={
-          <Button>
-            <Edit2 className="h-4 w-4" />
-            Edit Profile
-          </Button>
+          <button
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              backgroundColor: c.primary,
+              color: 'white',
+              padding: '10px 16px',
+              borderRadius: '8px',
+              border: 'none',
+              fontWeight: '500',
+              cursor: 'pointer',
+            }}
+          >
+            <Edit2 style={{ width: '20px', height: '20px' }} />
+            <span>{t.agency.editProfile}</span>
+          </button>
         }
       />
 
       {/* Agency Header Card */}
-      <Card className="overflow-hidden">
-        <div className="bg-gradient-to-r from-[var(--charcoal)] to-[var(--gray-700)] p-6 text-white">
-          <div className="flex flex-col md:flex-row md:items-center gap-6">
-            <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-white/10 backdrop-blur border border-white/20">
-              <Building2 className="h-10 w-10" />
+      <div
+        style={{
+          backgroundColor: c.cardBg,
+          borderRadius: '12px',
+          border: `1px solid ${c.border}`,
+          overflow: 'hidden',
+        }}
+      >
+        {/* Dark Header */}
+        <div
+          style={{
+            background: 'linear-gradient(to right, #111827, #374151)',
+            padding: '24px',
+            color: 'white',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+            <div
+              style={{
+                width: '80px',
+                height: '80px',
+                borderRadius: '16px',
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                backdropFilter: 'blur(4px)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Building2 style={{ width: '40px', height: '40px' }} />
             </div>
-            <div className="flex-1">
-              <div className="flex items-center gap-3 mb-2">
-                <h2 className="text-2xl font-bold">{DEFAULT_AGENCY.name}</h2>
+            <div style={{ flex: 1 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+                <h2 style={{ fontSize: '24px', fontWeight: '700', margin: 0, color: 'white' }}>
+                  {DEFAULT_AGENCY.name}
+                </h2>
                 {DEFAULT_AGENCY.isVerified && (
-                  <Badge className="bg-[var(--success)] text-white border-0">
-                    <CheckCircle2 className="h-3 w-3 mr-1" />
-                    Verified
-                  </Badge>
+                  <span
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      backgroundColor: '#16A34A',
+                      color: 'white',
+                      fontSize: '12px',
+                      fontWeight: '500',
+                      padding: '4px 10px',
+                      borderRadius: '12px',
+                    }}
+                  >
+                    <CheckCircle2 style={{ width: '12px', height: '12px' }} />
+                    {t.agency.verified}
+                  </span>
                 )}
               </div>
-              <p className="text-white/70">{DEFAULT_AGENCY.legalName}</p>
-              <div className="flex flex-wrap gap-4 mt-4 text-sm text-white/80">
-                <span className="flex items-center gap-2">
-                  <Mail className="h-4 w-4" />
+              <p style={{ color: 'rgba(255, 255, 255, 0.7)', margin: 0 }}>{DEFAULT_AGENCY.legalName}</p>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', marginTop: '16px', fontSize: '14px', color: 'rgba(255, 255, 255, 0.8)' }}>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Mail style={{ width: '16px', height: '16px' }} />
                   {DEFAULT_AGENCY.email}
                 </span>
-                <span className="flex items-center gap-2">
-                  <Phone className="h-4 w-4" />
+                <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Phone style={{ width: '16px', height: '16px' }} />
                   {DEFAULT_AGENCY.phone}
                 </span>
               </div>
             </div>
           </div>
         </div>
-        <CardContent className="p-5 bg-[var(--gray-50)]">
-          <div className="flex items-center gap-2 text-sm text-[var(--gray-600)]">
-            <MapPin className="h-4 w-4" />
-            {DEFAULT_AGENCY.address}, {DEFAULT_AGENCY.city}, {DEFAULT_AGENCY.province}
-          </div>
-        </CardContent>
-      </Card>
+        {/* Address Bar */}
+        <div
+          style={{
+            padding: '20px 24px',
+            backgroundColor: c.cardBgHover,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            fontSize: '14px',
+            color: c.textSecondary,
+          }}
+        >
+          <MapPin style={{ width: '16px', height: '16px' }} />
+          {DEFAULT_AGENCY.address}, {DEFAULT_AGENCY.city}, {DEFAULT_AGENCY.province}
+        </div>
+      </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
+      {/* 3-Column Grid */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '24px' }}>
         {/* PPIU License */}
-        <Card className="lg:col-span-1">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base flex items-center gap-2">
-              <Shield className="h-4 w-4 text-[var(--success)]" />
-              PPIU License
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="p-4 bg-gradient-to-br from-[var(--success-light)] to-white rounded-xl border border-[var(--success)]/20">
-              <div className="flex items-center justify-between mb-3">
-                <Badge variant="success" className="text-xs">
-                  {DEFAULT_AGENCY.ppiuStatus}
-                </Badge>
-              </div>
-              <p className="text-lg font-mono font-bold text-[var(--charcoal)]">
+        <div
+          style={{
+            backgroundColor: c.cardBg,
+            borderRadius: '12px',
+            border: `1px solid ${c.border}`,
+            overflow: 'hidden',
+          }}
+        >
+          <div style={{ padding: '20px', borderBottom: `1px solid ${c.borderLight}` }}>
+            <h3 style={{ fontSize: '14px', fontWeight: '600', color: c.textPrimary, margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Shield style={{ width: '16px', height: '16px', color: c.success }} />
+              {t.agency.ppiuLicense}
+            </h3>
+          </div>
+          <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {/* License Badge */}
+            <div
+              style={{
+                padding: '16px',
+                background: `linear-gradient(to bottom right, ${c.successLight}, ${c.cardBg})`,
+                borderRadius: '12px',
+                border: `1px solid rgba(22, 163, 74, 0.2)`,
+              }}
+            >
+              <span
+                style={{
+                  backgroundColor: c.successLight,
+                  color: c.success,
+                  fontSize: '12px',
+                  fontWeight: '500',
+                  padding: '4px 10px',
+                  borderRadius: '12px',
+                }}
+              >
+                {DEFAULT_AGENCY.ppiuStatus}
+              </span>
+              <p style={{ fontSize: '18px', fontFamily: 'monospace', fontWeight: '700', color: c.textPrimary, marginTop: '12px', marginBottom: 0 }}>
                 {DEFAULT_AGENCY.ppiuNumber}
               </p>
             </div>
 
-            <div className="space-y-3">
-              <div className="flex items-center justify-between py-2 border-b border-[var(--gray-100)]">
-                <span className="text-sm text-[var(--gray-500)] flex items-center gap-2">
-                  <Calendar className="h-4 w-4" />
-                  Issued
+            {/* Dates */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: `1px solid ${c.borderLight}` }}>
+                <span style={{ fontSize: '14px', color: c.textMuted, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Calendar style={{ width: '16px', height: '16px' }} />
+                  {t.agency.issued}
                 </span>
-                <span className="text-sm font-medium text-[var(--charcoal)]">
+                <span style={{ fontSize: '14px', fontWeight: '500', color: c.textPrimary }}>
                   {formatDate(DEFAULT_AGENCY.ppiuIssueDate)}
                 </span>
               </div>
-              <div className="flex items-center justify-between py-2">
-                <span className="text-sm text-[var(--gray-500)] flex items-center gap-2">
-                  <Calendar className="h-4 w-4" />
-                  Expires
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0' }}>
+                <span style={{ fontSize: '14px', color: c.textMuted, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Calendar style={{ width: '16px', height: '16px' }} />
+                  {t.agency.expires}
                 </span>
-                <span className="text-sm font-medium text-[var(--charcoal)]">
+                <span style={{ fontSize: '14px', fontWeight: '500', color: c.textPrimary }}>
                   {formatDate(DEFAULT_AGENCY.ppiuExpiryDate)}
                 </span>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* Contact Persons */}
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base flex items-center gap-2">
-              <Users className="h-4 w-4 text-[var(--info)]" />
-              Contact Persons
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {DEFAULT_AGENCY.contactPersons.map((contact, index) => (
+        <div
+          style={{
+            backgroundColor: c.cardBg,
+            borderRadius: '12px',
+            border: `1px solid ${c.border}`,
+            overflow: 'hidden',
+          }}
+        >
+          <div style={{ padding: '20px', borderBottom: `1px solid ${c.borderLight}` }}>
+            <h3 style={{ fontSize: '14px', fontWeight: '600', color: c.textPrimary, margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Users style={{ width: '16px', height: '16px', color: c.info }} />
+              {t.agency.contactPersons}
+            </h3>
+          </div>
+          <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {DEFAULT_AGENCY.contactPersons.map((contact) => (
               <div
                 key={contact.id}
-                className={`p-4 rounded-xl ${contact.isPrimary ? 'bg-[var(--info-light)] border border-[var(--info)]/20' : 'bg-[var(--gray-50)]'}`}
+                style={{
+                  padding: '16px',
+                  borderRadius: '12px',
+                  backgroundColor: contact.isPrimary ? c.infoLight : c.cardBgHover,
+                  border: contact.isPrimary ? `1px solid rgba(37, 99, 235, 0.2)` : `1px solid ${c.border}`,
+                }}
               >
-                <div className="flex items-start justify-between mb-2">
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
                   <div>
-                    <p className="font-semibold text-[var(--charcoal)]">{contact.name}</p>
-                    <p className="text-xs text-[var(--gray-500)]">{contact.position}</p>
+                    <p style={{ fontSize: '14px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>{contact.name}</p>
+                    <p style={{ fontSize: '12px', color: c.textMuted, margin: '2px 0 0 0' }}>{contact.position}</p>
                   </div>
                   {contact.isPrimary && (
-                    <Badge variant="secondary" className="text-xs bg-[var(--info)] text-white border-0">
-                      Primary
-                    </Badge>
+                    <span
+                      style={{
+                        backgroundColor: c.info,
+                        color: 'white',
+                        fontSize: '10px',
+                        fontWeight: '500',
+                        padding: '2px 8px',
+                        borderRadius: '8px',
+                      }}
+                    >
+                      {t.agency.primary}
+                    </span>
                   )}
                 </div>
-                <div className="space-y-1 text-sm text-[var(--gray-600)]">
-                  <p className="flex items-center gap-2">
-                    <Phone className="h-3.5 w-3.5" />
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '14px', color: c.textSecondary }}>
+                  <p style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
+                    <Phone style={{ width: '14px', height: '14px' }} />
                     {contact.phone}
                   </p>
-                  <p className="flex items-center gap-2">
-                    <Mail className="h-3.5 w-3.5" />
+                  <p style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
+                    <Mail style={{ width: '14px', height: '14px' }} />
                     {contact.email}
                   </p>
                 </div>
               </div>
             ))}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* Verification QR */}
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base flex items-center gap-2">
-              <QrCode className="h-4 w-4 text-[var(--gray-500)]" />
-              Verification
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-center p-6 bg-white rounded-xl border-2 border-dashed border-[var(--gray-200)]">
-              <div className="text-center">
-                <div className="inline-flex items-center justify-center w-28 h-28 bg-[var(--gray-900)] rounded-xl mb-3">
-                  <QrCode className="h-20 w-20 text-white" />
+        <div
+          style={{
+            backgroundColor: c.cardBg,
+            borderRadius: '12px',
+            border: `1px solid ${c.border}`,
+            overflow: 'hidden',
+          }}
+        >
+          <div style={{ padding: '20px', borderBottom: `1px solid ${c.borderLight}` }}>
+            <h3 style={{ fontSize: '14px', fontWeight: '600', color: c.textPrimary, margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <QrCode style={{ width: '16px', height: '16px', color: c.textMuted }} />
+              {t.agency.verification}
+            </h3>
+          </div>
+          <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {/* QR Code */}
+            <div
+              style={{
+                padding: '24px',
+                backgroundColor: c.cardBg,
+                borderRadius: '12px',
+                border: `2px dashed ${c.border}`,
+                display: 'flex',
+                justifyContent: 'center',
+              }}
+            >
+              <div style={{ textAlign: 'center' }}>
+                <div
+                  style={{
+                    width: '112px',
+                    height: '112px',
+                    backgroundColor: '#111827',
+                    borderRadius: '12px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginBottom: '12px',
+                  }}
+                >
+                  <QrCode style={{ width: '80px', height: '80px', color: 'white' }} />
                 </div>
-                <p className="text-xs text-[var(--gray-500)]">Scan to verify agency</p>
+                <p style={{ fontSize: '12px', color: c.textMuted, margin: 0 }}>{t.agency.scanToVerify}</p>
               </div>
             </div>
 
-            <div className="p-3 bg-[var(--gray-50)] rounded-lg">
-              <p className="text-xs text-[var(--gray-500)] mb-1">Verification Code</p>
-              <div className="flex items-center justify-between">
-                <code className="text-sm font-mono font-bold text-[var(--charcoal)]">
+            {/* Verification Code */}
+            <div
+              style={{
+                padding: '12px',
+                backgroundColor: c.cardBgHover,
+                borderRadius: '8px',
+              }}
+            >
+              <p style={{ fontSize: '12px', color: c.textMuted, marginBottom: '4px' }}>{t.agency.verificationCode}</p>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <code style={{ fontSize: '14px', fontFamily: 'monospace', fontWeight: '700', color: c.textPrimary }}>
                   {DEFAULT_AGENCY.verificationCode}
                 </code>
-                <Button variant="ghost" size="icon" className="h-8 w-8">
-                  <Copy className="h-4 w-4" />
-                </Button>
+                <button
+                  style={{
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '6px',
+                    border: 'none',
+                    backgroundColor: 'transparent',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <Copy style={{ width: '16px', height: '16px', color: c.textMuted }} />
+                </button>
               </div>
             </div>
 
+            {/* Verified Badge */}
             {DEFAULT_AGENCY.isVerified && (
-              <div className="flex items-center gap-2 p-3 bg-[var(--success-light)] rounded-lg text-[var(--success)]">
-                <CheckCircle2 className="h-5 w-5" />
-                <span className="text-sm font-medium">Agency Verified</span>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '12px',
+                  backgroundColor: c.successLight,
+                  borderRadius: '8px',
+                  color: c.success,
+                }}
+              >
+                <CheckCircle2 style={{ width: '20px', height: '20px' }} />
+                <span style={{ fontSize: '14px', fontWeight: '500' }}>{t.agency.agencyVerified}</span>
               </div>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
 
       {/* Bank Accounts */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base flex items-center gap-2">
-            <CreditCard className="h-4 w-4 text-[var(--warning)]" />
-            Bank Accounts
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div
+        style={{
+          backgroundColor: c.cardBg,
+          borderRadius: '12px',
+          border: `1px solid ${c.border}`,
+          overflow: 'hidden',
+        }}
+      >
+        <div style={{ padding: '20px', borderBottom: `1px solid ${c.borderLight}` }}>
+          <h3 style={{ fontSize: '14px', fontWeight: '600', color: c.textPrimary, margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <CreditCard style={{ width: '16px', height: '16px', color: c.warning }} />
+            {t.agency.bankAccounts}
+          </h3>
+        </div>
+        <div style={{ padding: '20px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
             {DEFAULT_AGENCY.bankAccounts.map((bank) => (
               <div
                 key={bank.id}
-                className={`p-4 rounded-xl border-2 ${bank.isPrimary ? 'border-[var(--warning)] bg-[var(--warning-light)]' : 'border-[var(--gray-200)] bg-[var(--gray-50)]'}`}
+                style={{
+                  padding: '16px',
+                  borderRadius: '12px',
+                  border: bank.isPrimary ? `2px solid ${c.warning}` : `2px solid ${c.border}`,
+                  backgroundColor: bank.isPrimary ? c.warningLight : c.cardBgHover,
+                }}
               >
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex items-center gap-3">
-                    <div className={`h-10 w-10 rounded-lg flex items-center justify-center ${bank.isPrimary ? 'bg-[var(--warning)]/20' : 'bg-[var(--gray-200)]'}`}>
-                      <CreditCard className={`h-5 w-5 ${bank.isPrimary ? 'text-[var(--warning)]' : 'text-[var(--gray-500)]'}`} />
-                    </div>
-                    <div>
-                      <p className="font-semibold text-[var(--charcoal)]">{bank.bankName}</p>
-                      {bank.isPrimary && (
-                        <Badge variant="warning" className="text-xs mt-1">Primary</Badge>
-                      )}
-                    </div>
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', marginBottom: '12px' }}>
+                  <div
+                    style={{
+                      width: '40px',
+                      height: '40px',
+                      borderRadius: '8px',
+                      backgroundColor: bank.isPrimary ? 'rgba(217, 119, 6, 0.2)' : c.border,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <CreditCard style={{ width: '20px', height: '20px', color: bank.isPrimary ? c.warning : c.textMuted }} />
+                  </div>
+                  <div>
+                    <p style={{ fontSize: '14px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>{bank.bankName}</p>
+                    {bank.isPrimary && (
+                      <span
+                        style={{
+                          display: 'inline-block',
+                          marginTop: '4px',
+                          backgroundColor: c.warningLight,
+                          color: c.warning,
+                          fontSize: '10px',
+                          fontWeight: '500',
+                          padding: '2px 8px',
+                          borderRadius: '8px',
+                        }}
+                      >
+                        {t.agency.primary}
+                      </span>
+                    )}
                   </div>
                 </div>
-                <div className="space-y-1">
-                  <p className="text-lg font-mono font-bold text-[var(--charcoal)]">{bank.accountNumber}</p>
-                  <p className="text-sm text-[var(--gray-600)]">{bank.accountName}</p>
+                <div>
+                  <p style={{ fontSize: '18px', fontFamily: 'monospace', fontWeight: '700', color: c.textPrimary, margin: 0 }}>
+                    {bank.accountNumber}
+                  </p>
+                  <p style={{ fontSize: '14px', color: c.textSecondary, marginTop: '4px', marginBottom: 0 }}>
+                    {bank.accountName}
+                  </p>
                 </div>
               </div>
             ))}
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }

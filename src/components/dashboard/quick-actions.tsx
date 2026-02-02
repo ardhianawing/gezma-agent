@@ -1,84 +1,133 @@
+'use client';
+
 import Link from 'next/link';
 import { UserPlus, Package, Plane, FileText, Building2, Settings } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-
-const actions = [
-  {
-    title: 'Add Pilgrim',
-    description: 'Register a new pilgrim',
-    icon: UserPlus,
-    href: '/pilgrims/new',
-    color: 'var(--gezma-red)',
-    bgColor: 'var(--gezma-red-light)',
-  },
-  {
-    title: 'Create Package',
-    description: 'Build a new umrah package',
-    icon: Package,
-    href: '/packages/new',
-    color: 'var(--info)',
-    bgColor: 'var(--info-light)',
-  },
-  {
-    title: 'New Trip',
-    description: 'Schedule a departure',
-    icon: Plane,
-    href: '/trips/new',
-    color: 'var(--success)',
-    bgColor: 'var(--success-light)',
-  },
-  {
-    title: 'Documents',
-    description: 'Manage agency docs',
-    icon: FileText,
-    href: '/documents',
-    color: 'var(--warning)',
-    bgColor: 'var(--warning-light)',
-  },
-  {
-    title: 'Agency Profile',
-    description: 'Update company info',
-    icon: Building2,
-    href: '/agency',
-    color: '#8B5CF6',
-    bgColor: '#EDE9FE',
-  },
-  {
-    title: 'Settings',
-    description: 'Configure system',
-    icon: Settings,
-    href: '/settings',
-    color: 'var(--gray-600)',
-    bgColor: 'var(--gray-100)',
-  },
-];
+import { useLanguage } from '@/lib/i18n';
+import { useTheme } from '@/lib/theme';
 
 export function QuickActions() {
+  const { t } = useLanguage();
+  const { c } = useTheme();
+
+  const actions = [
+    {
+      title: t.quickActions.addPilgrim,
+      description: t.pilgrims.registerNew,
+      icon: UserPlus,
+      href: '/pilgrims/new',
+      color: c.primary,
+      bgColor: c.primaryLight,
+    },
+    {
+      title: t.quickActions.createPackage,
+      description: t.packages.buildNew,
+      icon: Package,
+      href: '/packages/new',
+      color: c.info,
+      bgColor: c.infoLight,
+    },
+    {
+      title: t.quickActions.newTrip,
+      description: t.trips.scheduleNew,
+      icon: Plane,
+      href: '/trips/new',
+      color: c.success,
+      bgColor: c.successLight,
+    },
+    {
+      title: t.quickActions.documents,
+      description: t.documents.manageAgencyDocs,
+      icon: FileText,
+      href: '/documents',
+      color: c.warning,
+      bgColor: c.warningLight,
+    },
+    {
+      title: t.quickActions.agencyProfile,
+      description: t.agency.updateCompanyInfo,
+      icon: Building2,
+      href: '/agency',
+      color: '#7C3AED',
+      bgColor: '#F5F3FF',
+    },
+    {
+      title: t.quickActions.settings,
+      description: t.settings.configureSystem,
+      icon: Settings,
+      href: '/settings',
+      color: c.textMuted,
+      bgColor: c.cardBgHover,
+    },
+  ];
+
   return (
-    <Card className="rounded-xl border border-[var(--gray-200)] shadow-sm overflow-hidden">
-      <CardHeader className="p-6 pb-6">
-        <CardTitle className="text-xl font-bold">Quick Actions</CardTitle>
-      </CardHeader>
-      <CardContent className="p-6 pt-0">
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <div
+      style={{
+        backgroundColor: c.cardBg,
+        borderRadius: '12px',
+        border: `1px solid ${c.border}`,
+        overflow: 'hidden',
+        transition: 'background-color 0.3s ease, border-color 0.3s ease',
+      }}
+    >
+      {/* Header */}
+      <div style={{ padding: '24px', borderBottom: `1px solid ${c.borderLight}` }}>
+        <h2 style={{ fontSize: '18px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>
+          {t.dashboard.quickActions}
+        </h2>
+      </div>
+
+      {/* Content */}
+      <div style={{ padding: '24px' }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            gap: '16px',
+          }}
+        >
           {actions.map((action) => (
-            <Link key={action.href} href={action.href}>
-              <div className="flex items-center gap-4 rounded-xl border border-[var(--gray-200)] bg-[var(--gray-50)]/50 p-5 transition-all duration-200 hover:border-[var(--gezma-red)] hover:bg-white hover:shadow-md group">
+            <Link key={action.href} href={action.href} style={{ textDecoration: 'none' }}>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  padding: '16px',
+                  backgroundColor: c.cardBgHover,
+                  borderRadius: '8px',
+                  border: `1px solid ${c.border}`,
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                }}
+              >
                 <div
-                  className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl transition-transform group-hover:scale-105"
-                  style={{ backgroundColor: action.bgColor }}
+                  style={{
+                    width: '40px',
+                    height: '40px',
+                    borderRadius: '8px',
+                    backgroundColor: action.bgColor,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                  }}
                 >
-                  <action.icon className="h-5 w-5" style={{ color: action.color }} />
+                  <action.icon style={{ width: '20px', height: '20px', color: action.color }} />
                 </div>
                 <div>
-                  <p className="font-semibold text-sm text-[var(--charcoal)]">{action.title}</p>
-                  <p className="text-xs text-[var(--gray-500)] mt-0.5">{action.description}</p>
+                  <p style={{ fontSize: '14px', fontWeight: '500', color: c.textPrimary, margin: 0 }}>
+                    {action.title}
+                  </p>
+                  <p style={{ fontSize: '13px', color: c.textMuted, margin: '2px 0 0 0' }}>
+                    {action.description}
+                  </p>
                 </div>
               </div>
             </Link>
           ))}
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

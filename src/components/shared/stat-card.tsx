@@ -1,7 +1,8 @@
+'use client';
+
 import { LucideIcon, TrendingUp, TrendingDown } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
 import Link from 'next/link';
-import { cn } from '@/lib/utils';
+import { useTheme } from '@/lib/theme';
 
 interface StatCardProps {
   title: string;
@@ -14,6 +15,7 @@ interface StatCardProps {
     value: number;
     isPositive: boolean;
   };
+  trendLabel?: string;
   href?: string;
 }
 
@@ -22,78 +24,109 @@ export function StatCard({
   value,
   description,
   icon: Icon,
-  iconColor = 'var(--gray-600)',
-  iconBgColor = 'var(--gray-100)',
+  iconColor,
+  iconBgColor,
   trend,
+  trendLabel = 'vs last month',
   href
 }: StatCardProps) {
+  const { c } = useTheme();
+
   const content = (
     <div
-      className={cn(
-        'group rounded-xl bg-white border border-[var(--gray-200)]',
-        'shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)]',
-        href && 'cursor-pointer hover:-translate-y-1 transition-all duration-200'
-      )}
-      style={{ padding: '20px' }}  /* 20px semua sisi - SEIMBANG */
+      style={{
+        backgroundColor: c.cardBg,
+        borderRadius: '12px',
+        padding: '24px',
+        border: `1px solid ${c.border}`,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '8px',
+        minHeight: '140px',
+        position: 'relative',
+        cursor: href ? 'pointer' : 'default',
+        transition: 'all 0.3s ease',
+      }}
     >
-      {/* Container dengan height tetap */}
-      <div className="h-[120px] flex flex-col">
-
-        {/* ROW 1: Label + Icon (icon at TOP-RIGHT) */}
-        <div className="flex justify-between items-start gap-4">
-          <p className="text-xs font-medium text-[var(--gray-500)] uppercase tracking-wide">{title}</p>
-          {Icon && (
-            <div
-              className="flex h-11 w-11 items-center justify-center rounded-full shadow-sm flex-shrink-0 transition-transform group-hover:scale-105"
-              style={{ backgroundColor: iconBgColor }}
-            >
-              <Icon className="h-5 w-5" style={{ color: iconColor }} />
-            </div>
-          )}
+      {/* Icon - posisi absolute di kanan atas */}
+      {Icon && (
+        <div
+          style={{
+            position: 'absolute',
+            right: '24px',
+            top: '24px',
+            width: '48px',
+            height: '48px',
+            borderRadius: '50%',
+            backgroundColor: iconBgColor || c.primaryLight,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Icon style={{ width: '24px', height: '24px', color: iconColor || c.primary }} />
         </div>
+      )}
 
-        {/* ROW 2: Value */}
-        <p className="text-2xl font-bold text-[var(--charcoal)] tracking-tight truncate mt-2" title={String(value)}>
+      {/* Content */}
+      <div style={{ paddingRight: '60px' }}>
+        <p
+          style={{
+            fontSize: '12px',
+            fontWeight: '500',
+            color: c.textMuted,
+            textTransform: 'uppercase',
+            letterSpacing: '0.05em',
+            margin: 0,
+          }}
+        >
+          {title}
+        </p>
+        <p
+          style={{
+            fontSize: '28px',
+            fontWeight: '700',
+            color: c.textPrimary,
+            margin: '8px 0',
+          }}
+        >
           {value}
         </p>
-
-        {/* ROW 3: Subtitle/Description */}
         {description && (
-          <p className="text-xs text-[var(--gray-500)] mt-1">{description}</p>
+          <p style={{ fontSize: '14px', color: c.textMuted, margin: 0 }}>
+            {description}
+          </p>
         )}
+      </div>
 
-        {/* ROW 4: Growth indicator - pushed to bottom */}
-        <div className="mt-auto">
-          {trend ? (
-            <div className="flex items-center gap-1">
-              <span
-                className={cn(
-                  'inline-flex items-center gap-1 text-xs font-semibold',
-                  trend.isPositive
-                    ? 'text-[var(--success)]'
-                    : 'text-[var(--error)]'
-                )}
-              >
-                {trend.isPositive ? (
-                  <TrendingUp className="h-3 w-3" />
-                ) : (
-                  <TrendingDown className="h-3 w-3" />
-                )}
-                {trend.isPositive ? '+' : ''}{trend.value}%
-              </span>
-              <span className="text-[10px] text-[var(--gray-500)] uppercase">vs last month</span>
-            </div>
-          ) : (
-            /* Empty spacer for consistent height */
-            <div className="h-4" />
-          )}
-        </div>
+      {/* Growth indicator - di bagian bawah, DALAM card */}
+      <div style={{ marginTop: 'auto' }}>
+        {trend ? (
+          <span
+            style={{
+              fontSize: '14px',
+              color: trend.isPositive ? c.success : c.error,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+            }}
+          >
+            {trend.isPositive ? (
+              <TrendingUp style={{ width: '16px', height: '16px' }} />
+            ) : (
+              <TrendingDown style={{ width: '16px', height: '16px' }} />
+            )}
+            {trend.isPositive ? '+' : ''}{trend.value}% {trendLabel}
+          </span>
+        ) : (
+          <div style={{ height: '20px' }} />
+        )}
       </div>
     </div>
   );
 
   if (href) {
-    return <Link href={href}>{content}</Link>;
+    return <Link href={href} style={{ textDecoration: 'none' }}>{content}</Link>;
   }
 
   return content;

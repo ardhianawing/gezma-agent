@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard,
@@ -10,28 +11,29 @@ import {
   FileText,
   Building2,
   Settings,
+  HelpCircle,
+  LogOut,
+  ChevronRight,
   X,
   LucideIcon,
-  LogOut,
-  HelpCircle
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { useLanguage } from '@/lib/i18n';
+import { useTheme } from '@/lib/theme';
 
-interface NavItem {
-  title: string;
+interface MenuItem {
+  labelKey: 'dashboard' | 'pilgrims' | 'packages' | 'trips' | 'documents' | 'agency' | 'settings';
   href: string;
   icon: LucideIcon;
-  badge?: number;
 }
 
-const navItems: NavItem[] = [
-  { title: 'Dashboard', href: '/', icon: LayoutDashboard },
-  { title: 'Pilgrims', href: '/pilgrims', icon: Users },
-  { title: 'Packages', href: '/packages', icon: Package },
-  { title: 'Trips', href: '/trips', icon: Plane },
-  { title: 'Documents', href: '/documents', icon: FileText },
-  { title: 'Agency', href: '/agency', icon: Building2 },
-  { title: 'Settings', href: '/settings', icon: Settings },
+const menuItems: MenuItem[] = [
+  { labelKey: 'dashboard', href: '/', icon: LayoutDashboard },
+  { labelKey: 'pilgrims', href: '/pilgrims', icon: Users },
+  { labelKey: 'packages', href: '/packages', icon: Package },
+  { labelKey: 'trips', href: '/trips', icon: Plane },
+  { labelKey: 'documents', href: '/documents', icon: FileText },
+  { labelKey: 'agency', href: '/agency', icon: Building2 },
+  { labelKey: 'settings', href: '/settings', icon: Settings },
 ];
 
 interface SidebarProps {
@@ -41,116 +43,304 @@ interface SidebarProps {
 
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const pathname = usePathname();
+  const { t } = useLanguage();
+  const { theme, c } = useTheme();
+
+  const isActive = (href: string) => {
+    if (href === '/') {
+      return pathname === '/';
+    }
+    return pathname.startsWith(href);
+  };
 
   return (
     <>
       {/* Mobile Overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm md:hidden"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 40,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            backdropFilter: 'blur(4px)',
+          }}
           onClick={onClose}
         />
       )}
 
-      {/* Sidebar - Premium Platinum Style */}
+      {/* Sidebar */}
       <aside
-        className={cn(
-          "fixed top-0 left-0 h-full w-[260px] bg-white transition-transform duration-300 ease-out",
-          "border-r border-[var(--gray-200)]",
-          "z-50 md:z-40",
-          isOpen ? "translate-x-0" : "-translate-x-full",
-          "md:translate-x-0"
-        )}
+        style={{
+          width: '260px',
+          height: '100vh',
+          backgroundColor: c.sidebarBg,
+          borderRight: `1px solid ${c.sidebarBorder}`,
+          display: 'flex',
+          flexDirection: 'column',
+          position: 'fixed',
+          left: 0,
+          top: 0,
+          zIndex: 50,
+          transform: isOpen ? 'translateX(0)' : undefined,
+          transition: 'transform 0.3s ease, background-color 0.3s ease',
+        }}
       >
-        {/* Logo - Generous Padding */}
-        <div className="flex items-center justify-between p-6 border-b border-[var(--gray-100)]">
-          <Link href="/" className="flex items-center">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/images/gezma-logo.png"
-              alt="Logo"
-              className="h-9 w-auto object-contain"
+        {/* Logo */}
+        <div
+          style={{
+            padding: '24px 20px',
+            borderBottom: `1px solid ${c.borderLight}`,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
+          <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <Image
+              src={theme === 'dark' ? '/logo-dark.png' : '/logo-light.png'}
+              alt="Gezma Logo"
+              width={40}
+              height={40}
+              style={{
+                objectFit: 'contain',
+                borderRadius: '10px',
+              }}
+              priority
             />
+            <span style={{ fontSize: '20px', fontWeight: '700', color: theme === 'dark' ? 'white' : c.primary }}>
+              GEZMA
+            </span>
           </Link>
+
           {/* Close button for mobile */}
           <button
             onClick={onClose}
-            className="md:hidden p-2.5 rounded-lg hover:bg-[var(--gray-100)] transition-colors"
+            style={{
+              padding: '8px',
+              borderRadius: '8px',
+              border: 'none',
+              backgroundColor: 'transparent',
+              cursor: 'pointer',
+              display: 'none',
+            }}
           >
-            <X className="h-5 w-5 text-[var(--gray-500)]" />
+            <X style={{ width: '20px', height: '20px', color: c.textMuted }} />
           </button>
         </div>
 
-        {/* Navigation - Breathing Room */}
-        <nav className="flex flex-col gap-1.5 p-4 overflow-y-auto h-[calc(100%-5.5rem-8rem)]">
-          <p className="px-3 py-2 text-[11px] font-semibold text-[var(--gray-400)] uppercase tracking-wider">
-            Menu
+        {/* Main Menu */}
+        <div style={{ flex: 1, padding: '16px 12px', overflowY: 'auto' }}>
+          <p
+            style={{
+              fontSize: '11px',
+              fontWeight: '600',
+              color: c.textLight,
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+              padding: '0 12px',
+              marginBottom: '8px',
+            }}
+          >
+            {t.nav.menu}
           </p>
-          {navItems.map((item) => {
-            const isActive = pathname === item.href ||
-              (item.href !== '/pilgrims' && pathname.startsWith(item.href));
-            const Icon = item.icon;
 
-            return (
-              <Link
-                key={item.title}
-                href={item.href}
-                onClick={onClose}
-                className={cn(
-                  'flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200',
-                  isActive
-                    ? 'bg-[var(--gezma-red)] text-white shadow-md'
-                    : 'text-[var(--gray-600)] hover:bg-[var(--gray-100)] hover:text-[var(--charcoal)]'
-                )}
-              >
-                <Icon className={cn(
-                  "h-5 w-5 flex-shrink-0",
-                  isActive ? "text-white" : "text-[var(--gray-400)]"
-                )} />
-                <span className="truncate">{item.title}</span>
-                {item.badge && (
-                  <span className={cn(
-                    "ml-auto flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-xs font-semibold",
-                    isActive ? "bg-white/20 text-white" : "bg-[var(--gezma-red)] text-white"
-                  )}>
-                    {item.badge}
-                  </span>
-                )}
-              </Link>
-            );
-          })}
+          <nav style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            {menuItems.map((item) => {
+              const Icon = item.icon;
+              const active = isActive(item.href);
+              const label = t.nav[item.labelKey];
 
-          <div className="mt-6 pt-4 border-t border-[var(--gray-100)]">
-            <p className="px-3 py-2 text-[11px] font-semibold text-[var(--gray-400)] uppercase tracking-wider">
-              Support
-            </p>
-            <Link
-              href="#"
-              className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-[var(--gray-600)] hover:bg-[var(--gray-100)] hover:text-[var(--charcoal)] transition-all duration-200"
+              return (
+                <Link key={item.href} href={item.href} style={{ textDecoration: 'none' }} onClick={onClose}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '12px',
+                      padding: '12px 16px',
+                      borderRadius: '10px',
+                      cursor: 'pointer',
+                      transition: 'all 0.15s ease',
+                      backgroundColor: active ? c.sidebarActiveItem : 'transparent',
+                      borderLeft: active ? `3px solid ${c.primary}` : '3px solid transparent',
+                    }}
+                  >
+                    <Icon
+                      style={{
+                        width: '20px',
+                        height: '20px',
+                        color: active ? c.primary : c.textMuted,
+                        flexShrink: 0,
+                      }}
+                    />
+                    <span
+                      style={{
+                        fontSize: '14px',
+                        fontWeight: active ? '600' : '500',
+                        color: active ? c.primary : c.textSecondary,
+                        flex: 1,
+                      }}
+                    >
+                      {label}
+                    </span>
+                    {active && (
+                      <ChevronRight
+                        style={{
+                          width: '16px',
+                          height: '16px',
+                          color: c.primary,
+                        }}
+                      />
+                    )}
+                  </div>
+                </Link>
+              );
+            })}
+          </nav>
+
+          {/* Support Section */}
+          <div style={{ marginTop: '24px' }}>
+            <p
+              style={{
+                fontSize: '11px',
+                fontWeight: '600',
+                color: c.textLight,
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+                padding: '0 12px',
+                marginBottom: '8px',
+              }}
             >
-              <HelpCircle className="h-5 w-5 text-[var(--gray-400)]" />
-              <span>Help Center</span>
-            </Link>
-          </div>
-        </nav>
+              {t.nav.support}
+            </p>
 
-        {/* Footer - Premium Style */}
-        <div className="absolute bottom-0 left-0 right-0 border-t border-[var(--gray-100)] p-5 bg-[var(--gray-50)]/50">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="h-11 w-11 rounded-xl bg-[var(--charcoal)] flex items-center justify-center shadow-sm">
-              <span className="text-sm font-bold text-white">BT</span>
+            <nav style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              <Link href="/help" style={{ textDecoration: 'none' }} onClick={onClose}>
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    padding: '12px 16px',
+                    borderRadius: '10px',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease',
+                    backgroundColor: 'transparent',
+                  }}
+                >
+                  <HelpCircle
+                    style={{
+                      width: '20px',
+                      height: '20px',
+                      color: c.textMuted,
+                      flexShrink: 0,
+                    }}
+                  />
+                  <span
+                    style={{
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      color: c.textSecondary,
+                    }}
+                  >
+                    {t.nav.helpCenter}
+                  </span>
+                </div>
+              </Link>
+            </nav>
+          </div>
+        </div>
+
+        {/* User Profile & Sign Out */}
+        <div
+          style={{
+            padding: '16px',
+            borderTop: `1px solid ${c.borderLight}`,
+            backgroundColor: c.cardBgHover,
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              padding: '12px',
+              backgroundColor: c.cardBg,
+              borderRadius: '12px',
+              border: `1px solid ${c.border}`,
+            }}
+          >
+            <div
+              style={{
+                width: '40px',
+                height: '40px',
+                borderRadius: '50%',
+                background: 'linear-gradient(135deg, #1F2937 0%, #374151 100%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'white',
+                fontSize: '14px',
+                fontWeight: '600',
+                flexShrink: 0,
+              }}
+            >
+              BT
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-[var(--charcoal)] truncate">Barokah Travel</p>
-              <p className="text-xs text-[var(--gray-500)]">PPIU/123/2023</p>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p
+                style={{
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  color: c.textPrimary,
+                  margin: 0,
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
+              >
+                Barokah Travel
+              </p>
+              <p
+                style={{
+                  fontSize: '12px',
+                  color: c.textMuted,
+                  margin: '2px 0 0 0',
+                }}
+              >
+                PPIU/123/2023
+              </p>
             </div>
           </div>
-          <button className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-[var(--gray-600)] hover:text-[var(--error)] hover:bg-[var(--error-light)] rounded-xl transition-all duration-200">
-            <LogOut className="h-4 w-4" />
-            <span>Sign Out</span>
+
+          {/* Sign Out Button */}
+          <button
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              width: '100%',
+              padding: '10px',
+              marginTop: '12px',
+              backgroundColor: 'transparent',
+              border: `1px solid ${c.border}`,
+              borderRadius: '8px',
+              color: c.textMuted,
+              fontSize: '14px',
+              fontWeight: '500',
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            <LogOut style={{ width: '18px', height: '18px' }} />
+            {t.common.signOut}
           </button>
         </div>
       </aside>
     </>
   );
 }
+
+export default Sidebar;

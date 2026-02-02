@@ -1,67 +1,173 @@
 'use client';
 
-import { Bell, Search, User, Menu, ChevronDown } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Bell, Search, Menu, ChevronDown } from 'lucide-react';
+import { LanguageToggle } from '@/components/shared/language-toggle';
+import { ThemeToggle } from '@/components/shared/theme-toggle';
+import { useLanguage } from '@/lib/i18n';
+import { useTheme } from '@/lib/theme';
 
 interface HeaderProps {
   onMenuClick?: () => void;
 }
 
 export function Header({ onMenuClick }: HeaderProps) {
+  const { t } = useLanguage();
+  const { c } = useTheme();
+
   return (
-    <header className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur-md border-b border-[var(--gray-100)]">
-      <div className="flex h-20 items-center justify-between px-8 lg:px-12">
+    <header
+      style={{
+        position: 'sticky',
+        top: 0,
+        zIndex: 50,
+        width: '100%',
+        backgroundColor: c.headerBg,
+        backdropFilter: 'blur(8px)',
+        borderBottom: `1px solid ${c.borderLight}`,
+        transition: 'background-color 0.3s ease, border-color 0.3s ease',
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          height: '72px',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '0 32px',
+        }}
+      >
         {/* Left side - Menu button (mobile) + Search */}
-        <div className="flex items-center gap-4 flex-1">
-          {/* Mobile menu button */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flex: 1 }}>
+          {/* Mobile menu button - hidden on desktop */}
           <button
             onClick={onMenuClick}
-            className="md:hidden p-2.5 rounded-xl hover:bg-[var(--gray-100)] transition-colors"
+            style={{
+              padding: '10px',
+              borderRadius: '12px',
+              border: 'none',
+              backgroundColor: 'transparent',
+              cursor: 'pointer',
+              display: 'none',
+            }}
           >
-            <Menu className="h-5 w-5 text-[var(--gray-500)]" />
+            <Menu style={{ width: '20px', height: '20px', color: c.textMuted }} />
           </button>
 
           {/* Search */}
-          <div className="relative hidden sm:block w-full max-w-md">
-            <Search className="absolute left-6 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--gray-400)]" />
+          <div style={{ position: 'relative', width: '100%', maxWidth: '400px' }}>
+            <Search
+              style={{
+                position: 'absolute',
+                left: '16px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                width: '20px',
+                height: '20px',
+                color: c.textLight,
+                pointerEvents: 'none',
+              }}
+            />
             <input
               type="search"
-              placeholder="Search pilgrims, packages, trips..."
-              style={{ paddingLeft: '5rem' }}
-              className="h-14 w-full !pl-20 rounded-2xl border border-[var(--gray-200)] bg-[var(--gray-50)] pr-8 text-lg text-[var(--charcoal)] placeholder:text-[var(--gray-400)] focus:outline-none focus:ring-4 focus:ring-[var(--gezma-red)]/10 focus:bg-white focus:border-[var(--gezma-red)] transition-all"
+              placeholder={t.header.searchPlaceholder}
+              style={{
+                width: '100%',
+                height: '48px',
+                paddingLeft: '48px',
+                paddingRight: '16px',
+                borderRadius: '12px',
+                border: `1px solid ${c.border}`,
+                backgroundColor: c.inputBg,
+                fontSize: '14px',
+                color: c.textPrimary,
+                outline: 'none',
+                transition: 'all 0.2s ease',
+              }}
             />
           </div>
         </div>
 
-        {/* Right side - Notifications + User */}
-        <div className="flex items-center gap-2 lg:gap-3">
-          {/* Mobile search button */}
-          <Button variant="ghost" size="icon" className="sm:hidden rounded-xl">
-            <Search className="h-5 w-5" />
-          </Button>
+        {/* Right side - Theme Toggle + Language Toggle + Notifications + User */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          {/* Theme Toggle */}
+          <ThemeToggle />
+
+          {/* Language Toggle */}
+          <LanguageToggle />
 
           {/* Notifications */}
-          <Button variant="ghost" size="icon" className="relative rounded-xl hover:bg-[var(--gray-100)]">
-            <Bell className="h-5 w-5 text-[var(--gray-500)]" />
-            <span className="absolute right-2 top-2 flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--gezma-red)] opacity-75"></span>
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-[var(--gezma-red)]"></span>
-            </span>
-          </Button>
+          <button
+            style={{
+              position: 'relative',
+              padding: '10px',
+              borderRadius: '12px',
+              border: 'none',
+              backgroundColor: 'transparent',
+              cursor: 'pointer',
+              transition: 'background-color 0.2s',
+            }}
+          >
+            <Bell style={{ width: '20px', height: '20px', color: c.textMuted }} />
+            {/* Notification dot */}
+            <span
+              style={{
+                position: 'absolute',
+                right: '10px',
+                top: '10px',
+                width: '8px',
+                height: '8px',
+                borderRadius: '50%',
+                backgroundColor: c.primary,
+              }}
+            />
+          </button>
 
           {/* Divider */}
-          <div className="hidden lg:block h-8 w-px bg-[var(--gray-200)]" />
+          <div
+            style={{
+              height: '32px',
+              width: '1px',
+              backgroundColor: c.border,
+              margin: '0 8px',
+            }}
+          />
 
           {/* User Menu */}
-          <button className="flex items-center gap-3 rounded-xl px-2 lg:px-3 py-2 hover:bg-[var(--gray-100)] transition-all duration-200">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--charcoal)] shadow-sm">
-              <span className="text-sm font-bold text-white">AD</span>
+          <button
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              padding: '8px 12px',
+              borderRadius: '12px',
+              border: 'none',
+              backgroundColor: 'transparent',
+              cursor: 'pointer',
+              transition: 'background-color 0.2s',
+            }}
+          >
+            <div
+              style={{
+                width: '40px',
+                height: '40px',
+                borderRadius: '12px',
+                background: 'linear-gradient(135deg, #1F2937 0%, #374151 100%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <span style={{ fontSize: '14px', fontWeight: '700', color: 'white' }}>AD</span>
             </div>
-            <div className="hidden lg:block text-left">
-              <p className="text-sm font-semibold text-[var(--charcoal)]">Admin</p>
-              <p className="text-xs text-[var(--gray-500)]">Barokah Travel</p>
+            <div style={{ textAlign: 'left' }}>
+              <p style={{ fontSize: '14px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>
+                Admin
+              </p>
+              <p style={{ fontSize: '12px', color: c.textMuted, margin: 0 }}>
+                Barokah Travel
+              </p>
             </div>
-            <ChevronDown className="hidden lg:block h-4 w-4 text-[var(--gray-400)]" />
+            <ChevronDown style={{ width: '16px', height: '16px', color: c.textLight }} />
           </button>
         </div>
       </div>

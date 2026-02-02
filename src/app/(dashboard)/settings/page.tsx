@@ -1,10 +1,8 @@
 'use client';
 
 import { PageHeader } from '@/components/layout/page-header';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { useTheme } from '@/lib/theme';
+import { useLanguage } from '@/lib/i18n';
 import {
   Settings,
   Bell,
@@ -21,180 +19,367 @@ import {
   Check
 } from 'lucide-react';
 
-const settingsSections = [
-  {
-    icon: Settings,
-    title: 'General',
-    description: 'Basic application settings and preferences',
-    color: 'var(--gray-600)',
-    bgColor: 'var(--gray-100)',
-  },
-  {
-    icon: Bell,
-    title: 'Notifications',
-    description: 'Configure how you receive notifications',
-    color: 'var(--info)',
-    bgColor: 'var(--info-light)',
-  },
-  {
-    icon: Shield,
-    title: 'Security',
-    description: 'Password, 2FA, and security settings',
-    color: 'var(--success)',
-    bgColor: 'var(--success-light)',
-  },
-  {
-    icon: CreditCard,
-    title: 'Billing',
-    description: 'Manage subscription and payment methods',
-    color: 'var(--warning)',
-    bgColor: 'var(--warning-light)',
-  },
-  {
-    icon: Users,
-    title: 'Team',
-    description: 'Manage team members and permissions',
-    color: 'var(--gezma-red)',
-    bgColor: 'var(--gezma-red-light)',
-  },
-  {
-    icon: Globe,
-    title: 'Language & Region',
-    description: 'Set your preferred language and timezone',
-    color: '#7C3AED',
-    bgColor: '#EDE9FE',
-  },
-];
-
 export default function SettingsPage() {
+  const { theme, setTheme, c } = useTheme();
+  const { t } = useLanguage();
+
+  const settingsSections = [
+    {
+      icon: Settings,
+      title: t.settings.general,
+      description: t.settings.generalDesc,
+      color: c.textMuted,
+      bgColor: c.cardBgHover,
+    },
+    {
+      icon: Bell,
+      title: t.settings.notifications,
+      description: t.settings.notificationsDesc,
+      color: c.info,
+      bgColor: c.infoLight,
+    },
+    {
+      icon: Shield,
+      title: t.settings.security,
+      description: t.settings.securityDesc,
+      color: c.success,
+      bgColor: c.successLight,
+    },
+    {
+      icon: CreditCard,
+      title: t.settings.billing,
+      description: t.settings.billingDesc,
+      color: c.warning,
+      bgColor: c.warningLight,
+    },
+    {
+      icon: Users,
+      title: t.settings.team,
+      description: t.settings.teamDesc,
+      color: c.primary,
+      bgColor: c.primaryLight,
+    },
+    {
+      icon: Globe,
+      title: t.settings.languageRegion,
+      description: t.settings.languageRegionDesc,
+      color: '#7C3AED',
+      bgColor: '#F5F3FF',
+    },
+  ];
+
   return (
-    <div className="space-y-6">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       <PageHeader
-        title="Settings"
-        description="Manage your application settings and preferences"
+        title={t.settings.title}
+        description={t.settings.description}
       />
 
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px' }}>
         {/* Left Column - Settings Menu */}
-        <div className="lg:col-span-2 space-y-4">
-          <Card>
-            <CardContent className="p-0">
-              <div className="divide-y divide-[var(--gray-100)]">
-                {settingsSections.map((section) => {
-                  const Icon = section.icon;
-                  return (
-                    <button
-                      key={section.title}
-                      className="w-full flex items-center gap-4 p-5 hover:bg-[var(--gray-50)] transition-colors text-left group"
-                    >
-                      <div
-                        className="flex h-12 w-12 items-center justify-center rounded-xl"
-                        style={{ backgroundColor: section.bgColor }}
-                      >
-                        <Icon className="h-6 w-6" style={{ color: section.color }} />
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-[var(--charcoal)] group-hover:text-[var(--gezma-red)] transition-colors">
-                          {section.title}
-                        </h3>
-                        <p className="text-sm text-[var(--gray-500)]">{section.description}</p>
-                      </div>
-                      <ChevronRight className="h-5 w-5 text-[var(--gray-400)] group-hover:text-[var(--gezma-red)] group-hover:translate-x-1 transition-all" />
-                    </button>
-                  );
-                })}
-              </div>
-            </CardContent>
-          </Card>
+        <div>
+          <div
+            style={{
+              backgroundColor: c.cardBg,
+              borderRadius: '12px',
+              border: `1px solid ${c.border}`,
+              overflow: 'hidden',
+              transition: 'all 0.3s ease',
+            }}
+          >
+            {settingsSections.map((section, index) => {
+              const Icon = section.icon;
+              return (
+                <button
+                  key={section.title}
+                  style={{
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '16px',
+                    padding: '20px',
+                    backgroundColor: 'transparent',
+                    border: 'none',
+                    borderBottom: index < settingsSections.length - 1 ? `1px solid ${c.borderLight}` : 'none',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                    transition: 'background-color 0.2s',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: '48px',
+                      height: '48px',
+                      borderRadius: '12px',
+                      backgroundColor: section.bgColor,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <Icon style={{ width: '24px', height: '24px', color: section.color }} />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <h3 style={{ fontSize: '14px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>
+                      {section.title}
+                    </h3>
+                    <p style={{ fontSize: '14px', color: c.textMuted, margin: '4px 0 0 0' }}>
+                      {section.description}
+                    </p>
+                  </div>
+                  <ChevronRight style={{ width: '20px', height: '20px', color: c.textLight }} />
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* Right Column - Quick Settings */}
-        <div className="space-y-4">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           {/* Theme Toggle */}
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center gap-2">
-                <Palette className="h-4 w-4 text-[var(--gray-500)]" />
-                Appearance
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <button className="w-full flex items-center justify-between p-3 rounded-lg border-2 border-[var(--gezma-red)] bg-[var(--gezma-red-50)]">
-                <div className="flex items-center gap-3">
-                  <Sun className="h-5 w-5 text-[var(--warning)]" />
-                  <span className="font-medium text-[var(--charcoal)]">Light Mode</span>
+          <div
+            style={{
+              backgroundColor: c.cardBg,
+              borderRadius: '12px',
+              border: `1px solid ${c.border}`,
+              overflow: 'hidden',
+              transition: 'all 0.3s ease',
+            }}
+          >
+            <div style={{ padding: '20px', borderBottom: `1px solid ${c.borderLight}` }}>
+              <h3 style={{ fontSize: '14px', fontWeight: '600', color: c.textPrimary, margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Palette style={{ width: '16px', height: '16px', color: c.textMuted }} />
+                {t.settings.appearance}
+              </h3>
+            </div>
+            <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {/* Light Mode */}
+              <button
+                onClick={() => setTheme('light')}
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '12px',
+                  borderRadius: '8px',
+                  border: theme === 'light' ? `2px solid ${c.primary}` : `1px solid ${c.border}`,
+                  backgroundColor: theme === 'light' ? c.primaryLight : 'transparent',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <Sun style={{ width: '20px', height: '20px', color: '#F59E0B' }} />
+                  <span style={{ fontSize: '14px', fontWeight: '500', color: c.textPrimary }}>{t.settings.lightMode}</span>
                 </div>
-                <div className="h-5 w-5 rounded-full bg-[var(--gezma-red)] flex items-center justify-center">
-                  <Check className="h-3 w-3 text-white" />
-                </div>
+                {theme === 'light' && (
+                  <div
+                    style={{
+                      width: '20px',
+                      height: '20px',
+                      borderRadius: '50%',
+                      backgroundColor: c.primary,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <Check style={{ width: '12px', height: '12px', color: 'white' }} />
+                  </div>
+                )}
               </button>
-              <button className="w-full flex items-center justify-between p-3 rounded-lg border border-[var(--gray-200)] hover:border-[var(--gray-300)] transition-colors">
-                <div className="flex items-center gap-3">
-                  <Moon className="h-5 w-5 text-[var(--gray-600)]" />
-                  <span className="font-medium text-[var(--charcoal)]">Dark Mode</span>
+
+              {/* Dark Mode */}
+              <button
+                onClick={() => setTheme('dark')}
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '12px',
+                  borderRadius: '8px',
+                  border: theme === 'dark' ? `2px solid ${c.primary}` : `1px solid ${c.border}`,
+                  backgroundColor: theme === 'dark' ? c.primaryLight : 'transparent',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <Moon style={{ width: '20px', height: '20px', color: c.textMuted }} />
+                  <span style={{ fontSize: '14px', fontWeight: '500', color: c.textPrimary }}>{t.settings.darkMode}</span>
                 </div>
+                {theme === 'dark' && (
+                  <div
+                    style={{
+                      width: '20px',
+                      height: '20px',
+                      borderRadius: '50%',
+                      backgroundColor: c.primary,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <Check style={{ width: '12px', height: '12px', color: 'white' }} />
+                  </div>
+                )}
               </button>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
           {/* Notification Preferences */}
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center gap-2">
-                <Bell className="h-4 w-4 text-[var(--gray-500)]" />
-                Quick Notifications
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Mail className="h-5 w-5 text-[var(--gray-500)]" />
-                  <span className="text-sm text-[var(--charcoal)]">Email alerts</span>
+          <div
+            style={{
+              backgroundColor: c.cardBg,
+              borderRadius: '12px',
+              border: `1px solid ${c.border}`,
+              overflow: 'hidden',
+              transition: 'all 0.3s ease',
+            }}
+          >
+            <div style={{ padding: '20px', borderBottom: `1px solid ${c.borderLight}` }}>
+              <h3 style={{ fontSize: '14px', fontWeight: '600', color: c.textPrimary, margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Bell style={{ width: '16px', height: '16px', color: c.textMuted }} />
+                {t.settings.quickNotifications}
+              </h3>
+            </div>
+            <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {/* Email Alerts */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <Mail style={{ width: '20px', height: '20px', color: c.textMuted }} />
+                  <span style={{ fontSize: '14px', color: c.textPrimary }}>{t.settings.emailAlerts}</span>
                 </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input type="checkbox" defaultChecked className="sr-only peer" />
-                  <div className="w-11 h-6 bg-[var(--gray-200)] peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-[var(--gezma-red-light)] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-[var(--gray-300)] after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--gezma-red)]"></div>
-                </label>
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Smartphone className="h-5 w-5 text-[var(--gray-500)]" />
-                  <span className="text-sm text-[var(--charcoal)]">Push notifications</span>
+                <div
+                  style={{
+                    width: '44px',
+                    height: '24px',
+                    backgroundColor: c.primary,
+                    borderRadius: '12px',
+                    position: 'relative',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <div
+                    style={{
+                      position: 'absolute',
+                      right: '2px',
+                      top: '2px',
+                      width: '20px',
+                      height: '20px',
+                      backgroundColor: 'white',
+                      borderRadius: '50%',
+                      transition: 'transform 0.2s',
+                    }}
+                  />
                 </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input type="checkbox" className="sr-only peer" />
-                  <div className="w-11 h-6 bg-[var(--gray-200)] peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-[var(--gezma-red-light)] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-[var(--gray-300)] after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--gezma-red)]"></div>
-                </label>
               </div>
-            </CardContent>
-          </Card>
+
+              {/* Push Notifications */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <Smartphone style={{ width: '20px', height: '20px', color: c.textMuted }} />
+                  <span style={{ fontSize: '14px', color: c.textPrimary }}>{t.settings.pushNotifications}</span>
+                </div>
+                <div
+                  style={{
+                    width: '44px',
+                    height: '24px',
+                    backgroundColor: c.border,
+                    borderRadius: '12px',
+                    position: 'relative',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <div
+                    style={{
+                      position: 'absolute',
+                      left: '2px',
+                      top: '2px',
+                      width: '20px',
+                      height: '20px',
+                      backgroundColor: 'white',
+                      borderRadius: '50%',
+                      border: `1px solid ${c.border}`,
+                      transition: 'transform 0.2s',
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
 
           {/* Account Info */}
-          <Card className="bg-gradient-to-br from-[var(--charcoal)] to-[var(--gray-800)] text-white">
-            <CardContent className="p-5">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="h-12 w-12 rounded-full bg-white/10 flex items-center justify-center">
-                  <span className="text-lg font-bold">BT</span>
-                </div>
-                <div>
-                  <p className="font-semibold">Barokah Travel</p>
-                  <p className="text-sm text-white/60">Professional Plan</p>
-                </div>
+          <div
+            style={{
+              background: 'linear-gradient(to bottom right, #111827, #374151)',
+              borderRadius: '12px',
+              padding: '20px',
+              color: 'white',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px' }}>
+              <div
+                style={{
+                  width: '48px',
+                  height: '48px',
+                  borderRadius: '50%',
+                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <span style={{ fontSize: '18px', fontWeight: '700' }}>BT</span>
               </div>
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-white/60">Storage used</span>
-                  <span className="font-medium">2.4 GB / 10 GB</span>
-                </div>
-                <div className="h-2 bg-white/10 rounded-full overflow-hidden">
-                  <div className="h-full w-[24%] bg-gradient-to-r from-[var(--gezma-red)] to-[#F87171] rounded-full" />
-                </div>
+              <div>
+                <p style={{ fontSize: '14px', fontWeight: '600', margin: 0 }}>Barokah Travel</p>
+                <p style={{ fontSize: '14px', color: 'rgba(255, 255, 255, 0.6)', margin: '4px 0 0 0' }}>Professional Plan</p>
               </div>
-              <Button variant="outline" className="w-full mt-4 border-white/20 text-white hover:bg-white/10 hover:text-white">
-                Upgrade Plan
-              </Button>
-            </CardContent>
-          </Card>
+            </div>
+            <div style={{ fontSize: '14px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                <span style={{ color: 'rgba(255, 255, 255, 0.6)' }}>{t.settings.storageUsed}</span>
+                <span style={{ fontWeight: '500' }}>2.4 GB / 10 GB</span>
+              </div>
+              <div
+                style={{
+                  height: '8px',
+                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                  borderRadius: '9999px',
+                  overflow: 'hidden',
+                }}
+              >
+                <div
+                  style={{
+                    width: '24%',
+                    height: '100%',
+                    background: `linear-gradient(to right, ${c.primary}, #F87171)`,
+                    borderRadius: '9999px',
+                  }}
+                />
+              </div>
+            </div>
+            <button
+              style={{
+                width: '100%',
+                marginTop: '16px',
+                padding: '10px',
+                borderRadius: '8px',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                backgroundColor: 'transparent',
+                color: 'white',
+                fontSize: '14px',
+                fontWeight: '500',
+                cursor: 'pointer',
+              }}
+            >
+              {t.settings.upgradePlan}
+            </button>
+          </div>
         </div>
       </div>
     </div>

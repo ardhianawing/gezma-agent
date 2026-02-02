@@ -1,11 +1,11 @@
-import { PilgrimStatus, TripStatus, PILGRIM_STATUS_CONFIG } from '@/types';
-import { cn } from '@/lib/utils';
+'use client';
+
+import { PilgrimStatus, TripStatus } from '@/types';
 
 interface StatusBadgeProps {
   status: PilgrimStatus | TripStatus;
   size?: 'sm' | 'md' | 'lg';
   showDot?: boolean;
-  className?: string;
 }
 
 // Soft Chip Colors - Platinum Design System
@@ -29,40 +29,48 @@ const TRIP_STATUS_ENHANCED: Record<TripStatus, { label: string; color: string; b
   cancelled: { label: 'Cancelled', color: '#B91C1C', bgColor: '#FEE2E2', borderColor: '#FECACA' },
 };
 
-export function StatusBadge({ status, size = 'md', showDot = true, className }: StatusBadgeProps) {
+export function StatusBadge({ status, size = 'md', showDot = true }: StatusBadgeProps) {
   const config = PILGRIM_STATUS_ENHANCED[status as PilgrimStatus] || TRIP_STATUS_ENHANCED[status as TripStatus];
 
   if (!config) return null;
 
+  const sizeStyles = {
+    sm: { fontSize: '11px', padding: '4px 0', minWidth: '95px', dotSize: '6px' },
+    md: { fontSize: '12px', padding: '6px 0', minWidth: '105px', dotSize: '8px' },
+    lg: { fontSize: '14px', padding: '8px 0', minWidth: '115px', dotSize: '10px' },
+  };
+
+  const currentSize = sizeStyles[size];
+
   return (
     <span
-      className={cn(
-        'inline-flex items-center gap-1.5 font-semibold rounded-full border',
-        'transition-all duration-150',
-        {
-          'px-2 py-0.5 text-xs': size === 'sm',
-          'px-2.5 py-1 text-sm': size === 'md',
-          'px-3 py-1.5 text-base': size === 'lg',
-        },
-        className
-      )}
       style={{
-        backgroundColor: config.bgColor,
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: '6px',
+        minWidth: currentSize.minWidth,
+        padding: currentSize.padding,
+        fontSize: currentSize.fontSize,
+        fontWeight: '600',
         color: config.color,
-        borderColor: config.borderColor,
+        backgroundColor: config.bgColor,
+        border: `1px solid ${config.borderColor}`,
+        borderRadius: '9999px',
+        textAlign: 'center',
+        whiteSpace: 'nowrap',
+        transition: 'all 0.15s ease',
       }}
     >
       {showDot && (
         <span
-          className={cn(
-            'rounded-full flex-shrink-0',
-            {
-              'h-1.5 w-1.5': size === 'sm',
-              'h-2 w-2': size === 'md',
-              'h-2.5 w-2.5': size === 'lg',
-            }
-          )}
-          style={{ backgroundColor: config.color }}
+          style={{
+            width: currentSize.dotSize,
+            height: currentSize.dotSize,
+            borderRadius: '50%',
+            backgroundColor: config.color,
+            flexShrink: 0,
+          }}
         />
       )}
       {config.label}

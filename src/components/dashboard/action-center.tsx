@@ -1,14 +1,16 @@
+'use client';
+
 import Link from 'next/link';
 import { AlertCircle, FileX, ClipboardX, AlertTriangle } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { useLanguage } from '@/lib/i18n';
+import { useTheme } from '@/lib/theme';
 
 interface Alert {
   id: string;
   type: 'missing_docs' | 'incomplete_manifest' | 'license_expiring' | 'payment_pending';
   priority: 'critical' | 'high' | 'medium';
-  title: string;
-  description: string;
+  titleKey: string;
+  descriptionKey: string;
   count?: number;
   href: string;
 }
@@ -18,8 +20,8 @@ const mockAlerts: Alert[] = [
     id: 'alert_001',
     type: 'missing_docs',
     priority: 'critical',
-    title: 'Missing Documents',
-    description: '8 pilgrims have incomplete documents',
+    titleKey: 'missingDocuments',
+    descriptionKey: 'pilgrimsIncomplete',
     count: 8,
     href: '/pilgrims?filter=missing_docs',
   },
@@ -27,16 +29,16 @@ const mockAlerts: Alert[] = [
     id: 'alert_002',
     type: 'incomplete_manifest',
     priority: 'high',
-    title: 'Incomplete Trip Manifest',
-    description: 'Umrah Reguler - Maret 2026 needs confirmation',
+    titleKey: 'incompleteManifest',
+    descriptionKey: 'needsConfirmation',
     href: '/trips/trip_001',
   },
   {
     id: 'alert_003',
     type: 'license_expiring',
     priority: 'medium',
-    title: 'PPIU License Expiring',
-    description: 'License expires in 45 days',
+    titleKey: 'licenseExpiring',
+    descriptionKey: 'licenseExpiresIn',
     href: '/agency',
   },
 ];
@@ -48,62 +50,163 @@ const iconMap = {
   payment_pending: AlertCircle,
 };
 
-const priorityColors = {
-  critical: 'bg-[#D32F2F]', // GEZMA Red
-  high: 'bg-[#F59E0B]',     // Warning Orange
-  medium: 'bg-[#1E40AF]',   // Info Blue
-};
-
 export function ActionCenter() {
+  const { t } = useLanguage();
+  const { c } = useTheme();
+
+  const priorityColors = {
+    critical: c.error,
+    high: c.warning,
+    medium: c.info,
+  };
+
+  const priorityBgColors = {
+    critical: c.errorLight,
+    high: c.warningLight,
+    medium: c.infoLight,
+  };
+
+  const getAlertTitle = (alert: Alert) => {
+    const titles: Record<string, string> = {
+      missingDocuments: t.dashboard.missingDocuments,
+      incompleteManifest: t.dashboard.incompleteManifest,
+      licenseExpiring: t.dashboard.licenseExpiring,
+    };
+    return titles[alert.titleKey] || alert.titleKey;
+  };
+
+  const getAlertDescription = (alert: Alert) => {
+    if (alert.type === 'missing_docs') {
+      return `${alert.count} ${t.dashboard.pilgrimsIncomplete}`;
+    }
+    if (alert.type === 'incomplete_manifest') {
+      return `Umrah Reguler - Maret 2026 ${t.dashboard.needsConfirmation}`;
+    }
+    if (alert.type === 'license_expiring') {
+      return `${t.dashboard.licenseExpiresIn} 45 ${t.dashboard.days}`;
+    }
+    return '';
+  };
+
   return (
-    <Card className="rounded-xl border border-[var(--gray-200)] shadow-sm overflow-hidden">
-      <CardHeader className="p-6">
-        <div className="flex items-center justify-between gap-4">
-          <div>
-            <CardTitle className="text-xl font-bold">Action Center</CardTitle>
-            <CardDescription className="text-sm mt-1">Items requiring your attention</CardDescription>
-          </div>
-          {/* Badge lebih besar, dengan padding */}
-          <Badge variant="error" className="h-8 w-8 text-sm font-bold flex items-center justify-center rounded-full flex-shrink-0">
-            {mockAlerts.length}
-          </Badge>
+    <div
+      style={{
+        backgroundColor: c.cardBg,
+        borderRadius: '12px',
+        border: `1px solid ${c.border}`,
+        overflow: 'hidden',
+        transition: 'background-color 0.3s ease, border-color 0.3s ease',
+      }}
+    >
+      {/* Header */}
+      <div
+        style={{
+          padding: '24px',
+          borderBottom: `1px solid ${c.borderLight}`,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}
+      >
+        <div>
+          <h2 style={{ fontSize: '18px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>
+            {t.dashboard.actionCenter}
+          </h2>
+          <p style={{ fontSize: '14px', color: c.textMuted, marginTop: '4px', marginBottom: 0 }}>
+            {t.dashboard.actionCenterDesc}
+          </p>
         </div>
-      </CardHeader>
-      <CardContent className="p-6 pt-0 space-y-4">
+        <span
+          style={{
+            backgroundColor: c.errorLight,
+            color: c.error,
+            fontSize: '14px',
+            fontWeight: '600',
+            width: '32px',
+            height: '32px',
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          {mockAlerts.length}
+        </span>
+      </div>
+
+      {/* Content */}
+      <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
         {mockAlerts.length === 0 ? (
-          <p className="text-center text-sm text-[var(--gray-500)] py-6">
+          <p style={{ textAlign: 'center', fontSize: '14px', color: c.textMuted, padding: '24px 0' }}>
             All caught up! No actions required.
           </p>
         ) : (
           mockAlerts.map((alert) => {
             const Icon = iconMap[alert.type];
             return (
-              <Link key={alert.id} href={alert.href}>
-                <div className="group flex items-center gap-4 rounded-xl border border-[var(--gray-200)] bg-white pl-8 pr-6 py-5 transition-all duration-200 hover:border-[var(--gezma-red)] hover:shadow-xl relative overflow-hidden">
-                  {/* Strategic Indicator Ribbon - Wider and Explicitly Colored */}
-                  <div className={`absolute left-0 top-0 bottom-0 w-2 ${priorityColors[alert.priority]}`} />
-
-                  <div className="flex items-center justify-center h-12 w-12 rounded-full bg-[var(--gray-50)] flex-shrink-0 group-hover:scale-110 transition-transform">
-                    <Icon className="h-6 w-6 text-[var(--gray-600)]" />
+              <Link key={alert.id} href={alert.href} style={{ textDecoration: 'none' }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '16px',
+                    padding: '16px',
+                    backgroundColor: c.cardBg,
+                    borderRadius: '8px',
+                    border: `1px solid ${c.border}`,
+                    borderLeft: `4px solid ${priorityColors[alert.priority]}`,
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                  }}
+                >
+                  {/* Icon */}
+                  <div
+                    style={{
+                      width: '40px',
+                      height: '40px',
+                      borderRadius: '8px',
+                      backgroundColor: priorityBgColors[alert.priority],
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <Icon style={{ width: '20px', height: '20px', color: priorityColors[alert.priority] }} />
                   </div>
 
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-3">
-                      <p className="font-bold text-base text-[var(--charcoal)]">{alert.title}</p>
-                      {alert.count && (
-                        <Badge variant="secondary" className="h-6 text-xs px-2.5 rounded-full font-bold ml-1 flex-shrink-0">
-                          {alert.count}
-                        </Badge>
-                      )}
-                    </div>
-                    <p className="text-sm text-[var(--gray-500)] mt-1 line-clamp-1">{alert.description}</p>
+                  {/* Content */}
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <p style={{ fontSize: '14px', fontWeight: '500', color: c.textPrimary, margin: 0 }}>
+                      {getAlertTitle(alert)}
+                    </p>
+                    <p style={{ fontSize: '13px', color: c.textMuted, margin: '2px 0 0 0' }}>
+                      {getAlertDescription(alert)}
+                    </p>
                   </div>
+
+                  {/* Badge */}
+                  {alert.count && (
+                    <span
+                      style={{
+                        backgroundColor: priorityBgColors[alert.priority],
+                        color: priorityColors[alert.priority],
+                        fontSize: '12px',
+                        fontWeight: '500',
+                        padding: '4px 10px',
+                        borderRadius: '12px',
+                        flexShrink: 0,
+                      }}
+                    >
+                      {alert.count}
+                    </span>
+                  )}
                 </div>
               </Link>
             );
           })
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

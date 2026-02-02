@@ -1,0 +1,207 @@
+import { Translations } from './en';
+
+export const id: Translations = {
+  // Common
+  common: {
+    search: 'Cari',
+    save: 'Simpan',
+    cancel: 'Batal',
+    delete: 'Hapus',
+    edit: 'Ubah',
+    view: 'Lihat',
+    add: 'Tambah',
+    create: 'Buat',
+    update: 'Perbarui',
+    back: 'Kembali',
+    next: 'Selanjutnya',
+    previous: 'Sebelumnya',
+    loading: 'Memuat...',
+    noData: 'Tidak ada data',
+    actions: 'Aksi',
+    status: 'Status',
+    all: 'Semua',
+    filter: 'Filter',
+    export: 'Ekspor',
+    import: 'Impor',
+    download: 'Unduh',
+    upload: 'Unggah',
+    signOut: 'Keluar',
+    viewAll: 'Lihat Semua',
+  },
+
+  // Navigation / Sidebar
+  nav: {
+    menu: 'Menu',
+    support: 'Dukungan',
+    dashboard: 'Dasbor',
+    pilgrims: 'Jamaah',
+    packages: 'Paket',
+    trips: 'Perjalanan',
+    documents: 'Dokumen',
+    agency: 'Agensi',
+    settings: 'Pengaturan',
+    helpCenter: 'Pusat Bantuan',
+  },
+
+  // Dashboard
+  dashboard: {
+    title: 'Dasbor',
+    description: 'Selamat datang kembali! Berikut perkembangan agensi Anda.',
+    totalPilgrims: 'Total Jamaah',
+    activeTrips: 'Perjalanan Aktif',
+    totalRevenue: 'Total Pendapatan',
+    packages: 'Paket',
+    registeredThisYear: 'Terdaftar tahun ini',
+    inPreparation: 'Dalam persiapan',
+    thisMonth: 'Bulan ini',
+    availablePackages: 'Paket tersedia',
+    vsLastMonth: 'vs bulan lalu',
+    actionCenter: 'Pusat Aksi',
+    actionCenterDesc: 'Item yang memerlukan perhatian Anda',
+    quickActions: 'Aksi Cepat',
+    upcomingDepartures: 'Keberangkatan Mendatang',
+    recentActivity: 'Aktivitas Terbaru',
+    missingDocuments: 'Dokumen Belum Lengkap',
+    pilgrimsIncomplete: 'jamaah memiliki dokumen tidak lengkap',
+    incompleteManifest: 'Manifest Perjalanan Belum Lengkap',
+    needsConfirmation: 'membutuhkan konfirmasi',
+    licenseExpiring: 'Izin PPIU Akan Habis',
+    licenseExpiresIn: 'Izin berakhir dalam',
+    days: 'hari',
+  },
+
+  // Pilgrims
+  pilgrims: {
+    title: 'Jamaah',
+    description: 'Kelola data jamaah dan pantau perjalanan mereka',
+    addPilgrim: 'Tambah Jamaah',
+    searchPlaceholder: 'Cari berdasarkan nama, email, atau telepon...',
+    tableHeaders: {
+      pilgrim: 'Jamaah',
+      contact: 'Kontak',
+      status: 'Status',
+      documents: 'Dokumen',
+      actions: 'Aksi',
+    },
+    registerNew: 'Daftarkan jamaah baru',
+    showing: 'Menampilkan',
+    pilgrimsLabel: 'jamaah',
+  },
+
+  // Packages
+  packages: {
+    title: 'Paket',
+    description: 'Kelola paket umrah dan itinerari Anda',
+    createPackage: 'Buat Paket',
+    duration: 'Durasi',
+    airline: 'Maskapai',
+    hotelRating: 'Rating Hotel',
+    startingFrom: 'Mulai dari',
+    viewDetails: 'Lihat Detail',
+    days: 'Hari',
+    buildNew: 'Buat paket umrah baru',
+  },
+
+  // Trips
+  trips: {
+    title: 'Perjalanan',
+    description: 'Kelola keberangkatan dan manifest perjalanan',
+    createTrip: 'Buat Perjalanan',
+    departure: 'Keberangkatan',
+    seatAvailability: 'Ketersediaan Kursi',
+    confirmed: 'Terkonfirmasi',
+    left: 'tersisa',
+    scheduleNew: 'Jadwalkan keberangkatan',
+    pax: 'pax',
+  },
+
+  // Documents
+  documents: {
+    title: 'Dokumen Agensi',
+    description: 'Kelola dokumen legal dan lisensi agensi Anda',
+    uploadDocument: 'Unggah Dokumen',
+    validDocuments: 'Dokumen Valid',
+    expiringSoon: 'Segera Berakhir',
+    expired: 'Kadaluarsa',
+    allDocuments: 'Semua Dokumen',
+    allDocumentsDesc: 'Kelola dan pantau dokumen legal agensi Anda',
+    issued: 'Diterbitkan',
+    expires: 'Berakhir',
+    valid: 'Valid',
+    manageAgencyDocs: 'Kelola dokumen agensi',
+    manageDocuments: 'Kelola dan pantau dokumen legal agensi Anda',
+  },
+
+  // Agency
+  agency: {
+    title: 'Profil Agensi',
+    description: 'Lihat dan kelola informasi agensi Anda',
+    editProfile: 'Ubah Profil',
+    ppiuLicense: 'Lisensi PPIU',
+    contactPersons: 'Kontak Person',
+    verification: 'Verifikasi',
+    bankAccounts: 'Rekening Bank',
+    verificationCode: 'Kode Verifikasi',
+    scanToVerify: 'Pindai untuk verifikasi agensi',
+    agencyVerified: 'Agensi Terverifikasi',
+    primary: 'Utama',
+    updateCompanyInfo: 'Perbarui info perusahaan',
+    issued: 'Diterbitkan',
+    expires: 'Berakhir',
+    verified: 'Terverifikasi',
+  },
+
+  // Settings
+  settings: {
+    title: 'Pengaturan',
+    description: 'Kelola pengaturan dan preferensi aplikasi Anda',
+    general: 'Umum',
+    generalDesc: 'Pengaturan dasar dan preferensi aplikasi',
+    notifications: 'Notifikasi',
+    notificationsDesc: 'Atur cara Anda menerima notifikasi',
+    security: 'Keamanan',
+    securityDesc: 'Kata sandi, 2FA, dan pengaturan keamanan',
+    billing: 'Tagihan',
+    billingDesc: 'Kelola langganan dan metode pembayaran',
+    team: 'Tim',
+    teamDesc: 'Kelola anggota tim dan izin akses',
+    languageRegion: 'Bahasa & Wilayah',
+    languageRegionDesc: 'Atur bahasa dan zona waktu pilihan Anda',
+    appearance: 'Tampilan',
+    lightMode: 'Mode Terang',
+    darkMode: 'Mode Gelap',
+    quickNotifications: 'Notifikasi Cepat',
+    emailAlerts: 'Notifikasi email',
+    pushNotifications: 'Notifikasi push',
+    storageUsed: 'Penyimpanan terpakai',
+    upgradePlan: 'Upgrade Paket',
+    configureSystem: 'Konfigurasi sistem',
+  },
+
+  // Quick Actions
+  quickActions: {
+    addPilgrim: 'Tambah Jamaah',
+    createPackage: 'Buat Paket',
+    newTrip: 'Perjalanan Baru',
+    documents: 'Dokumen',
+    agencyProfile: 'Profil Agensi',
+    settings: 'Pengaturan',
+  },
+
+  // Status
+  status: {
+    registered: 'Terdaftar',
+    documentsComplete: 'Dokumen Lengkap',
+    confirmed: 'Terkonfirmasi',
+    cancelled: 'Dibatalkan',
+    preparing: 'Persiapan',
+    ready: 'Siap',
+    departed: 'Berangkat',
+    completed: 'Selesai',
+  },
+
+  // Header
+  header: {
+    searchPlaceholder: 'Cari jamaah, paket, perjalanan...',
+  },
+};

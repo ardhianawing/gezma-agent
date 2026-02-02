@@ -3,24 +3,36 @@
 import { useState } from 'react';
 import { Sidebar } from '@/components/layout/sidebar';
 import { Header } from '@/components/layout/header';
+import { useTheme } from '@/lib/theme';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { c } = useTheme();
 
   return (
-    <div className="min-h-screen bg-[var(--page-bg)]">
-      {/* Sidebar - Fixed on desktop */}
+    <div style={{ minHeight: '100vh', backgroundColor: c.pageBg, transition: 'background-color 0.3s ease' }}>
+      {/* Sidebar - Fixed on left */}
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      {/* Content Wrapper - Brute force offset */}
+      {/* Content Wrapper - Offset by sidebar width */}
       <div
-        className="flex flex-col min-h-screen transition-all duration-300"
-        style={{ marginLeft: '260px', width: 'calc(100% - 260px)' }}
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          minHeight: '100vh',
+          marginLeft: '260px',
+          width: 'calc(100% - 260px)',
+          transition: 'all 0.3s ease',
+        }}
       >
         <Header onMenuClick={() => setSidebarOpen(true)} />
         <main
-          className="flex-1 animate-fade-in relative z-0"
-          style={{ padding: '32px' }}
+          style={{
+            flex: 1,
+            padding: '32px',
+            position: 'relative',
+            zIndex: 0,
+          }}
         >
           {children}
         </main>

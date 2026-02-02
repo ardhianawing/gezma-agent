@@ -1,4 +1,7 @@
+'use client';
+
 import { ReactNode } from 'react';
+import { useTheme } from '@/lib/theme';
 
 interface PageHeaderProps {
   title: string;
@@ -7,15 +10,47 @@ interface PageHeaderProps {
 }
 
 export function PageHeader({ title, description, actions }: PageHeaderProps) {
+  const { c } = useTheme();
+
   return (
-    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: '16px',
+      }}
+    >
       <div>
-        <h1 className="text-2xl lg:text-3xl font-bold text-[var(--charcoal)]">{title}</h1>
+        <h1
+          style={{
+            fontSize: '28px',
+            fontWeight: '700',
+            color: c.textPrimary,
+            margin: 0,
+          }}
+        >
+          {title}
+        </h1>
         {description && (
-          <p className="mt-1 text-sm lg:text-base text-[var(--gray-600)]">{description}</p>
+          <p
+            style={{
+              fontSize: '14px',
+              color: c.textMuted,
+              marginTop: '4px',
+              marginBottom: 0,
+            }}
+          >
+            {description}
+          </p>
         )}
       </div>
-      {actions && <div className="flex items-center gap-2">{actions}</div>}
+      {actions && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          {actions}
+        </div>
+      )}
     </div>
   );
 }

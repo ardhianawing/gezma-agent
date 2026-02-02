@@ -3,114 +3,292 @@
 import Link from 'next/link';
 import { Plus, Star, Plane, Clock, Users, ArrowRight } from 'lucide-react';
 import { PageHeader } from '@/components/layout/page-header';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { mockPackages } from '@/data/mock-packages';
 import { formatCurrency } from '@/lib/utils';
+import { useTheme } from '@/lib/theme';
+import { useLanguage } from '@/lib/i18n';
 
 export default function PackagesPage() {
+  const { c } = useTheme();
+  const { t } = useLanguage();
+
   return (
-    <div className="space-y-6">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       <PageHeader
-        title="Packages"
-        description="Manage your umrah packages and itineraries"
+        title={t.packages.title}
+        description={t.packages.description}
         actions={
           <Link href="/packages/new">
-            <Button>
-              <Plus className="h-4 w-4" />
-              Create Package
-            </Button>
+            <button
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                backgroundColor: c.primary,
+                color: 'white',
+                padding: '10px 16px',
+                borderRadius: '8px',
+                border: 'none',
+                fontWeight: '500',
+                cursor: 'pointer',
+                transition: 'background-color 0.2s',
+              }}
+            >
+              <Plus style={{ width: '20px', height: '20px' }} />
+              <span>{t.packages.createPackage}</span>
+            </button>
           </Link>
         }
       />
 
-      <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(3, 1fr)',
+          gap: '20px',
+        }}
+      >
         {mockPackages.map((pkg) => (
-          <Link key={pkg.id} href={`/packages/${pkg.id}`}>
-            <Card className="h-full group cursor-pointer hover:border-[var(--gezma-red-light)] transition-all duration-200 hover:-translate-y-1">
-              <CardContent className="p-0">
-                {/* Header with gradient */}
-                <div className="relative p-5 pb-4 bg-gradient-to-br from-[var(--gray-50)] to-white border-b border-[var(--gray-100)]">
-                  <div className="flex items-start justify-between mb-3">
-                    <div>
-                      <h3 className="font-bold text-sm text-[var(--charcoal)] group-hover:text-[var(--gezma-red)] transition-colors">
-                        {pkg.name}
-                      </h3>
-                      <p className="text-xs text-[var(--gray-500)] mt-0.5 uppercase tracking-wide font-medium">
-                        {pkg.category}
-                      </p>
+          <Link key={pkg.id} href={`/packages/${pkg.id}`} style={{ textDecoration: 'none' }}>
+            <div
+              style={{
+                backgroundColor: c.cardBg,
+                borderRadius: '12px',
+                border: `1px solid ${c.border}`,
+                overflow: 'hidden',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+              }}
+            >
+              {/* Header with gradient */}
+              <div
+                style={{
+                  padding: '20px',
+                  paddingBottom: '16px',
+                  background: `linear-gradient(to bottom right, ${c.cardBgHover}, ${c.cardBg})`,
+                  borderBottom: `1px solid ${c.borderLight}`,
+                }}
+              >
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    justifyContent: 'space-between',
+                    marginBottom: '12px',
+                  }}
+                >
+                  <div>
+                    <h3
+                      style={{
+                        fontWeight: '700',
+                        fontSize: '14px',
+                        color: c.textPrimary,
+                        margin: 0,
+                      }}
+                    >
+                      {pkg.name}
+                    </h3>
+                    <p
+                      style={{
+                        fontSize: '12px',
+                        color: c.textMuted,
+                        marginTop: '2px',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.05em',
+                        fontWeight: '500',
+                      }}
+                    >
+                      {pkg.category}
+                    </p>
+                  </div>
+                  {pkg.isPromo && (
+                    <span
+                      style={{
+                        backgroundColor: c.primaryLight,
+                        color: c.primary,
+                        fontSize: '12px',
+                        fontWeight: '500',
+                        padding: '4px 10px',
+                        borderRadius: '12px',
+                      }}
+                    >
+                      Promo
+                    </span>
+                  )}
+                </div>
+                <p
+                  style={{
+                    fontSize: '14px',
+                    color: c.textSecondary,
+                    margin: 0,
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden',
+                  }}
+                >
+                  {pkg.description}
+                </p>
+              </div>
+
+              {/* Features */}
+              <div
+                style={{
+                  padding: '20px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '12px',
+                  flex: 1,
+                }}
+              >
+                {/* Duration */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div
+                    style={{
+                      width: '32px',
+                      height: '32px',
+                      borderRadius: '8px',
+                      backgroundColor: c.infoLight,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <Clock style={{ width: '16px', height: '16px', color: c.info }} />
+                  </div>
+                  <div>
+                    <p style={{ fontSize: '12px', color: c.textMuted, margin: 0 }}>{t.packages.duration}</p>
+                    <p style={{ fontSize: '14px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>
+                      {pkg.duration} {t.packages.days}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Airline */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div
+                    style={{
+                      width: '32px',
+                      height: '32px',
+                      borderRadius: '8px',
+                      backgroundColor: c.successLight,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <Plane style={{ width: '16px', height: '16px', color: c.success }} />
+                  </div>
+                  <div>
+                    <p style={{ fontSize: '12px', color: c.textMuted, margin: 0 }}>{t.packages.airline}</p>
+                    <p style={{ fontSize: '14px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>
+                      {pkg.airline}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Hotel Rating */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div
+                    style={{
+                      width: '32px',
+                      height: '32px',
+                      borderRadius: '8px',
+                      backgroundColor: c.warningLight,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <Star style={{ width: '16px', height: '16px', color: c.warning }} />
+                  </div>
+                  <div>
+                    <p style={{ fontSize: '12px', color: c.textMuted, margin: 0 }}>{t.packages.hotelRating}</p>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
+                      {[...Array(pkg.makkahHotelRating)].map((_, i) => (
+                        <Star
+                          key={i}
+                          style={{
+                            width: '14px',
+                            height: '14px',
+                            fill: c.warning,
+                            color: c.warning,
+                          }}
+                        />
+                      ))}
                     </div>
-                    {pkg.isPromo && (
-                      <Badge variant="error" className="animate-pulse">
-                        Promo
-                      </Badge>
+                  </div>
+                </div>
+              </div>
+
+              {/* Footer with price */}
+              <div
+                style={{
+                  padding: '20px',
+                  paddingTop: '16px',
+                  borderTop: `1px solid ${c.borderLight}`,
+                  backgroundColor: c.cardBgHover,
+                  marginTop: 'auto',
+                }}
+              >
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'flex-end',
+                    justifyContent: 'space-between',
+                  }}
+                >
+                  <div>
+                    <p style={{ fontSize: '12px', color: c.textMuted, marginBottom: '4px' }}>
+                      {t.packages.startingFrom}
+                    </p>
+                    {pkg.isPromo && pkg.promoPrice && (
+                      <p
+                        style={{
+                          fontSize: '14px',
+                          color: c.textLight,
+                          textDecoration: 'line-through',
+                          margin: 0,
+                        }}
+                      >
+                        {formatCurrency(pkg.publishedPrice)}
+                      </p>
                     )}
+                    <p
+                      style={{
+                        fontSize: '18px',
+                        fontWeight: '700',
+                        color: c.primary,
+                        margin: 0,
+                      }}
+                    >
+                      {formatCurrency(pkg.isPromo && pkg.promoPrice ? pkg.promoPrice : pkg.publishedPrice)}
+                    </p>
                   </div>
-                  <p className="text-sm text-[var(--gray-600)] line-clamp-2">
-                    {pkg.description}
-                  </p>
+                  <button
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      padding: '8px 12px',
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      color: c.textSecondary,
+                      backgroundColor: c.cardBg,
+                      border: `1px solid ${c.border}`,
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {t.packages.viewDetails}
+                    <ArrowRight style={{ width: '14px', height: '14px' }} />
+                  </button>
                 </div>
-
-                {/* Features */}
-                <div className="p-5 space-y-3">
-                  <div className="flex items-center gap-3 text-sm">
-                    <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-[var(--info-light)]">
-                      <Clock className="h-4 w-4 text-[var(--info)]" />
-                    </div>
-                    <div>
-                      <p className="text-[var(--gray-500)] text-xs">Duration</p>
-                      <p className="font-semibold text-[var(--charcoal)]">{pkg.duration} Days</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3 text-sm">
-                    <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-[var(--success-light)]">
-                      <Plane className="h-4 w-4 text-[var(--success)]" />
-                    </div>
-                    <div>
-                      <p className="text-[var(--gray-500)] text-xs">Airline</p>
-                      <p className="font-semibold text-[var(--charcoal)]">{pkg.airline}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3 text-sm">
-                    <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-[var(--warning-light)]">
-                      <Star className="h-4 w-4 text-[var(--warning)]" />
-                    </div>
-                    <div>
-                      <p className="text-[var(--gray-500)] text-xs">Hotel Rating</p>
-                      <div className="flex items-center gap-1">
-                        {[...Array(pkg.makkahHotelRating)].map((_, i) => (
-                          <Star key={i} className="h-3.5 w-3.5 fill-[var(--warning)] text-[var(--warning)]" />
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Footer with price */}
-                <div className="p-5 pt-4 border-t border-[var(--gray-100)] bg-[var(--gray-50)]">
-                  <div className="flex items-end justify-between">
-                    <div>
-                      <p className="text-xs text-[var(--gray-500)] mb-1">Starting from</p>
-                      {pkg.isPromo && pkg.promoPrice && (
-                        <p className="text-sm text-[var(--gray-400)] line-through">
-                          {formatCurrency(pkg.publishedPrice)}
-                        </p>
-                      )}
-                      <p className="text-lg font-bold text-[var(--gezma-red)]">
-                        {formatCurrency(pkg.isPromo && pkg.promoPrice ? pkg.promoPrice : pkg.publishedPrice)}
-                      </p>
-                    </div>
-                    <Button variant="outline" size="sm" className="group-hover:bg-[var(--gezma-red)] group-hover:text-white group-hover:border-[var(--gezma-red)] transition-all">
-                      View Details
-                      <ArrowRight className="h-3.5 w-3.5 ml-1" />
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </Link>
         ))}
       </div>
