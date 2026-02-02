@@ -1,0 +1,27 @@
+{
+  "name": "GEZMA Agent",
+  "short_name": "GEZMA",
+  "description": "Travel Agency Operations Dashboard for Umrah PPIU",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#F60000",
+  "background_color": "#FFFFFF",
+  "icons": [
+    {
+      "src": "/icons/icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["business", "productivity"],
+  "orientation": "any",
+  "lang": "id",
+  "dir": "ltr"
+}
