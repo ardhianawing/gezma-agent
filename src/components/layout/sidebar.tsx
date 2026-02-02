@@ -25,7 +25,7 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { title: 'Dashboard', href: '/pilgrims', icon: LayoutDashboard },
+  { title: 'Dashboard', href: '/', icon: LayoutDashboard },
   { title: 'Pilgrims', href: '/pilgrims', icon: Users },
   { title: 'Packages', href: '/packages', icon: Package },
   { title: 'Trips', href: '/trips', icon: Plane },
@@ -47,43 +47,43 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       {/* Mobile Overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden"
+          className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm md:hidden"
           onClick={onClose}
         />
       )}
 
-      {/* Sidebar */}
+      {/* Sidebar - Premium Platinum Style */}
       <aside
         className={cn(
-          "fixed top-0 left-0 z-50 h-full w-[260px] bg-white border-r border-[var(--gray-200)] transition-transform duration-300 ease-out",
-          "shadow-xl lg:shadow-[var(--shadow-sm)]",
+          "fixed top-0 left-0 h-full w-[260px] bg-white transition-transform duration-300 ease-out",
+          "border-r border-[var(--gray-200)]",
+          "z-50 md:z-40",
           isOpen ? "translate-x-0" : "-translate-x-full",
-          "lg:translate-x-0"
+          "md:translate-x-0"
         )}
       >
-        {/* Logo */}
-        <div className="flex h-16 items-center justify-between border-b border-[var(--gray-100)] px-5">
-          <Link href="/pilgrims" className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[var(--gezma-red)] to-[var(--gezma-red-hover)] shadow-md">
-              <span className="font-bold text-white text-lg">G</span>
-            </div>
-            <div>
-              <h1 className="text-lg font-bold text-[var(--charcoal)] tracking-tight">GEZMA</h1>
-              <p className="text-[10px] text-[var(--gray-500)] uppercase tracking-wider font-medium">Agent Dashboard</p>
-            </div>
+        {/* Logo - Generous Padding */}
+        <div className="flex items-center justify-between p-6 border-b border-[var(--gray-100)]">
+          <Link href="/" className="flex items-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/images/gezma-logo.png"
+              alt="Logo"
+              className="h-9 w-auto object-contain"
+            />
           </Link>
           {/* Close button for mobile */}
           <button
             onClick={onClose}
-            className="lg:hidden p-2 rounded-lg hover:bg-[var(--gray-100)] transition-colors"
+            className="md:hidden p-2.5 rounded-lg hover:bg-[var(--gray-100)] transition-colors"
           >
             <X className="h-5 w-5 text-[var(--gray-500)]" />
           </button>
         </div>
 
-        {/* Navigation */}
-        <nav className="flex flex-col gap-1 p-3 overflow-y-auto h-[calc(100%-4rem-7rem)]">
-          <p className="px-3 py-2 text-[10px] font-semibold text-[var(--gray-400)] uppercase tracking-wider">
+        {/* Navigation - Breathing Room */}
+        <nav className="flex flex-col gap-1.5 p-4 overflow-y-auto h-[calc(100%-5.5rem-8rem)]">
+          <p className="px-3 py-2 text-[11px] font-semibold text-[var(--gray-400)] uppercase tracking-wider">
             Menu
           </p>
           {navItems.map((item) => {
@@ -97,15 +97,15 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                 href={item.href}
                 onClick={onClose}
                 className={cn(
-                  'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-150',
+                  'flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200',
                   isActive
-                    ? 'bg-gradient-to-r from-[var(--gezma-red)] to-[var(--gezma-red-hover)] text-white shadow-md'
+                    ? 'bg-[var(--gezma-red)] text-white shadow-md'
                     : 'text-[var(--gray-600)] hover:bg-[var(--gray-100)] hover:text-[var(--charcoal)]'
                 )}
               >
                 <Icon className={cn(
                   "h-5 w-5 flex-shrink-0",
-                  isActive ? "text-white" : "text-[var(--gray-500)]"
+                  isActive ? "text-white" : "text-[var(--gray-400)]"
                 )} />
                 <span className="truncate">{item.title}</span>
                 {item.badge && (
@@ -120,32 +120,32 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             );
           })}
 
-          <div className="mt-4 pt-4 border-t border-[var(--gray-100)]">
-            <p className="px-3 py-2 text-[10px] font-semibold text-[var(--gray-400)] uppercase tracking-wider">
+          <div className="mt-6 pt-4 border-t border-[var(--gray-100)]">
+            <p className="px-3 py-2 text-[11px] font-semibold text-[var(--gray-400)] uppercase tracking-wider">
               Support
             </p>
             <Link
               href="#"
-              className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--gray-600)] hover:bg-[var(--gray-100)] hover:text-[var(--charcoal)] transition-all duration-150"
+              className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-[var(--gray-600)] hover:bg-[var(--gray-100)] hover:text-[var(--charcoal)] transition-all duration-200"
             >
-              <HelpCircle className="h-5 w-5 text-[var(--gray-500)]" />
+              <HelpCircle className="h-5 w-5 text-[var(--gray-400)]" />
               <span>Help Center</span>
             </Link>
           </div>
         </nav>
 
-        {/* Footer */}
-        <div className="absolute bottom-0 left-0 right-0 border-t border-[var(--gray-100)] p-4 bg-[var(--gray-50)]">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[var(--charcoal)] to-[var(--gray-700)] flex items-center justify-center shadow-sm">
-              <span className="text-sm font-semibold text-white">BT</span>
+        {/* Footer - Premium Style */}
+        <div className="absolute bottom-0 left-0 right-0 border-t border-[var(--gray-100)] p-5 bg-[var(--gray-50)]/50">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="h-11 w-11 rounded-xl bg-[var(--charcoal)] flex items-center justify-center shadow-sm">
+              <span className="text-sm font-bold text-white">BT</span>
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-[var(--charcoal)] truncate">Barokah Travel</p>
               <p className="text-xs text-[var(--gray-500)]">PPIU/123/2023</p>
             </div>
           </div>
-          <button className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-[var(--gray-600)] hover:text-[var(--error)] hover:bg-[var(--error-light)] rounded-lg transition-colors">
+          <button className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-[var(--gray-600)] hover:text-[var(--error)] hover:bg-[var(--error-light)] rounded-xl transition-all duration-200">
             <LogOut className="h-4 w-4" />
             <span>Sign Out</span>
           </button>

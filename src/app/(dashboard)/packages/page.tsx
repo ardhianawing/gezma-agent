@@ -34,7 +34,7 @@ export default function PackagesPage() {
                 <div className="relative p-5 pb-4 bg-gradient-to-br from-[var(--gray-50)] to-white border-b border-[var(--gray-100)]">
                   <div className="flex items-start justify-between mb-3">
                     <div>
-                      <h3 className="font-bold text-lg text-[var(--charcoal)] group-hover:text-[var(--gezma-red)] transition-colors">
+                      <h3 className="font-bold text-sm text-[var(--charcoal)] group-hover:text-[var(--gezma-red)] transition-colors">
                         {pkg.name}
                       </h3>
                       <p className="text-xs text-[var(--gray-500)] mt-0.5 uppercase tracking-wide font-medium">
@@ -99,7 +99,7 @@ export default function PackagesPage() {
                           {formatCurrency(pkg.publishedPrice)}
                         </p>
                       )}
-                      <p className="text-2xl font-bold text-[var(--gezma-red)]">
+                      <p className="text-lg font-bold text-[var(--gezma-red)]">
                         {formatCurrency(pkg.isPromo && pkg.promoPrice ? pkg.promoPrice : pkg.publishedPrice)}
                       </p>
                     </div>

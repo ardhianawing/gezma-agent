@@ -49,26 +49,29 @@ const iconMap = {
 };
 
 const priorityColors = {
-  critical: 'bg-[var(--error-light)] text-[var(--error)] border-[var(--error)]',
-  high: 'bg-[var(--warning-light)] text-[var(--warning)] border-[var(--warning)]',
-  medium: 'bg-[var(--info-light)] text-[var(--info)] border-[var(--info)]',
+  critical: 'bg-[#D32F2F]', // GEZMA Red
+  high: 'bg-[#F59E0B]',     // Warning Orange
+  medium: 'bg-[#1E40AF]',   // Info Blue
 };
 
 export function ActionCenter() {
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
+    <Card className="rounded-xl border border-[var(--gray-200)] shadow-sm overflow-hidden">
+      <CardHeader className="p-6">
+        <div className="flex items-center justify-between gap-4">
           <div>
-            <CardTitle>Action Center</CardTitle>
-            <CardDescription>Items requiring your attention</CardDescription>
+            <CardTitle className="text-xl font-bold">Action Center</CardTitle>
+            <CardDescription className="text-sm mt-1">Items requiring your attention</CardDescription>
           </div>
-          <Badge variant="error">{mockAlerts.length}</Badge>
+          {/* Badge lebih besar, dengan padding */}
+          <Badge variant="error" className="h-8 w-8 text-sm font-bold flex items-center justify-center rounded-full flex-shrink-0">
+            {mockAlerts.length}
+          </Badge>
         </div>
       </CardHeader>
-      <CardContent className="space-y-3">
+      <CardContent className="p-6 pt-0 space-y-4">
         {mockAlerts.length === 0 ? (
-          <p className="text-center text-sm text-[var(--gray-600)] py-4">
+          <p className="text-center text-sm text-[var(--gray-500)] py-6">
             All caught up! No actions required.
           </p>
         ) : (
@@ -76,18 +79,24 @@ export function ActionCenter() {
             const Icon = iconMap[alert.type];
             return (
               <Link key={alert.id} href={alert.href}>
-                <div className={`flex items-start gap-3 rounded-[12px] border-l-4 bg-white p-4 transition-shadow hover:shadow-[var(--shadow-md)] ${priorityColors[alert.priority]}`}>
-                  <Icon className="h-5 w-5 mt-0.5 flex-shrink-0" />
+                <div className="group flex items-center gap-4 rounded-xl border border-[var(--gray-200)] bg-white pl-8 pr-6 py-5 transition-all duration-200 hover:border-[var(--gezma-red)] hover:shadow-xl relative overflow-hidden">
+                  {/* Strategic Indicator Ribbon - Wider and Explicitly Colored */}
+                  <div className={`absolute left-0 top-0 bottom-0 w-2 ${priorityColors[alert.priority]}`} />
+
+                  <div className="flex items-center justify-center h-12 w-12 rounded-full bg-[var(--gray-50)] flex-shrink-0 group-hover:scale-110 transition-transform">
+                    <Icon className="h-6 w-6 text-[var(--gray-600)]" />
+                  </div>
+
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <p className="font-medium text-sm text-[var(--charcoal)]">{alert.title}</p>
+                    <div className="flex items-center gap-3">
+                      <p className="font-bold text-base text-[var(--charcoal)]">{alert.title}</p>
                       {alert.count && (
-                        <Badge variant="secondary" className="h-5 text-xs">
+                        <Badge variant="secondary" className="h-6 text-xs px-2.5 rounded-full font-bold ml-1 flex-shrink-0">
                           {alert.count}
                         </Badge>
                       )}
                     </div>
-                    <p className="text-sm text-[var(--gray-600)] mt-0.5">{alert.description}</p>
+                    <p className="text-sm text-[var(--gray-500)] mt-1 line-clamp-1">{alert.description}</p>
                   </div>
                 </div>
               </Link>

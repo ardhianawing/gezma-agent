@@ -55,24 +55,24 @@ const actions = [
 
 export function QuickActions() {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Quick Actions</CardTitle>
+    <Card className="rounded-xl border border-[var(--gray-200)] shadow-sm overflow-hidden">
+      <CardHeader className="p-6 pb-6">
+        <CardTitle className="text-xl font-bold">Quick Actions</CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <CardContent className="p-6 pt-0">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {actions.map((action) => (
             <Link key={action.href} href={action.href}>
-              <div className="flex items-center gap-3 rounded-[12px] border border-[var(--gray-border)] p-4 transition-all hover:border-[var(--gray-400)] hover:shadow-sm">
+              <div className="flex items-center gap-4 rounded-xl border border-[var(--gray-200)] bg-[var(--gray-50)]/50 p-5 transition-all duration-200 hover:border-[var(--gezma-red)] hover:bg-white hover:shadow-md group">
                 <div
-                  className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-[10px]"
+                  className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl transition-transform group-hover:scale-105"
                   style={{ backgroundColor: action.bgColor }}
                 >
                   <action.icon className="h-5 w-5" style={{ color: action.color }} />
                 </div>
                 <div>
-                  <p className="font-medium text-sm text-[var(--charcoal)]">{action.title}</p>
-                  <p className="text-xs text-[var(--gray-600)]">{action.description}</p>
+                  <p className="font-semibold text-sm text-[var(--charcoal)]">{action.title}</p>
+                  <p className="text-xs text-[var(--gray-500)] mt-0.5">{action.description}</p>
                 </div>
               </div>
             </Link>

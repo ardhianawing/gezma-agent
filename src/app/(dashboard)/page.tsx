@@ -21,14 +21,14 @@ export default function DashboardPage() {
   const totalRevenue = mockPilgrims.reduce((sum, p) => sum + p.totalPaid, 0);
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col gap-8">
       <PageHeader
         title="Dashboard"
         description="Welcome back! Here's what's happening with your agency."
       />
 
-      {/* Stats */}
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      {/* Stats - Grid Structure: 4 Equal Columns, Gap 24px */}
+      <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard
           title="Total Pilgrims"
           value={totalPilgrims}
@@ -68,15 +68,16 @@ export default function DashboardPage() {
         />
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-2">
-        {/* Action Center */}
-        <div className="relative z-0">
+      {/* Middle Section: 2:1 Ratio (Action Center : Upcoming), Gap 32px */}
+      <div className="grid gap-8 xl:grid-cols-3 items-start">
+        {/* Action Center - Spans 2 Columns */}
+        <div className="relative z-0 h-full xl:col-span-2">
           <ActionCenter />
         </div>
 
-        {/* Upcoming Trips */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-4">
+        {/* Upcoming Trips - Spans 1 Column */}
+        <Card className="h-full xl:col-span-1 rounded-xl shadow-sm">
+          <CardHeader className="p-6 pb-6">
             <CardTitle className="flex items-center gap-2">
               <Calendar className="h-5 w-5 text-[var(--gray-500)]" />
               Upcoming Departures
@@ -88,13 +89,13 @@ export default function DashboardPage() {
               </Button>
             </Link>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="p-6 pt-0 space-y-4">
             {mockTrips
               .filter((t) => t.status === 'preparing' || t.status === 'ready')
               .slice(0, 3)
               .map((trip) => (
                 <Link key={trip.id} href={`/trips/${trip.id}`}>
-                  <div className="flex items-center justify-between rounded-xl border border-[var(--gray-200)] bg-[var(--gray-50)] p-4 hover:border-[var(--gezma-red)] hover:bg-white transition-all cursor-pointer group">
+                  <div className="flex items-center justify-between rounded-xl border border-[var(--gray-200)] bg-[var(--gray-50)] p-5 hover:border-[var(--gezma-red)] hover:bg-white transition-all cursor-pointer group">
                     <div className="flex items-center gap-4">
                       <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[var(--gezma-red-light)] group-hover:bg-[var(--gezma-red)] transition-colors">
                         <Plane className="h-5 w-5 text-[var(--gezma-red)] group-hover:text-white transition-colors" />
@@ -124,17 +125,17 @@ export default function DashboardPage() {
       <QuickActions />
 
       {/* Recent Activity */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Recent Activity</CardTitle>
+      <Card className="rounded-xl shadow-sm">
+        <CardHeader className="p-6 pb-6">
+          <CardTitle className="text-xl font-bold">Recent Activity</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-6 pt-0">
           <div className="space-y-0 relative">
             {/* Timeline Line */}
             <div className="absolute left-[19px] top-3 bottom-3 w-0.5 bg-gradient-to-b from-[var(--gezma-red)] via-[var(--gray-200)] to-transparent" />
 
             {mockActivities.slice(0, 5).map((activity, i) => (
-              <div key={activity.id} className="flex gap-4 relative py-3 group">
+              <div key={activity.id} className="flex gap-4 relative py-4 group">
                 <div className={`
                   flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full z-10 transition-transform group-hover:scale-110
                   ${i === 0
