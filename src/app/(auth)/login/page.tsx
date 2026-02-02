@@ -10,13 +10,13 @@ import { Button } from '@/components/ui/button';
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('admin@barokahtravel.com');
+  const [password, setPassword] = useState('demo123');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Mock authentication - just redirect to dashboard
-    router.push('/');
+    router.push('/pilgrims');
   };
 
   return (
