@@ -16,24 +16,44 @@ import {
   ChevronRight,
   X,
   LucideIcon,
+  ShoppingBag,
+  MessageSquare,
+  Newspaper,
+  GraduationCap,
+  HeadphonesIcon,
 } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n';
 import { useTheme } from '@/lib/theme';
 
 interface MenuItem {
-  labelKey: 'dashboard' | 'pilgrims' | 'packages' | 'trips' | 'documents' | 'agency' | 'settings';
+  label: string;
   href: string;
   icon: LucideIcon;
 }
 
+// === OPERASIONAL ===
 const menuItems: MenuItem[] = [
-  { labelKey: 'dashboard', href: '/', icon: LayoutDashboard },
-  { labelKey: 'pilgrims', href: '/pilgrims', icon: Users },
-  { labelKey: 'packages', href: '/packages', icon: Package },
-  { labelKey: 'trips', href: '/trips', icon: Plane },
-  { labelKey: 'documents', href: '/documents', icon: FileText },
-  { labelKey: 'agency', href: '/agency', icon: Building2 },
-  { labelKey: 'settings', href: '/settings', icon: Settings },
+  { label: 'Dasbor', href: '/', icon: LayoutDashboard },
+  { label: 'Jamaah', href: '/pilgrims', icon: Users },
+  { label: 'Paket', href: '/packages', icon: Package },
+  { label: 'Perjalanan', href: '/trips', icon: Plane },
+  { label: 'Dokumen', href: '/documents', icon: FileText },
+  { label: 'Agensi', href: '/agency', icon: Building2 },
+];
+
+// === PLATFORM ===
+const platformItems: MenuItem[] = [
+  { label: 'Marketplace', href: '/marketplace', icon: ShoppingBag },
+  { label: 'Forum', href: '/forum', icon: MessageSquare },
+  { label: 'Berita', href: '/news', icon: Newspaper },
+  { label: 'Akademi', href: '/academy', icon: GraduationCap },
+  { label: 'Layanan', href: '/services', icon: HeadphonesIcon },
+];
+
+// === LAINNYA ===
+const settingsItems: MenuItem[] = [
+  { label: 'Pengaturan', href: '/settings', icon: Settings },
+  { label: 'Pusat Bantuan', href: '/help', icon: HelpCircle },
 ];
 
 interface SidebarProps {
@@ -54,8 +74,56 @@ export function Sidebar({ isOpen, onClose, isOverlay = false }: SidebarProps) {
     return pathname.startsWith(href);
   };
 
-  // Don't render sidebar on overlay mode when closed
-  const shouldShow = isOverlay ? isOpen : true;
+  const renderMenuItem = (item: MenuItem) => {
+    const Icon = item.icon;
+    const active = isActive(item.href);
+
+    return (
+      <Link key={item.href} href={item.href} style={{ textDecoration: 'none' }} onClick={onClose}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            padding: '10px 16px',
+            borderRadius: '10px',
+            cursor: 'pointer',
+            transition: 'all 0.15s ease',
+            backgroundColor: active ? c.sidebarActiveItem : 'transparent',
+            borderLeft: active ? `3px solid ${c.primary}` : '3px solid transparent',
+          }}
+        >
+          <Icon
+            style={{
+              width: '20px',
+              height: '20px',
+              color: active ? c.primary : c.textMuted,
+              flexShrink: 0,
+            }}
+          />
+          <span
+            style={{
+              fontSize: '14px',
+              fontWeight: active ? '600' : '500',
+              color: active ? c.primary : c.textSecondary,
+              flex: 1,
+            }}
+          >
+            {item.label}
+          </span>
+          {active && (
+            <ChevronRight
+              style={{
+                width: '16px',
+                height: '16px',
+                color: c.primary,
+              }}
+            />
+          )}
+        </div>
+      </Link>
+    );
+  };
 
   return (
     <>
@@ -139,76 +207,8 @@ export function Sidebar({ isOpen, onClose, isOverlay = false }: SidebarProps) {
 
         {/* Main Menu */}
         <div style={{ flex: 1, padding: '16px 12px', overflowY: 'auto' }}>
-          <p
-            style={{
-              fontSize: '11px',
-              fontWeight: '600',
-              color: c.textLight,
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
-              padding: '0 12px',
-              marginBottom: '8px',
-            }}
-          >
-            {t.nav.menu}
-          </p>
-
-          <nav style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            {menuItems.map((item) => {
-              const Icon = item.icon;
-              const active = isActive(item.href);
-              const label = t.nav[item.labelKey];
-
-              return (
-                <Link key={item.href} href={item.href} style={{ textDecoration: 'none' }} onClick={onClose}>
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '12px',
-                      padding: '12px 16px',
-                      borderRadius: '10px',
-                      cursor: 'pointer',
-                      transition: 'all 0.15s ease',
-                      backgroundColor: active ? c.sidebarActiveItem : 'transparent',
-                      borderLeft: active ? `3px solid ${c.primary}` : '3px solid transparent',
-                    }}
-                  >
-                    <Icon
-                      style={{
-                        width: '20px',
-                        height: '20px',
-                        color: active ? c.primary : c.textMuted,
-                        flexShrink: 0,
-                      }}
-                    />
-                    <span
-                      style={{
-                        fontSize: '14px',
-                        fontWeight: active ? '600' : '500',
-                        color: active ? c.primary : c.textSecondary,
-                        flex: 1,
-                      }}
-                    >
-                      {label}
-                    </span>
-                    {active && (
-                      <ChevronRight
-                        style={{
-                          width: '16px',
-                          height: '16px',
-                          color: c.primary,
-                        }}
-                      />
-                    )}
-                  </div>
-                </Link>
-              );
-            })}
-          </nav>
-
-          {/* Support Section */}
-          <div style={{ marginTop: '24px' }}>
+          {/* Section 1: OPERASIONAL */}
+          <div>
             <p
               style={{
                 fontSize: '11px',
@@ -220,42 +220,56 @@ export function Sidebar({ isOpen, onClose, isOverlay = false }: SidebarProps) {
                 marginBottom: '8px',
               }}
             >
-              {t.nav.support}
+              Operasional
             </p>
-
             <nav style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-              <Link href="/help" style={{ textDecoration: 'none' }} onClick={onClose}>
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '12px',
-                    padding: '12px 16px',
-                    borderRadius: '10px',
-                    cursor: 'pointer',
-                    transition: 'all 0.15s ease',
-                    backgroundColor: 'transparent',
-                  }}
-                >
-                  <HelpCircle
-                    style={{
-                      width: '20px',
-                      height: '20px',
-                      color: c.textMuted,
-                      flexShrink: 0,
-                    }}
-                  />
-                  <span
-                    style={{
-                      fontSize: '14px',
-                      fontWeight: '500',
-                      color: c.textSecondary,
-                    }}
-                  >
-                    {t.nav.helpCenter}
-                  </span>
-                </div>
-              </Link>
+              {menuItems.map(renderMenuItem)}
+            </nav>
+          </div>
+
+          {/* Divider */}
+          <div style={{ height: '1px', backgroundColor: c.borderLight, margin: '12px 0' }} />
+
+          {/* Section 2: PLATFORM */}
+          <div>
+            <p
+              style={{
+                fontSize: '11px',
+                fontWeight: '600',
+                color: c.textLight,
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+                padding: '0 12px',
+                marginBottom: '8px',
+              }}
+            >
+              Platform
+            </p>
+            <nav style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              {platformItems.map(renderMenuItem)}
+            </nav>
+          </div>
+
+          {/* Divider */}
+          <div style={{ height: '1px', backgroundColor: c.borderLight, margin: '12px 0' }} />
+
+          {/* Section 3: LAINNYA */}
+          <div>
+            <p
+              style={{
+                fontSize: '11px',
+                fontWeight: '600',
+                color: c.textLight,
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+                padding: '0 12px',
+                marginBottom: '8px',
+              }}
+            >
+              Lainnya
+            </p>
+            <nav style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              {settingsItems.map(renderMenuItem)}
             </nav>
           </div>
         </div>
