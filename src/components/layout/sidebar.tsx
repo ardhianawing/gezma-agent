@@ -21,6 +21,7 @@ import {
   Newspaper,
   GraduationCap,
   HeadphonesIcon,
+  Globe,
 } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n';
 import { useTheme } from '@/lib/theme';
@@ -44,6 +45,7 @@ const menuItems: MenuItem[] = [
 // === PLATFORM ===
 const platformItems: MenuItem[] = [
   { label: 'Marketplace', href: '/marketplace', icon: ShoppingBag },
+  { label: 'Trade Centre', href: '/trade', icon: Globe },
   { label: 'Forum', href: '/forum', icon: MessageSquare },
   { label: 'Berita', href: '/news', icon: Newspaper },
   { label: 'Akademi', href: '/academy', icon: GraduationCap },
