@@ -207,30 +207,7 @@ export function Sidebar({ isOpen, onClose, isOverlay = false }: SidebarProps) {
 
         {/* Main Menu */}
         <div style={{ flex: 1, padding: '16px 12px', overflowY: 'auto' }}>
-          {/* Section 1: OPERASIONAL */}
-          <div>
-            <p
-              style={{
-                fontSize: '11px',
-                fontWeight: '600',
-                color: c.textLight,
-                textTransform: 'uppercase',
-                letterSpacing: '0.05em',
-                padding: '0 12px',
-                marginBottom: '8px',
-              }}
-            >
-              Operasional
-            </p>
-            <nav style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-              {menuItems.map(renderMenuItem)}
-            </nav>
-          </div>
-
-          {/* Divider */}
-          <div style={{ height: '1px', backgroundColor: c.borderLight, margin: '12px 0' }} />
-
-          {/* Section 2: PLATFORM */}
+          {/* Section 1: PLATFORM */}
           <div>
             <p
               style={{
@@ -247,6 +224,29 @@ export function Sidebar({ isOpen, onClose, isOverlay = false }: SidebarProps) {
             </p>
             <nav style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
               {platformItems.map(renderMenuItem)}
+            </nav>
+          </div>
+
+          {/* Divider */}
+          <div style={{ height: '1px', backgroundColor: c.borderLight, margin: '12px 0' }} />
+
+          {/* Section 2: OPERASIONAL */}
+          <div>
+            <p
+              style={{
+                fontSize: '11px',
+                fontWeight: '600',
+                color: c.textLight,
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+                padding: '0 12px',
+                marginBottom: '8px',
+              }}
+            >
+              Operasional
+            </p>
+            <nav style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              {menuItems.map(renderMenuItem)}
             </nav>
           </div>
 
