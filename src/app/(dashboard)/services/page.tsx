@@ -19,8 +19,10 @@ import {
   faqs,
   contactInfo,
 } from '@/data/mock-services';
+import { useResponsive } from '@/lib/hooks/use-responsive';
 
 export default function ServicesPage() {
+  const { isMobile, isTablet } = useResponsive();
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [expandedFaq, setExpandedFaq] = useState<string | null>(null);
 
@@ -44,7 +46,7 @@ export default function ServicesPage() {
       </div>
 
       {/* QUICK CONTACT CARDS */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : isTablet ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: '16px' }}>
         {[
           { icon: MessageCircle, label: 'Live Chat', sublabel: 'Online 24/7', color: '#059669', bg: '#D1FAE5', action: 'Mulai Chat' },
           { icon: Phone, label: 'WhatsApp', sublabel: contactInfo.whatsapp, color: '#16A34A', bg: '#DCFCE7', action: 'Hubungi' },
@@ -133,7 +135,7 @@ export default function ServicesPage() {
           </div>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : isTablet ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)', gap: '16px' }}>
           {filteredServices.map((service) => {
             const cat = serviceCategories.find(c => c.id === service.category);
             return (
@@ -202,7 +204,7 @@ export default function ServicesPage() {
       </div>
 
       {/* FAQ + CONTACT INFO */}
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile || isTablet ? '1fr' : '2fr 1fr', gap: '24px' }}>
         {/* FAQ */}
         <div>
           <h2 style={{ fontSize: '18px', fontWeight: '700', color: '#111827', margin: '0 0 16px 0' }}>

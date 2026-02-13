@@ -20,6 +20,7 @@ import {
   academyStats,
   type CourseCategory,
 } from '@/data/mock-academy';
+import { useResponsive } from '@/lib/hooks/use-responsive';
 
 function formatNumber(num: number): string {
   if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
@@ -31,6 +32,7 @@ function formatPrice(price: number): string {
 }
 
 export default function AcademyPage() {
+  const { isMobile, isTablet } = useResponsive();
   const [activeCategory, setActiveCategory] = useState<CourseCategory>('semua');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -79,7 +81,7 @@ export default function AcademyPage() {
       </div>
 
       {/* STATS */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : isTablet ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: '16px' }}>
         {[
           { icon: BookOpen, label: 'Total Kursus', value: academyStats.totalCourses, color: '#2563EB', bg: '#DBEAFE' },
           { icon: Users, label: 'Total Peserta', value: formatNumber(academyStats.totalStudents), color: '#059669', bg: '#D1FAE5' },
@@ -127,7 +129,7 @@ export default function AcademyPage() {
           </button>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : isTablet ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: '16px' }}>
           {learningPaths.map((path) => (
             <div
               key={path.id}
@@ -236,7 +238,7 @@ export default function AcademyPage() {
           <p style={{ fontSize: '14px', color: '#9CA3AF' }}>Tidak ada kursus ditemukan</p>
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : isTablet ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)', gap: '20px' }}>
           {filteredCourses.map((course) => {
             const levelStyle = getLevelColor(course.level);
             const catColor = getCatColor(course.category);
