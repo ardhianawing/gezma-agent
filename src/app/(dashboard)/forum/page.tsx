@@ -20,6 +20,7 @@ import {
   forumStats,
   type ForumCategory,
 } from '@/data/mock-forum';
+import { useResponsive } from '@/lib/hooks/use-responsive';
 
 function timeAgo(dateStr: string): string {
   const now = new Date();
@@ -40,6 +41,7 @@ function formatNumber(num: number): string {
 }
 
 export default function ForumPage() {
+  const { isMobile, isTablet } = useResponsive();
   const [activeCategory, setActiveCategory] = useState<ForumCategory>('semua');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<'latest' | 'hot' | 'most_liked'>('latest');
@@ -92,13 +94,13 @@ export default function ForumPage() {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', width: '100%', maxWidth: '100%', overflow: 'hidden', boxSizing: 'border-box' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '16px' : '20px', width: '100%', maxWidth: '100%', overflow: 'hidden', boxSizing: 'border-box' }}>
 
       {/* ===== HEADER ===== */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
         <div style={{ minWidth: 0 }}>
-          <h1 style={{ fontSize: '28px', fontWeight: '700', color: '#111827', margin: 0 }}>Forum</h1>
-          <p style={{ fontSize: '14px', color: '#6B7280', marginTop: '4px' }}>
+          <h1 style={{ fontSize: isMobile ? '24px' : '28px', fontWeight: '700', color: '#111827', margin: 0 }}>Forum</h1>
+          <p style={{ fontSize: isMobile ? '13px' : '14px', color: '#6B7280', marginTop: '4px' }}>
             Komunitas travel umrah Indonesia —{' '}
             <span style={{ color: '#059669', fontWeight: '600' }}>{forumStats.onlineNow} online</span>
             {' · '}{formatNumber(forumStats.totalMembers)} anggota · {formatNumber(forumStats.totalThreads)} thread
