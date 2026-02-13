@@ -213,17 +213,19 @@ export default function ForumPage() {
         backgroundColor: 'white', borderRadius: '12px', border: '1px solid #E5E7EB',
         overflow: 'hidden', width: '100%', maxWidth: '100%',
       }}>
-        {/* Table Header */}
-        <div style={{
-          display: 'flex', alignItems: 'center',
-          padding: '10px 16px', backgroundColor: '#F9FAFB', borderBottom: '1px solid #E5E7EB',
-          fontSize: '11px', fontWeight: '600', color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em',
-        }}>
-          <span style={{ flex: 1 }}>THREAD</span>
-          <span style={{ width: '60px', textAlign: 'center', flexShrink: 0 }}>BALAS</span>
-          <span style={{ width: '60px', textAlign: 'center', flexShrink: 0 }}>LIHAT</span>
-          <span style={{ width: '130px', textAlign: 'right', flexShrink: 0 }}>TERAKHIR</span>
-        </div>
+        {/* Table Header - Hidden on mobile */}
+        {!isMobile && (
+          <div style={{
+            display: 'flex', alignItems: 'center',
+            padding: '10px 16px', backgroundColor: '#F9FAFB', borderBottom: '1px solid #E5E7EB',
+            fontSize: '11px', fontWeight: '600', color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em',
+          }}>
+            <span style={{ flex: 1 }}>THREAD</span>
+            <span style={{ width: '60px', textAlign: 'center', flexShrink: 0 }}>BALAS</span>
+            <span style={{ width: '60px', textAlign: 'center', flexShrink: 0 }}>LIHAT</span>
+            <span style={{ width: '130px', textAlign: 'right', flexShrink: 0 }}>TERAKHIR</span>
+          </div>
+        )}
 
         {/* Thread Rows */}
         {filteredThreads.length === 0 ? (
@@ -241,12 +243,15 @@ export default function ForumPage() {
               <div
                 key={thread.id}
                 style={{
-                  display: 'flex', alignItems: 'center',
-                  padding: '12px 16px',
+                  display: 'flex',
+                  flexDirection: isMobile ? 'column' : 'row',
+                  alignItems: isMobile ? 'stretch' : 'center',
+                  padding: isMobile ? '14px' : '12px 16px',
                   borderBottom: index < filteredThreads.length - 1 ? '1px solid #F3F4F6' : 'none',
                   backgroundColor: isPinned ? '#FFFBEB' : 'white',
                   cursor: 'pointer',
                   transition: 'background-color 0.1s',
+                  gap: isMobile ? '10px' : '0',
                 }}
                 onMouseEnter={(e) => {
                   if (!isPinned) e.currentTarget.style.backgroundColor = '#F9FAFB';
@@ -255,8 +260,8 @@ export default function ForumPage() {
                   if (!isPinned) e.currentTarget.style.backgroundColor = 'white';
                 }}
               >
-                {/* Thread Info - FLEX 1 */}
-                <div style={{ flex: 1, display: 'flex', gap: '10px', alignItems: 'center', minWidth: 0, overflow: 'hidden' }}>
+                {/* Thread Info */}
+                <div style={{ flex: 1, display: 'flex', gap: '10px', alignItems: 'flex-start', minWidth: 0, overflow: 'hidden' }}>
                   {/* Avatar */}
                   <div style={{
                     width: '36px', height: '36px', borderRadius: '50%', flexShrink: 0,
@@ -270,21 +275,25 @@ export default function ForumPage() {
 
                   <div style={{ minWidth: 0, flex: 1, overflow: 'hidden' }}>
                     {/* Title */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginBottom: '3px', overflow: 'hidden' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginBottom: '3px', flexWrap: isMobile ? 'wrap' : 'nowrap', overflow: 'hidden' }}>
                       {isPinned && <Pin style={{ width: '12px', height: '12px', color: '#D97706', flexShrink: 0 }} />}
                       {isHot && <Flame style={{ width: '12px', height: '12px', color: '#DC2626', flexShrink: 0 }} />}
                       {thread.isSolved && <CheckCircle style={{ width: '12px', height: '12px', color: '#059669', flexShrink: 0 }} />}
 
                       <span style={{
                         fontSize: '13px', fontWeight: '600', color: '#111827',
-                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                        overflow: 'hidden', textOverflow: 'ellipsis',
+                        whiteSpace: isMobile ? 'normal' : 'nowrap',
+                        display: isMobile ? '-webkit-box' : 'block',
+                        WebkitLineClamp: isMobile ? 2 : undefined,
+                        WebkitBoxOrient: isMobile ? 'vertical' : undefined,
                       }}>
                         {thread.title}
                       </span>
                     </div>
 
                     {/* Meta */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', overflow: 'hidden' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', overflow: 'hidden', flexWrap: 'wrap' }}>
                       <span style={{ fontSize: '11px', color: '#374151', fontWeight: '500', flexShrink: 0 }}>
                         {thread.author.name}
                       </span>
@@ -309,7 +318,7 @@ export default function ForumPage() {
                         </span>
                       )}
 
-                      {thread.tags.slice(0, 2).map((tag) => (
+                      {!isMobile && thread.tags.slice(0, 2).map((tag) => (
                         <span key={tag} style={{
                           fontSize: '10px', color: '#9CA3AF', fontWeight: '500', flexShrink: 0, whiteSpace: 'nowrap',
                         }}>
@@ -320,47 +329,77 @@ export default function ForumPage() {
                   </div>
                 </div>
 
-                {/* Reply Count */}
-                <div style={{ width: '60px', textAlign: 'center', flexShrink: 0 }}>
-                  <p style={{
-                    fontSize: '15px', fontWeight: '700', margin: 0,
-                    color: thread.replyCount > 50 ? '#DC2626' : thread.replyCount > 20 ? '#D97706' : '#374151',
+                {/* Mobile: Stats Row */}
+                {isMobile ? (
+                  <div style={{
+                    display: 'flex', alignItems: 'center', gap: '16px',
+                    paddingLeft: '46px',
+                    fontSize: '11px', color: '#6B7280',
                   }}>
-                    {thread.replyCount}
-                  </p>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '2px' }}>
-                    <Heart style={{ width: '9px', height: '9px', color: '#D1D5DB' }} />
-                    <span style={{ fontSize: '9px', color: '#9CA3AF' }}>{thread.likeCount}</span>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <MessageSquare style={{ width: '12px', height: '12px' }} />
+                      <span style={{
+                        fontWeight: '700',
+                        color: thread.replyCount > 50 ? '#DC2626' : thread.replyCount > 20 ? '#D97706' : '#374151',
+                      }}>{thread.replyCount}</span>
+                    </span>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <Eye style={{ width: '12px', height: '12px' }} />
+                      {formatNumber(thread.viewCount)}
+                    </span>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <Heart style={{ width: '12px', height: '12px' }} />
+                      {thread.likeCount}
+                    </span>
+                    <span style={{ marginLeft: 'auto', fontSize: '10px', color: '#9CA3AF' }}>
+                      {thread.lastReply ? thread.lastReply.time : timeAgo(thread.updatedAt)}
+                    </span>
                   </div>
-                </div>
-
-                {/* View Count */}
-                <div style={{ width: '60px', textAlign: 'center', flexShrink: 0 }}>
-                  <p style={{ fontSize: '13px', fontWeight: '600', color: '#6B7280', margin: 0 }}>
-                    {formatNumber(thread.viewCount)}
-                  </p>
-                </div>
-
-                {/* Last Activity */}
-                <div style={{ width: '130px', textAlign: 'right', flexShrink: 0 }}>
-                  {thread.lastReply ? (
-                    <>
+                ) : (
+                  <>
+                    {/* Desktop: Reply Count */}
+                    <div style={{ width: '60px', textAlign: 'center', flexShrink: 0 }}>
                       <p style={{
-                        fontSize: '11px', fontWeight: '500', color: '#374151', margin: 0,
-                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                        fontSize: '15px', fontWeight: '700', margin: 0,
+                        color: thread.replyCount > 50 ? '#DC2626' : thread.replyCount > 20 ? '#D97706' : '#374151',
                       }}>
-                        {thread.lastReply.user}
+                        {thread.replyCount}
                       </p>
-                      <p style={{ fontSize: '10px', color: '#9CA3AF', margin: '1px 0 0 0' }}>
-                        {thread.lastReply.time}
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '2px' }}>
+                        <Heart style={{ width: '9px', height: '9px', color: '#D1D5DB' }} />
+                        <span style={{ fontSize: '9px', color: '#9CA3AF' }}>{thread.likeCount}</span>
+                      </div>
+                    </div>
+
+                    {/* Desktop: View Count */}
+                    <div style={{ width: '60px', textAlign: 'center', flexShrink: 0 }}>
+                      <p style={{ fontSize: '13px', fontWeight: '600', color: '#6B7280', margin: 0 }}>
+                        {formatNumber(thread.viewCount)}
                       </p>
-                    </>
-                  ) : (
-                    <p style={{ fontSize: '10px', color: '#9CA3AF', margin: 0 }}>
-                      {timeAgo(thread.updatedAt)}
-                    </p>
-                  )}
-                </div>
+                    </div>
+
+                    {/* Desktop: Last Activity */}
+                    <div style={{ width: '130px', textAlign: 'right', flexShrink: 0 }}>
+                      {thread.lastReply ? (
+                        <>
+                          <p style={{
+                            fontSize: '11px', fontWeight: '500', color: '#374151', margin: 0,
+                            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                          }}>
+                            {thread.lastReply.user}
+                          </p>
+                          <p style={{ fontSize: '10px', color: '#9CA3AF', margin: '1px 0 0 0' }}>
+                            {thread.lastReply.time}
+                          </p>
+                        </>
+                      ) : (
+                        <p style={{ fontSize: '10px', color: '#9CA3AF', margin: 0 }}>
+                          {timeAgo(thread.updatedAt)}
+                        </p>
+                      )}
+                    </div>
+                  </>
+                )}
               </div>
             );
           })
