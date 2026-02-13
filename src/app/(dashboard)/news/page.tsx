@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react';
 import { Search, ChevronRight, X } from 'lucide-react';
 import { newsArticles, newsCategories, type NewsCategory } from '@/data/mock-news';
+import { useResponsive } from '@/lib/hooks/use-responsive';
 
 function timeAgo(dateStr: string): string {
   const now = new Date();
@@ -16,6 +17,7 @@ function timeAgo(dateStr: string): string {
 }
 
 export default function NewsPage() {
+  const { isMobile, isTablet } = useResponsive();
   const [activeCategory, setActiveCategory] = useState<NewsCategory>('semua');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -44,25 +46,38 @@ export default function NewsPage() {
   const getCatLabel = (catId: string) => newsCategories.find(c => c.id === catId)?.label || '';
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', width: '100%', maxWidth: '100%', overflow: 'hidden', boxSizing: 'border-box' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '16px' : '24px', width: '100%', maxWidth: '100%', overflow: 'hidden', boxSizing: 'border-box' }}>
 
       {/* HEADER */}
       <div>
-        <h1 style={{ fontSize: '28px', fontWeight: '700', color: '#111827', margin: 0 }}>Berita</h1>
-        <p style={{ fontSize: '14px', color: '#6B7280', marginTop: '4px' }}>
+        <h1 style={{ fontSize: isMobile ? '24px' : '28px', fontWeight: '700', color: '#111827', margin: 0 }}>Berita</h1>
+        <p style={{ fontSize: isMobile ? '13px' : '14px', color: '#6B7280', marginTop: '4px' }}>
           Informasi terkini seputar umrah, regulasi Saudi, dan update GEZMA
         </p>
       </div>
 
       {/* FEATURED / HEADLINE */}
       {activeCategory === 'semua' && !searchQuery && featured.length > 0 && (
-        <div style={{ display: 'flex', gap: '16px', width: '100%' }}>
+        <div style={{
+          display: 'flex',
+          flexDirection: isMobile || isTablet ? 'column' : 'row',
+          gap: isMobile ? '12px' : '16px',
+          width: '100%'
+        }}>
           {/* Main Featured */}
           <div
             style={{
-              flex: 2, backgroundColor: '#111827', borderRadius: '16px', padding: '32px',
-              display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
-              minHeight: '280px', position: 'relative', overflow: 'hidden', cursor: 'pointer',
+              flex: isMobile || isTablet ? '1' : '2',
+              backgroundColor: '#111827',
+              borderRadius: isMobile ? '12px' : '16px',
+              padding: isMobile ? '24px' : '32px',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'flex-end',
+              minHeight: isMobile ? '220px' : '280px',
+              position: 'relative',
+              overflow: 'hidden',
+              cursor: 'pointer',
             }}
           >
             <div style={{ position: 'absolute', top: '20px', right: '20px', fontSize: '64px', opacity: 0.15 }}>
@@ -84,10 +99,10 @@ export default function NewsPage() {
             }}>
               {getCatLabel(featured[0].category)}
             </span>
-            <h2 style={{ fontSize: '22px', fontWeight: '700', color: 'white', margin: '0 0 10px 0', lineHeight: '1.3' }}>
+            <h2 style={{ fontSize: isMobile ? '18px' : '22px', fontWeight: '700', color: 'white', margin: '0 0 10px 0', lineHeight: '1.3' }}>
               {featured[0].title}
             </h2>
-            <p style={{ fontSize: '14px', color: '#9CA3AF', margin: '0 0 16px 0', lineHeight: '1.5', maxWidth: '90%' }}>
+            <p style={{ fontSize: isMobile ? '13px' : '14px', color: '#9CA3AF', margin: '0 0 16px 0', lineHeight: '1.5', maxWidth: isMobile ? '100%' : '90%' }}>
               {featured[0].excerpt.slice(0, 150)}...
             </p>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
