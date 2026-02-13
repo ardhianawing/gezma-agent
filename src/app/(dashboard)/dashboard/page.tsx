@@ -69,25 +69,30 @@ export default function DashboardPage() {
 
       {/* GEZMA BANNER */}
       <div style={{
-        backgroundColor: '#3B82F6',
+        background: 'linear-gradient(135deg, #1E40AF 0%, #3B82F6 100%)',
         borderRadius: '16px',
-        padding: '24px 28px',
-        boxShadow: '0 4px 12px rgba(59, 130, 246, 0.15)',
+        padding: '32px 36px',
+        boxShadow: '0 8px 24px rgba(30, 64, 175, 0.25)',
+        border: '1px solid rgba(255, 255, 255, 0.1)',
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
-          <span style={{ fontSize: '32px' }}>🇮🇩</span>
-          <h2 style={{ fontSize: '20px', fontWeight: '700', color: 'white', margin: 0 }}>
-            GEZMA (Generasi Gen Z & Milenial)
-          </h2>
-        </div>
-        <p style={{
-          fontSize: '14px',
-          color: 'rgba(255, 255, 255, 0.95)',
-          lineHeight: '1.6',
-          margin: 0,
-          maxWidth: '900px',
+        <h2 style={{
+          fontSize: '24px',
+          fontWeight: '800',
+          color: 'white',
+          margin: '0 0 16px 0',
+          letterSpacing: '0.5px',
+          textTransform: 'uppercase',
         }}>
-          Tujuannya untuk membina generasi dari para anggota aspirasi yang berniat memberi tongkat estafet ke generasinya menuju Indonesia Emas 2030.
+          GEZMA (Gerakan Generasi Z & Milenial)
+        </h2>
+        <p style={{
+          fontSize: '15px',
+          color: 'rgba(255, 255, 255, 0.95)',
+          lineHeight: '1.7',
+          margin: 0,
+          fontWeight: '500',
+        }}>
+          Ekosistem pembinaan bagi anggota Ashpirasi, menyiapkan generasi penerus yang siap menerima tongkat estafet perjuangan menuju Indonesia Emas 2030.
         </p>
       </div>
 
