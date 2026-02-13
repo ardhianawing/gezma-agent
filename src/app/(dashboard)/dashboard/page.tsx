@@ -1,8 +1,10 @@
 'use client';
 
 import { Users, Package, Plane, FileText, Bell, UserPlus, PackagePlus, CalendarPlus } from 'lucide-react';
+import { useResponsive } from '@/lib/hooks/use-responsive';
 
 export default function DashboardPage() {
+  const { isMobile, isTablet } = useResponsive();
   // Mock data untuk stats
   const stats = [
     { label: 'Total Jemaah', value: '156', icon: Users, change: '+12', changeType: 'positive' as const, color: '#3B82F6' },
@@ -70,23 +72,23 @@ export default function DashboardPage() {
       {/* GEZMA BANNER */}
       <div style={{
         background: 'linear-gradient(135deg, #1E40AF 0%, #3B82F6 100%)',
-        borderRadius: '16px',
-        padding: '32px 36px',
+        borderRadius: isMobile ? '12px' : '16px',
+        padding: isMobile ? '20px 24px' : '32px 36px',
         boxShadow: '0 8px 24px rgba(30, 64, 175, 0.25)',
         border: '1px solid rgba(255, 255, 255, 0.1)',
       }}>
         <h2 style={{
-          fontSize: '24px',
+          fontSize: isMobile ? '18px' : '24px',
           fontWeight: '800',
           color: 'white',
-          margin: '0 0 16px 0',
+          margin: '0 0 12px 0',
           letterSpacing: '0.5px',
           textTransform: 'uppercase',
         }}>
           GEZMA (Gerakan Generasi Z & Milenial)
         </h2>
         <p style={{
-          fontSize: '15px',
+          fontSize: isMobile ? '13px' : '15px',
           color: 'rgba(255, 255, 255, 0.95)',
           lineHeight: '1.7',
           margin: 0,
@@ -97,7 +99,11 @@ export default function DashboardPage() {
       </div>
 
       {/* STATS CARDS */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px' }}>
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: isMobile ? '1fr' : isTablet ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
+        gap: isMobile ? '12px' : '16px'
+      }}>
         {stats.map((stat) => {
           const Icon = stat.icon;
           return (
@@ -143,7 +149,11 @@ export default function DashboardPage() {
       </div>
 
       {/* ACTION CENTER & QUICK ACTIONS */}
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '16px' }}>
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: isMobile || isTablet ? '1fr' : '2fr 1fr',
+        gap: isMobile ? '12px' : '16px'
+      }}>
         {/* ACTION CENTER */}
         <div style={{
           backgroundColor: 'white',
@@ -245,7 +255,11 @@ export default function DashboardPage() {
       </div>
 
       {/* UPCOMING TRIPS & RECENT ACTIVITY */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: isMobile || isTablet ? '1fr' : '1fr 1fr',
+        gap: isMobile ? '12px' : '16px'
+      }}>
         {/* UPCOMING TRIPS */}
         <div style={{
           backgroundColor: 'white',
