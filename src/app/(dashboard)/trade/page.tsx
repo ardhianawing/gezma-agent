@@ -9,6 +9,7 @@ import {
   tradeProducts, tradeCategories, tradeStats,
   type TradeCategory, type TradeProduct,
 } from '@/data/mock-trade';
+import { useResponsive } from '@/lib/hooks/use-responsive';
 
 function formatRupiah(num: number): string {
   return 'Rp ' + num.toLocaleString('id-ID');
@@ -20,6 +21,7 @@ function formatNumber(num: number): string {
 }
 
 export default function TradeCentrePage() {
+  const { isMobile, isTablet } = useResponsive();
   const [activeCategory, setActiveCategory] = useState<TradeCategory>('semua');
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<'katalog' | 'pengajuan'>('katalog');
@@ -198,7 +200,7 @@ export default function TradeCentrePage() {
               <p style={{ fontSize: '14px', color: '#9CA3AF' }}>Tidak ada produk ditemukan</p>
             </div>
           ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '16px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(300px, 1fr))', gap: '16px' }}>
               {filteredProducts.map((product) => {
                 const catInfo = tradeCategories.find(c => c.id === product.category);
                 return (
