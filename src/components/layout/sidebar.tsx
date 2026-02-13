@@ -34,7 +34,7 @@ interface MenuItem {
 
 // === OPERASIONAL ===
 const menuItems: MenuItem[] = [
-  { label: 'Dasbor', href: '/', icon: LayoutDashboard },
+  { label: 'Dasbor', href: '/dashboard', icon: LayoutDashboard },
   { label: 'Jamaah', href: '/pilgrims', icon: Users },
   { label: 'Paket', href: '/packages', icon: Package },
   { label: 'Perjalanan', href: '/trips', icon: Plane },
