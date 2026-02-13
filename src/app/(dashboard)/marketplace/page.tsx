@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react';
 import { Search, SlidersHorizontal, X } from 'lucide-react';
 import { marketplaceItems, categories, type Category } from '@/data/mock-marketplace';
+import { useResponsive } from '@/lib/hooks/use-responsive';
 
 // Format rupiah
 function formatRupiah(num: number): string {
@@ -10,6 +11,7 @@ function formatRupiah(num: number): string {
 }
 
 export default function MarketplacePage() {
+  const { isMobile, isTablet } = useResponsive();
   const [activeCategory, setActiveCategory] = useState<Category>('hotel');
   const [searchQuery, setSearchQuery] = useState('');
   const [showFilter, setShowFilter] = useState(false);
@@ -102,14 +104,14 @@ export default function MarketplacePage() {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '16px' : '24px' }}>
 
       {/* ===== HEADER ===== */}
       <div>
-        <h1 style={{ fontSize: '28px', fontWeight: '700', color: '#111827', margin: 0 }}>
+        <h1 style={{ fontSize: isMobile ? '24px' : '28px', fontWeight: '700', color: '#111827', margin: 0 }}>
           Marketplace
         </h1>
-        <p style={{ fontSize: '14px', color: '#6B7280', marginTop: '4px' }}>
+        <p style={{ fontSize: isMobile ? '13px' : '14px', color: '#6B7280', marginTop: '4px' }}>
           Pusat belanja kebutuhan operasional umrah
         </p>
       </div>
@@ -384,8 +386,8 @@ export default function MarketplacePage() {
       ) : (
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))',
-          gap: '20px',
+          gridTemplateColumns: isMobile ? '1fr' : isTablet ? 'repeat(2, 1fr)' : 'repeat(auto-fill, minmax(340px, 1fr))',
+          gap: isMobile ? '12px' : '20px',
         }}>
           {filteredItems.map((item) => (
             <div
