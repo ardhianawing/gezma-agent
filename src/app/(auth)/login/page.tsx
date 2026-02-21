@@ -5,9 +5,11 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Eye, EyeOff, Loader2, Check } from 'lucide-react';
+import { useResponsive } from '@/lib/hooks/use-responsive';
 
 export default function LoginPage() {
   const router = useRouter();
+  const { isMobile, isTablet } = useResponsive();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -45,16 +47,17 @@ export default function LoginPage() {
   const canSubmit = email.trim() !== '' && password.trim() !== '';
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', width: '100%' }}>
+    <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', minHeight: '100vh', width: '100%' }}>
       {/* Left Side - Branding */}
+      {!isMobile && (
       <div
         style={{
-          width: '45%',
+          width: isTablet ? '40%' : '45%',
           background: 'linear-gradient(160deg, #0F172A 0%, #1E293B 50%, #0F172A 100%)',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
-          padding: '40px',
+          padding: isTablet ? '28px' : '40px',
           position: 'relative',
           overflow: 'hidden',
         }}
@@ -175,20 +178,48 @@ export default function LoginPage() {
           </p>
         </div>
       </div>
+      )}
 
       {/* Right Side - Login Form */}
       <div
         style={{
-          width: '55%',
+          width: isMobile ? '100%' : isTablet ? '60%' : '55%',
+          flex: isMobile ? '1' : undefined,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           background: '#FFFFFF',
-          padding: '40px',
+          padding: isMobile ? '24px 20px' : '40px',
         }}
       >
         <div style={{ width: '100%', maxWidth: '400px' }}>
-          {/* Logo for form side */}
+          {/* Mobile branding header */}
+          {isMobile && (
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                marginBottom: '32px',
+              }}
+            >
+              <Image
+                src="/logo-light.png"
+                alt="GEZMA"
+                width={48}
+                height={48}
+                style={{ objectFit: 'contain', marginBottom: '12px' }}
+              />
+              <span style={{ fontSize: '20px', fontWeight: '700', color: '#1E293B', letterSpacing: '-0.5px' }}>
+                GEZMA Agent
+              </span>
+              <p style={{ fontSize: '13px', color: '#94A3B8', margin: '6px 0 0 0' }}>
+                Platform PPIU Modern
+              </p>
+            </div>
+          )}
+          {/* Logo for form side - desktop/tablet only */}
+          {!isMobile && (
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '36px' }}>
             <Image
               src="/logo-light.png"
@@ -201,12 +232,13 @@ export default function LoginPage() {
               GEZMA Agent
             </span>
           </div>
+          )}
 
           {/* Header */}
-          <div style={{ marginBottom: '32px' }}>
+          <div style={{ marginBottom: isMobile ? '24px' : '32px', textAlign: isMobile ? 'center' : undefined }}>
             <h2
               style={{
-                fontSize: '26px',
+                fontSize: isMobile ? '22px' : '26px',
                 fontWeight: '700',
                 color: '#1E293B',
                 margin: '0 0 6px 0',
@@ -215,7 +247,7 @@ export default function LoginPage() {
             >
               Selamat Datang
             </h2>
-            <p style={{ fontSize: '14px', color: '#64748B', margin: 0 }}>
+            <p style={{ fontSize: isMobile ? '13px' : '14px', color: '#64748B', margin: 0 }}>
               Masukkan email dan password untuk mengakses dashboard
             </p>
           </div>
@@ -405,9 +437,9 @@ export default function LoginPage() {
           <p
             style={{
               textAlign: 'center',
-              fontSize: '14px',
+              fontSize: isMobile ? '13px' : '14px',
               color: '#64748B',
-              marginTop: '28px',
+              marginTop: isMobile ? '24px' : '28px',
             }}
           >
             Belum punya akun?{' '}
@@ -418,6 +450,13 @@ export default function LoginPage() {
               Daftar Agency
             </Link>
           </p>
+
+          {/* Mobile footer */}
+          {isMobile && (
+            <p style={{ textAlign: 'center', fontSize: '12px', color: '#CBD5E1', marginTop: '32px' }}>
+              &copy; 2026 GEZMA Technology
+            </p>
+          )}
         </div>
       </div>
 

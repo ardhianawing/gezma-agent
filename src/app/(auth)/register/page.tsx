@@ -5,15 +5,17 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Building2, User, Lock, ChevronRight, ChevronLeft, Check, Loader2, Eye, EyeOff } from 'lucide-react';
+import { useResponsive } from '@/lib/hooks/use-responsive';
 
 const STEPS = [
-  { number: 1, label: 'Data Agency', icon: Building2 },
-  { number: 2, label: 'Data PIC', icon: User },
-  { number: 3, label: 'Buat Password', icon: Lock },
+  { number: 1, label: 'Data Agency', shortLabel: 'Agency', icon: Building2 },
+  { number: 2, label: 'Data PIC', shortLabel: 'PIC', icon: User },
+  { number: 3, label: 'Buat Password', shortLabel: 'Password', icon: Lock },
 ];
 
 export default function RegisterPage() {
   const router = useRouter();
+  const { isMobile, isTablet } = useResponsive();
   const [currentStep, setCurrentStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -121,16 +123,17 @@ export default function RegisterPage() {
   };
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', width: '100%' }}>
+    <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', minHeight: '100vh', width: '100%' }}>
       {/* Left Side - Branding */}
+      {!isMobile && (
       <div
         style={{
-          width: '45%',
+          width: isTablet ? '40%' : '45%',
           background: 'linear-gradient(160deg, #0F172A 0%, #1E293B 50%, #0F172A 100%)',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
-          padding: '40px',
+          padding: isTablet ? '28px' : '40px',
           position: 'relative',
           overflow: 'hidden',
         }}
@@ -251,24 +254,49 @@ export default function RegisterPage() {
           </p>
         </div>
       </div>
+      )}
 
       {/* Right Side - Form */}
       <div
         style={{
-          width: '55%',
+          width: isMobile ? '100%' : isTablet ? '60%' : '55%',
+          flex: isMobile ? '1' : undefined,
           display: 'flex',
-          alignItems: 'center',
+          alignItems: isMobile ? 'flex-start' : 'center',
           justifyContent: 'center',
           background: '#FFFFFF',
-          padding: '40px',
+          padding: isMobile ? '24px 20px' : '40px',
         }}
       >
         <div style={{ width: '100%', maxWidth: '460px' }}>
+          {/* Mobile branding header */}
+          {isMobile && (
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                marginBottom: '24px',
+              }}
+            >
+              <Image
+                src="/logo-light.png"
+                alt="GEZMA"
+                width={44}
+                height={44}
+                style={{ objectFit: 'contain', marginBottom: '10px' }}
+              />
+              <span style={{ fontSize: '18px', fontWeight: '700', color: '#1E293B', letterSpacing: '-0.5px' }}>
+                GEZMA Agent
+              </span>
+            </div>
+          )}
+
           {/* Header */}
-          <div style={{ marginBottom: '32px' }}>
+          <div style={{ marginBottom: isMobile ? '20px' : '32px', textAlign: isMobile ? 'center' : undefined }}>
             <h2
               style={{
-                fontSize: '26px',
+                fontSize: isMobile ? '20px' : '26px',
                 fontWeight: '700',
                 color: '#1E293B',
                 margin: '0 0 6px 0',
@@ -277,7 +305,7 @@ export default function RegisterPage() {
             >
               Daftar Agency Baru
             </h2>
-            <p style={{ fontSize: '14px', color: '#64748B', margin: 0 }}>
+            <p style={{ fontSize: isMobile ? '13px' : '14px', color: '#64748B', margin: 0 }}>
               Lengkapi data berikut untuk mendaftarkan agency Anda
             </p>
           </div>
@@ -288,10 +316,10 @@ export default function RegisterPage() {
               display: 'flex',
               alignItems: 'center',
               gap: '0',
-              marginBottom: '32px',
-              padding: '16px 20px',
+              marginBottom: isMobile ? '20px' : '32px',
+              padding: isMobile ? '12px 14px' : '16px 20px',
               background: '#F8FAFC',
-              borderRadius: '14px',
+              borderRadius: isMobile ? '12px' : '14px',
               border: '1px solid #E2E8F0',
             }}
           >
@@ -305,19 +333,20 @@ export default function RegisterPage() {
                     style={{
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '10px',
+                      gap: isMobile ? '6px' : '10px',
                       cursor: isCompleted ? 'pointer' : 'default',
                     }}
                     onClick={() => isCompleted && setCurrentStep(step.number)}
                   >
                     <div
                       style={{
-                        width: '36px',
-                        height: '36px',
-                        borderRadius: '10px',
+                        width: isMobile ? '30px' : '36px',
+                        height: isMobile ? '30px' : '36px',
+                        borderRadius: isMobile ? '8px' : '10px',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
+                        flexShrink: 0,
                         background: isCompleted
                           ? '#059669'
                           : isActive
@@ -328,12 +357,12 @@ export default function RegisterPage() {
                       }}
                     >
                       {isCompleted ? (
-                        <Check style={{ width: '16px', height: '16px', color: 'white' }} />
+                        <Check style={{ width: isMobile ? '14px' : '16px', height: isMobile ? '14px' : '16px', color: 'white' }} />
                       ) : (
                         <Icon
                           style={{
-                            width: '16px',
-                            height: '16px',
+                            width: isMobile ? '14px' : '16px',
+                            height: isMobile ? '14px' : '16px',
                             color: isActive ? 'white' : '#94A3B8',
                           }}
                         />
@@ -341,13 +370,13 @@ export default function RegisterPage() {
                     </div>
                     <span
                       style={{
-                        fontSize: '13px',
+                        fontSize: isMobile ? '11px' : '13px',
                         fontWeight: isActive || isCompleted ? '600' : '500',
                         color: isActive ? '#1E293B' : isCompleted ? '#059669' : '#94A3B8',
                         whiteSpace: 'nowrap',
                       }}
                     >
-                      {step.label}
+                      {isMobile ? step.shortLabel : step.label}
                     </span>
                   </div>
                   {index < STEPS.length - 1 && (
@@ -355,7 +384,7 @@ export default function RegisterPage() {
                       style={{
                         flex: 1,
                         height: '2px',
-                        margin: '0 12px',
+                        margin: isMobile ? '0 6px' : '0 12px',
                         borderRadius: '1px',
                         background: isCompleted ? '#059669' : '#E2E8F0',
                         transition: 'background 0.3s ease',
@@ -678,7 +707,7 @@ export default function RegisterPage() {
             )}
 
             {/* Navigation */}
-            <div style={{ display: 'flex', gap: '12px', marginTop: '28px' }}>
+            <div style={{ display: 'flex', gap: isMobile ? '10px' : '12px', marginTop: isMobile ? '20px' : '28px' }}>
               {currentStep > 1 && (
                 <button
                   type="button"
@@ -797,9 +826,9 @@ export default function RegisterPage() {
           <p
             style={{
               textAlign: 'center',
-              fontSize: '14px',
+              fontSize: isMobile ? '13px' : '14px',
               color: '#64748B',
-              marginTop: '28px',
+              marginTop: isMobile ? '20px' : '28px',
             }}
           >
             Sudah punya akun?{' '}
@@ -814,6 +843,13 @@ export default function RegisterPage() {
               Masuk
             </Link>
           </p>
+
+          {/* Mobile footer */}
+          {isMobile && (
+            <p style={{ textAlign: 'center', fontSize: '12px', color: '#CBD5E1', marginTop: '24px' }}>
+              &copy; 2026 GEZMA Technology
+            </p>
+          )}
         </div>
       </div>
 
@@ -821,14 +857,6 @@ export default function RegisterPage() {
         @keyframes spin {
           from { transform: rotate(0deg); }
           to { transform: rotate(360deg); }
-        }
-        @media (max-width: 768px) {
-          div:first-child > div:first-child {
-            display: none !important;
-          }
-          div:first-child > div:last-child {
-            width: 100% !important;
-          }
         }
       `}</style>
     </div>
