@@ -18,7 +18,7 @@ services:
     build: .
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "3001:3000"
     environment:
       DATABASE_URL: postgresql://gezma_admin:${DB_PASSWORD:-gezma_secret_2026}@db:5432/gezma_agent
       JWT_SECRET: ${JWT_SECRET:-change-me-in-production}
