@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 import { tripFormSchema } from '@/lib/validations/trip';
+import { logActivity } from '@/lib/activity-logger';
 
 type Context = { params: Promise<{ id: string }> };
 
@@ -83,6 +84,16 @@ export async function PUT(req: NextRequest, { params }: Context) {
       },
     });
 
+    logActivity({
+      type: 'trip',
+      action: 'updated',
+      title: 'Trip diperbarui',
+      description: `Trip "${trip.name}" telah diperbarui`,
+      userId: auth.userId,
+      agencyId: auth.agencyId,
+      metadata: { entityId: trip.id },
+    });
+
     return NextResponse.json(trip);
   } catch (error) {
     console.error('PUT /api/trips/[id] error:', error);
@@ -106,6 +117,16 @@ export async function DELETE(req: NextRequest, { params }: Context) {
     }
 
     await prisma.trip.delete({ where: { id } });
+
+    logActivity({
+      type: 'trip',
+      action: 'deleted',
+      title: 'Trip dihapus',
+      description: `Trip "${existing.name}" telah dihapus`,
+      userId: auth.userId,
+      agencyId: auth.agencyId,
+      metadata: { entityId: id },
+    });
 
     return NextResponse.json({ message: 'Trip berhasil dihapus' });
   } catch (error) {

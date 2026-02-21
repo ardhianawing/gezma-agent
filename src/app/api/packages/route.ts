@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 import { packageFormSchema } from '@/lib/validations/package';
+import { logActivity } from '@/lib/activity-logger';
 
 function slugify(text: string): string {
   return text
@@ -115,6 +116,16 @@ export async function POST(req: NextRequest) {
         isActive: data.isActive,
         agencyId: auth.agencyId,
       },
+    });
+
+    logActivity({
+      type: 'package',
+      action: 'created',
+      title: 'Paket baru dibuat',
+      description: `Paket "${pkg.name}" telah dibuat`,
+      userId: auth.userId,
+      agencyId: auth.agencyId,
+      metadata: { entityId: pkg.id },
     });
 
     return NextResponse.json(pkg, { status: 201 });

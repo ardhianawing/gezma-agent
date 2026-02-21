@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 import { pilgrimFormSchema } from '@/lib/validations/pilgrim';
+import { logActivity } from '@/lib/activity-logger';
 
 type Context = { params: Promise<{ id: string }> };
 
@@ -93,6 +94,16 @@ export async function PUT(req: NextRequest, { params }: Context) {
       include: { documents: true, payments: true },
     });
 
+    logActivity({
+      type: 'pilgrim',
+      action: 'updated',
+      title: 'Data jemaah diperbarui',
+      description: `Data ${pilgrim.name} telah diperbarui`,
+      userId: auth.userId,
+      agencyId: auth.agencyId,
+      metadata: { entityId: pilgrim.id },
+    });
+
     return NextResponse.json(pilgrim);
   } catch (error) {
     console.error('PUT /api/pilgrims/[id] error:', error);
@@ -116,6 +127,16 @@ export async function DELETE(req: NextRequest, { params }: Context) {
     }
 
     await prisma.pilgrim.delete({ where: { id } });
+
+    logActivity({
+      type: 'pilgrim',
+      action: 'deleted',
+      title: 'Jemaah dihapus',
+      description: `${existing.name} telah dihapus`,
+      userId: auth.userId,
+      agencyId: auth.agencyId,
+      metadata: { entityId: id },
+    });
 
     return NextResponse.json({ message: 'Jemaah berhasil dihapus' });
   } catch (error) {

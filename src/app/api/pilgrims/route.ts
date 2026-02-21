@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 import { pilgrimFormSchema } from '@/lib/validations/pilgrim';
+import { logActivity } from '@/lib/activity-logger';
 
 export async function GET(req: NextRequest) {
   const auth = getAuthPayload(req);
@@ -123,6 +124,16 @@ export async function POST(req: NextRequest) {
         agencyId: auth.agencyId,
       },
       include: { documents: true, payments: true },
+    });
+
+    logActivity({
+      type: 'pilgrim',
+      action: 'created',
+      title: 'Jemaah baru ditambahkan',
+      description: `${pilgrim.name} ditambahkan sebagai jemaah baru`,
+      userId: auth.userId,
+      agencyId: auth.agencyId,
+      metadata: { entityId: pilgrim.id },
     });
 
     return NextResponse.json(pilgrim, { status: 201 });

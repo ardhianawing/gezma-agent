@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 import { packageFormSchema } from '@/lib/validations/package';
+import { logActivity } from '@/lib/activity-logger';
 
 function slugify(text: string): string {
   return text
@@ -113,6 +114,16 @@ export async function PUT(req: NextRequest, { params }: Context) {
       },
     });
 
+    logActivity({
+      type: 'package',
+      action: 'updated',
+      title: 'Paket diperbarui',
+      description: `Paket "${pkg.name}" telah diperbarui`,
+      userId: auth.userId,
+      agencyId: auth.agencyId,
+      metadata: { entityId: pkg.id },
+    });
+
     return NextResponse.json(pkg);
   } catch (error) {
     console.error('PUT /api/packages/[id] error:', error);
@@ -136,6 +147,16 @@ export async function DELETE(req: NextRequest, { params }: Context) {
     }
 
     await prisma.package.delete({ where: { id } });
+
+    logActivity({
+      type: 'package',
+      action: 'deleted',
+      title: 'Paket dihapus',
+      description: `Paket "${existing.name}" telah dihapus`,
+      userId: auth.userId,
+      agencyId: auth.agencyId,
+      metadata: { entityId: id },
+    });
 
     return NextResponse.json({ message: 'Paket berhasil dihapus' });
   } catch (error) {

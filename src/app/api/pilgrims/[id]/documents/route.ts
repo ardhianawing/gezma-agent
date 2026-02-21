@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
+import { logActivity } from '@/lib/activity-logger';
 
 type Context = { params: Promise<{ id: string }> };
 
@@ -38,6 +39,16 @@ export async function POST(req: NextRequest, { params }: Context) {
         uploadedAt: new Date(),
         pilgrimId: id,
       },
+    });
+
+    logActivity({
+      type: 'document',
+      action: 'uploaded',
+      title: 'Dokumen diupload',
+      description: `${pilgrim.name} - Dokumen ${type} telah diupload`,
+      userId: auth.userId,
+      agencyId: auth.agencyId,
+      metadata: { entityId: doc.id, pilgrimId: id },
     });
 
     return NextResponse.json(doc, { status: 201 });

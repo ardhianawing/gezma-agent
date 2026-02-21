@@ -7,7 +7,14 @@ import { useResponsive } from '@/lib/hooks/use-responsive';
 import { StatCard } from '@/components/shared/stat-card';
 import { ActionCenter } from '@/components/dashboard/action-center';
 import { QuickActions } from '@/components/dashboard/quick-actions';
-import { mockActivities } from '@/data/mock-activity';
+interface Activity {
+  id: string;
+  type: string;
+  action: string;
+  title: string;
+  description: string;
+  createdAt: string;
+}
 
 interface DashboardStats {
   totalPilgrims: number;
@@ -16,9 +23,6 @@ interface DashboardStats {
   pendingDocs: number;
   upcomingTrips: { id: string; name: string; departureDate: string | null; registeredCount: number; status: string }[];
 }
-
-// --- Recent activities (first 6) ---
-const recentActivities = mockActivities.slice(0, 6);
 
 // --- Activity icon map ---
 const activityIconColors: Record<string, string> = {
@@ -54,6 +58,8 @@ export default function DashboardPage() {
   const { isMobile, isTablet } = useResponsive();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [activities, setActivities] = useState<Activity[]>([]);
+  const [activitiesLoading, setActivitiesLoading] = useState(true);
 
   useEffect(() => {
     async function fetchStats() {
@@ -69,7 +75,21 @@ export default function DashboardPage() {
         setLoading(false);
       }
     }
+    async function fetchActivities() {
+      try {
+        const res = await fetch('/api/activities');
+        if (res.ok) {
+          const json = await res.json();
+          setActivities(json.data || []);
+        }
+      } catch {
+        // silently fail
+      } finally {
+        setActivitiesLoading(false);
+      }
+    }
     fetchStats();
+    fetchActivities();
   }, []);
 
   const totalJemaah = stats?.totalPilgrims ?? 0;
@@ -365,58 +385,67 @@ export default function DashboardPage() {
               gap: '16px',
             }}
           >
-            {recentActivities.map((activity) => {
-              const dotColor = activityIconColors[activity.type] || c.textMuted;
-              return (
-                <div
-                  key={activity.id}
-                  style={{
-                    display: 'flex',
-                    gap: '12px',
-                    alignItems: 'flex-start',
-                  }}
-                >
-                  {/* Colored dot */}
+            {activitiesLoading ? (
+              <p style={{ textAlign: 'center', fontSize: '14px', color: c.textMuted, padding: '24px 0' }}>
+                Loading...
+              </p>
+            ) : activities.length === 0 ? (
+              <p style={{ textAlign: 'center', fontSize: '14px', color: c.textMuted, padding: '24px 0' }}>
+                Belum ada aktivitas.
+              </p>
+            ) : (
+              activities.slice(0, 6).map((activity) => {
+                const dotColor = activityIconColors[activity.type] || c.textMuted;
+                return (
                   <div
+                    key={activity.id}
                     style={{
-                      width: '8px',
-                      height: '8px',
-                      borderRadius: '50%',
-                      backgroundColor: dotColor,
-                      marginTop: '6px',
-                      flexShrink: 0,
+                      display: 'flex',
+                      gap: '12px',
+                      alignItems: 'flex-start',
                     }}
-                  />
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <p
+                  >
+                    <div
                       style={{
-                        fontSize: '13px',
-                        color: c.textPrimary,
-                        margin: '0 0 2px 0',
-                        fontWeight: '500',
+                        width: '8px',
+                        height: '8px',
+                        borderRadius: '50%',
+                        backgroundColor: dotColor,
+                        marginTop: '6px',
+                        flexShrink: 0,
                       }}
-                    >
-                      {activity.title}
-                    </p>
-                    <p
-                      style={{
-                        fontSize: '12px',
-                        color: c.textMuted,
-                        margin: '0 0 4px 0',
-                        whiteSpace: 'nowrap',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                      }}
-                    >
-                      {activity.description}
-                    </p>
-                    <span style={{ fontSize: '11px', color: c.textLight }}>
-                      {timeAgo(activity.timestamp)}
-                    </span>
+                    />
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p
+                        style={{
+                          fontSize: '13px',
+                          color: c.textPrimary,
+                          margin: '0 0 2px 0',
+                          fontWeight: '500',
+                        }}
+                      >
+                        {activity.title}
+                      </p>
+                      <p
+                        style={{
+                          fontSize: '12px',
+                          color: c.textMuted,
+                          margin: '0 0 4px 0',
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                        }}
+                      >
+                        {activity.description}
+                      </p>
+                      <span style={{ fontSize: '11px', color: c.textLight }}>
+                        {timeAgo(activity.createdAt)}
+                      </span>
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })
+            )}
           </div>
         </div>
       </div>
