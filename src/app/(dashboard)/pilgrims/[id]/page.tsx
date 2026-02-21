@@ -3,12 +3,14 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Edit } from 'lucide-react';
+import { ArrowLeft, Edit, Plus } from 'lucide-react';
 import { PageHeader } from '@/components/layout/page-header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { StatusBadge } from '@/components/shared/status-badge';
 import { DocumentUpload } from '@/components/pilgrims/document-upload';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import type { Pilgrim } from '@/types/pilgrim';
 import type { PilgrimStatus, DocumentType } from '@/types';
@@ -20,6 +22,17 @@ export default function PilgrimDetailPage() {
   const [pilgrim, setPilgrim] = useState<Pilgrim | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+
+  // Payment dialog state
+  const [showPayment, setShowPayment] = useState(false);
+  const [paymentForm, setPaymentForm] = useState({
+    amount: '',
+    type: 'dp' as 'dp' | 'installment' | 'full' | 'refund',
+    method: 'transfer' as 'transfer' | 'cash' | 'card',
+    date: new Date().toISOString().split('T')[0],
+    notes: '',
+  });
+  const [savingPayment, setSavingPayment] = useState(false);
 
   useEffect(() => {
     async function fetchPilgrim() {
@@ -36,6 +49,50 @@ export default function PilgrimDetailPage() {
     }
     fetchPilgrim();
   }, [id]);
+
+  async function handlePaymentSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!pilgrim) return;
+    setSavingPayment(true);
+    try {
+      const res = await fetch(`/api/pilgrims/${id}/payments`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount: parseFloat(paymentForm.amount),
+          type: paymentForm.type,
+          method: paymentForm.method,
+          date: paymentForm.date,
+          notes: paymentForm.notes || undefined,
+        }),
+      });
+      if (!res.ok) return;
+      const newPayment = await res.json();
+      const newAmount = parseFloat(paymentForm.amount);
+      setPilgrim((prev) =>
+        prev
+          ? {
+              ...prev,
+              payments: [newPayment, ...(prev.payments || [])],
+              totalPaid: prev.totalPaid + newAmount,
+              remainingBalance: prev.remainingBalance - newAmount,
+            }
+          : prev
+      );
+      setShowPayment(false);
+      setPaymentForm({
+        amount: '',
+        type: 'dp',
+        method: 'transfer',
+        date: new Date().toISOString().split('T')[0],
+        notes: '',
+      });
+    } catch {
+      // silently fail
+    } finally {
+      setSavingPayment(false);
+    }
+  }
 
   if (loading) {
     return <div style={{ padding: '40px', textAlign: 'center' }}>Memuat data...</div>;
@@ -224,13 +281,89 @@ export default function PilgrimDetailPage() {
           </CardContent>
         </Card>
 
-        {/* Payment History */}
-        {pilgrim.payments && pilgrim.payments.length > 0 && (
-          <Card className="lg:col-span-3">
-            <CardHeader>
-              <CardTitle>Payment History</CardTitle>
-            </CardHeader>
-            <CardContent>
+        {/* Payment History — always visible */}
+        <Card className="lg:col-span-3">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle>Payment History</CardTitle>
+            <Dialog open={showPayment} onOpenChange={setShowPayment}>
+              <Button size="sm" onClick={() => setShowPayment(true)}>
+                <Plus className="h-4 w-4 mr-1" />
+                Tambah Pembayaran
+              </Button>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Tambah Pembayaran</DialogTitle>
+                </DialogHeader>
+                <form onSubmit={handlePaymentSubmit} className="space-y-4">
+                  <div>
+                    <label className="text-sm font-medium text-[var(--gray-600)] mb-1 block">Jumlah (Rp)</label>
+                    <Input
+                      type="number"
+                      min="1"
+                      required
+                      value={paymentForm.amount}
+                      onChange={(e) => setPaymentForm((f) => ({ ...f, amount: e.target.value }))}
+                      placeholder="5000000"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm font-medium text-[var(--gray-600)] mb-1 block">Tipe</label>
+                      <select
+                        className="flex h-11 w-full rounded-xl border border-[var(--gray-200)] bg-white px-4 py-2.5 text-sm text-[var(--charcoal)]"
+                        value={paymentForm.type}
+                        onChange={(e) => setPaymentForm((f) => ({ ...f, type: e.target.value as typeof f.type }))}
+                      >
+                        <option value="dp">DP</option>
+                        <option value="installment">Cicilan</option>
+                        <option value="full">Lunas</option>
+                        <option value="refund">Refund</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-[var(--gray-600)] mb-1 block">Metode</label>
+                      <select
+                        className="flex h-11 w-full rounded-xl border border-[var(--gray-200)] bg-white px-4 py-2.5 text-sm text-[var(--charcoal)]"
+                        value={paymentForm.method}
+                        onChange={(e) => setPaymentForm((f) => ({ ...f, method: e.target.value as typeof f.method }))}
+                      >
+                        <option value="transfer">Transfer</option>
+                        <option value="cash">Cash</option>
+                        <option value="card">Kartu</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-[var(--gray-600)] mb-1 block">Tanggal</label>
+                    <Input
+                      type="date"
+                      required
+                      value={paymentForm.date}
+                      onChange={(e) => setPaymentForm((f) => ({ ...f, date: e.target.value }))}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-[var(--gray-600)] mb-1 block">Catatan</label>
+                    <Input
+                      value={paymentForm.notes}
+                      onChange={(e) => setPaymentForm((f) => ({ ...f, notes: e.target.value }))}
+                      placeholder="Opsional"
+                    />
+                  </div>
+                  <div className="flex justify-end gap-2 pt-2">
+                    <Button type="button" variant="outline" onClick={() => setShowPayment(false)}>
+                      Batal
+                    </Button>
+                    <Button type="submit" disabled={savingPayment}>
+                      {savingPayment ? 'Menyimpan...' : 'Simpan'}
+                    </Button>
+                  </div>
+                </form>
+              </DialogContent>
+            </Dialog>
+          </CardHeader>
+          <CardContent>
+            {pilgrim.payments && pilgrim.payments.length > 0 ? (
               <div className="space-y-3">
                 {pilgrim.payments.map((payment) => (
                   <div key={payment.id} className="flex items-center justify-between rounded-[12px] border border-[var(--gray-border)] p-4">
@@ -238,13 +371,17 @@ export default function PilgrimDetailPage() {
                       <p className="text-sm font-medium text-[var(--charcoal)] capitalize">{payment.type}</p>
                       <p className="text-xs text-[var(--gray-600)]">{formatDate(payment.date)} &bull; {payment.method}</p>
                     </div>
-                    <p className="text-sm font-bold text-[var(--success)]">+ {formatCurrency(payment.amount)}</p>
+                    <p className={`text-sm font-bold ${payment.type === 'refund' ? 'text-[var(--error)]' : 'text-[var(--success)]'}`}>
+                      {payment.type === 'refund' ? '- ' : '+ '}{formatCurrency(payment.amount)}
+                    </p>
                   </div>
                 ))}
               </div>
-            </CardContent>
-          </Card>
-        )}
+            ) : (
+              <p className="text-sm text-[var(--gray-600)] text-center py-8">Belum ada pembayaran</p>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

@@ -6,6 +6,9 @@ import { formatDate } from '@/lib/utils';
 import { useTheme } from '@/lib/theme';
 import { useLanguage } from '@/lib/i18n';
 import { useResponsive } from '@/lib/hooks/use-responsive';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import {
   Building2,
   Mail,
@@ -41,12 +44,35 @@ interface AgencyData {
   isVerified: boolean;
 }
 
+interface EditForm {
+  name: string;
+  legalName: string;
+  tagline: string;
+  description: string;
+  phone: string;
+  whatsapp: string;
+  website: string;
+  address: string;
+  city: string;
+  province: string;
+  postalCode: string;
+}
+
 export default function AgencyPage() {
   const { c } = useTheme();
   const { t } = useLanguage();
   const { isMobile, isTablet } = useResponsive();
   const [agency, setAgency] = useState<AgencyData | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // Edit modal state
+  const [showEdit, setShowEdit] = useState(false);
+  const [editForm, setEditForm] = useState<EditForm>({
+    name: '', legalName: '', tagline: '', description: '',
+    phone: '', whatsapp: '', website: '',
+    address: '', city: '', province: '', postalCode: '',
+  });
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     fetch('/api/agency')
@@ -55,6 +81,44 @@ export default function AgencyPage() {
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
+
+  function openEdit() {
+    if (!agency) return;
+    setEditForm({
+      name: agency.name || '',
+      legalName: agency.legalName || '',
+      tagline: agency.tagline || '',
+      description: agency.description || '',
+      phone: agency.phone || '',
+      whatsapp: agency.whatsapp || '',
+      website: agency.website || '',
+      address: agency.address || '',
+      city: agency.city || '',
+      province: agency.province || '',
+      postalCode: agency.postalCode || '',
+    });
+    setShowEdit(true);
+  }
+
+  async function handleEditSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setSaving(true);
+    try {
+      const res = await fetch('/api/agency', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(editForm),
+      });
+      if (!res.ok) return;
+      const updated = await res.json();
+      setAgency(updated);
+      setShowEdit(false);
+    } catch {
+      // silently fail
+    } finally {
+      setSaving(false);
+    }
+  }
 
   if (loading) {
     return <div style={{ padding: '40px', textAlign: 'center', color: '#6b7280' }}>Memuat data agency...</div>;
@@ -74,6 +138,7 @@ export default function AgencyPage() {
         description={t.agency.description}
         actions={
           <button
+            onClick={openEdit}
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -94,6 +159,115 @@ export default function AgencyPage() {
           </button>
         }
       />
+
+      {/* Edit Profile Dialog */}
+      <Dialog open={showEdit} onOpenChange={setShowEdit}>
+        <DialogContent className="max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{t.agency.editProfile}</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleEditSubmit} className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-medium text-[var(--gray-600)] mb-1 block">Nama Brand</label>
+                <Input
+                  required
+                  value={editForm.name}
+                  onChange={(e) => setEditForm((f) => ({ ...f, name: e.target.value }))}
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-[var(--gray-600)] mb-1 block">Nama Legal (PT)</label>
+                <Input
+                  required
+                  value={editForm.legalName}
+                  onChange={(e) => setEditForm((f) => ({ ...f, legalName: e.target.value }))}
+                />
+              </div>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-[var(--gray-600)] mb-1 block">Tagline</label>
+              <Input
+                value={editForm.tagline}
+                onChange={(e) => setEditForm((f) => ({ ...f, tagline: e.target.value }))}
+                placeholder="Slogan singkat"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-[var(--gray-600)] mb-1 block">Deskripsi</label>
+              <textarea
+                className="flex w-full rounded-xl border border-[var(--gray-200)] bg-white px-4 py-2.5 text-sm text-[var(--charcoal)] placeholder:text-[var(--gray-400)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gezma-red)]/20 focus-visible:border-[var(--gezma-red)] min-h-[80px]"
+                value={editForm.description}
+                onChange={(e) => setEditForm((f) => ({ ...f, description: e.target.value }))}
+                placeholder="Tentang agensi"
+              />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-medium text-[var(--gray-600)] mb-1 block">Telepon</label>
+                <Input
+                  required
+                  value={editForm.phone}
+                  onChange={(e) => setEditForm((f) => ({ ...f, phone: e.target.value }))}
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-[var(--gray-600)] mb-1 block">WhatsApp</label>
+                <Input
+                  value={editForm.whatsapp}
+                  onChange={(e) => setEditForm((f) => ({ ...f, whatsapp: e.target.value }))}
+                />
+              </div>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-[var(--gray-600)] mb-1 block">Website</label>
+              <Input
+                value={editForm.website}
+                onChange={(e) => setEditForm((f) => ({ ...f, website: e.target.value }))}
+                placeholder="https://..."
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-[var(--gray-600)] mb-1 block">Alamat</label>
+              <Input
+                value={editForm.address}
+                onChange={(e) => setEditForm((f) => ({ ...f, address: e.target.value }))}
+              />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label className="text-sm font-medium text-[var(--gray-600)] mb-1 block">Kota</label>
+                <Input
+                  value={editForm.city}
+                  onChange={(e) => setEditForm((f) => ({ ...f, city: e.target.value }))}
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-[var(--gray-600)] mb-1 block">Provinsi</label>
+                <Input
+                  value={editForm.province}
+                  onChange={(e) => setEditForm((f) => ({ ...f, province: e.target.value }))}
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-[var(--gray-600)] mb-1 block">Kode Pos</label>
+                <Input
+                  value={editForm.postalCode}
+                  onChange={(e) => setEditForm((f) => ({ ...f, postalCode: e.target.value }))}
+                />
+              </div>
+            </div>
+            <div className="flex justify-end gap-2 pt-2">
+              <Button type="button" variant="outline" onClick={() => setShowEdit(false)}>
+                Batal
+              </Button>
+              <Button type="submit" disabled={saving}>
+                {saving ? 'Menyimpan...' : 'Simpan'}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       {/* Agency Header Card */}
       <div
