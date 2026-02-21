@@ -45,23 +45,46 @@ export default function NewPilgrimPage() {
     setSaving(true);
 
     try {
-      // Validate NIK length
       if (form.nik.length !== 16) {
         setError('NIK harus 16 digit');
         setSaving(false);
         return;
       }
 
-      // Simulate API call delay
-      await new Promise((resolve) => setTimeout(resolve, 800));
+      const payload = {
+        nik: form.nik,
+        name: form.name,
+        gender: form.gender,
+        birthPlace: form.birthPlace,
+        birthDate: form.birthDate,
+        address: form.address,
+        city: form.city,
+        province: form.province,
+        postalCode: form.postalCode || undefined,
+        phone: form.phone,
+        email: form.email,
+        whatsapp: form.whatsapp || undefined,
+        emergencyContact: {
+          name: form.emergencyName,
+          phone: form.emergencyPhone,
+          relation: form.emergencyRelation,
+        },
+      };
 
-      // TODO: Replace with real API call when Pilgrim model is in Prisma
-      // const res = await fetch('/api/pilgrims', { method: 'POST', body: JSON.stringify(form) });
-      // if (!res.ok) throw new Error('Failed to create pilgrim');
+      const res = await fetch('/api/pilgrims', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Gagal menyimpan');
+      }
 
       router.push('/pilgrims');
-    } catch {
-      setError('Gagal menyimpan data jemaah. Silakan coba lagi.');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Gagal menyimpan data jemaah. Silakan coba lagi.');
       setSaving(false);
     }
   };

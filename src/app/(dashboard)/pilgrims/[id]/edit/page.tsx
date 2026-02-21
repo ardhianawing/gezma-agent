@@ -10,17 +10,15 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { mockPilgrims } from '@/data/mock-pilgrims';
-import type { Pilgrim } from '@/types/pilgrim';
 
 export default function EditPilgrimPage() {
   const router = useRouter();
   const params = useParams();
   const id = params.id as string;
 
-  const pilgrim = mockPilgrims.find((p) => p.id === id);
-
+  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
   const [form, setForm] = useState({
     name: '',
     nik: '',
@@ -43,35 +41,50 @@ export default function EditPilgrimPage() {
   });
 
   useEffect(() => {
-    if (pilgrim) {
-      setForm({
-        name: pilgrim.name,
-        nik: pilgrim.nik,
-        gender: pilgrim.gender,
-        email: pilgrim.email,
-        phone: pilgrim.phone,
-        whatsapp: pilgrim.whatsapp || '',
-        birthPlace: pilgrim.birthPlace,
-        birthDate: pilgrim.birthDate,
-        address: pilgrim.address,
-        city: pilgrim.city,
-        province: pilgrim.province,
-        postalCode: pilgrim.postalCode || '',
-        emergencyName: pilgrim.emergencyContact.name,
-        emergencyPhone: pilgrim.emergencyContact.phone,
-        emergencyRelation: pilgrim.emergencyContact.relation,
-        roomNumber: pilgrim.roomNumber || '',
-        roomType: (pilgrim.roomType || '') as '' | 'single' | 'double' | 'triple' | 'quad',
-        notes: pilgrim.notes || '',
-      });
+    async function fetchPilgrim() {
+      try {
+        const res = await fetch(`/api/pilgrims/${id}`);
+        if (!res.ok) throw new Error('Not found');
+        const pilgrim = await res.json();
+        const ec = pilgrim.emergencyContact || {};
+        setForm({
+          name: pilgrim.name,
+          nik: pilgrim.nik,
+          gender: pilgrim.gender,
+          email: pilgrim.email,
+          phone: pilgrim.phone,
+          whatsapp: pilgrim.whatsapp || '',
+          birthPlace: pilgrim.birthPlace,
+          birthDate: pilgrim.birthDate,
+          address: pilgrim.address,
+          city: pilgrim.city,
+          province: pilgrim.province,
+          postalCode: pilgrim.postalCode || '',
+          emergencyName: ec.name || '',
+          emergencyPhone: ec.phone || '',
+          emergencyRelation: ec.relation || '',
+          roomNumber: pilgrim.roomNumber || '',
+          roomType: (pilgrim.roomType || '') as '' | 'single' | 'double' | 'triple' | 'quad',
+          notes: pilgrim.notes || '',
+        });
+      } catch {
+        setError('Jemaah tidak ditemukan');
+      } finally {
+        setLoading(false);
+      }
     }
-  }, [pilgrim]);
+    fetchPilgrim();
+  }, [id]);
 
-  if (!pilgrim) {
+  if (loading) {
+    return <div style={{ padding: '40px', textAlign: 'center' }}>Memuat data...</div>;
+  }
+
+  if (error) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
-          <p className="text-lg font-semibold text-[var(--charcoal)]">Jemaah tidak ditemukan</p>
+          <p className="text-lg font-semibold text-[var(--charcoal)]">{error}</p>
           <p className="text-sm text-[var(--gray-600)] mt-1">ID: {id}</p>
           <Link href="/pilgrims">
             <Button variant="outline" className="mt-4">
@@ -91,15 +104,48 @@ export default function EditPilgrimPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
+    setError('');
 
-    // Simulate API call delay
-    await new Promise((resolve) => setTimeout(resolve, 800));
+    try {
+      const payload = {
+        nik: form.nik,
+        name: form.name,
+        gender: form.gender,
+        birthPlace: form.birthPlace,
+        birthDate: form.birthDate,
+        address: form.address,
+        city: form.city,
+        province: form.province,
+        postalCode: form.postalCode || undefined,
+        phone: form.phone,
+        email: form.email,
+        whatsapp: form.whatsapp || undefined,
+        emergencyContact: {
+          name: form.emergencyName,
+          phone: form.emergencyPhone,
+          relation: form.emergencyRelation,
+        },
+        notes: form.notes || undefined,
+        roomNumber: form.roomNumber || undefined,
+        roomType: form.roomType || undefined,
+      };
 
-    // TODO: Replace with real API call when Pilgrim model is in Prisma
-    // await fetch(`/api/pilgrims/${id}`, { method: 'PUT', body: JSON.stringify(form) });
+      const res = await fetch(`/api/pilgrims/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
 
-    setSaving(false);
-    router.push(`/pilgrims/${id}`);
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Gagal menyimpan');
+      }
+
+      router.push(`/pilgrims/${id}`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Gagal menyimpan data jemaah.');
+      setSaving(false);
+    }
   };
 
   return (
@@ -111,10 +157,16 @@ export default function EditPilgrimPage() {
           </Button>
         </Link>
         <PageHeader
-          title={`Edit: ${pilgrim.name}`}
+          title={`Edit: ${form.name}`}
           description="Update informasi jemaah"
         />
       </div>
+
+      {error && (
+        <div className="rounded-xl border border-red-200 bg-red-50 p-4">
+          <p className="text-sm text-red-700">{error}</p>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit}>
         {/* Personal Information */}

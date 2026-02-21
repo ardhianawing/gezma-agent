@@ -1,18 +1,63 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, Edit } from 'lucide-react';
 import { PageHeader } from '@/components/layout/page-header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { StatusBadge } from '@/components/shared/status-badge';
-import { mockPilgrims } from '@/data/mock-pilgrims';
 import { formatCurrency, formatDate } from '@/lib/utils';
+import type { Pilgrim } from '@/types/pilgrim';
+import type { PilgrimStatus } from '@/types';
 
-export default function PilgrimDetailPage({ params }: { params: { id: string } }) {
-  const pilgrim = mockPilgrims.find((p) => p.id === params.id);
+export default function PilgrimDetailPage() {
+  const params = useParams();
+  const id = params.id as string;
 
-  if (!pilgrim) {
-    return <div>Pilgrim not found</div>;
+  const [pilgrim, setPilgrim] = useState<Pilgrim | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    async function fetchPilgrim() {
+      try {
+        const res = await fetch(`/api/pilgrims/${id}`);
+        if (!res.ok) throw new Error('Not found');
+        const data = await res.json();
+        setPilgrim(data);
+      } catch {
+        setError('Jemaah tidak ditemukan');
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchPilgrim();
+  }, [id]);
+
+  if (loading) {
+    return <div style={{ padding: '40px', textAlign: 'center' }}>Memuat data...</div>;
   }
+
+  if (error || !pilgrim) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <p className="text-lg font-semibold text-[var(--charcoal)]">{error || 'Jemaah tidak ditemukan'}</p>
+          <Link href="/pilgrims">
+            <Button variant="outline" className="mt-4">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Kembali ke Daftar
+            </Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  const emergencyContact = pilgrim.emergencyContact as { name: string; phone: string; relation: string };
+  const checklist = (pilgrim.checklist || {}) as unknown as Record<string, boolean>;
 
   return (
     <div className="space-y-6">
@@ -79,15 +124,15 @@ export default function PilgrimDetailPage({ params }: { params: { id: string } }
               <div className="grid gap-4 md:grid-cols-2">
                 <div>
                   <p className="text-xs text-[var(--gray-600)]">Name</p>
-                  <p className="text-sm text-[var(--charcoal)]">{pilgrim.emergencyContact.name}</p>
+                  <p className="text-sm text-[var(--charcoal)]">{emergencyContact.name}</p>
                 </div>
                 <div>
                   <p className="text-xs text-[var(--gray-600)]">Relation</p>
-                  <p className="text-sm text-[var(--charcoal)]">{pilgrim.emergencyContact.relation}</p>
+                  <p className="text-sm text-[var(--charcoal)]">{emergencyContact.relation}</p>
                 </div>
                 <div>
                   <p className="text-xs text-[var(--gray-600)]">Phone</p>
-                  <p className="text-sm text-[var(--charcoal)]">{pilgrim.emergencyContact.phone}</p>
+                  <p className="text-sm text-[var(--charcoal)]">{emergencyContact.phone}</p>
                 </div>
               </div>
             </div>
@@ -121,19 +166,23 @@ export default function PilgrimDetailPage({ params }: { params: { id: string } }
             <CardTitle>Documents</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid gap-3 md:grid-cols-2">
-              {pilgrim.documents.map((doc) => (
-                <div key={doc.id} className="rounded-[12px] border border-[var(--gray-border)] p-4">
-                  <p className="text-sm font-medium text-[var(--charcoal)] uppercase">{doc.type.replace('_', ' ')}</p>
-                  <div style={{ marginTop: '8px' }}>
-                    <StatusBadge status={doc.status as any} size="sm" />
+            {pilgrim.documents && pilgrim.documents.length > 0 ? (
+              <div className="grid gap-3 md:grid-cols-2">
+                {pilgrim.documents.map((doc) => (
+                  <div key={doc.id} className="rounded-[12px] border border-[var(--gray-border)] p-4">
+                    <p className="text-sm font-medium text-[var(--charcoal)] uppercase">{doc.type.replace('_', ' ')}</p>
+                    <div style={{ marginTop: '8px' }}>
+                      <StatusBadge status={doc.status as PilgrimStatus} size="sm" />
+                    </div>
+                    {doc.uploadedAt && (
+                      <p className="text-xs text-[var(--gray-600)] mt-1">{formatDate(doc.uploadedAt as string)}</p>
+                    )}
                   </div>
-                  {doc.uploadedAt && (
-                    <p className="text-xs text-[var(--gray-600)] mt-1">{formatDate(doc.uploadedAt)}</p>
-                  )}
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-[var(--gray-600)]">Belum ada dokumen.</p>
+            )}
           </CardContent>
         </Card>
 
@@ -144,21 +193,21 @@ export default function PilgrimDetailPage({ params }: { params: { id: string } }
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              <ChecklistItem label="KTP Uploaded" checked={pilgrim.checklist.ktpUploaded} />
-              <ChecklistItem label="Passport Uploaded" checked={pilgrim.checklist.passportUploaded} />
-              <ChecklistItem label="Passport Valid (6+ months)" checked={pilgrim.checklist.passportValid} />
-              <ChecklistItem label="Photo Uploaded" checked={pilgrim.checklist.photoUploaded} />
-              <ChecklistItem label="DP Paid" checked={pilgrim.checklist.dpPaid} />
-              <ChecklistItem label="Full Payment" checked={pilgrim.checklist.fullPayment} />
-              <ChecklistItem label="Visa Submitted" checked={pilgrim.checklist.visaSubmitted} />
-              <ChecklistItem label="Visa Received" checked={pilgrim.checklist.visaReceived} />
-              <ChecklistItem label="Health Certificate" checked={pilgrim.checklist.healthCertificate} />
+              <ChecklistItem label="KTP Uploaded" checked={!!checklist.ktpUploaded} />
+              <ChecklistItem label="Passport Uploaded" checked={!!checklist.passportUploaded} />
+              <ChecklistItem label="Passport Valid (6+ months)" checked={!!checklist.passportValid} />
+              <ChecklistItem label="Photo Uploaded" checked={!!checklist.photoUploaded} />
+              <ChecklistItem label="DP Paid" checked={!!checklist.dpPaid} />
+              <ChecklistItem label="Full Payment" checked={!!checklist.fullPayment} />
+              <ChecklistItem label="Visa Submitted" checked={!!checklist.visaSubmitted} />
+              <ChecklistItem label="Visa Received" checked={!!checklist.visaReceived} />
+              <ChecklistItem label="Health Certificate" checked={!!checklist.healthCertificate} />
             </div>
           </CardContent>
         </Card>
 
         {/* Payment History */}
-        {pilgrim.payments.length > 0 && (
+        {pilgrim.payments && pilgrim.payments.length > 0 && (
           <Card className="lg:col-span-3">
             <CardHeader>
               <CardTitle>Payment History</CardTitle>
@@ -169,7 +218,7 @@ export default function PilgrimDetailPage({ params }: { params: { id: string } }
                   <div key={payment.id} className="flex items-center justify-between rounded-[12px] border border-[var(--gray-border)] p-4">
                     <div>
                       <p className="text-sm font-medium text-[var(--charcoal)] capitalize">{payment.type}</p>
-                      <p className="text-xs text-[var(--gray-600)]">{formatDate(payment.date)} • {payment.method}</p>
+                      <p className="text-xs text-[var(--gray-600)]">{formatDate(payment.date)} &bull; {payment.method}</p>
                     </div>
                     <p className="text-sm font-bold text-[var(--success)]">+ {formatCurrency(payment.amount)}</p>
                   </div>

@@ -46,6 +46,9 @@ model Agency {
 
   // Relations
   users           User[]
+  pilgrims        Pilgrim[]
+  packages        Package[]
+  trips           Trip[]
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -84,4 +87,193 @@ model User {
   updatedAt       DateTime @updatedAt
 
   @@map("users")
+}
+
+model Pilgrim {
+  id                String   @id @default(uuid())
+
+  // Personal Info
+  nik               String
+  name              String
+  gender            String   // male, female
+  birthPlace        String
+  birthDate         String   // ISO date string
+  address           String
+  city              String
+  province          String
+  postalCode        String?
+
+  // Contact
+  phone             String
+  email             String
+  whatsapp          String?
+
+  // Emergency Contact (JSON)
+  emergencyContact  Json     // { name, phone, relation }
+
+  // Checklist (JSON)
+  checklist         Json     @default("{}")
+
+  // Status & Assignment
+  status            String   @default("lead") // lead, dp, lunas, dokumen, visa, ready, departed, completed
+  tripId            String?
+  roomNumber        String?
+  roomType          String?  // single, double, triple, quad
+
+  // Cached payment totals
+  totalPaid         Float    @default(0)
+  remainingBalance  Float    @default(0)
+
+  // Notes
+  notes             String?
+
+  // Metadata
+  createdBy         String?
+
+  // Multi-tenant
+  agencyId          String
+  agency            Agency   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+
+  // Relations
+  documents         PilgrimDocument[]
+  payments          PaymentRecord[]
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@unique([nik, agencyId])
+  @@map("pilgrims")
+}
+
+model PilgrimDocument {
+  id          String    @id @default(uuid())
+  type        String    // ktp, passport, photo, visa, health_cert, book_nikah
+  status      String    @default("missing") // missing, uploaded, verified, expired, rejected
+  fileName    String?
+  fileUrl     String?
+  fileSize    Int?
+  uploadedAt  DateTime?
+  expiryDate  DateTime?
+  verifiedAt  DateTime?
+  verifiedBy  String?
+  notes       String?
+
+  // Relation
+  pilgrimId   String
+  pilgrim     Pilgrim   @relation(fields: [pilgrimId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("pilgrim_documents")
+}
+
+model PaymentRecord {
+  id          String   @id @default(uuid())
+  amount      Float
+  type        String   // dp, installment, full, refund
+  method      String   // transfer, cash, card
+  date        DateTime
+  notes       String?
+  receiptUrl  String?
+
+  // Relation
+  pilgrimId   String
+  pilgrim     Pilgrim  @relation(fields: [pilgrimId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("payment_records")
+}
+
+model Package {
+  id                  String   @id @default(uuid())
+
+  // Basic Info
+  name                String
+  slug                String
+  category            String   // regular, plus, vip, ramadhan, budget
+  description         String
+  duration            Int      // days
+  airline             String
+
+  // Itinerary (JSON)
+  itinerary           Json     @default("[]") // ItineraryDay[]
+
+  // Pricing (JSON)
+  hpp                 Json     // PricingBreakdown
+  totalHpp            Float    @default(0)
+  margin              Float    @default(0) // percentage
+  marginAmount        Float    @default(0)
+  publishedPrice      Float    @default(0)
+
+  // Hotels
+  makkahHotel         String
+  makkahHotelRating   Int
+  makkahHotelDistance  String
+  madinahHotel        String
+  madinahHotelRating  Int
+  madinahHotelDistance String
+
+  // Inclusions / Exclusions (string arrays)
+  inclusions          String[] @default([])
+  exclusions          String[] @default([])
+
+  // Gallery
+  galleryUrls         String[] @default([])
+
+  // Status
+  isActive            Boolean  @default(true)
+  isPromo             Boolean  @default(false)
+  promoPrice          Float?
+  promoEndDate        DateTime?
+
+  // Media
+  thumbnailUrl        String?
+  brochureUrl         String?
+
+  // Multi-tenant
+  agencyId            String
+  agency              Agency   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@unique([slug, agencyId])
+  @@map("packages")
+}
+
+model Trip {
+  id                    String   @id @default(uuid())
+  name                  String
+  packageId             String?
+  departureDate         DateTime?
+  returnDate            DateTime?
+  registrationCloseDate DateTime?
+
+  // Capacity
+  capacity              Int      @default(0)
+  registeredCount       Int      @default(0)
+  confirmedCount        Int      @default(0)
+
+  // Status
+  status                String   @default("open") // open, preparing, ready, departed, completed, cancelled
+
+  // JSON fields
+  flightInfo            Json?
+  checklist             Json?
+
+  // Guide
+  muthawwifName         String?
+  muthawwifPhone        String?
+
+  // Multi-tenant
+  agencyId              String
+  agency                Agency   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@map("trips")
 }

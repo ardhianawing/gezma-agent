@@ -1,17 +1,76 @@
 'use client';
 
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { Eye, Edit2, Trash2 } from 'lucide-react';
 import { StatusBadge } from '@/components/shared/status-badge';
-import { mockPilgrims } from '@/data/mock-pilgrims';
 import { useLanguage } from '@/lib/i18n';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
+import type { PilgrimStatus } from '@/types';
+
+interface PilgrimRow {
+  id: string;
+  name: string;
+  nik: string;
+  email: string;
+  phone: string;
+  status: PilgrimStatus;
+  documents: { status: string }[];
+}
+
+interface Pagination {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
 
 export default function PilgrimsPage() {
   const { t } = useLanguage();
   const { c } = useTheme();
-  const { isMobile, isTablet } = useResponsive();
+  const { isMobile } = useResponsive();
+
+  const [pilgrims, setPilgrims] = useState<PilgrimRow[]>([]);
+  const [pagination, setPagination] = useState<Pagination>({ page: 1, limit: 20, total: 0, totalPages: 0 });
+  const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
+  const [loading, setLoading] = useState(true);
+
+  const fetchPilgrims = useCallback(async (page = 1) => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams({ page: String(page), limit: '20' });
+      if (search) params.set('search', search);
+      if (statusFilter) params.set('status', statusFilter);
+
+      const res = await fetch(`/api/pilgrims?${params}`);
+      if (res.ok) {
+        const json = await res.json();
+        setPilgrims(json.data);
+        setPagination(json.pagination);
+      }
+    } catch (err) {
+      console.error('Failed to fetch pilgrims:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, [search, statusFilter]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => fetchPilgrims(1), 300);
+    return () => clearTimeout(timer);
+  }, [fetchPilgrims]);
+
+  const handleDelete = async (id: string, name: string) => {
+    if (!confirm(`Hapus jemaah "${name}"?`)) return;
+    try {
+      const res = await fetch(`/api/pilgrims/${id}`, { method: 'DELETE' });
+      if (res.ok) fetchPilgrims(pagination.page);
+    } catch (err) {
+      console.error('Failed to delete pilgrim:', err);
+    }
+  };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '16px' : '24px' }}>
@@ -27,7 +86,6 @@ export default function PilgrimsPage() {
           </p>
         </div>
 
-        {/* Button Add Pilgrim */}
         <Link href="/pilgrims/new" style={{ textDecoration: 'none' }}>
           <button
             style={{
@@ -56,7 +114,6 @@ export default function PilgrimsPage() {
 
       {/* ==================== SEARCH & FILTER ==================== */}
       <div style={{ display: 'flex', gap: '12px', flexDirection: isMobile ? 'column' : 'row' }}>
-        {/* Search Input */}
         <div style={{ position: 'relative', flex: 1 }}>
           <div
             style={{
@@ -77,6 +134,8 @@ export default function PilgrimsPage() {
           <input
             type="text"
             placeholder={t.pilgrims.searchPlaceholder}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
             style={{
               width: '100%',
               height: '44px',
@@ -92,15 +151,12 @@ export default function PilgrimsPage() {
           />
         </div>
 
-        {/* Filter Button */}
-        <button
+        <select
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
           style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '8px',
             height: '44px',
-            padding: '0 20px',
+            padding: '0 16px',
             fontSize: '14px',
             fontWeight: '500',
             color: c.textSecondary,
@@ -111,11 +167,16 @@ export default function PilgrimsPage() {
             width: isMobile ? '100%' : 'auto',
           }}
         >
-          <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-          </svg>
-          {t.common.filter}
-        </button>
+          <option value="">Semua Status</option>
+          <option value="lead">Lead</option>
+          <option value="dp">DP</option>
+          <option value="lunas">Lunas</option>
+          <option value="dokumen">Dokumen</option>
+          <option value="visa">Visa</option>
+          <option value="ready">Ready</option>
+          <option value="departed">Departed</option>
+          <option value="completed">Completed</option>
+        </select>
       </div>
 
       {/* ==================== TABLE ==================== */}
@@ -127,113 +188,147 @@ export default function PilgrimsPage() {
           overflow: 'hidden'
         }}
       >
-        <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: isMobile ? '600px' : 'auto' }}>
-            <thead>
-              <tr style={{ backgroundColor: c.cardBgHover, borderBottom: `1px solid ${c.border}` }}>
-                <th style={{ textAlign: 'left', padding: isMobile ? '12px 16px' : '16px 24px', fontSize: '12px', fontWeight: '600', color: c.textSecondary, textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>
-                  {t.pilgrims.tableHeaders.pilgrim}
-                </th>
-                <th style={{ textAlign: 'left', padding: isMobile ? '12px' : '16px', fontSize: '12px', fontWeight: '600', color: c.textSecondary, textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>
-                  {t.pilgrims.tableHeaders.contact}
-                </th>
-                <th style={{ textAlign: 'left', padding: isMobile ? '12px' : '16px', fontSize: '12px', fontWeight: '600', color: c.textSecondary, textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>
-                  {t.pilgrims.tableHeaders.status}
-                </th>
-                <th style={{ textAlign: 'left', padding: isMobile ? '12px' : '16px', fontSize: '12px', fontWeight: '600', color: c.textSecondary, textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>
-                  {t.pilgrims.tableHeaders.documents}
-                </th>
-                <th style={{ textAlign: 'left', padding: isMobile ? '12px 16px' : '16px 24px', fontSize: '12px', fontWeight: '600', color: c.textSecondary, textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>
-                  {t.pilgrims.tableHeaders.actions}
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {mockPilgrims.map((pilgrim, index) => (
-                <tr
-                  key={pilgrim.id}
-                  style={{
-                    borderBottom: index < mockPilgrims.length - 1 ? `1px solid ${c.borderLight}` : 'none',
-                  }}
-                >
-                  {/* Pilgrim */}
-                  <td style={{ padding: isMobile ? '12px 16px' : '16px 24px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                      <div
-                        style={{
-                          width: '40px',
-                          height: '40px',
-                          borderRadius: '50%',
-                          backgroundColor: c.primary,
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          color: 'white',
-                          fontSize: '14px',
-                          fontWeight: '600',
-                          flexShrink: 0,
-                        }}
-                      >
-                        {pilgrim.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
-                      </div>
-                      <div>
-                        <p style={{ margin: 0, fontSize: '14px', fontWeight: '500', color: c.textPrimary, whiteSpace: 'nowrap' }}>
-                          {pilgrim.name}
-                        </p>
-                        <p style={{ margin: 0, fontSize: '12px', color: c.textMuted }}>
-                          {pilgrim.nik}
-                        </p>
-                      </div>
-                    </div>
-                  </td>
-
-                  {/* Contact */}
-                  <td style={{ padding: isMobile ? '12px' : '16px' }}>
-                    <p style={{ margin: 0, fontSize: '14px', color: c.textPrimary, whiteSpace: 'nowrap' }}>
-                      {pilgrim.email}
-                    </p>
-                    <p style={{ margin: 0, fontSize: '12px', color: c.textMuted }}>
-                      {pilgrim.phone}
-                    </p>
-                  </td>
-
-                  {/* Status */}
-                  <td style={{ padding: isMobile ? '12px' : '16px' }}>
-                    <StatusBadge status={pilgrim.status} size="sm" />
-                  </td>
-
-                  {/* Documents */}
-                  <td style={{ padding: isMobile ? '12px' : '16px' }}>
-                    {(() => {
-                      const completed = pilgrim.documents.filter(d => d.status === 'verified').length;
-                      const total = 4;
-                      return (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                          {Array.from({ length: total }).map((_, i) => (
-                            <div
-                              key={i}
-                              style={{
-                                width: '10px',
-                                height: '10px',
-                                borderRadius: '50%',
-                                backgroundColor: i < completed ? c.success : c.border,
-                              }}
-                            />
-                          ))}
-                          <span style={{ marginLeft: '8px', fontSize: '12px', color: c.textSecondary, whiteSpace: 'nowrap' }}>
-                            {completed}/{total}
-                          </span>
+        {loading ? (
+          <div style={{ padding: '40px', textAlign: 'center', color: c.textMuted }}>
+            Memuat data...
+          </div>
+        ) : pilgrims.length === 0 ? (
+          <div style={{ padding: '40px', textAlign: 'center', color: c.textMuted }}>
+            {search || statusFilter ? 'Tidak ada jemaah yang cocok dengan filter.' : 'Belum ada data jemaah.'}
+          </div>
+        ) : (
+          <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: isMobile ? '600px' : 'auto' }}>
+              <thead>
+                <tr style={{ backgroundColor: c.cardBgHover, borderBottom: `1px solid ${c.border}` }}>
+                  <th style={{ textAlign: 'left', padding: isMobile ? '12px 16px' : '16px 24px', fontSize: '12px', fontWeight: '600', color: c.textSecondary, textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>
+                    {t.pilgrims.tableHeaders.pilgrim}
+                  </th>
+                  <th style={{ textAlign: 'left', padding: isMobile ? '12px' : '16px', fontSize: '12px', fontWeight: '600', color: c.textSecondary, textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>
+                    {t.pilgrims.tableHeaders.contact}
+                  </th>
+                  <th style={{ textAlign: 'left', padding: isMobile ? '12px' : '16px', fontSize: '12px', fontWeight: '600', color: c.textSecondary, textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>
+                    {t.pilgrims.tableHeaders.status}
+                  </th>
+                  <th style={{ textAlign: 'left', padding: isMobile ? '12px' : '16px', fontSize: '12px', fontWeight: '600', color: c.textSecondary, textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>
+                    {t.pilgrims.tableHeaders.documents}
+                  </th>
+                  <th style={{ textAlign: 'left', padding: isMobile ? '12px 16px' : '16px 24px', fontSize: '12px', fontWeight: '600', color: c.textSecondary, textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>
+                    {t.pilgrims.tableHeaders.actions}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {pilgrims.map((pilgrim, index) => (
+                  <tr
+                    key={pilgrim.id}
+                    style={{
+                      borderBottom: index < pilgrims.length - 1 ? `1px solid ${c.borderLight}` : 'none',
+                    }}
+                  >
+                    <td style={{ padding: isMobile ? '12px 16px' : '16px 24px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <div
+                          style={{
+                            width: '40px',
+                            height: '40px',
+                            borderRadius: '50%',
+                            backgroundColor: c.primary,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            color: 'white',
+                            fontSize: '14px',
+                            fontWeight: '600',
+                            flexShrink: 0,
+                          }}
+                        >
+                          {pilgrim.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
                         </div>
-                      );
-                    })()}
-                  </td>
+                        <div>
+                          <p style={{ margin: 0, fontSize: '14px', fontWeight: '500', color: c.textPrimary, whiteSpace: 'nowrap' }}>
+                            {pilgrim.name}
+                          </p>
+                          <p style={{ margin: 0, fontSize: '12px', color: c.textMuted }}>
+                            {pilgrim.nik}
+                          </p>
+                        </div>
+                      </div>
+                    </td>
 
-                  {/* Actions */}
-                  <td style={{ padding: isMobile ? '12px 16px' : '16px 24px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      <Link href={`/pilgrims/${pilgrim.id}`}>
+                    <td style={{ padding: isMobile ? '12px' : '16px' }}>
+                      <p style={{ margin: 0, fontSize: '14px', color: c.textPrimary, whiteSpace: 'nowrap' }}>
+                        {pilgrim.email}
+                      </p>
+                      <p style={{ margin: 0, fontSize: '12px', color: c.textMuted }}>
+                        {pilgrim.phone}
+                      </p>
+                    </td>
+
+                    <td style={{ padding: isMobile ? '12px' : '16px' }}>
+                      <StatusBadge status={pilgrim.status} size="sm" />
+                    </td>
+
+                    <td style={{ padding: isMobile ? '12px' : '16px' }}>
+                      {(() => {
+                        const completed = pilgrim.documents.filter(d => d.status === 'verified').length;
+                        const total = 4;
+                        return (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            {Array.from({ length: total }).map((_, i) => (
+                              <div
+                                key={i}
+                                style={{
+                                  width: '10px',
+                                  height: '10px',
+                                  borderRadius: '50%',
+                                  backgroundColor: i < completed ? c.success : c.border,
+                                }}
+                              />
+                            ))}
+                            <span style={{ marginLeft: '8px', fontSize: '12px', color: c.textSecondary, whiteSpace: 'nowrap' }}>
+                              {completed}/{total}
+                            </span>
+                          </div>
+                        );
+                      })()}
+                    </td>
+
+                    <td style={{ padding: isMobile ? '12px 16px' : '16px 24px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <Link href={`/pilgrims/${pilgrim.id}`}>
+                          <button
+                            title={t.common.view}
+                            style={{
+                              padding: '8px',
+                              border: 'none',
+                              backgroundColor: 'transparent',
+                              borderRadius: '6px',
+                              cursor: 'pointer',
+                              color: c.textLight,
+                            }}
+                          >
+                            <Eye style={{ width: '18px', height: '18px' }} />
+                          </button>
+                        </Link>
+                        <Link href={`/pilgrims/${pilgrim.id}/edit`}>
+                          <button
+                            title={t.common.edit}
+                            style={{
+                              padding: '8px',
+                              border: 'none',
+                              backgroundColor: 'transparent',
+                              borderRadius: '6px',
+                              cursor: 'pointer',
+                              color: c.textLight,
+                            }}
+                          >
+                            <Edit2 style={{ width: '18px', height: '18px' }} />
+                          </button>
+                        </Link>
                         <button
-                          title={t.common.view}
+                          title={t.common.delete}
+                          onClick={() => handleDelete(pilgrim.id, pilgrim.name)}
                           style={{
                             padding: '8px',
                             border: 'none',
@@ -243,42 +338,16 @@ export default function PilgrimsPage() {
                             color: c.textLight,
                           }}
                         >
-                          <Eye style={{ width: '18px', height: '18px' }} />
+                          <Trash2 style={{ width: '18px', height: '18px' }} />
                         </button>
-                      </Link>
-                      <button
-                        title={t.common.edit}
-                        style={{
-                          padding: '8px',
-                          border: 'none',
-                          backgroundColor: 'transparent',
-                          borderRadius: '6px',
-                          cursor: 'pointer',
-                          color: c.textLight,
-                        }}
-                      >
-                        <Edit2 style={{ width: '18px', height: '18px' }} />
-                      </button>
-                      <button
-                        title={t.common.delete}
-                        style={{
-                          padding: '8px',
-                          border: 'none',
-                          backgroundColor: 'transparent',
-                          borderRadius: '6px',
-                          cursor: 'pointer',
-                          color: c.textLight,
-                        }}
-                      >
-                        <Trash2 style={{ width: '18px', height: '18px' }} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
 
         {/* Footer */}
         <div
@@ -294,32 +363,35 @@ export default function PilgrimsPage() {
           }}
         >
           <p style={{ margin: 0, fontSize: '14px', color: c.textSecondary }}>
-            {t.pilgrims.showing} <span style={{ fontWeight: '500' }}>{mockPilgrims.length}</span> {t.pilgrims.pilgrimsLabel}
+            {t.pilgrims.showing} <span style={{ fontWeight: '500' }}>{pagination.total}</span> {t.pilgrims.pilgrimsLabel}
           </p>
           <div style={{ display: 'flex', gap: '8px' }}>
             <button
-              disabled
+              disabled={pagination.page <= 1}
+              onClick={() => fetchPilgrims(pagination.page - 1)}
               style={{
                 padding: '6px 12px',
                 fontSize: '14px',
-                color: c.textLight,
+                color: pagination.page <= 1 ? c.textLight : c.textSecondary,
                 backgroundColor: c.cardBg,
                 border: `1px solid ${c.border}`,
                 borderRadius: '6px',
-                cursor: 'not-allowed',
+                cursor: pagination.page <= 1 ? 'not-allowed' : 'pointer',
               }}
             >
               {t.common.previous}
             </button>
             <button
+              disabled={pagination.page >= pagination.totalPages}
+              onClick={() => fetchPilgrims(pagination.page + 1)}
               style={{
                 padding: '6px 12px',
                 fontSize: '14px',
-                color: c.textSecondary,
+                color: pagination.page >= pagination.totalPages ? c.textLight : c.textSecondary,
                 backgroundColor: c.cardBg,
                 border: `1px solid ${c.border}`,
                 borderRadius: '6px',
-                cursor: 'pointer',
+                cursor: pagination.page >= pagination.totalPages ? 'not-allowed' : 'pointer',
               }}
             >
               {t.common.next}

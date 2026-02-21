@@ -1,17 +1,67 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Edit } from 'lucide-react';
+import { ArrowLeft, Edit, Trash2 } from 'lucide-react';
 import { PageHeader } from '@/components/layout/page-header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { mockPackages } from '@/data/mock-packages';
 import { formatCurrency } from '@/lib/utils';
+import type { Package } from '@/types/package';
 
-export default function PackageDetailPage({ params }: { params: { id: string } }) {
-  const pkg = mockPackages.find((p) => p.id === params.id);
+export default function PackageDetailPage() {
+  const params = useParams();
+  const router = useRouter();
+  const id = params.id as string;
+
+  const [pkg, setPkg] = useState<Package | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchPackage() {
+      try {
+        const res = await fetch(`/api/packages/${id}`);
+        if (!res.ok) throw new Error('Not found');
+        setPkg(await res.json());
+      } catch {
+        setPkg(null);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchPackage();
+  }, [id]);
+
+  const handleDelete = async () => {
+    if (!pkg || !confirm(`Hapus paket "${pkg.name}"?`)) return;
+    try {
+      const res = await fetch(`/api/packages/${id}`, { method: 'DELETE' });
+      if (res.ok) router.push('/packages');
+    } catch (err) {
+      console.error('Failed to delete package:', err);
+    }
+  };
+
+  if (loading) {
+    return <div style={{ padding: '40px', textAlign: 'center' }}>Memuat data...</div>;
+  }
 
   if (!pkg) {
-    return <div>Package not found</div>;
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <p className="text-lg font-semibold text-[var(--charcoal)]">Paket tidak ditemukan</p>
+          <Link href="/packages">
+            <Button variant="outline" className="mt-4">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Kembali ke Daftar
+            </Button>
+          </Link>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -24,14 +74,20 @@ export default function PackageDetailPage({ params }: { params: { id: string } }
         </Link>
         <PageHeader
           title={pkg.name}
-          description={`${pkg.duration} days • ${pkg.category.toUpperCase()}`}
+          description={`${pkg.duration} days \u2022 ${pkg.category.toUpperCase()}`}
           actions={
-            <Link href={`/packages/${pkg.id}/edit`}>
-              <Button variant="outline">
-                <Edit className="h-4 w-4" />
-                Edit Package
+            <div className="flex gap-2">
+              <Link href={`/packages/${pkg.id}/edit`}>
+                <Button variant="outline">
+                  <Edit className="h-4 w-4" />
+                  Edit Package
+                </Button>
+              </Link>
+              <Button variant="outline" onClick={handleDelete}>
+                <Trash2 className="h-4 w-4" />
+                Hapus
               </Button>
-            </Link>
+            </div>
           }
         />
       </div>
@@ -75,12 +131,12 @@ export default function PackageDetailPage({ params }: { params: { id: string } }
             <div>
               <p className="font-medium text-[var(--charcoal)]">Makkah</p>
               <p className="text-sm text-[var(--gray-600)] mt-1">{pkg.makkahHotel}</p>
-              <p className="text-sm text-[var(--gray-600)]">{pkg.makkahHotelRating}⭐ • {pkg.makkahHotelDistance}</p>
+              <p className="text-sm text-[var(--gray-600)]">{pkg.makkahHotelRating} star &bull; {pkg.makkahHotelDistance}</p>
             </div>
             <div>
               <p className="font-medium text-[var(--charcoal)]">Madinah</p>
               <p className="text-sm text-[var(--gray-600)] mt-1">{pkg.madinahHotel}</p>
-              <p className="text-sm text-[var(--gray-600)]">{pkg.madinahHotelRating}⭐ • {pkg.madinahHotelDistance}</p>
+              <p className="text-sm text-[var(--gray-600)]">{pkg.madinahHotelRating} star &bull; {pkg.madinahHotelDistance}</p>
             </div>
           </CardContent>
         </Card>
@@ -104,7 +160,7 @@ export default function PackageDetailPage({ params }: { params: { id: string } }
             <ul className="space-y-2">
               {pkg.inclusions.map((item, index) => (
                 <li key={index} className="flex items-start gap-2 text-sm text-[var(--gray-600)]">
-                  <span className="text-[var(--success)] mt-0.5">✓</span>
+                  <span className="text-[var(--success)] mt-0.5">&#10003;</span>
                   {item}
                 </li>
               ))}
@@ -121,7 +177,7 @@ export default function PackageDetailPage({ params }: { params: { id: string } }
             <ul className="space-y-2">
               {pkg.exclusions.map((item, index) => (
                 <li key={index} className="flex items-start gap-2 text-sm text-[var(--gray-600)]">
-                  <span className="text-[var(--error)] mt-0.5">✗</span>
+                  <span className="text-[var(--error)] mt-0.5">&#10007;</span>
                   {item}
                 </li>
               ))}
