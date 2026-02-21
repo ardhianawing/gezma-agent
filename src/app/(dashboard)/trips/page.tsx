@@ -1,19 +1,45 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Plus, Plane } from 'lucide-react';
 import { PageHeader } from '@/components/layout/page-header';
 import { StatusBadge } from '@/components/shared/status-badge';
-import { mockTrips } from '@/data/mock-trips';
+import type { TripStatus } from '@/types';
 import { formatShortDate } from '@/lib/utils';
 import { useTheme } from '@/lib/theme';
 import { useLanguage } from '@/lib/i18n';
 import { useResponsive } from '@/lib/hooks/use-responsive';
 
+interface TripData {
+  id: string;
+  name: string;
+  departureDate: string | null;
+  returnDate: string | null;
+  capacity: number;
+  registeredCount: number;
+  confirmedCount: number;
+  status: string;
+  flightInfo: {
+    departureAirline?: string;
+    departureFlightNo?: string;
+  } | null;
+}
+
 export default function TripsPage() {
   const { c } = useTheme();
   const { t } = useLanguage();
   const { isMobile, isTablet } = useResponsive();
+  const [trips, setTrips] = useState<TripData[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/trips')
+      .then((res) => res.json())
+      .then((json) => setTrips(json.data || []))
+      .catch(() => setTrips([]))
+      .finally(() => setLoading(false));
+  }, []);
 
   // Responsive grid columns - use auto-fill for better tablet support
   const gridColumns = isMobile ? '1fr' : 'repeat(auto-fill, minmax(320px, 1fr))';
@@ -56,8 +82,18 @@ export default function TripsPage() {
           gap: '16px',
         }}
       >
-        {mockTrips.map((trip) => {
-          const occupancy = (trip.registeredCount / trip.capacity) * 100;
+        {loading && (
+          <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px', color: c.textSecondary }}>
+            Memuat data trip...
+          </div>
+        )}
+        {!loading && trips.length === 0 && (
+          <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px', color: c.textSecondary }}>
+            Belum ada trip. Buat trip pertama Anda.
+          </div>
+        )}
+        {trips.map((trip) => {
+          const occupancy = trip.capacity > 0 ? (trip.registeredCount / trip.capacity) * 100 : 0;
           const occupancyColor = occupancy >= 100 ? c.success : occupancy >= 80 ? c.warning : c.primary;
 
           return (
@@ -120,11 +156,11 @@ export default function TripsPage() {
                           fontWeight: '500',
                         }}
                       >
-                        {formatShortDate(trip.departureDate)} - {formatShortDate(trip.returnDate)}
+                        {trip.departureDate ? formatShortDate(trip.departureDate) : '-'} - {trip.returnDate ? formatShortDate(trip.returnDate) : '-'}
                       </p>
                     </div>
                   </div>
-                  <StatusBadge status={trip.status} size="sm" />
+                  <StatusBadge status={trip.status as TripStatus} size="sm" />
                 </div>
 
                 {/* Flight Info Ticket Stub */}
@@ -148,7 +184,7 @@ export default function TripsPage() {
                   >
                     <span style={{ color: c.textSecondary }}>{t.trips.departure}</span>
                     <span style={{ fontFamily: 'monospace', fontWeight: '500', color: c.textPrimary }}>
-                      {trip.flightInfo.departureFlightNo}
+                      {trip.flightInfo?.departureFlightNo || '-'}
                     </span>
                   </div>
                   <div
@@ -160,7 +196,7 @@ export default function TripsPage() {
                       fontWeight: '500',
                     }}
                   >
-                    <span>{trip.flightInfo.departureAirline}</span>
+                    <span>{trip.flightInfo?.departureAirline || '-'}</span>
                     <span>CGK → JED</span>
                   </div>
                 </div>

@@ -1,29 +1,92 @@
+'use client';
+
+import { useState, useEffect, use } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Edit, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, CheckCircle2 } from 'lucide-react';
 import { PageHeader } from '@/components/layout/page-header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { StatusBadge } from '@/components/shared/status-badge';
-import { mockTrips } from '@/data/mock-trips';
 import { formatDate, formatCurrency } from '@/lib/utils';
-import { Badge } from '@/components/ui/badge';
+import type { TripStatus, PilgrimStatus } from '@/types';
 
-export default function TripDetailPage({ params }: { params: { id: string } }) {
-  const trip = mockTrips.find((t) => t.id === params.id);
+interface ManifestEntry {
+  pilgrimId: string;
+  pilgrimName: string;
+  pilgrimStatus: string;
+  documentsComplete: number;
+  documentsTotal: number;
+  roomNumber?: string;
+}
 
-  if (!trip) {
-    return <div>Trip not found</div>;
+interface TripDetail {
+  id: string;
+  name: string;
+  packageId: string | null;
+  departureDate: string | null;
+  returnDate: string | null;
+  capacity: number;
+  registeredCount: number;
+  confirmedCount: number;
+  status: string;
+  muthawwifName: string | null;
+  muthawwifPhone: string | null;
+  flightInfo: {
+    departureAirline?: string;
+    departureFlightNo?: string;
+    departureTime?: string;
+    returnAirline?: string;
+    returnFlightNo?: string;
+    returnTime?: string;
+  } | null;
+  checklist: {
+    allPilgrimsConfirmed?: boolean;
+    manifestComplete?: boolean;
+    roomingListFinalized?: boolean;
+    flightTicketsIssued?: boolean;
+    hotelConfirmed?: boolean;
+    guideAssigned?: boolean;
+    insuranceProcessed?: boolean;
+    departureBriefingDone?: boolean;
+  } | null;
+  manifest: ManifestEntry[];
+}
+
+export default function TripDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
+  const [trip, setTrip] = useState<TripDetail | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    fetch(`/api/trips/${id}`)
+      .then((res) => {
+        if (!res.ok) throw new Error('Not found');
+        return res.json();
+      })
+      .then((data) => setTrip(data))
+      .catch(() => setError('Trip tidak ditemukan'))
+      .finally(() => setLoading(false));
+  }, [id]);
+
+  if (loading) {
+    return <div className="p-6 text-center text-[var(--gray-600)]">Memuat data trip...</div>;
   }
 
+  if (error || !trip) {
+    return <div className="p-6 text-center text-[var(--gray-600)]">{error || 'Trip tidak ditemukan'}</div>;
+  }
+
+  const checklist = trip.checklist || {};
   const checklistItems = [
-    { label: 'All pilgrims confirmed', checked: trip.checklist.allPilgrimsConfirmed },
-    { label: 'Manifest complete', checked: trip.checklist.manifestComplete },
-    { label: 'Rooming list finalized', checked: trip.checklist.roomingListFinalized },
-    { label: 'Flight tickets issued', checked: trip.checklist.flightTicketsIssued },
-    { label: 'Hotel confirmed', checked: trip.checklist.hotelConfirmed },
-    { label: 'Guide assigned', checked: trip.checklist.guideAssigned },
-    { label: 'Insurance processed', checked: trip.checklist.insuranceProcessed },
-    { label: 'Departure briefing done', checked: trip.checklist.departureBriefingDone },
+    { label: 'All pilgrims confirmed', checked: checklist.allPilgrimsConfirmed },
+    { label: 'Manifest complete', checked: checklist.manifestComplete },
+    { label: 'Rooming list finalized', checked: checklist.roomingListFinalized },
+    { label: 'Flight tickets issued', checked: checklist.flightTicketsIssued },
+    { label: 'Hotel confirmed', checked: checklist.hotelConfirmed },
+    { label: 'Guide assigned', checked: checklist.guideAssigned },
+    { label: 'Insurance processed', checked: checklist.insuranceProcessed },
+    { label: 'Departure briefing done', checked: checklist.departureBriefingDone },
   ];
 
   return (
@@ -36,9 +99,9 @@ export default function TripDetailPage({ params }: { params: { id: string } }) {
         </Link>
         <PageHeader
           title={trip.name}
-          description={trip.packageName}
+          description={trip.packageId || ''}
           actions={
-            <StatusBadge status={trip.status} />
+            <StatusBadge status={trip.status as TripStatus} />
           }
         />
       </div>
@@ -53,16 +116,16 @@ export default function TripDetailPage({ params }: { params: { id: string } }) {
             <div className="grid gap-4 md:grid-cols-2">
               <div>
                 <p className="text-sm font-medium text-[var(--gray-600)]">Departure</p>
-                <p className="text-sm text-[var(--charcoal)]">{formatDate(trip.departureDate)}</p>
+                <p className="text-sm text-[var(--charcoal)]">{trip.departureDate ? formatDate(trip.departureDate) : '-'}</p>
                 <p className="text-xs text-[var(--gray-600)] mt-1">
-                  {trip.flightInfo.departureAirline} {trip.flightInfo.departureFlightNo} • {trip.flightInfo.departureTime}
+                  {trip.flightInfo?.departureAirline || ''} {trip.flightInfo?.departureFlightNo || ''} {trip.flightInfo?.departureTime ? `• ${trip.flightInfo.departureTime}` : ''}
                 </p>
               </div>
               <div>
                 <p className="text-sm font-medium text-[var(--gray-600)]">Return</p>
-                <p className="text-sm text-[var(--charcoal)]">{formatDate(trip.returnDate)}</p>
+                <p className="text-sm text-[var(--charcoal)]">{trip.returnDate ? formatDate(trip.returnDate) : '-'}</p>
                 <p className="text-xs text-[var(--gray-600)] mt-1">
-                  {trip.flightInfo.returnAirline} {trip.flightInfo.returnFlightNo} • {trip.flightInfo.returnTime}
+                  {trip.flightInfo?.returnAirline || ''} {trip.flightInfo?.returnFlightNo || ''} {trip.flightInfo?.returnTime ? `• ${trip.flightInfo.returnTime}` : ''}
                 </p>
               </div>
               <div>
@@ -71,17 +134,13 @@ export default function TripDetailPage({ params }: { params: { id: string } }) {
                   {trip.registeredCount}/{trip.capacity} pilgrims
                 </p>
               </div>
-              <div>
-                <p className="text-sm font-medium text-[var(--gray-600)]">Price per Person</p>
-                <p className="text-sm font-bold text-[var(--charcoal)]">{formatCurrency(trip.pricePerPerson)}</p>
-              </div>
             </div>
 
-            {trip.checklist.guideAssigned && (
+            {(trip.muthawwifName || checklist.guideAssigned) && (
               <div className="pt-4 border-t border-[var(--gray-border)]">
                 <p className="text-sm font-medium text-[var(--gray-600)] mb-2">Guide/Muthawwif</p>
-                <p className="text-sm text-[var(--charcoal)]">{trip.checklist.guideName}</p>
-                <p className="text-sm text-[var(--gray-600)]">{trip.checklist.guidePhone}</p>
+                <p className="text-sm text-[var(--charcoal)]">{trip.muthawwifName || '-'}</p>
+                <p className="text-sm text-[var(--gray-600)]">{trip.muthawwifPhone || '-'}</p>
               </div>
             )}
           </CardContent>
@@ -113,10 +172,10 @@ export default function TripDetailPage({ params }: { params: { id: string } }) {
         {/* Manifest */}
         <Card className="lg:col-span-3">
           <CardHeader>
-            <CardTitle>Trip Manifest ({trip.manifest.length} pilgrims)</CardTitle>
+            <CardTitle>Trip Manifest ({trip.manifest?.length || 0} pilgrims)</CardTitle>
           </CardHeader>
           <CardContent>
-            {trip.manifest.length === 0 ? (
+            {(!trip.manifest || trip.manifest.length === 0) ? (
               <p className="text-center text-sm text-[var(--gray-600)] py-4">No pilgrims added yet</p>
             ) : (
               <div className="overflow-x-auto">
@@ -134,7 +193,7 @@ export default function TripDetailPage({ params }: { params: { id: string } }) {
                       <tr key={entry.pilgrimId}>
                         <td className="px-4 py-3 text-sm text-[var(--charcoal)]">{entry.pilgrimName}</td>
                         <td className="px-4 py-3">
-                          <StatusBadge status={entry.pilgrimStatus} size="sm" />
+                          <StatusBadge status={entry.pilgrimStatus as PilgrimStatus} size="sm" />
                         </td>
                         <td className="px-4 py-3 text-sm text-[var(--gray-600)]">
                           {entry.documentsComplete}/{entry.documentsTotal}
