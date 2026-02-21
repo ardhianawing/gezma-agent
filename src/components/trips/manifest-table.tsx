@@ -16,8 +16,15 @@ import {
 } from '@/components/ui/table';
 import { StatusBadge } from '@/components/shared/status-badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { mockPilgrims } from '@/data/mock-pilgrims';
 import type { ManifestEntry } from '@/types/trip';
+
+interface PilgrimOption {
+  id: string;
+  name: string;
+  email: string;
+  status: string;
+  tripId: string | null;
+}
 
 interface ManifestTableProps {
   manifest: ManifestEntry[];
@@ -38,13 +45,36 @@ export function ManifestTable({
 }: ManifestTableProps) {
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
   const [searchQuery, setSearchQuery] = React.useState('');
+  const [availablePilgrims, setAvailablePilgrims] = React.useState<PilgrimOption[]>([]);
+  const [loadingPilgrims, setLoadingPilgrims] = React.useState(false);
 
-  // Get pilgrims not in manifest
-  const availablePilgrims = mockPilgrims.filter(
+  // Fetch available pilgrims when dialog opens
+  React.useEffect(() => {
+    if (!isDialogOpen) return;
+
+    async function fetchPilgrims() {
+      setLoadingPilgrims(true);
+      try {
+        const res = await fetch('/api/pilgrims?limit=100');
+        if (res.ok) {
+          const json = await res.json();
+          setAvailablePilgrims(json.data || []);
+        }
+      } catch {
+        // silently fail
+      } finally {
+        setLoadingPilgrims(false);
+      }
+    }
+    fetchPilgrims();
+  }, [isDialogOpen]);
+
+  // Filter: not in manifest and not assigned to another trip
+  const unassignedPilgrims = availablePilgrims.filter(
     (p) => !manifest.some((m) => m.pilgrimId === p.id) && !p.tripId
   );
 
-  const filteredPilgrims = availablePilgrims.filter(
+  const filteredPilgrims = unassignedPilgrims.filter(
     (p) =>
       p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       p.email.toLowerCase().includes(searchQuery.toLowerCase())
@@ -57,7 +87,6 @@ export function ManifestTable({
   };
 
   const exportManifest = () => {
-    // Simple CSV export
     const headers = ['No', 'Name', 'Status', 'Documents', 'Room'];
     const rows = manifest.map((entry, index) => [
       index + 1,
@@ -107,7 +136,11 @@ export function ManifestTable({
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
                   <div className="max-h-[400px] overflow-y-auto space-y-2">
-                    {filteredPilgrims.length === 0 ? (
+                    {loadingPilgrims ? (
+                      <p className="text-center py-8 text-[var(--gray-600)]">
+                        Loading...
+                      </p>
+                    ) : filteredPilgrims.length === 0 ? (
                       <p className="text-center py-8 text-[var(--gray-600)]">
                         No available pilgrims found
                       </p>
@@ -122,7 +155,7 @@ export function ManifestTable({
                             <p className="text-xs text-[var(--gray-600)]">{pilgrim.email}</p>
                           </div>
                           <div className="flex items-center gap-2">
-                            <StatusBadge status={pilgrim.status} size="sm" />
+                            <StatusBadge status={pilgrim.status as 'lead' | 'dp' | 'lunas'} size="sm" />
                             <Button size="sm" onClick={() => handleAddPilgrim(pilgrim.id)}>
                               Add
                             </Button>
@@ -141,7 +174,7 @@ export function ManifestTable({
         {manifest.length === 0 ? (
           <div className="text-center py-8 text-[var(--gray-600)]">
             <p>No pilgrims in manifest yet.</p>
-            {isEditable && <p className="text-sm mt-1">Click "Add Pilgrim" to start adding.</p>}
+            {isEditable && <p className="text-sm mt-1">Click &quot;Add Pilgrim&quot; to start adding.</p>}
           </div>
         ) : (
           <Table>

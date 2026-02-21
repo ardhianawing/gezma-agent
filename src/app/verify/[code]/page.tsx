@@ -1,12 +1,57 @@
-import { CheckCircle2, XCircle, Building2, Phone, Mail, MapPin, Calendar, Shield } from 'lucide-react';
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useParams } from 'next/navigation';
+import { CheckCircle2, XCircle, Building2, Phone, Mail, MapPin, Calendar, Shield, Loader2 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
-import { mockAgencies } from '@/data/mock-agencies';
 
-export default function VerifyPage({ params }: { params: { code: string } }) {
-  const agency = mockAgencies.find((a) => a.verificationCode === params.code);
-  const isVerified = agency?.isVerified;
+interface AgencyVerification {
+  id: string;
+  name: string;
+  legalName: string;
+  ppiuNumber: string | null;
+  ppiuExpiryDate: string | null;
+  isVerified: boolean;
+  phone: string;
+  email: string;
+  city: string | null;
+  province: string | null;
+}
 
-  if (!agency) {
+export default function VerifyPage() {
+  const params = useParams<{ code: string }>();
+  const [agency, setAgency] = useState<AgencyVerification | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
+
+  useEffect(() => {
+    async function fetchAgency() {
+      try {
+        const res = await fetch(`/api/verify/${params.code}`);
+        if (res.ok) {
+          const json = await res.json();
+          setAgency(json.data);
+        } else {
+          setNotFound(true);
+        }
+      } catch {
+        setNotFound(true);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchAgency();
+  }, [params.code]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[var(--gray-100)] flex items-center justify-center p-4">
+        <Loader2 className="h-8 w-8 animate-spin text-[var(--gray-600)]" />
+      </div>
+    );
+  }
+
+  if (notFound || !agency) {
     return (
       <div className="min-h-screen bg-[var(--gray-100)] flex items-center justify-center p-4">
         <Card className="w-full max-w-md">
@@ -37,8 +82,8 @@ export default function VerifyPage({ params }: { params: { code: string } }) {
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
-              <div className={`w-16 h-16 rounded-full flex items-center justify-center ${isVerified ? 'bg-[var(--success-light)]' : 'bg-[var(--error-light)]'}`}>
-                {isVerified ? (
+              <div className={`w-16 h-16 rounded-full flex items-center justify-center ${agency.isVerified ? 'bg-[var(--success-light)]' : 'bg-[var(--error-light)]'}`}>
+                {agency.isVerified ? (
                   <CheckCircle2 className="h-8 w-8 text-[var(--success)]" />
                 ) : (
                   <XCircle className="h-8 w-8 text-[var(--error)]" />
@@ -46,10 +91,10 @@ export default function VerifyPage({ params }: { params: { code: string } }) {
               </div>
               <div>
                 <h2 className="text-lg font-bold text-[var(--charcoal)]">
-                  {isVerified ? 'Verified Agency' : 'Not Verified'}
+                  {agency.isVerified ? 'Verified Agency' : 'Not Verified'}
                 </h2>
                 <p className="text-sm text-[var(--gray-600)]">
-                  {isVerified
+                  {agency.isVerified
                     ? 'This travel agency is officially registered and verified'
                     : 'This agency could not be verified'
                   }
@@ -73,9 +118,9 @@ export default function VerifyPage({ params }: { params: { code: string } }) {
             </div>
 
             <div className="space-y-3">
-              <InfoRow icon={Shield} label="PPIU Number" value={agency.ppiuNumber} />
-              <InfoRow icon={Calendar} label="Valid Until" value={formatDate(agency.ppiuExpiryDate)} />
-              <InfoRow icon={MapPin} label="Address" value={`${agency.city}, ${agency.province}`} />
+              {agency.ppiuNumber && <InfoRow icon={Shield} label="PPIU Number" value={agency.ppiuNumber} />}
+              {agency.ppiuExpiryDate && <InfoRow icon={Calendar} label="Valid Until" value={formatDate(agency.ppiuExpiryDate)} />}
+              {agency.city && agency.province && <InfoRow icon={MapPin} label="Address" value={`${agency.city}, ${agency.province}`} />}
               <InfoRow icon={Phone} label="Phone" value={agency.phone} />
               <InfoRow icon={Mail} label="Email" value={agency.email} />
             </div>
@@ -92,7 +137,7 @@ export default function VerifyPage({ params }: { params: { code: string } }) {
   );
 }
 
-function InfoRow({ icon: Icon, label, value }: { icon: any; label: string; value: string }) {
+function InfoRow({ icon: Icon, label, value }: { icon: React.ComponentType<React.SVGProps<SVGSVGElement>>; label: string; value: string }) {
   return (
     <div className="flex items-start gap-3">
       <Icon className="h-5 w-5 text-[var(--gray-600)] flex-shrink-0 mt-0.5" />

@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { AlertCircle, FileX, ClipboardX, AlertTriangle } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n';
@@ -10,39 +11,11 @@ interface Alert {
   id: string;
   type: 'missing_docs' | 'incomplete_manifest' | 'license_expiring' | 'payment_pending';
   priority: 'critical' | 'high' | 'medium';
-  titleKey: string;
-  descriptionKey: string;
+  title: string;
+  description: string;
   count?: number;
   href: string;
 }
-
-const mockAlerts: Alert[] = [
-  {
-    id: 'alert_001',
-    type: 'missing_docs',
-    priority: 'critical',
-    titleKey: 'missingDocuments',
-    descriptionKey: 'pilgrimsIncomplete',
-    count: 8,
-    href: '/pilgrims?filter=missing_docs',
-  },
-  {
-    id: 'alert_002',
-    type: 'incomplete_manifest',
-    priority: 'high',
-    titleKey: 'incompleteManifest',
-    descriptionKey: 'needsConfirmation',
-    href: '/trips/trip_001',
-  },
-  {
-    id: 'alert_003',
-    type: 'license_expiring',
-    priority: 'medium',
-    titleKey: 'licenseExpiring',
-    descriptionKey: 'licenseExpiresIn',
-    href: '/agency',
-  },
-];
 
 const iconMap = {
   missing_docs: FileX,
@@ -55,6 +28,25 @@ export function ActionCenter() {
   const { t } = useLanguage();
   const { c } = useTheme();
   const { isMobile } = useResponsive();
+  const [alerts, setAlerts] = useState<Alert[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchAlerts() {
+      try {
+        const res = await fetch('/api/dashboard/alerts');
+        if (res.ok) {
+          const json = await res.json();
+          setAlerts(json.data || []);
+        }
+      } catch {
+        // silently fail
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchAlerts();
+  }, []);
 
   const priorityColors = {
     critical: c.error,
@@ -66,28 +58,6 @@ export function ActionCenter() {
     critical: c.errorLight,
     high: c.warningLight,
     medium: c.infoLight,
-  };
-
-  const getAlertTitle = (alert: Alert) => {
-    const titles: Record<string, string> = {
-      missingDocuments: t.dashboard.missingDocuments,
-      incompleteManifest: t.dashboard.incompleteManifest,
-      licenseExpiring: t.dashboard.licenseExpiring,
-    };
-    return titles[alert.titleKey] || alert.titleKey;
-  };
-
-  const getAlertDescription = (alert: Alert) => {
-    if (alert.type === 'missing_docs') {
-      return `${alert.count} ${t.dashboard.pilgrimsIncomplete}`;
-    }
-    if (alert.type === 'incomplete_manifest') {
-      return `Umrah Reguler - Maret 2026 ${t.dashboard.needsConfirmation}`;
-    }
-    if (alert.type === 'license_expiring') {
-      return `${t.dashboard.licenseExpiresIn} 45 ${t.dashboard.days}`;
-    }
-    return '';
   };
 
   return (
@@ -120,34 +90,40 @@ export function ActionCenter() {
             {t.dashboard.actionCenterDesc}
           </p>
         </div>
-        <span
-          style={{
-            backgroundColor: c.errorLight,
-            color: c.error,
-            fontSize: '14px',
-            fontWeight: '600',
-            width: '32px',
-            height: '32px',
-            borderRadius: '50%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexShrink: 0,
-          }}
-        >
-          {mockAlerts.length}
-        </span>
+        {!loading && alerts.length > 0 && (
+          <span
+            style={{
+              backgroundColor: c.errorLight,
+              color: c.error,
+              fontSize: '14px',
+              fontWeight: '600',
+              width: '32px',
+              height: '32px',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+            }}
+          >
+            {alerts.length}
+          </span>
+        )}
       </div>
 
       {/* Content */}
       <div style={{ padding: isMobile ? '16px' : '24px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-        {mockAlerts.length === 0 ? (
+        {loading ? (
           <p style={{ textAlign: 'center', fontSize: '14px', color: c.textMuted, padding: '24px 0' }}>
-            All caught up! No actions required.
+            Loading...
+          </p>
+        ) : alerts.length === 0 ? (
+          <p style={{ textAlign: 'center', fontSize: '14px', color: c.textMuted, padding: '24px 0' }}>
+            Semua sudah beres! Tidak ada aksi yang diperlukan.
           </p>
         ) : (
-          mockAlerts.map((alert) => {
-            const Icon = iconMap[alert.type];
+          alerts.map((alert) => {
+            const Icon = iconMap[alert.type] || AlertCircle;
             return (
               <Link key={alert.id} href={alert.href} style={{ textDecoration: 'none' }}>
                 <div
@@ -191,7 +167,7 @@ export function ActionCenter() {
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
                     }}>
-                      {getAlertTitle(alert)}
+                      {alert.title}
                     </p>
                     <p style={{
                       fontSize: '13px',
@@ -201,7 +177,7 @@ export function ActionCenter() {
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
                     }}>
-                      {getAlertDescription(alert)}
+                      {alert.description}
                     </p>
                   </div>
 
