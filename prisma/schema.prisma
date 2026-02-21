@@ -1,0 +1,87 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Agency {
+  id              String   @id @default(uuid())
+  name            String   // Company brand name
+  legalName       String   // PT. ...
+  tagline         String?
+  description     String?
+
+  // PPIU Info
+  ppiuNumber      String?  @unique
+  ppiuIssueDate   DateTime?
+  ppiuExpiryDate  DateTime?
+  ppiuStatus      String   @default("pending") // pending, active, expiring, expired
+
+  // Contact
+  email           String   @unique
+  phone           String
+  whatsapp        String?
+  website         String?
+
+  // Address
+  address         String?
+  city            String?
+  province        String?
+  postalCode      String?
+
+  // Branding
+  primaryColor    String   @default("#F60000")
+  logoUrl         String?
+
+  // Verification
+  verificationCode String  @unique @default(uuid())
+  isVerified       Boolean @default(false)
+
+  // Settings
+  currency        String   @default("IDR")
+  timezone        String   @default("Asia/Jakarta")
+
+  // Relations
+  users           User[]
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("agencies")
+}
+
+model User {
+  id              String   @id @default(uuid())
+
+  // Personal Info
+  name            String
+  email           String   @unique
+  password        String   // bcrypt hashed
+  phone           String?
+  position        String?  // e.g., "Direktur", "Admin Operasional"
+  avatarUrl       String?
+
+  // Role
+  role            String   @default("admin") // owner, admin, staff, marketing
+
+  // Status
+  isActive        Boolean  @default(true)
+  isVerified      Boolean  @default(false)
+  verificationCode String? @unique
+  verificationExpiry DateTime?
+
+  // Agency relation
+  agencyId        String
+  agency          Agency   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+
+  // Session tracking
+  lastLoginAt     DateTime?
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("users")
+}

@@ -3,20 +3,42 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState('admin@barokahtravel.com');
-  const [password, setPassword] = useState('demo123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Mock authentication - just redirect to dashboard
-    router.push('/pilgrims');
+    setIsLoading(true);
+    setError('');
+
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || 'Email atau password salah');
+        return;
+      }
+
+      router.push('/dashboard');
+    } catch {
+      setError('Terjadi kesalahan. Silakan coba lagi.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -40,7 +62,7 @@ export default function LoginPage() {
         </div>
 
         <div className="relative z-10 text-sm" style={{ color: 'rgba(255, 255, 255, 0.6)' }}>
-          &copy; 2024 GEZMA Technology. All rights reserved.
+          &copy; 2026 GEZMA Technology. All rights reserved.
         </div>
 
         {/* Abstract Background Pattern */}
@@ -76,7 +98,7 @@ export default function LoginPage() {
               <div className="flex items-center justify-between">
                 <Label htmlFor="password">Password</Label>
                 <Link
-                  href="/forgot-password"
+                  href="#"
                   className="text-sm font-medium text-[var(--gezma-red)] hover:underline"
                 >
                   Forgot password?
@@ -93,11 +115,18 @@ export default function LoginPage() {
               />
             </div>
 
+            {error && (
+              <div className="rounded-lg border border-[var(--error-light)] bg-[var(--error-50)] px-4 py-3 text-sm text-[var(--error)]">
+                {error}
+              </div>
+            )}
+
             <Button
               type="submit"
+              disabled={isLoading}
               className="w-full h-11 text-base font-medium shadow-[var(--shadow-lg)] hover:shadow-xl transition-all hover:-translate-y-0.5"
             >
-              Sign In to Dashboard
+              {isLoading ? 'Signing in...' : 'Sign In to Dashboard'}
             </Button>
           </form>
 
