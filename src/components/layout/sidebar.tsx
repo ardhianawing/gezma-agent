@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n';
 import { useTheme } from '@/lib/theme';
+import { useAuth } from '@/lib/auth';
 
 interface MenuItem {
   label: string;
@@ -68,6 +69,7 @@ export function Sidebar({ isOpen, onClose, isOverlay = false }: SidebarProps) {
   const pathname = usePathname();
   const { t } = useLanguage();
   const { theme, c } = useTheme();
+  const { user, logout } = useAuth();
 
   const isActive = (href: string) => {
     if (href === '/') {
@@ -310,7 +312,7 @@ export function Sidebar({ isOpen, onClose, isOverlay = false }: SidebarProps) {
                 flexShrink: 0,
               }}
             >
-              BT
+              {user?.agency?.name ? user.agency.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase() : '??'}
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <p
@@ -324,7 +326,7 @@ export function Sidebar({ isOpen, onClose, isOverlay = false }: SidebarProps) {
                   textOverflow: 'ellipsis',
                 }}
               >
-                Barokah Travel
+                {user?.agency?.name || 'Loading...'}
               </p>
               <p
                 style={{
@@ -333,13 +335,14 @@ export function Sidebar({ isOpen, onClose, isOverlay = false }: SidebarProps) {
                   margin: '2px 0 0 0',
                 }}
               >
-                PPIU/123/2023
+                {user?.name || '-'}
               </p>
             </div>
           </div>
 
           {/* Sign Out Button */}
           <button
+            onClick={logout}
             style={{
               display: 'flex',
               alignItems: 'center',

@@ -6,6 +6,7 @@ import { ThemeToggle } from '@/components/shared/theme-toggle';
 import { useLanguage } from '@/lib/i18n';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
+import { useAuth } from '@/lib/auth';
 
 interface HeaderProps {
   onMenuClick?: () => void;
@@ -16,6 +17,7 @@ export function Header({ onMenuClick, showMenuButton = false }: HeaderProps) {
   const { t } = useLanguage();
   const { c } = useTheme();
   const { isMobile } = useResponsive();
+  const { user } = useAuth();
 
   return (
     <header
@@ -189,16 +191,18 @@ export function Header({ onMenuClick, showMenuButton = false }: HeaderProps) {
                 flexShrink: 0,
               }}
             >
-              <span style={{ fontSize: isMobile ? '12px' : '14px', fontWeight: '700', color: 'white' }}>AD</span>
+              <span style={{ fontSize: isMobile ? '12px' : '14px', fontWeight: '700', color: 'white' }}>
+                {user?.name ? user.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase() : '??'}
+              </span>
             </div>
             {!isMobile && (
               <>
                 <div style={{ textAlign: 'left' }}>
                   <p style={{ fontSize: '14px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>
-                    Admin
+                    {user?.name || 'Loading...'}
                   </p>
                   <p style={{ fontSize: '12px', color: c.textMuted, margin: 0 }}>
-                    Barokah Travel
+                    {user?.agency?.name || '-'}
                   </p>
                 </div>
                 <ChevronDown style={{ width: '16px', height: '16px', color: c.textLight }} />
