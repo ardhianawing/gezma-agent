@@ -1,28 +1,21 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { Users, Package, Plane, FileText, Calendar, Clock } from 'lucide-react';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
 import { StatCard } from '@/components/shared/stat-card';
 import { ActionCenter } from '@/components/dashboard/action-center';
 import { QuickActions } from '@/components/dashboard/quick-actions';
-import { mockTrips } from '@/data/mock-trips';
 import { mockActivities } from '@/data/mock-activity';
-import { mockPilgrims } from '@/data/mock-pilgrims';
-import { mockPackages } from '@/data/mock-packages';
 
-// --- Computed stats from mock data ---
-const totalJemaah = mockPilgrims.length;
-const activePackages = mockPackages.filter((p) => p.isActive).length;
-const activeTrips = mockTrips.filter((t) => t.status !== 'completed');
-const activeTripsCount = activeTrips.length;
-const docsIncomplete = mockPilgrims.filter((p) => {
-  const verified = p.documents.filter((d) => d.status === 'verified').length;
-  return verified < 4;
-}).length;
-
-// --- Upcoming trips (not completed) ---
-const upcomingTrips = mockTrips.filter((t) => t.status !== 'completed');
+interface DashboardStats {
+  totalPilgrims: number;
+  activePackages: number;
+  activeTrips: number;
+  pendingDocs: number;
+  upcomingTrips: { id: string; name: string; departureDate: string | null; registeredCount: number; status: string }[];
+}
 
 // --- Recent activities (first 6) ---
 const recentActivities = mockActivities.slice(0, 6);
@@ -59,6 +52,31 @@ function timeAgo(timestamp: string): string {
 export default function DashboardPage() {
   const { c } = useTheme();
   const { isMobile, isTablet } = useResponsive();
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchStats() {
+      try {
+        const res = await fetch('/api/dashboard/stats');
+        if (res.ok) {
+          const data = await res.json();
+          setStats(data);
+        }
+      } catch {
+        // silently fail, stats will show 0
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchStats();
+  }, []);
+
+  const totalJemaah = stats?.totalPilgrims ?? 0;
+  const activePackages = stats?.activePackages ?? 0;
+  const activeTripsCount = stats?.activeTrips ?? 0;
+  const docsIncomplete = stats?.pendingDocs ?? 0;
+  const upcomingTrips = stats?.upcomingTrips ?? [];
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', width: '100%' }}>
@@ -114,6 +132,8 @@ export default function DashboardPage() {
           display: 'grid',
           gridTemplateColumns: isMobile ? '1fr' : isTablet ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
           gap: isMobile ? '12px' : '16px',
+          opacity: loading ? 0.5 : 1,
+          transition: 'opacity 0.2s',
         }}
       >
         <StatCard
@@ -122,8 +142,6 @@ export default function DashboardPage() {
           icon={Users}
           iconColor="#3B82F6"
           iconBgColor="#3B82F615"
-          trend={{ value: 12, isPositive: true }}
-          trendLabel="vs last month"
           href="/pilgrims"
         />
         <StatCard
@@ -132,8 +150,6 @@ export default function DashboardPage() {
           icon={Package}
           iconColor="#10B981"
           iconBgColor="#10B98115"
-          trend={{ value: 2, isPositive: true }}
-          trendLabel="new this month"
           href="/packages"
         />
         <StatCard
@@ -289,7 +305,7 @@ export default function DashboardPage() {
                         }}
                       >
                         <Calendar style={{ width: '12px', height: '12px' }} />
-                        {trip.departureDate}
+                        {trip.departureDate ? new Date(trip.departureDate).toLocaleDateString('id-ID') : '-'}
                       </span>
                       <span
                         style={{
