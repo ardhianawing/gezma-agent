@@ -9,18 +9,18 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { tripFormSchema, type TripFormData } from '@/lib/validations/trip';
-import { mockPackages } from '@/data/mock-packages';
 import { formatCurrency } from '@/lib/utils';
 import type { Trip } from '@/types/trip';
 
 interface TripFormProps {
   initialData?: Partial<Trip>;
+  packages: { id: string; name: string; publishedPrice: number }[];
   onSubmit: (data: TripFormData) => void;
   onCancel: () => void;
   isLoading?: boolean;
 }
 
-export function TripForm({ initialData, onSubmit, onCancel, isLoading }: TripFormProps) {
+export function TripForm({ initialData, packages, onSubmit, onCancel, isLoading }: TripFormProps) {
   const {
     register,
     handleSubmit,
@@ -56,7 +56,7 @@ export function TripForm({ initialData, onSubmit, onCancel, isLoading }: TripFor
   });
 
   const selectedPackageId = watch('packageId');
-  const selectedPackage = mockPackages.find((p) => p.id === selectedPackageId);
+  const selectedPackage = packages.find((p) => p.id === selectedPackageId);
 
   // Auto-fill price when package is selected
   React.useEffect(() => {
@@ -92,7 +92,7 @@ export function TripForm({ initialData, onSubmit, onCancel, isLoading }: TripFor
               className={`w-full h-10 rounded-[12px] border px-3 text-sm ${errors.packageId ? 'border-[var(--error)]' : 'border-[var(--gray-border)]'}`}
             >
               <option value="">Select package</option>
-              {mockPackages.filter((p) => p.isActive).map((pkg) => (
+              {packages.map((pkg) => (
                 <option key={pkg.id} value={pkg.id}>
                   {pkg.name} - {formatCurrency(pkg.publishedPrice)}
                 </option>

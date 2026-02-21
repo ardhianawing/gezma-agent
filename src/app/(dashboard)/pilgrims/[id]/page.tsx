@@ -8,9 +8,10 @@ import { PageHeader } from '@/components/layout/page-header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { StatusBadge } from '@/components/shared/status-badge';
+import { DocumentUpload } from '@/components/pilgrims/document-upload';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import type { Pilgrim } from '@/types/pilgrim';
-import type { PilgrimStatus } from '@/types';
+import type { PilgrimStatus, DocumentType } from '@/types';
 
 export default function PilgrimDetailPage() {
   const params = useParams();
@@ -161,30 +162,47 @@ export default function PilgrimDetailPage() {
         </Card>
 
         {/* Documents */}
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle>Documents</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {pilgrim.documents && pilgrim.documents.length > 0 ? (
-              <div className="grid gap-3 md:grid-cols-2">
-                {pilgrim.documents.map((doc) => (
-                  <div key={doc.id} className="rounded-[12px] border border-[var(--gray-border)] p-4">
-                    <p className="text-sm font-medium text-[var(--charcoal)] uppercase">{doc.type.replace('_', ' ')}</p>
-                    <div style={{ marginTop: '8px' }}>
-                      <StatusBadge status={doc.status as PilgrimStatus} size="sm" />
-                    </div>
-                    {doc.uploadedAt && (
-                      <p className="text-xs text-[var(--gray-600)] mt-1">{formatDate(doc.uploadedAt as string)}</p>
-                    )}
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm text-[var(--gray-600)]">Belum ada dokumen.</p>
-            )}
-          </CardContent>
-        </Card>
+        <div className="lg:col-span-2">
+          <DocumentUpload
+            documents={pilgrim.documents || []}
+            onUpload={async (type: DocumentType, file: File) => {
+              try {
+                const res = await fetch(`/api/pilgrims/${id}/documents`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    type,
+                    status: 'uploaded',
+                    fileName: file.name,
+                    fileSize: file.size,
+                  }),
+                });
+                if (!res.ok) return;
+                const newDoc = await res.json();
+                setPilgrim((prev) => prev ? {
+                  ...prev,
+                  documents: [newDoc, ...(prev.documents || [])],
+                } : prev);
+              } catch {
+                // silently fail
+              }
+            }}
+            onRemove={async (documentId: string) => {
+              try {
+                const res = await fetch(`/api/pilgrims/${id}/documents/${documentId}`, {
+                  method: 'DELETE',
+                });
+                if (!res.ok) return;
+                setPilgrim((prev) => prev ? {
+                  ...prev,
+                  documents: (prev.documents || []).filter((d) => d.id !== documentId),
+                } : prev);
+              } catch {
+                // silently fail
+              }
+            }}
+          />
+        </div>
 
         {/* Checklist */}
         <Card>

@@ -1,48 +1,116 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { PageHeader } from '@/components/layout/page-header';
 import { FileText, Upload, Download, Eye, Calendar, AlertCircle, CheckCircle2, Clock } from 'lucide-react';
-import { DEFAULT_AGENCY } from '@/data/mock-agencies';
 import { formatDate } from '@/lib/utils';
 import { useTheme } from '@/lib/theme';
 import { useLanguage } from '@/lib/i18n';
 import { useResponsive } from '@/lib/hooks/use-responsive';
 
+interface AgencyDocument {
+  id: string;
+  type: string;
+  name: string;
+  number?: string;
+  issueDate?: string;
+  expiryDate?: string;
+  status: 'valid' | 'expiring' | 'expired';
+}
+
+function computeDocumentStatus(expiryDate?: string | null): 'valid' | 'expiring' | 'expired' {
+  if (!expiryDate) return 'valid';
+  const expiry = new Date(expiryDate);
+  const now = new Date();
+  const threeMonths = new Date();
+  threeMonths.setMonth(threeMonths.getMonth() + 3);
+
+  if (expiry < now) return 'expired';
+  if (expiry < threeMonths) return 'expiring';
+  return 'valid';
+}
+
 export default function DocumentsPage() {
   const { c } = useTheme();
   const { t } = useLanguage();
-  const { isMobile, isTablet } = useResponsive();
+  const { isMobile } = useResponsive();
+
+  const [documents, setDocuments] = useState<AgencyDocument[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchAgency() {
+      try {
+        const res = await fetch('/api/agency');
+        if (!res.ok) throw new Error('Failed to fetch');
+        const agency = await res.json();
+
+        // Transform agency PPIU fields into document-like items
+        const docs: AgencyDocument[] = [];
+
+        if (agency.ppiuNumber || agency.ppiuIssueDate || agency.ppiuExpiryDate) {
+          docs.push({
+            id: 'ppiu',
+            type: 'ppiu_license',
+            name: 'Izin PPIU',
+            number: agency.ppiuNumber || undefined,
+            issueDate: agency.ppiuIssueDate || undefined,
+            expiryDate: agency.ppiuExpiryDate || undefined,
+            status: computeDocumentStatus(agency.ppiuExpiryDate),
+          });
+        }
+
+        // Add a placeholder for SIUP (business license) — agency model doesn't track it yet
+        // but we show the section so users know what's expected
+        if (docs.length === 0) {
+          docs.push({
+            id: 'ppiu_empty',
+            type: 'ppiu_license',
+            name: 'Izin PPIU',
+            status: 'valid',
+          });
+        }
+
+        setDocuments(docs);
+      } catch {
+        // Silently fail — show empty state
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchAgency();
+  }, []);
 
   const statusConfig = {
     valid: {
       color: c.success,
       bgColor: c.successLight,
-      borderColor: `rgba(22, 163, 74, 0.2)`,
       label: t.documents.valid,
       Icon: CheckCircle2,
     },
     expiring: {
       color: c.warning,
       bgColor: c.warningLight,
-      borderColor: `rgba(217, 119, 6, 0.2)`,
       label: t.documents.expiringSoon,
       Icon: Clock,
     },
     expired: {
       color: c.error,
       bgColor: c.errorLight,
-      borderColor: `rgba(220, 38, 38, 0.2)`,
       label: t.documents.expired,
       Icon: AlertCircle,
     },
   };
 
-  const validCount = DEFAULT_AGENCY.documents.filter(d => d.status === 'valid').length;
-  const expiringCount = DEFAULT_AGENCY.documents.filter(d => d.status === 'expiring').length;
-  const expiredCount = DEFAULT_AGENCY.documents.filter(d => d.status === 'expired').length;
+  const validCount = documents.filter(d => d.status === 'valid').length;
+  const expiringCount = documents.filter(d => d.status === 'expiring').length;
+  const expiredCount = documents.filter(d => d.status === 'expired').length;
 
-  // Responsive grid columns - use auto-fit for better tablet support
   const statsGridColumns = isMobile ? '1fr' : 'repeat(auto-fit, minmax(200px, 1fr))';
+
+  if (loading) {
+    return <div style={{ padding: '40px', textAlign: 'center' }}>Memuat data...</div>;
+  }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '16px' : '24px' }}>
@@ -198,123 +266,129 @@ export default function DocumentsPage() {
 
         {/* Document Items */}
         <div>
-          {DEFAULT_AGENCY.documents.map((doc, index) => {
-            const config = statusConfig[doc.status as keyof typeof statusConfig];
-            return (
-              <div
-                key={doc.id}
-                style={{
-                  display: 'flex',
-                  alignItems: isMobile ? 'flex-start' : 'center',
-                  flexDirection: isMobile ? 'column' : 'row',
-                  gap: '16px',
-                  padding: isMobile ? '16px' : '20px',
-                  borderBottom: index < DEFAULT_AGENCY.documents.length - 1 ? `1px solid ${c.borderLight}` : 'none',
-                  transition: 'background-color 0.2s',
-                }}
-              >
-                {/* Icon + Content */}
-                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px', flex: 1, width: '100%' }}>
-                  {/* Icon */}
-                  <div
-                    style={{
-                      width: isMobile ? '48px' : '56px',
-                      height: isMobile ? '48px' : '56px',
-                      borderRadius: '12px',
-                      backgroundColor: config.bgColor,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      flexShrink: 0,
-                    }}
-                  >
-                    <FileText style={{ width: isMobile ? '24px' : '28px', height: isMobile ? '24px' : '28px', color: config.color }} />
+          {documents.length === 0 ? (
+            <div style={{ padding: '40px', textAlign: 'center', color: c.textMuted, fontSize: '14px' }}>
+              Belum ada dokumen agency.
+            </div>
+          ) : (
+            documents.map((doc, index) => {
+              const config = statusConfig[doc.status];
+              return (
+                <div
+                  key={doc.id}
+                  style={{
+                    display: 'flex',
+                    alignItems: isMobile ? 'flex-start' : 'center',
+                    flexDirection: isMobile ? 'column' : 'row',
+                    gap: '16px',
+                    padding: isMobile ? '16px' : '20px',
+                    borderBottom: index < documents.length - 1 ? `1px solid ${c.borderLight}` : 'none',
+                    transition: 'background-color 0.2s',
+                  }}
+                >
+                  {/* Icon + Content */}
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px', flex: 1, width: '100%' }}>
+                    {/* Icon */}
+                    <div
+                      style={{
+                        width: isMobile ? '48px' : '56px',
+                        height: isMobile ? '48px' : '56px',
+                        borderRadius: '12px',
+                        backgroundColor: config.bgColor,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexShrink: 0,
+                      }}
+                    >
+                      <FileText style={{ width: isMobile ? '24px' : '28px', height: isMobile ? '24px' : '28px', color: config.color }} />
+                    </div>
+
+                    {/* Content */}
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '4px', flexWrap: 'wrap' }}>
+                        <h4 style={{ fontSize: '14px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>
+                          {doc.name}
+                        </h4>
+                        <span
+                          style={{
+                            backgroundColor: config.bgColor,
+                            color: config.color,
+                            fontSize: '12px',
+                            fontWeight: '500',
+                            padding: '4px 10px',
+                            borderRadius: '12px',
+                          }}
+                        >
+                          {config.label}
+                        </span>
+                      </div>
+                      {doc.number && (
+                        <p
+                          style={{
+                            fontSize: '14px',
+                            fontFamily: 'monospace',
+                            color: c.textMuted,
+                            marginBottom: '8px',
+                          }}
+                        >
+                          {doc.number}
+                        </p>
+                      )}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '16px', fontSize: '12px', color: c.textMuted, flexWrap: 'wrap' }}>
+                        {doc.issueDate && (
+                          <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                            <Calendar style={{ width: '14px', height: '14px' }} />
+                            {t.documents.issued}: {formatDate(doc.issueDate)}
+                          </span>
+                        )}
+                        {doc.expiryDate && (
+                          <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                            <Clock style={{ width: '14px', height: '14px' }} />
+                            {t.documents.expires}: {formatDate(doc.expiryDate)}
+                          </span>
+                        )}
+                      </div>
+                    </div>
                   </div>
 
-                  {/* Content */}
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '4px', flexWrap: 'wrap' }}>
-                      <h4 style={{ fontSize: '14px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>
-                        {doc.name}
-                      </h4>
-                      <span
-                        style={{
-                          backgroundColor: config.bgColor,
-                          color: config.color,
-                          fontSize: '12px',
-                          fontWeight: '500',
-                          padding: '4px 10px',
-                          borderRadius: '12px',
-                        }}
-                      >
-                        {config.label}
-                      </span>
-                    </div>
-                    {doc.number && (
-                      <p
-                        style={{
-                          fontSize: '14px',
-                          fontFamily: 'monospace',
-                          color: c.textMuted,
-                          marginBottom: '8px',
-                        }}
-                      >
-                        {doc.number}
-                      </p>
-                    )}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px', fontSize: '12px', color: c.textMuted, flexWrap: 'wrap' }}>
-                      {doc.issueDate && (
-                        <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                          <Calendar style={{ width: '14px', height: '14px' }} />
-                          {t.documents.issued}: {formatDate(doc.issueDate)}
-                        </span>
-                      )}
-                      {doc.expiryDate && (
-                        <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                          <Clock style={{ width: '14px', height: '14px' }} />
-                          {t.documents.expires}: {formatDate(doc.expiryDate)}
-                        </span>
-                      )}
-                    </div>
+                  {/* Actions */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', alignSelf: isMobile ? 'flex-end' : 'center' }}>
+                    <button
+                      style={{
+                        width: '36px',
+                        height: '36px',
+                        borderRadius: '8px',
+                        border: 'none',
+                        backgroundColor: 'transparent',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      <Eye style={{ width: '16px', height: '16px', color: c.textMuted }} />
+                    </button>
+                    <button
+                      style={{
+                        width: '36px',
+                        height: '36px',
+                        borderRadius: '8px',
+                        border: 'none',
+                        backgroundColor: 'transparent',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      <Download style={{ width: '16px', height: '16px', color: c.textMuted }} />
+                    </button>
                   </div>
                 </div>
-
-                {/* Actions */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', alignSelf: isMobile ? 'flex-end' : 'center' }}>
-                  <button
-                    style={{
-                      width: '36px',
-                      height: '36px',
-                      borderRadius: '8px',
-                      border: 'none',
-                      backgroundColor: 'transparent',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                  >
-                    <Eye style={{ width: '16px', height: '16px', color: c.textMuted }} />
-                  </button>
-                  <button
-                    style={{
-                      width: '36px',
-                      height: '36px',
-                      borderRadius: '8px',
-                      border: 'none',
-                      backgroundColor: 'transparent',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                  >
-                    <Download style={{ width: '16px', height: '16px', color: c.textMuted }} />
-                  </button>
-                </div>
-              </div>
-            );
-          })}
+              );
+            })
+          )}
         </div>
       </div>
     </div>
