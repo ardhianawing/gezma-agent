@@ -5,6 +5,33 @@ import { logActivity } from '@/lib/activity-logger';
 
 type Context = { params: Promise<{ id: string }> };
 
+export async function GET(req: NextRequest, { params }: Context) {
+  const auth = getAuthPayload(req);
+  if (!auth) return unauthorizedResponse();
+
+  const { id } = await params;
+
+  try {
+    const pilgrim = await prisma.pilgrim.findFirst({
+      where: { id, agencyId: auth.agencyId },
+    });
+
+    if (!pilgrim) {
+      return NextResponse.json({ error: 'Jemaah tidak ditemukan' }, { status: 404 });
+    }
+
+    const payments = await prisma.paymentRecord.findMany({
+      where: { pilgrimId: id },
+      orderBy: { date: 'desc' },
+    });
+
+    return NextResponse.json({ data: payments });
+  } catch (error) {
+    console.error('GET /api/pilgrims/[id]/payments error:', error);
+    return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
+  }
+}
+
 const VALID_TYPES = ['dp', 'installment', 'full', 'refund'] as const;
 const VALID_METHODS = ['transfer', 'cash', 'card'] as const;
 

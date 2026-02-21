@@ -73,6 +73,7 @@ export default function AgencyPage() {
     address: '', city: '', province: '', postalCode: '',
   });
   const [saving, setSaving] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     fetch('/api/agency')
@@ -488,6 +489,12 @@ export default function AgencyPage() {
                   {agency.verificationCode}
                 </code>
                 <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(agency.verificationCode).then(() => {
+                      setCopied(true);
+                      setTimeout(() => setCopied(false), 2000);
+                    });
+                  }}
                   style={{
                     width: '32px',
                     height: '32px',
@@ -499,8 +506,12 @@ export default function AgencyPage() {
                     alignItems: 'center',
                     justifyContent: 'center',
                   }}
+                  title={copied ? 'Tersalin!' : 'Salin kode'}
                 >
-                  <Copy style={{ width: '16px', height: '16px', color: c.textMuted }} />
+                  {copied
+                    ? <CheckCircle2 style={{ width: '16px', height: '16px', color: c.success }} />
+                    : <Copy style={{ width: '16px', height: '16px', color: c.textMuted }} />
+                  }
                 </button>
               </div>
             </div>

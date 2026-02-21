@@ -1,5 +1,7 @@
 'use client';
 
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { PageHeader } from '@/components/layout/page-header';
 import { useTheme } from '@/lib/theme';
 import { useLanguage } from '@/lib/i18n';
@@ -20,10 +22,24 @@ import {
   Check
 } from 'lucide-react';
 
+interface AgencyInfo {
+  name: string;
+}
+
 export default function SettingsPage() {
   const { theme, setTheme, c } = useTheme();
   const { t } = useLanguage();
   const { isMobile, isTablet } = useResponsive();
+  const [emailAlerts, setEmailAlerts] = useState(true);
+  const [pushNotifs, setPushNotifs] = useState(false);
+  const [agency, setAgency] = useState<AgencyInfo | null>(null);
+
+  useEffect(() => {
+    fetch('/api/agency')
+      .then((res) => res.json())
+      .then((data) => setAgency(data))
+      .catch(() => {});
+  }, []);
 
   const settingsSections = [
     {
@@ -32,6 +48,7 @@ export default function SettingsPage() {
       description: t.settings.generalDesc,
       color: c.textMuted,
       bgColor: c.cardBgHover,
+      href: null as string | null,
     },
     {
       icon: Bell,
@@ -39,6 +56,7 @@ export default function SettingsPage() {
       description: t.settings.notificationsDesc,
       color: c.info,
       bgColor: c.infoLight,
+      href: null,
     },
     {
       icon: Shield,
@@ -46,6 +64,7 @@ export default function SettingsPage() {
       description: t.settings.securityDesc,
       color: c.success,
       bgColor: c.successLight,
+      href: null,
     },
     {
       icon: CreditCard,
@@ -53,6 +72,7 @@ export default function SettingsPage() {
       description: t.settings.billingDesc,
       color: c.warning,
       bgColor: c.warningLight,
+      href: null,
     },
     {
       icon: Users,
@@ -60,6 +80,7 @@ export default function SettingsPage() {
       description: t.settings.teamDesc,
       color: c.primary,
       bgColor: c.primaryLight,
+      href: '/settings/users',
     },
     {
       icon: Globe,
@@ -67,11 +88,16 @@ export default function SettingsPage() {
       description: t.settings.languageRegionDesc,
       color: '#7C3AED',
       bgColor: '#F5F3FF',
+      href: null,
     },
   ];
 
   // Responsive grid columns - use auto-fit for better tablet support
   const mainGridColumns = isMobile || isTablet ? '1fr' : 'repeat(auto-fit, minmax(320px, 1fr))';
+
+  const agencyInitials = agency?.name
+    ? agency.name.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase()
+    : '..';
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '16px' : '24px' }}>
@@ -94,9 +120,8 @@ export default function SettingsPage() {
           >
             {settingsSections.map((section, index) => {
               const Icon = section.icon;
-              return (
-                <button
-                  key={section.title}
+              const content = (
+                <div
                   style={{
                     width: '100%',
                     display: 'flex',
@@ -104,11 +129,10 @@ export default function SettingsPage() {
                     gap: '16px',
                     padding: isMobile ? '16px' : '20px',
                     backgroundColor: 'transparent',
-                    border: 'none',
                     borderBottom: index < settingsSections.length - 1 ? `1px solid ${c.borderLight}` : 'none',
-                    cursor: 'pointer',
-                    textAlign: 'left',
-                    transition: 'background-color 0.2s',
+                    cursor: section.href ? 'pointer' : 'default',
+                    textAlign: 'left' as const,
+                    opacity: section.href ? 1 : 0.6,
                   }}
                 >
                   <div
@@ -133,9 +157,26 @@ export default function SettingsPage() {
                       {section.description}
                     </p>
                   </div>
-                  <ChevronRight style={{ width: '20px', height: '20px', color: c.textLight, flexShrink: 0 }} />
-                </button>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+                    {!section.href && (
+                      <span style={{ fontSize: '11px', color: c.textLight, backgroundColor: c.cardBgHover, padding: '2px 8px', borderRadius: '6px' }}>
+                        Soon
+                      </span>
+                    )}
+                    <ChevronRight style={{ width: '20px', height: '20px', color: c.textLight }} />
+                  </div>
+                </div>
               );
+
+              if (section.href) {
+                return (
+                  <Link key={section.title} href={section.href} style={{ textDecoration: 'none', display: 'block' }}>
+                    {content}
+                  </Link>
+                );
+              }
+
+              return <div key={section.title}>{content}</div>;
             })}
           </div>
         </div>
@@ -258,29 +299,35 @@ export default function SettingsPage() {
                   <Mail style={{ width: '20px', height: '20px', color: c.textMuted }} />
                   <span style={{ fontSize: '14px', color: c.textPrimary }}>{t.settings.emailAlerts}</span>
                 </div>
-                <div
+                <button
+                  type="button"
+                  onClick={() => setEmailAlerts(!emailAlerts)}
                   style={{
                     width: '44px',
                     height: '24px',
-                    backgroundColor: c.primary,
+                    backgroundColor: emailAlerts ? c.primary : c.border,
                     borderRadius: '12px',
                     position: 'relative',
                     cursor: 'pointer',
+                    border: 'none',
+                    padding: 0,
+                    transition: 'background-color 0.2s',
                   }}
                 >
                   <div
                     style={{
                       position: 'absolute',
-                      right: '2px',
                       top: '2px',
+                      left: emailAlerts ? '22px' : '2px',
                       width: '20px',
                       height: '20px',
                       backgroundColor: 'white',
                       borderRadius: '50%',
-                      transition: 'transform 0.2s',
+                      transition: 'left 0.2s',
+                      border: emailAlerts ? 'none' : `1px solid ${c.border}`,
                     }}
                   />
-                </div>
+                </button>
               </div>
 
               {/* Push Notifications */}
@@ -289,30 +336,35 @@ export default function SettingsPage() {
                   <Smartphone style={{ width: '20px', height: '20px', color: c.textMuted }} />
                   <span style={{ fontSize: '14px', color: c.textPrimary }}>{t.settings.pushNotifications}</span>
                 </div>
-                <div
+                <button
+                  type="button"
+                  onClick={() => setPushNotifs(!pushNotifs)}
                   style={{
                     width: '44px',
                     height: '24px',
-                    backgroundColor: c.border,
+                    backgroundColor: pushNotifs ? c.primary : c.border,
                     borderRadius: '12px',
                     position: 'relative',
                     cursor: 'pointer',
+                    border: 'none',
+                    padding: 0,
+                    transition: 'background-color 0.2s',
                   }}
                 >
                   <div
                     style={{
                       position: 'absolute',
-                      left: '2px',
                       top: '2px',
+                      left: pushNotifs ? '22px' : '2px',
                       width: '20px',
                       height: '20px',
                       backgroundColor: 'white',
                       borderRadius: '50%',
-                      border: `1px solid ${c.border}`,
-                      transition: 'transform 0.2s',
+                      transition: 'left 0.2s',
+                      border: pushNotifs ? 'none' : `1px solid ${c.border}`,
                     }}
                   />
-                </div>
+                </button>
               </div>
             </div>
           </div>
@@ -339,17 +391,17 @@ export default function SettingsPage() {
                   flexShrink: 0,
                 }}
               >
-                <span style={{ fontSize: isMobile ? '14px' : '18px', fontWeight: '700' }}>BT</span>
+                <span style={{ fontSize: isMobile ? '14px' : '18px', fontWeight: '700' }}>{agencyInitials}</span>
               </div>
               <div>
-                <p style={{ fontSize: '14px', fontWeight: '600', margin: 0 }}>Barokah Travel</p>
+                <p style={{ fontSize: '14px', fontWeight: '600', margin: 0 }}>{agency?.name || '...'}</p>
                 <p style={{ fontSize: '14px', color: 'rgba(255, 255, 255, 0.6)', margin: '4px 0 0 0' }}>Professional Plan</p>
               </div>
             </div>
             <div style={{ fontSize: '14px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
                 <span style={{ color: 'rgba(255, 255, 255, 0.6)' }}>{t.settings.storageUsed}</span>
-                <span style={{ fontWeight: '500' }}>2.4 GB / 10 GB</span>
+                <span style={{ fontWeight: '500' }}>— / 10 GB</span>
               </div>
               <div
                 style={{
@@ -361,7 +413,7 @@ export default function SettingsPage() {
               >
                 <div
                   style={{
-                    width: '24%',
+                    width: '0%',
                     height: '100%',
                     background: `linear-gradient(to right, ${c.primary}, #F87171)`,
                     borderRadius: '9999px',
