@@ -2,10 +2,9 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
+import { Eye, EyeOff, Loader2, Check } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -13,6 +12,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,114 +30,403 @@ export default function LoginPage() {
 
       if (!res.ok) {
         setError(data.error || 'Email atau password salah');
+        setIsLoading(false);
         return;
       }
 
-      router.push('/dashboard');
+      // Redirect — don't reset loading so UI stays in loading state during navigation
+      window.location.href = '/dashboard';
     } catch {
       setError('Terjadi kesalahan. Silakan coba lagi.');
-    } finally {
       setIsLoading(false);
     }
   };
 
+  const canSubmit = email.trim() !== '' && password.trim() !== '';
+
   return (
-    <div className="flex min-h-screen w-full">
-      {/* Left Side - Branding (Hidden on mobile) */}
-      <div className="hidden w-1/2 bg-[var(--charcoal)] lg:flex flex-col justify-between p-12 relative overflow-hidden">
-        <div className="relative z-10 flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-[10px] bg-white/10 backdrop-blur-sm border border-white/20">
-            <span className="font-bold text-white text-lg">G</span>
+    <div style={{ display: 'flex', minHeight: '100vh', width: '100%' }}>
+      {/* Left Side - Branding */}
+      <div
+        style={{
+          width: '45%',
+          background: 'linear-gradient(160deg, #0F172A 0%, #1E293B 50%, #0F172A 100%)',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+          padding: '40px',
+          position: 'relative',
+          overflow: 'hidden',
+        }}
+      >
+        {/* Decorative elements */}
+        <div
+          style={{
+            position: 'absolute',
+            top: '-20%',
+            right: '-10%',
+            width: '500px',
+            height: '500px',
+            background: 'radial-gradient(circle, rgba(211, 47, 47, 0.15) 0%, transparent 70%)',
+            borderRadius: '50%',
+            pointerEvents: 'none',
+          }}
+        />
+        <div
+          style={{
+            position: 'absolute',
+            bottom: '-15%',
+            left: '-10%',
+            width: '400px',
+            height: '400px',
+            background: 'radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%)',
+            borderRadius: '50%',
+            pointerEvents: 'none',
+          }}
+        />
+
+        {/* Logo */}
+        <div style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <Image
+            src="/logo-dark.png"
+            alt="GEZMA"
+            width={42}
+            height={42}
+            style={{ objectFit: 'contain' }}
+          />
+          <span style={{ color: 'white', fontSize: '20px', fontWeight: '700', letterSpacing: '-0.5px' }}>
+            GEZMA Agent
+          </span>
+        </div>
+
+        {/* Center Content */}
+        <div style={{ position: 'relative', zIndex: 1, maxWidth: '420px' }}>
+          <div
+            style={{
+              display: 'inline-block',
+              padding: '6px 14px',
+              borderRadius: '20px',
+              background: 'rgba(211, 47, 47, 0.15)',
+              border: '1px solid rgba(211, 47, 47, 0.25)',
+              marginBottom: '24px',
+            }}
+          >
+            <span style={{ color: '#FCA5A5', fontSize: '13px', fontWeight: '600' }}>
+              Platform PPIU Modern
+            </span>
           </div>
-          <span className="text-xl font-bold text-white tracking-tight">GEZMA Agent</span>
-        </div>
-
-        <div className="relative z-10">
-          <h1 className="text-4xl font-bold leading-tight mb-4" style={{ color: '#ffffff' }}>
-            Manage your Umrah travel agency with confidence.
+          <h1
+            style={{
+              fontSize: '36px',
+              fontWeight: '800',
+              lineHeight: '1.2',
+              color: 'white',
+              margin: '0 0 16px 0',
+              letterSpacing: '-0.5px',
+            }}
+          >
+            Kelola perjalanan Umrah dengan lebih{' '}
+            <span style={{ color: '#FCA5A5' }}>profesional</span>
           </h1>
-          <p className="text-lg max-w-md" style={{ color: 'rgba(255, 255, 255, 0.9)' }}>
-            The complete operating system for modern PPIU. Streamline operations, manage pilgrims, and grow your business.
+          <p
+            style={{
+              fontSize: '16px',
+              lineHeight: '1.7',
+              color: 'rgba(255, 255, 255, 0.65)',
+              margin: 0,
+            }}
+          >
+            Satu platform untuk mengelola jemaah, dokumen, paket, dan keberangkatan.
           </p>
+
+          {/* Feature list */}
+          <div style={{ marginTop: '32px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            {[
+              'Manajemen jemaah & dokumen terpusat',
+              'Tracking pembayaran real-time',
+              'Laporan operasional otomatis',
+            ].map((feature) => (
+              <div key={feature} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div
+                  style={{
+                    width: '22px',
+                    height: '22px',
+                    borderRadius: '50%',
+                    background: 'rgba(16, 185, 129, 0.15)',
+                    border: '1px solid rgba(16, 185, 129, 0.3)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                  }}
+                >
+                  <Check style={{ width: '12px', height: '12px', color: '#34D399' }} />
+                </div>
+                <span style={{ fontSize: '14px', color: 'rgba(255, 255, 255, 0.75)' }}>{feature}</span>
+              </div>
+            ))}
+          </div>
         </div>
 
-        <div className="relative z-10 text-sm" style={{ color: 'rgba(255, 255, 255, 0.6)' }}>
-          &copy; 2026 GEZMA Technology. All rights reserved.
-        </div>
-
-        {/* Abstract Background Pattern */}
-        <div className="absolute inset-0 z-0 opacity-20">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[var(--gezma-red)] rounded-full blur-[120px]" />
+        {/* Footer */}
+        <div style={{ position: 'relative', zIndex: 1 }}>
+          <p style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.35)', margin: 0 }}>
+            &copy; 2026 GEZMA Technology. All rights reserved.
+          </p>
         </div>
       </div>
 
       {/* Right Side - Login Form */}
-      <div className="flex w-full items-center justify-center lg:w-1/2 bg-white p-8">
-        <div className="w-full max-w-sm space-y-8">
-          <div className="text-center lg:text-left">
-            <h2 className="text-2xl font-bold tracking-tight text-[var(--charcoal)]">Welcome back</h2>
-            <p className="mt-2 text-sm text-[var(--gray-600)]">
-              Enter your credentials to access your dashboard
+      <div
+        style={{
+          width: '55%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: '#FFFFFF',
+          padding: '40px',
+        }}
+      >
+        <div style={{ width: '100%', maxWidth: '400px' }}>
+          {/* Logo for form side */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '36px' }}>
+            <Image
+              src="/logo-light.png"
+              alt="GEZMA"
+              width={36}
+              height={36}
+              style={{ objectFit: 'contain' }}
+            />
+            <span style={{ fontSize: '18px', fontWeight: '700', color: '#1E293B', letterSpacing: '-0.5px' }}>
+              GEZMA Agent
+            </span>
+          </div>
+
+          {/* Header */}
+          <div style={{ marginBottom: '32px' }}>
+            <h2
+              style={{
+                fontSize: '26px',
+                fontWeight: '700',
+                color: '#1E293B',
+                margin: '0 0 6px 0',
+                letterSpacing: '-0.5px',
+              }}
+            >
+              Selamat Datang
+            </h2>
+            <p style={{ fontSize: '14px', color: '#64748B', margin: 0 }}>
+              Masukkan email dan password untuk mengakses dashboard
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email address</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="admin@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="h-11 bg-[var(--gray-100)] border-[var(--gray-200)] focus:bg-white transition-colors"
-              />
-            </div>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password">Password</Label>
-                <Link
-                  href="#"
-                  className="text-sm font-medium text-[var(--gezma-red)] hover:underline"
-                >
-                  Forgot password?
-                </Link>
-              </div>
-              <Input
-                id="password"
-                type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="h-11 bg-[var(--gray-100)] border-[var(--gray-200)] focus:bg-white transition-colors"
-              />
-            </div>
-
-            {error && (
-              <div className="rounded-lg border border-[var(--error-light)] bg-[var(--error-50)] px-4 py-3 text-sm text-[var(--error)]">
-                {error}
-              </div>
-            )}
-
-            <Button
-              type="submit"
-              disabled={isLoading}
-              className="w-full h-11 text-base font-medium shadow-[var(--shadow-lg)] hover:shadow-xl transition-all hover:-translate-y-0.5"
+          {/* Error */}
+          {error && (
+            <div
+              style={{
+                padding: '12px 16px',
+                borderRadius: '10px',
+                background: '#FEF2F2',
+                border: '1px solid #FECACA',
+                marginBottom: '20px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px',
+              }}
             >
-              {isLoading ? 'Signing in...' : 'Sign In to Dashboard'}
-            </Button>
+              <div
+                style={{
+                  width: '20px',
+                  height: '20px',
+                  borderRadius: '50%',
+                  background: '#FEE2E2',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                }}
+              >
+                <span style={{ color: '#DC2626', fontSize: '12px', fontWeight: '700' }}>!</span>
+              </div>
+              <span style={{ fontSize: '13px', color: '#DC2626', fontWeight: '500' }}>{error}</span>
+            </div>
+          )}
+
+          {/* Form */}
+          <form onSubmit={handleSubmit}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+              {/* Email */}
+              <div>
+                <label
+                  htmlFor="email"
+                  style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#334155', marginBottom: '6px' }}
+                >
+                  Alamat Email
+                </label>
+                <input
+                  id="email"
+                  type="email"
+                  placeholder="ahmad@barokahtravel.com"
+                  value={email}
+                  onChange={(e) => { setEmail(e.target.value); setError(''); }}
+                  required
+                  style={{
+                    width: '100%',
+                    height: '46px',
+                    padding: '0 16px',
+                    borderRadius: '10px',
+                    border: '1.5px solid #E2E8F0',
+                    background: '#F8FAFC',
+                    fontSize: '14px',
+                    color: '#1E293B',
+                    outline: 'none',
+                    transition: 'all 0.2s ease',
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = '#D32F2F';
+                    e.target.style.background = '#FFFFFF';
+                    e.target.style.boxShadow = '0 0 0 3px rgba(211, 47, 47, 0.08)';
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = '#E2E8F0';
+                    e.target.style.background = '#F8FAFC';
+                    e.target.style.boxShadow = 'none';
+                  }}
+                />
+              </div>
+
+              {/* Password */}
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                  <label
+                    htmlFor="password"
+                    style={{ fontSize: '13px', fontWeight: '600', color: '#334155' }}
+                  >
+                    Password
+                  </label>
+                  <Link
+                    href="#"
+                    style={{ fontSize: '12px', fontWeight: '600', color: '#D32F2F', textDecoration: 'none' }}
+                  >
+                    Lupa password?
+                  </Link>
+                </div>
+                <div style={{ position: 'relative' }}>
+                  <input
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="Masukkan password"
+                    value={password}
+                    onChange={(e) => { setPassword(e.target.value); setError(''); }}
+                    required
+                    style={{
+                      width: '100%',
+                      height: '46px',
+                      padding: '0 44px 0 16px',
+                      borderRadius: '10px',
+                      border: '1.5px solid #E2E8F0',
+                      background: '#F8FAFC',
+                      fontSize: '14px',
+                      color: '#1E293B',
+                      outline: 'none',
+                      transition: 'all 0.2s ease',
+                    }}
+                    onFocus={(e) => {
+                      e.target.style.borderColor = '#D32F2F';
+                      e.target.style.background = '#FFFFFF';
+                      e.target.style.boxShadow = '0 0 0 3px rgba(211, 47, 47, 0.08)';
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = '#E2E8F0';
+                      e.target.style.background = '#F8FAFC';
+                      e.target.style.boxShadow = 'none';
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    style={{
+                      position: 'absolute',
+                      right: '12px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      padding: '4px',
+                      color: '#94A3B8',
+                    }}
+                  >
+                    {showPassword ? <EyeOff style={{ width: '18px', height: '18px' }} /> : <Eye style={{ width: '18px', height: '18px' }} />}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Submit */}
+            <button
+              type="submit"
+              disabled={!canSubmit || isLoading}
+              style={{
+                width: '100%',
+                height: '48px',
+                marginTop: '28px',
+                borderRadius: '12px',
+                border: 'none',
+                background:
+                  !canSubmit || isLoading
+                    ? '#E2E8F0'
+                    : 'linear-gradient(135deg, #D32F2F 0%, #B71C1C 100%)',
+                color: !canSubmit || isLoading ? '#94A3B8' : 'white',
+                fontSize: '15px',
+                fontWeight: '600',
+                cursor: !canSubmit || isLoading ? 'not-allowed' : 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                transition: 'all 0.2s ease',
+                boxShadow:
+                  !canSubmit || isLoading ? 'none' : '0 4px 12px rgba(211, 47, 47, 0.25)',
+              }}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 style={{ width: '18px', height: '18px', animation: 'spin 1s linear infinite' }} />
+                  Masuk...
+                </>
+              ) : (
+                'Masuk ke Dashboard'
+              )}
+            </button>
           </form>
 
-          <p className="text-center text-sm text-[var(--gray-600)]">
-            Don&apos;t have an account?{' '}
-            <Link href="/register" className="font-medium text-[var(--gezma-red)] hover:underline">
-              Register agency
+          {/* Register link */}
+          <p
+            style={{
+              textAlign: 'center',
+              fontSize: '14px',
+              color: '#64748B',
+              marginTop: '28px',
+            }}
+          >
+            Belum punya akun?{' '}
+            <Link
+              href="/register"
+              style={{ color: '#D32F2F', fontWeight: '600', textDecoration: 'none' }}
+            >
+              Daftar Agency
             </Link>
           </p>
         </div>
       </div>
+
+      <style jsx>{`
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   );
 }

@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import jwt from 'jsonwebtoken';
+
+const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-change-me';
 
 export async function GET(
   req: NextRequest,
@@ -18,6 +21,7 @@ export async function GET(
     // Find user by verification code
     const user = await prisma.user.findUnique({
       where: { verificationCode: code },
+      include: { agency: true },
     });
 
     if (!user) {
@@ -50,13 +54,46 @@ export async function GET(
         isVerified: true,
         verificationCode: null,
         verificationExpiry: null,
+        lastLoginAt: new Date(),
       },
     });
 
-    return NextResponse.json(
-      { message: 'Email berhasil diverifikasi! Silakan login.' },
-      { status: 200 }
+    // Auto-login: generate JWT token
+    const token = jwt.sign(
+      {
+        userId: user.id,
+        email: user.email,
+        role: user.role,
+        agencyId: user.agencyId,
+      },
+      JWT_SECRET,
+      { expiresIn: 60 * 60 * 24 * 7 }
     );
+
+    const response = NextResponse.json({
+      message: 'Email berhasil diverifikasi!',
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        agency: {
+          id: user.agency.id,
+          name: user.agency.name,
+        },
+      },
+    });
+
+    // Set auth cookie
+    response.cookies.set('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60,
+      path: '/',
+    });
+
+    return response;
   } catch (error) {
     console.error('Verification error:', error);
     return NextResponse.json(
