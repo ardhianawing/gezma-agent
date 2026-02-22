@@ -6,9 +6,6 @@ import { formatDate } from '@/lib/utils';
 import { useTheme } from '@/lib/theme';
 import { useLanguage } from '@/lib/i18n';
 import { useResponsive } from '@/lib/hooks/use-responsive';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import {
   Building2,
   Mail,
@@ -59,7 +56,7 @@ interface EditForm {
 }
 
 export default function AgencyPage() {
-  const { c } = useTheme();
+  const { c, theme } = useTheme();
   const { t } = useLanguage();
   const { isMobile, isTablet } = useResponsive();
   const [agency, setAgency] = useState<AgencyData | null>(null);
@@ -74,6 +71,11 @@ export default function AgencyPage() {
   });
   const [saving, setSaving] = useState(false);
   const [copied, setCopied] = useState(false);
+
+  // Shared styles for the edit modal
+  const inputStyle: React.CSSProperties = { width: '100%', padding: '12px 16px', fontSize: '14px', color: c.textPrimary, backgroundColor: c.cardBgHover, border: `1px solid ${c.border}`, borderRadius: '12px', outline: 'none', boxSizing: 'border-box' as const };
+  const labelStyle: React.CSSProperties = { display: 'block', fontSize: '13px', fontWeight: '500', color: c.textMuted, marginBottom: '8px' };
+  const textareaStyle: React.CSSProperties = { ...inputStyle, minHeight: '80px', resize: 'vertical' as const };
 
   useEffect(() => {
     fetch('/api/agency')
@@ -122,11 +124,11 @@ export default function AgencyPage() {
   }
 
   if (loading) {
-    return <div style={{ padding: '40px', textAlign: 'center', color: '#6b7280' }}>Memuat data agency...</div>;
+    return <div style={{ padding: '40px', textAlign: 'center', color: c.textMuted }}>Memuat data agency...</div>;
   }
 
   if (!agency) {
-    return <div style={{ padding: '40px', textAlign: 'center', color: '#6b7280' }}>Agency tidak ditemukan</div>;
+    return <div style={{ padding: '40px', textAlign: 'center', color: c.textMuted }}>Agency tidak ditemukan</div>;
   }
 
   // Responsive grid columns - use auto-fill for better tablet support
@@ -161,114 +163,152 @@ export default function AgencyPage() {
         }
       />
 
-      {/* Edit Profile Dialog */}
-      <Dialog open={showEdit} onOpenChange={setShowEdit}>
-        <DialogContent className="max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>{t.agency.editProfile}</DialogTitle>
-          </DialogHeader>
-          <form onSubmit={handleEditSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      {/* Edit Profile Modal */}
+      {showEdit && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div onClick={() => setShowEdit(false)} style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)' }} />
+          <div style={{ position: 'relative', width: '100%', maxWidth: '600px', maxHeight: '90vh', overflowY: 'auto', margin: '0 16px', backgroundColor: c.cardBg, borderRadius: '16px', border: `1px solid ${c.border}`, padding: '28px' }}>
+            <h2 style={{ fontSize: '18px', fontWeight: '600', color: c.textPrimary, margin: '0 0 20px 0' }}>{t.agency.editProfile}</h2>
+            <form onSubmit={handleEditSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '16px' }}>
+                <div>
+                  <label style={labelStyle}>Nama Brand</label>
+                  <input
+                    required
+                    value={editForm.name}
+                    onChange={(e) => setEditForm((f) => ({ ...f, name: e.target.value }))}
+                    style={inputStyle}
+                  />
+                </div>
+                <div>
+                  <label style={labelStyle}>Nama Legal (PT)</label>
+                  <input
+                    required
+                    value={editForm.legalName}
+                    onChange={(e) => setEditForm((f) => ({ ...f, legalName: e.target.value }))}
+                    style={inputStyle}
+                  />
+                </div>
+              </div>
               <div>
-                <label className="text-sm font-medium text-[var(--gray-600)] mb-1 block">Nama Brand</label>
-                <Input
-                  required
-                  value={editForm.name}
-                  onChange={(e) => setEditForm((f) => ({ ...f, name: e.target.value }))}
+                <label style={labelStyle}>Tagline</label>
+                <input
+                  value={editForm.tagline}
+                  onChange={(e) => setEditForm((f) => ({ ...f, tagline: e.target.value }))}
+                  placeholder="Slogan singkat"
+                  style={inputStyle}
                 />
               </div>
               <div>
-                <label className="text-sm font-medium text-[var(--gray-600)] mb-1 block">Nama Legal (PT)</label>
-                <Input
-                  required
-                  value={editForm.legalName}
-                  onChange={(e) => setEditForm((f) => ({ ...f, legalName: e.target.value }))}
+                <label style={labelStyle}>Deskripsi</label>
+                <textarea
+                  value={editForm.description}
+                  onChange={(e) => setEditForm((f) => ({ ...f, description: e.target.value }))}
+                  placeholder="Tentang agensi"
+                  style={textareaStyle}
                 />
               </div>
-            </div>
-            <div>
-              <label className="text-sm font-medium text-[var(--gray-600)] mb-1 block">Tagline</label>
-              <Input
-                value={editForm.tagline}
-                onChange={(e) => setEditForm((f) => ({ ...f, tagline: e.target.value }))}
-                placeholder="Slogan singkat"
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium text-[var(--gray-600)] mb-1 block">Deskripsi</label>
-              <textarea
-                className="flex w-full rounded-xl border border-[var(--gray-200)] bg-white px-4 py-2.5 text-sm text-[var(--charcoal)] placeholder:text-[var(--gray-400)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gezma-red)]/20 focus-visible:border-[var(--gezma-red)] min-h-[80px]"
-                value={editForm.description}
-                onChange={(e) => setEditForm((f) => ({ ...f, description: e.target.value }))}
-                placeholder="Tentang agensi"
-              />
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-medium text-[var(--gray-600)] mb-1 block">Telepon</label>
-                <Input
-                  required
-                  value={editForm.phone}
-                  onChange={(e) => setEditForm((f) => ({ ...f, phone: e.target.value }))}
-                />
+              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '16px' }}>
+                <div>
+                  <label style={labelStyle}>Telepon</label>
+                  <input
+                    required
+                    value={editForm.phone}
+                    onChange={(e) => setEditForm((f) => ({ ...f, phone: e.target.value }))}
+                    style={inputStyle}
+                  />
+                </div>
+                <div>
+                  <label style={labelStyle}>WhatsApp</label>
+                  <input
+                    value={editForm.whatsapp}
+                    onChange={(e) => setEditForm((f) => ({ ...f, whatsapp: e.target.value }))}
+                    style={inputStyle}
+                  />
+                </div>
               </div>
               <div>
-                <label className="text-sm font-medium text-[var(--gray-600)] mb-1 block">WhatsApp</label>
-                <Input
-                  value={editForm.whatsapp}
-                  onChange={(e) => setEditForm((f) => ({ ...f, whatsapp: e.target.value }))}
-                />
-              </div>
-            </div>
-            <div>
-              <label className="text-sm font-medium text-[var(--gray-600)] mb-1 block">Website</label>
-              <Input
-                value={editForm.website}
-                onChange={(e) => setEditForm((f) => ({ ...f, website: e.target.value }))}
-                placeholder="https://..."
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium text-[var(--gray-600)] mb-1 block">Alamat</label>
-              <Input
-                value={editForm.address}
-                onChange={(e) => setEditForm((f) => ({ ...f, address: e.target.value }))}
-              />
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div>
-                <label className="text-sm font-medium text-[var(--gray-600)] mb-1 block">Kota</label>
-                <Input
-                  value={editForm.city}
-                  onChange={(e) => setEditForm((f) => ({ ...f, city: e.target.value }))}
+                <label style={labelStyle}>Website</label>
+                <input
+                  value={editForm.website}
+                  onChange={(e) => setEditForm((f) => ({ ...f, website: e.target.value }))}
+                  placeholder="https://..."
+                  style={inputStyle}
                 />
               </div>
               <div>
-                <label className="text-sm font-medium text-[var(--gray-600)] mb-1 block">Provinsi</label>
-                <Input
-                  value={editForm.province}
-                  onChange={(e) => setEditForm((f) => ({ ...f, province: e.target.value }))}
+                <label style={labelStyle}>Alamat</label>
+                <input
+                  value={editForm.address}
+                  onChange={(e) => setEditForm((f) => ({ ...f, address: e.target.value }))}
+                  style={inputStyle}
                 />
               </div>
-              <div>
-                <label className="text-sm font-medium text-[var(--gray-600)] mb-1 block">Kode Pos</label>
-                <Input
-                  value={editForm.postalCode}
-                  onChange={(e) => setEditForm((f) => ({ ...f, postalCode: e.target.value }))}
-                />
+              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr 1fr', gap: '16px' }}>
+                <div>
+                  <label style={labelStyle}>Kota</label>
+                  <input
+                    value={editForm.city}
+                    onChange={(e) => setEditForm((f) => ({ ...f, city: e.target.value }))}
+                    style={inputStyle}
+                  />
+                </div>
+                <div>
+                  <label style={labelStyle}>Provinsi</label>
+                  <input
+                    value={editForm.province}
+                    onChange={(e) => setEditForm((f) => ({ ...f, province: e.target.value }))}
+                    style={inputStyle}
+                  />
+                </div>
+                <div>
+                  <label style={labelStyle}>Kode Pos</label>
+                  <input
+                    value={editForm.postalCode}
+                    onChange={(e) => setEditForm((f) => ({ ...f, postalCode: e.target.value }))}
+                    style={inputStyle}
+                  />
+                </div>
               </div>
-            </div>
-            <div className="flex justify-end gap-2 pt-2">
-              <Button type="button" variant="outline" onClick={() => setShowEdit(false)}>
-                Batal
-              </Button>
-              <Button type="submit" disabled={saving}>
-                {saving ? 'Menyimpan...' : 'Simpan'}
-              </Button>
-            </div>
-          </form>
-        </DialogContent>
-      </Dialog>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', paddingTop: '8px' }}>
+                <button
+                  type="button"
+                  onClick={() => setShowEdit(false)}
+                  style={{
+                    padding: '10px 20px',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    color: c.textSecondary,
+                    backgroundColor: 'transparent',
+                    border: `1px solid ${c.border}`,
+                    borderRadius: '10px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  disabled={saving}
+                  style={{
+                    padding: '10px 20px',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    color: 'white',
+                    backgroundColor: c.primary,
+                    border: 'none',
+                    borderRadius: '10px',
+                    cursor: saving ? 'not-allowed' : 'pointer',
+                    opacity: saving ? 0.6 : 1,
+                  }}
+                >
+                  {saving ? 'Menyimpan...' : 'Simpan'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Agency Header Card */}
       <div
@@ -282,7 +322,7 @@ export default function AgencyPage() {
         {/* Dark Header */}
         <div
           style={{
-            background: 'linear-gradient(to right, #111827, #374151)',
+            background: theme === 'dark' ? `linear-gradient(to right, ${c.cardBgHover}, ${c.cardBg})` : 'linear-gradient(to right, #111827, #374151)',
             padding: isMobile ? '20px' : '24px',
             color: 'white',
           }}

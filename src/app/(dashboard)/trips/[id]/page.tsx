@@ -2,10 +2,9 @@
 
 import { useState, useEffect, use } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, CheckCircle2, Printer } from 'lucide-react';
-import { PageHeader } from '@/components/layout/page-header';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ArrowLeft, CheckCircle2, Printer, Plane, ClipboardCheck, Users } from 'lucide-react';
+import { useTheme } from '@/lib/theme';
+import { useResponsive } from '@/lib/hooks/use-responsive';
 import { StatusBadge } from '@/components/shared/status-badge';
 import { formatDate, formatCurrency } from '@/lib/utils';
 import type { TripStatus, PilgrimStatus } from '@/types';
@@ -54,6 +53,8 @@ interface TripDetail {
 
 export default function TripDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
+  const { c } = useTheme();
+  const { isMobile } = useResponsive();
   const [trip, setTrip] = useState<TripDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -84,11 +85,19 @@ export default function TripDetailPage({ params }: { params: Promise<{ id: strin
   }
 
   if (loading) {
-    return <div className="p-6 text-center text-[var(--gray-600)]">Memuat data trip...</div>;
+    return (
+      <div style={{ padding: '24px', textAlign: 'center', color: c.textMuted }}>
+        Memuat data trip...
+      </div>
+    );
   }
 
   if (error || !trip) {
-    return <div className="p-6 text-center text-[var(--gray-600)]">{error || 'Trip tidak ditemukan'}</div>;
+    return (
+      <div style={{ padding: '24px', textAlign: 'center', color: c.textMuted }}>
+        {error || 'Trip tidak ditemukan'}
+      </div>
+    );
   }
 
   const checklist = trip.checklist || {};
@@ -103,130 +112,263 @@ export default function TripDetailPage({ params }: { params: Promise<{ id: strin
     { label: 'Departure briefing done', checked: checklist.departureBriefingDone },
   ];
 
+  const thStyle: React.CSSProperties = {
+    padding: '10px 16px',
+    textAlign: 'left',
+    fontSize: '12px',
+    fontWeight: '500',
+    color: c.textMuted,
+    textTransform: 'uppercase',
+    letterSpacing: '0.05em',
+  };
+
+  const tdStyle: React.CSSProperties = {
+    padding: '12px 16px',
+    fontSize: '14px',
+    borderTop: `1px solid ${c.border}`,
+  };
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Link href="/trips">
-          <Button variant="ghost" size="icon">
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+        <Link href="/trips" style={{ textDecoration: 'none' }}>
+          <div
+            style={{
+              width: '40px',
+              height: '40px',
+              borderRadius: '10px',
+              backgroundColor: c.cardBg,
+              border: `1px solid ${c.border}`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+            }}
+          >
+            <ArrowLeft style={{ width: '18px', height: '18px', color: c.textMuted }} />
+          </div>
         </Link>
-        <PageHeader
-          title={trip.name}
-          description={trip.packageId || ''}
-          actions={
-            <StatusBadge status={trip.status as TripStatus} />
-          }
-        />
+        <div style={{ flex: 1 }}>
+          <h1 style={{ fontSize: isMobile ? '22px' : '28px', fontWeight: '700', color: c.textPrimary, margin: 0 }}>
+            {trip.name}
+          </h1>
+          {trip.packageId && (
+            <p style={{ fontSize: '14px', color: c.textMuted, margin: '4px 0 0 0' }}>{trip.packageId}</p>
+          )}
+        </div>
+        <StatusBadge status={trip.status as TripStatus} />
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        {/* Trip Info */}
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle>Trip Information</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid gap-4 md:grid-cols-2">
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: isMobile ? '1fr' : '2fr 1fr',
+          gap: '24px',
+        }}
+      >
+        {/* Trip Info Card */}
+        <div
+          style={{
+            backgroundColor: c.cardBg,
+            borderRadius: '16px',
+            border: `1px solid ${c.border}`,
+            overflow: 'hidden',
+          }}
+        >
+          <div
+            style={{
+              padding: isMobile ? '16px 20px' : '20px 28px',
+              borderBottom: `1px solid ${c.border}`,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+            }}
+          >
+            <Plane style={{ width: '18px', height: '18px', color: c.primary }} />
+            <h3 style={{ fontSize: '16px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>
+              Trip Information
+            </h3>
+          </div>
+          <div style={{ padding: isMobile ? '20px' : '28px' }}>
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
+                gap: '20px',
+              }}
+            >
               <div>
-                <p className="text-sm font-medium text-[var(--gray-600)]">Departure</p>
-                <p className="text-sm text-[var(--charcoal)]">{trip.departureDate ? formatDate(trip.departureDate) : '-'}</p>
-                <p className="text-xs text-[var(--gray-600)] mt-1">
-                  {trip.flightInfo?.departureAirline || ''} {trip.flightInfo?.departureFlightNo || ''} {trip.flightInfo?.departureTime ? `• ${trip.flightInfo.departureTime}` : ''}
+                <p style={{ fontSize: '13px', fontWeight: '500', color: c.textMuted, margin: '0 0 4px 0' }}>Departure</p>
+                <p style={{ fontSize: '14px', color: c.textPrimary, margin: '0 0 4px 0' }}>
+                  {trip.departureDate ? formatDate(trip.departureDate) : '-'}
+                </p>
+                <p style={{ fontSize: '12px', color: c.textMuted, margin: 0 }}>
+                  {trip.flightInfo?.departureAirline || ''} {trip.flightInfo?.departureFlightNo || ''}{' '}
+                  {trip.flightInfo?.departureTime ? `• ${trip.flightInfo.departureTime}` : ''}
                 </p>
               </div>
               <div>
-                <p className="text-sm font-medium text-[var(--gray-600)]">Return</p>
-                <p className="text-sm text-[var(--charcoal)]">{trip.returnDate ? formatDate(trip.returnDate) : '-'}</p>
-                <p className="text-xs text-[var(--gray-600)] mt-1">
-                  {trip.flightInfo?.returnAirline || ''} {trip.flightInfo?.returnFlightNo || ''} {trip.flightInfo?.returnTime ? `• ${trip.flightInfo.returnTime}` : ''}
+                <p style={{ fontSize: '13px', fontWeight: '500', color: c.textMuted, margin: '0 0 4px 0' }}>Return</p>
+                <p style={{ fontSize: '14px', color: c.textPrimary, margin: '0 0 4px 0' }}>
+                  {trip.returnDate ? formatDate(trip.returnDate) : '-'}
+                </p>
+                <p style={{ fontSize: '12px', color: c.textMuted, margin: 0 }}>
+                  {trip.flightInfo?.returnAirline || ''} {trip.flightInfo?.returnFlightNo || ''}{' '}
+                  {trip.flightInfo?.returnTime ? `• ${trip.flightInfo.returnTime}` : ''}
                 </p>
               </div>
               <div>
-                <p className="text-sm font-medium text-[var(--gray-600)]">Capacity</p>
-                <p className="text-sm text-[var(--charcoal)]">
+                <p style={{ fontSize: '13px', fontWeight: '500', color: c.textMuted, margin: '0 0 4px 0' }}>Capacity</p>
+                <p style={{ fontSize: '14px', color: c.textPrimary, margin: 0 }}>
                   {trip.registeredCount}/{trip.capacity} pilgrims
                 </p>
               </div>
             </div>
 
             {(trip.muthawwifName || checklist.guideAssigned) && (
-              <div className="pt-4 border-t border-[var(--gray-border)]">
-                <p className="text-sm font-medium text-[var(--gray-600)] mb-2">Guide/Muthawwif</p>
-                <p className="text-sm text-[var(--charcoal)]">{trip.muthawwifName || '-'}</p>
-                <p className="text-sm text-[var(--gray-600)]">{trip.muthawwifPhone || '-'}</p>
+              <div style={{ paddingTop: '20px', marginTop: '20px', borderTop: `1px solid ${c.border}` }}>
+                <p style={{ fontSize: '13px', fontWeight: '500', color: c.textMuted, margin: '0 0 8px 0' }}>
+                  Guide/Muthawwif
+                </p>
+                <p style={{ fontSize: '14px', color: c.textPrimary, margin: '0 0 4px 0' }}>
+                  {trip.muthawwifName || '-'}
+                </p>
+                <p style={{ fontSize: '14px', color: c.textMuted, margin: 0 }}>{trip.muthawwifPhone || '-'}</p>
               </div>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        {/* Operational Checklist */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Operational Checklist</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
+        {/* Operational Checklist Card */}
+        <div
+          style={{
+            backgroundColor: c.cardBg,
+            borderRadius: '16px',
+            border: `1px solid ${c.border}`,
+            overflow: 'hidden',
+          }}
+        >
+          <div
+            style={{
+              padding: isMobile ? '16px 20px' : '20px 28px',
+              borderBottom: `1px solid ${c.border}`,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+            }}
+          >
+            <ClipboardCheck style={{ width: '18px', height: '18px', color: c.primary }} />
+            <h3 style={{ fontSize: '16px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>
+              Operational Checklist
+            </h3>
+          </div>
+          <div style={{ padding: isMobile ? '20px' : '28px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {checklistItems.map((item, index) => (
-                <div key={index} className="flex items-center gap-2">
+                <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <CheckCircle2
-                    className={`h-4 w-4 ${
-                      item.checked ? 'text-[var(--success)]' : 'text-[var(--gray-400)]'
-                    }`}
+                    style={{
+                      width: '16px',
+                      height: '16px',
+                      color: item.checked ? c.success : c.textLight,
+                    }}
                   />
-                  <span className={`text-sm ${item.checked ? 'text-[var(--charcoal)]' : 'text-[var(--gray-600)]'}`}>
+                  <span
+                    style={{
+                      fontSize: '14px',
+                      color: item.checked ? c.textPrimary : c.textMuted,
+                    }}
+                  >
                     {item.label}
                   </span>
                 </div>
               ))}
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
+      </div>
 
-        {/* Manifest */}
-        <Card className="lg:col-span-3">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>Trip Manifest ({trip.manifest?.length || 0} pilgrims)</CardTitle>
-            {trip.manifest && trip.manifest.length > 0 && (
-              <Button size="sm" variant="outline" onClick={handlePrintManifest}>
-                <Printer className="h-4 w-4 mr-1" />
-                Print
-              </Button>
-            )}
-          </CardHeader>
-          <CardContent>
-            {(!trip.manifest || trip.manifest.length === 0) ? (
-              <p className="text-center text-sm text-[var(--gray-600)] py-4">No pilgrims added yet</p>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="border-b border-[var(--gray-border)]">
-                    <tr>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-[var(--gray-600)]">Name</th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-[var(--gray-600)]">Status</th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-[var(--gray-600)]">Documents</th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-[var(--gray-600)]">Room</th>
+      {/* Manifest Card */}
+      <div
+        style={{
+          backgroundColor: c.cardBg,
+          borderRadius: '16px',
+          border: `1px solid ${c.border}`,
+          overflow: 'hidden',
+        }}
+      >
+        <div
+          style={{
+            padding: isMobile ? '16px 20px' : '20px 28px',
+            borderBottom: `1px solid ${c.border}`,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <Users style={{ width: '18px', height: '18px', color: c.primary }} />
+            <h3 style={{ fontSize: '16px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>
+              Trip Manifest ({trip.manifest?.length || 0} pilgrims)
+            </h3>
+          </div>
+          {trip.manifest && trip.manifest.length > 0 && (
+            <button
+              onClick={handlePrintManifest}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '8px 16px',
+                backgroundColor: c.cardBg,
+                color: c.textSecondary,
+                border: `1px solid ${c.border}`,
+                borderRadius: '12px',
+                fontSize: '13px',
+                fontWeight: '500',
+                cursor: 'pointer',
+              }}
+            >
+              <Printer style={{ width: '14px', height: '14px' }} />
+              Print
+            </button>
+          )}
+        </div>
+        <div style={{ padding: isMobile ? '20px' : '28px' }}>
+          {(!trip.manifest || trip.manifest.length === 0) ? (
+            <p style={{ textAlign: 'center', fontSize: '14px', color: c.textMuted, padding: '16px 0' }}>
+              No pilgrims added yet
+            </p>
+          ) : (
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr style={{ borderBottom: `1px solid ${c.border}` }}>
+                    <th style={thStyle}>Name</th>
+                    <th style={thStyle}>Status</th>
+                    <th style={thStyle}>Documents</th>
+                    <th style={thStyle}>Room</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {trip.manifest.map((entry) => (
+                    <tr key={entry.pilgrimId}>
+                      <td style={{ ...tdStyle, color: c.textPrimary }}>{entry.pilgrimName}</td>
+                      <td style={tdStyle}>
+                        <StatusBadge status={entry.pilgrimStatus as PilgrimStatus} size="sm" />
+                      </td>
+                      <td style={{ ...tdStyle, color: c.textMuted }}>
+                        {entry.documentsComplete}/{entry.documentsTotal}
+                      </td>
+                      <td style={{ ...tdStyle, color: c.textMuted }}>{entry.roomNumber || '-'}</td>
                     </tr>
-                  </thead>
-                  <tbody className="divide-y divide-[var(--gray-border)]">
-                    {trip.manifest.map((entry) => (
-                      <tr key={entry.pilgrimId}>
-                        <td className="px-4 py-3 text-sm text-[var(--charcoal)]">{entry.pilgrimName}</td>
-                        <td className="px-4 py-3">
-                          <StatusBadge status={entry.pilgrimStatus as PilgrimStatus} size="sm" />
-                        </td>
-                        <td className="px-4 py-3 text-sm text-[var(--gray-600)]">
-                          {entry.documentsComplete}/{entry.documentsTotal}
-                        </td>
-                        <td className="px-4 py-3 text-sm text-[var(--gray-600)]">{entry.roomNumber || '-'}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

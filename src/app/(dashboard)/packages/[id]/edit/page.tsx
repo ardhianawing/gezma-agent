@@ -2,6 +2,8 @@
 
 import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTheme } from '@/lib/theme';
+import { useResponsive } from '@/lib/hooks/use-responsive';
 import { PackageForm } from '@/components/packages/package-form';
 import type { PackageFormData } from '@/lib/validations/package';
 import type { Package } from '@/types/package';
@@ -9,6 +11,8 @@ import type { Package } from '@/types/package';
 export default function EditPackagePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const router = useRouter();
+  const { c } = useTheme();
+  const { isMobile } = useResponsive();
   const [isLoading, setIsLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -60,7 +64,7 @@ export default function EditPackagePage({ params }: { params: Promise<{ id: stri
 
   if (isFetching) {
     return (
-      <div style={{ padding: '48px', textAlign: 'center', color: '#6B7280' }}>
+      <div style={{ padding: '48px', textAlign: 'center', color: c.textMuted }}>
         Memuat data paket...
       </div>
     );
@@ -68,7 +72,7 @@ export default function EditPackagePage({ params }: { params: Promise<{ id: stri
 
   if (!initialData) {
     return (
-      <div style={{ padding: '48px', textAlign: 'center', color: '#DC2626' }}>
+      <div style={{ padding: '48px', textAlign: 'center', color: c.error }}>
         {error || 'Paket tidak ditemukan'}
       </div>
     );
@@ -76,7 +80,7 @@ export default function EditPackagePage({ params }: { params: Promise<{ id: stri
 
   return (
     <div style={{ maxWidth: '960px' }}>
-      <h1 style={{ fontSize: '24px', fontWeight: '700', marginBottom: '24px' }}>
+      <h1 style={{ fontSize: '24px', fontWeight: '700', marginBottom: '24px', color: c.textPrimary }}>
         Edit Paket
       </h1>
 
@@ -85,8 +89,8 @@ export default function EditPackagePage({ params }: { params: Promise<{ id: stri
           padding: '12px 16px',
           marginBottom: '16px',
           borderRadius: '8px',
-          backgroundColor: '#FEF2F2',
-          color: '#DC2626',
+          backgroundColor: c.errorLight,
+          color: c.error,
           fontSize: '14px',
         }}>
           {error}

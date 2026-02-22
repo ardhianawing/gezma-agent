@@ -3,12 +3,8 @@
 import * as React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useTheme } from '@/lib/theme';
+import { useResponsive } from '@/lib/hooks/use-responsive';
 import { ItineraryBuilder } from './itinerary-builder';
 import { PricingCalculator } from './pricing-calculator';
 import { packageFormSchema, type PackageFormData } from '@/lib/validations/package';
@@ -33,7 +29,20 @@ const defaultHpp: PricingBreakdown = {
   others: 0,
 };
 
+const chevronSvg = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`;
+
+const tabs = [
+  { value: 'basic', label: 'Basic Info' },
+  { value: 'itinerary', label: 'Itinerary' },
+  { value: 'pricing', label: 'Pricing' },
+  { value: 'hotels', label: 'Hotels' },
+  { value: 'inclusions', label: 'Inclusions' },
+];
+
 export function PackageForm({ initialData, onSubmit, onCancel, isLoading }: PackageFormProps) {
+  const { c } = useTheme();
+  const { isMobile } = useResponsive();
+  const [activeTab, setActiveTab] = React.useState('basic');
   const [itinerary, setItinerary] = React.useState<ItineraryDay[]>(initialData?.itinerary || []);
   const [hpp, setHpp] = React.useState<PricingBreakdown>(initialData?.hpp || defaultHpp);
   const [margin, setMargin] = React.useState(initialData?.margin || 25);
@@ -81,41 +90,115 @@ export function PackageForm({ initialData, onSubmit, onCancel, isLoading }: Pack
     });
   };
 
-  return (
-    <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
-      <Tabs defaultValue="basic">
-        <TabsList className="mb-6">
-          <TabsTrigger value="basic">Basic Info</TabsTrigger>
-          <TabsTrigger value="itinerary">Itinerary</TabsTrigger>
-          <TabsTrigger value="pricing">Pricing</TabsTrigger>
-          <TabsTrigger value="hotels">Hotels</TabsTrigger>
-          <TabsTrigger value="inclusions">Inclusions</TabsTrigger>
-        </TabsList>
+  const inputStyle: React.CSSProperties = {
+    padding: '12px 16px',
+    fontSize: '14px',
+    color: c.textPrimary,
+    backgroundColor: c.cardBgHover,
+    border: `1px solid ${c.border}`,
+    borderRadius: '12px',
+    width: '100%',
+    outline: 'none',
+    boxSizing: 'border-box',
+  };
 
-        <TabsContent value="basic">
-          <Card>
-            <CardHeader>
-              <CardTitle>Basic Information</CardTitle>
-            </CardHeader>
-            <CardContent className="grid gap-4 md:grid-cols-2">
-              <div className="md:col-span-2">
-                <Label htmlFor="name">Package Name</Label>
-                <Input
+  const inputErrorStyle: React.CSSProperties = {
+    ...inputStyle,
+    border: `1px solid ${c.error}`,
+  };
+
+  const labelStyle: React.CSSProperties = {
+    fontSize: '13px',
+    fontWeight: '500',
+    color: c.textMuted,
+    marginBottom: '8px',
+    display: 'block',
+  };
+
+  const selectStyle: React.CSSProperties = {
+    ...inputStyle,
+    appearance: 'none' as const,
+    paddingRight: '40px',
+    backgroundImage: chevronSvg,
+    backgroundRepeat: 'no-repeat',
+    backgroundPosition: 'right 12px center',
+    backgroundSize: '16px',
+  };
+
+  const cardStyle: React.CSSProperties = {
+    backgroundColor: c.cardBg,
+    borderRadius: '16px',
+    border: `1px solid ${c.border}`,
+  };
+
+  const cardHeaderStyle: React.CSSProperties = {
+    padding: isMobile ? '16px 20px' : '20px 28px',
+    borderBottom: `1px solid ${c.border}`,
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+  };
+
+  const cardBodyStyle: React.CSSProperties = {
+    padding: isMobile ? '20px' : '28px',
+  };
+
+  const errorTextStyle: React.CSSProperties = {
+    fontSize: '12px',
+    color: c.error,
+    marginTop: '4px',
+  };
+
+  return (
+    <form onSubmit={handleSubmit(handleFormSubmit)} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+      {/* Tab bar */}
+      <div style={{
+        display: 'flex', gap: '4px', padding: '4px',
+        backgroundColor: c.cardBgHover, borderRadius: '12px',
+        overflowX: 'auto',
+      }}>
+        {tabs.map(tab => (
+          <button
+            key={tab.value}
+            type="button"
+            onClick={() => setActiveTab(tab.value)}
+            style={{
+              padding: '8px 16px', borderRadius: '8px', fontSize: '14px', fontWeight: '500',
+              border: 'none', cursor: 'pointer', whiteSpace: 'nowrap',
+              backgroundColor: activeTab === tab.value ? c.cardBg : 'transparent',
+              color: activeTab === tab.value ? c.textPrimary : c.textMuted,
+            }}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Basic Info */}
+      {activeTab === 'basic' && (
+        <div style={cardStyle}>
+          <div style={cardHeaderStyle}>
+            <h3 style={{ fontSize: '16px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>Basic Information</h3>
+          </div>
+          <div style={cardBodyStyle}>
+            <div style={{
+              display: 'grid', gap: '16px',
+              gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
+            }}>
+              <div style={{ gridColumn: isMobile ? undefined : '1 / -1' }}>
+                <label htmlFor="name" style={labelStyle}>Package Name</label>
+                <input
                   id="name"
                   placeholder="e.g., Umrah Reguler 9 Hari"
                   {...register('name')}
-                  className={errors.name ? 'border-[var(--error)]' : ''}
+                  style={errors.name ? inputErrorStyle : inputStyle}
                 />
-                {errors.name && <p className="text-xs text-[var(--error)] mt-1">{errors.name.message}</p>}
+                {errors.name && <p style={errorTextStyle}>{errors.name.message}</p>}
               </div>
 
               <div>
-                <Label htmlFor="category">Category</Label>
-                <select
-                  id="category"
-                  {...register('category')}
-                  className="w-full h-10 rounded-[12px] border border-[var(--gray-border)] px-3 text-sm"
-                >
+                <label htmlFor="category" style={labelStyle}>Category</label>
+                <select id="category" {...register('category')} style={selectStyle}>
                   <option value="regular">Regular</option>
                   <option value="plus">Plus</option>
                   <option value="vip">VIP</option>
@@ -125,140 +208,172 @@ export function PackageForm({ initialData, onSubmit, onCancel, isLoading }: Pack
               </div>
 
               <div>
-                <Label htmlFor="duration">Duration (days)</Label>
-                <Input
+                <label htmlFor="duration" style={labelStyle}>Duration (days)</label>
+                <input
                   id="duration"
                   type="number"
                   min={7}
                   max={30}
                   {...register('duration', { valueAsNumber: true })}
-                  className={errors.duration ? 'border-[var(--error)]' : ''}
+                  style={errors.duration ? inputErrorStyle : inputStyle}
                 />
-                {errors.duration && <p className="text-xs text-[var(--error)] mt-1">{errors.duration.message}</p>}
+                {errors.duration && <p style={errorTextStyle}>{errors.duration.message}</p>}
               </div>
 
               <div>
-                <Label htmlFor="airline">Airline</Label>
-                <Input
+                <label htmlFor="airline" style={labelStyle}>Airline</label>
+                <input
                   id="airline"
                   placeholder="e.g., Saudi Arabian Airlines"
                   {...register('airline')}
-                  className={errors.airline ? 'border-[var(--error)]' : ''}
+                  style={errors.airline ? inputErrorStyle : inputStyle}
                 />
               </div>
 
-              <div className="flex items-center gap-2">
-                <input type="checkbox" id="isActive" {...register('isActive')} className="rounded" />
-                <Label htmlFor="isActive">Active Package</Label>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <input type="checkbox" id="isActive" {...register('isActive')} style={{ borderRadius: '4px' }} />
+                <label htmlFor="isActive" style={{ fontSize: '13px', fontWeight: '500', color: c.textMuted }}>Active Package</label>
               </div>
 
-              <div className="md:col-span-2">
-                <Label htmlFor="description">Description</Label>
-                <Textarea
+              <div style={{ gridColumn: isMobile ? undefined : '1 / -1' }}>
+                <label htmlFor="description" style={labelStyle}>Description</label>
+                <textarea
                   id="description"
                   placeholder="Package description..."
                   rows={4}
                   {...register('description')}
-                  className={errors.description ? 'border-[var(--error)]' : ''}
+                  style={{
+                    ...( errors.description ? inputErrorStyle : inputStyle),
+                    resize: 'vertical',
+                  }}
                 />
-                {errors.description && <p className="text-xs text-[var(--error)] mt-1">{errors.description.message}</p>}
+                {errors.description && <p style={errorTextStyle}>{errors.description.message}</p>}
               </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="itinerary">
-          <ItineraryBuilder value={itinerary} onChange={setItinerary} duration={duration || 9} />
-        </TabsContent>
-
-        <TabsContent value="pricing">
-          <PricingCalculator hpp={hpp} margin={margin} onHppChange={setHpp} onMarginChange={setMargin} />
-        </TabsContent>
-
-        <TabsContent value="hotels">
-          <Card>
-            <CardHeader>
-              <CardTitle>Hotel Information</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="grid gap-4 md:grid-cols-3">
-                <div className="md:col-span-2">
-                  <Label>Makkah Hotel</Label>
-                  <Input placeholder="Hotel name" {...register('makkahHotel')} />
-                </div>
-                <div>
-                  <Label>Rating</Label>
-                  <select
-                    {...register('makkahHotelRating', { valueAsNumber: true })}
-                    className="w-full h-10 rounded-[12px] border border-[var(--gray-border)] px-3 text-sm"
-                  >
-                    <option value={3}>3 Star</option>
-                    <option value={4}>4 Star</option>
-                    <option value={5}>5 Star</option>
-                  </select>
-                </div>
-                <div className="md:col-span-3">
-                  <Label>Distance</Label>
-                  <Input placeholder="e.g., 300m dari Masjidil Haram" {...register('makkahHotelDistance')} />
-                </div>
-              </div>
-
-              <div className="border-t pt-6 grid gap-4 md:grid-cols-3">
-                <div className="md:col-span-2">
-                  <Label>Madinah Hotel</Label>
-                  <Input placeholder="Hotel name" {...register('madinahHotel')} />
-                </div>
-                <div>
-                  <Label>Rating</Label>
-                  <select
-                    {...register('madinahHotelRating', { valueAsNumber: true })}
-                    className="w-full h-10 rounded-[12px] border border-[var(--gray-border)] px-3 text-sm"
-                  >
-                    <option value={3}>3 Star</option>
-                    <option value={4}>4 Star</option>
-                    <option value={5}>5 Star</option>
-                  </select>
-                </div>
-                <div className="md:col-span-3">
-                  <Label>Distance</Label>
-                  <Input placeholder="e.g., 200m dari Masjid Nabawi" {...register('madinahHotelDistance')} />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="inclusions">
-          <div className="grid gap-6 lg:grid-cols-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>Inclusions</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <InclusionList items={inclusions} onChange={setInclusions} placeholder="Add inclusion..." />
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Exclusions</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <InclusionList items={exclusions} onChange={setExclusions} placeholder="Add exclusion..." />
-              </CardContent>
-            </Card>
+            </div>
           </div>
-        </TabsContent>
-      </Tabs>
+        </div>
+      )}
+
+      {/* Itinerary */}
+      {activeTab === 'itinerary' && (
+        <ItineraryBuilder value={itinerary} onChange={setItinerary} duration={duration || 9} />
+      )}
+
+      {/* Pricing */}
+      {activeTab === 'pricing' && (
+        <PricingCalculator hpp={hpp} margin={margin} onHppChange={setHpp} onMarginChange={setMargin} />
+      )}
+
+      {/* Hotels */}
+      {activeTab === 'hotels' && (
+        <div style={cardStyle}>
+          <div style={cardHeaderStyle}>
+            <h3 style={{ fontSize: '16px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>Hotel Information</h3>
+          </div>
+          <div style={cardBodyStyle}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+              {/* Makkah Hotels */}
+              <div style={{
+                display: 'grid', gap: '16px',
+                gridTemplateColumns: isMobile ? '1fr' : '2fr 1fr',
+              }}>
+                <div>
+                  <label style={labelStyle}>Makkah Hotel</label>
+                  <input placeholder="Hotel name" {...register('makkahHotel')} style={inputStyle} />
+                </div>
+                <div>
+                  <label style={labelStyle}>Rating</label>
+                  <select {...register('makkahHotelRating', { valueAsNumber: true })} style={selectStyle}>
+                    <option value={3}>3 Star</option>
+                    <option value={4}>4 Star</option>
+                    <option value={5}>5 Star</option>
+                  </select>
+                </div>
+                <div style={{ gridColumn: '1 / -1' }}>
+                  <label style={labelStyle}>Distance</label>
+                  <input placeholder="e.g., 300m dari Masjidil Haram" {...register('makkahHotelDistance')} style={inputStyle} />
+                </div>
+              </div>
+
+              {/* Divider */}
+              <div style={{ borderTop: `1px solid ${c.border}` }} />
+
+              {/* Madinah Hotels */}
+              <div style={{
+                display: 'grid', gap: '16px',
+                gridTemplateColumns: isMobile ? '1fr' : '2fr 1fr',
+              }}>
+                <div>
+                  <label style={labelStyle}>Madinah Hotel</label>
+                  <input placeholder="Hotel name" {...register('madinahHotel')} style={inputStyle} />
+                </div>
+                <div>
+                  <label style={labelStyle}>Rating</label>
+                  <select {...register('madinahHotelRating', { valueAsNumber: true })} style={selectStyle}>
+                    <option value={3}>3 Star</option>
+                    <option value={4}>4 Star</option>
+                    <option value={5}>5 Star</option>
+                  </select>
+                </div>
+                <div style={{ gridColumn: '1 / -1' }}>
+                  <label style={labelStyle}>Distance</label>
+                  <input placeholder="e.g., 200m dari Masjid Nabawi" {...register('madinahHotelDistance')} style={inputStyle} />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Inclusions */}
+      {activeTab === 'inclusions' && (
+        <div style={{
+          display: 'grid', gap: '24px',
+          gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
+        }}>
+          <div style={cardStyle}>
+            <div style={cardHeaderStyle}>
+              <h3 style={{ fontSize: '16px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>Inclusions</h3>
+            </div>
+            <div style={cardBodyStyle}>
+              <InclusionList items={inclusions} onChange={setInclusions} placeholder="Add inclusion..." />
+            </div>
+          </div>
+
+          <div style={cardStyle}>
+            <div style={cardHeaderStyle}>
+              <h3 style={{ fontSize: '16px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>Exclusions</h3>
+            </div>
+            <div style={cardBodyStyle}>
+              <InclusionList items={exclusions} onChange={setExclusions} placeholder="Add exclusion..." />
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Actions */}
-      <div className="flex gap-4 justify-end">
-        <Button type="button" variant="outline" onClick={onCancel}>
+      <div style={{ display: 'flex', gap: '16px', justifyContent: 'flex-end' }}>
+        <button
+          type="button"
+          onClick={onCancel}
+          style={{
+            backgroundColor: c.cardBg, color: c.textSecondary, border: `1px solid ${c.border}`,
+            borderRadius: '12px', padding: '12px 24px', fontSize: '14px', fontWeight: '600', cursor: 'pointer',
+          }}
+        >
           Cancel
-        </Button>
-        <Button type="submit" disabled={isLoading}>
+        </button>
+        <button
+          type="submit"
+          disabled={isLoading}
+          style={{
+            backgroundColor: c.primary, color: 'white', border: 'none',
+            borderRadius: '12px', padding: '12px 24px', fontSize: '14px', fontWeight: '600',
+            cursor: isLoading ? 'not-allowed' : 'pointer', opacity: isLoading ? 0.6 : 1,
+          }}
+        >
           {isLoading ? 'Saving...' : initialData?.id ? 'Update Package' : 'Create Package'}
-        </Button>
+        </button>
       </div>
     </form>
   );
@@ -273,6 +388,7 @@ function InclusionList({
   onChange: (items: string[]) => void;
   placeholder: string;
 }) {
+  const { c } = useTheme();
   const [newItem, setNewItem] = React.useState('');
 
   const addItem = () => {
@@ -286,27 +402,52 @@ function InclusionList({
     onChange(items.filter((_, i) => i !== index));
   };
 
+  const inputStyle: React.CSSProperties = {
+    padding: '12px 16px',
+    fontSize: '14px',
+    color: c.textPrimary,
+    backgroundColor: c.cardBgHover,
+    border: `1px solid ${c.border}`,
+    borderRadius: '12px',
+    width: '100%',
+    outline: 'none',
+    boxSizing: 'border-box',
+    flex: 1,
+  };
+
   return (
-    <div className="space-y-3">
-      <div className="flex gap-2">
-        <Input
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+      <div style={{ display: 'flex', gap: '8px' }}>
+        <input
           value={newItem}
           onChange={(e) => setNewItem(e.target.value)}
           placeholder={placeholder}
-          onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addItem())}
+          onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addItem(); } }}
+          style={inputStyle}
         />
-        <Button type="button" variant="outline" onClick={addItem}>
+        <button
+          type="button"
+          onClick={addItem}
+          style={{
+            backgroundColor: c.cardBg, color: c.textSecondary, border: `1px solid ${c.border}`,
+            borderRadius: '12px', padding: '12px 24px', fontSize: '14px', fontWeight: '600',
+            cursor: 'pointer', whiteSpace: 'nowrap',
+          }}
+        >
           Add
-        </Button>
+        </button>
       </div>
-      <ul className="space-y-2">
+      <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: '8px' }}>
         {items.map((item, index) => (
-          <li key={index} className="flex items-center gap-2 text-sm">
-            <span className="flex-1">{item}</span>
+          <li key={index} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: c.textPrimary }}>
+            <span style={{ flex: 1 }}>{item}</span>
             <button
               type="button"
               onClick={() => removeItem(index)}
-              className="text-[var(--error)] hover:underline text-xs"
+              style={{
+                background: 'none', border: 'none', color: c.error,
+                fontSize: '12px', cursor: 'pointer', padding: '4px 8px',
+              }}
             >
               Remove
             </button>

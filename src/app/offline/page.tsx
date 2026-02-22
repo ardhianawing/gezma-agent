@@ -1,38 +1,75 @@
 'use client';
 
 import { WifiOff, RefreshCw } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { useTheme } from '@/lib/theme';
 
 export default function OfflinePage() {
+  const { c } = useTheme();
+
   return (
-    <div className="min-h-screen bg-[var(--gray-100)] flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <CardContent className="p-8 text-center">
-          <div className="mx-auto w-20 h-20 rounded-full bg-[var(--gray-200)] flex items-center justify-center mb-6">
-            <WifiOff className="h-10 w-10 text-[var(--gray-600)]" />
-          </div>
+    <div style={{
+      minHeight: '100vh',
+      backgroundColor: c.pageBg,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '16px',
+    }}>
+      <div style={{
+        width: '100%',
+        maxWidth: '448px',
+        backgroundColor: c.cardBg,
+        borderRadius: '16px',
+        border: `1px solid ${c.border}`,
+        padding: '32px',
+        textAlign: 'center',
+      }}>
+        <div style={{
+          width: '80px',
+          height: '80px',
+          borderRadius: '50%',
+          backgroundColor: c.cardBgHover,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          margin: '0 auto 24px',
+        }}>
+          <WifiOff style={{ width: '40px', height: '40px', color: c.textMuted }} />
+        </div>
 
-          <h1 className="text-2xl font-bold text-[var(--charcoal)] mb-2">You're Offline</h1>
-          <p className="text-[var(--gray-600)] mb-6">
-            It looks like you've lost your internet connection. Please check your connection and try again.
+        <h1 style={{ fontSize: '24px', fontWeight: '700', color: c.textPrimary, margin: '0 0 8px 0' }}>
+          You&apos;re Offline
+        </h1>
+        <p style={{ color: c.textMuted, margin: '0 0 24px 0', fontSize: '14px' }}>
+          It looks like you&apos;ve lost your internet connection. Please check your connection and try again.
+        </p>
+
+        <button
+          onClick={() => window.location.reload()}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+            backgroundColor: c.primary,
+            color: 'white',
+            border: 'none',
+            borderRadius: '12px',
+            padding: '12px 24px',
+            fontSize: '14px',
+            fontWeight: '600',
+            cursor: 'pointer',
+          }}
+        >
+          <RefreshCw style={{ width: '16px', height: '16px' }} />
+          Try Again
+        </button>
+
+        <div style={{ marginTop: '32px', paddingTop: '24px', borderTop: `1px solid ${c.border}` }}>
+          <p style={{ fontSize: '14px', color: c.textMuted, margin: 0 }}>
+            Some features may still work offline. Your data will sync when you&apos;re back online.
           </p>
-
-          <Button
-            onClick={() => window.location.reload()}
-            className="gap-2"
-          >
-            <RefreshCw className="h-4 w-4" />
-            Try Again
-          </Button>
-
-          <div className="mt-8 pt-6 border-t border-[var(--gray-border)]">
-            <p className="text-sm text-[var(--gray-600)]">
-              Some features may still work offline. Your data will sync when you're back online.
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }

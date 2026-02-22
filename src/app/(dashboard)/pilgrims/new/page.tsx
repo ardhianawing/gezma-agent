@@ -3,16 +3,14 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Save, Loader2 } from 'lucide-react';
-import { PageHeader } from '@/components/layout/page-header';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+import { ArrowLeft, Save, Loader2, User, Phone, Shield } from 'lucide-react';
+import { useTheme } from '@/lib/theme';
+import { useResponsive } from '@/lib/hooks/use-responsive';
 
 export default function NewPilgrimPage() {
   const router = useRouter();
+  const { c } = useTheme();
+  const { isMobile } = useResponsive();
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
@@ -89,225 +87,340 @@ export default function NewPilgrimPage() {
     }
   };
 
+  // Shared styles
+  const inputStyle: React.CSSProperties = {
+    width: '100%',
+    padding: '12px 16px',
+    fontSize: '14px',
+    color: c.textPrimary,
+    backgroundColor: c.cardBgHover,
+    border: `1px solid ${c.border}`,
+    borderRadius: '12px',
+    outline: 'none',
+    transition: 'border-color 0.2s ease',
+  };
+
+  const selectStyle: React.CSSProperties = {
+    ...inputStyle,
+    appearance: 'none' as const,
+    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`,
+    backgroundRepeat: 'no-repeat',
+    backgroundPosition: 'right 16px center',
+    paddingRight: '40px',
+  };
+
+  const textareaStyle: React.CSSProperties = {
+    ...inputStyle,
+    minHeight: '80px',
+    resize: 'vertical' as const,
+  };
+
+  const labelStyle: React.CSSProperties = {
+    display: 'block',
+    fontSize: '13px',
+    fontWeight: '500',
+    color: c.textMuted,
+    marginBottom: '8px',
+  };
+
+  const sectionCard = (title: string, icon: React.ReactNode, children: React.ReactNode) => (
+    <div
+      style={{
+        backgroundColor: c.cardBg,
+        borderRadius: '16px',
+        border: `1px solid ${c.border}`,
+        overflow: 'hidden',
+      }}
+    >
+      <div
+        style={{
+          padding: isMobile ? '16px 20px' : '20px 28px',
+          borderBottom: `1px solid ${c.border}`,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+        }}
+      >
+        {icon}
+        <h3 style={{ fontSize: '16px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>
+          {title}
+        </h3>
+      </div>
+      <div style={{ padding: isMobile ? '20px' : '28px' }}>
+        {children}
+      </div>
+    </div>
+  );
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Link href="/pilgrims">
-          <Button variant="ghost" size="icon">
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+        <Link href="/pilgrims" style={{ textDecoration: 'none' }}>
+          <div
+            style={{
+              width: '40px',
+              height: '40px',
+              borderRadius: '10px',
+              backgroundColor: c.cardBg,
+              border: `1px solid ${c.border}`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              transition: 'background-color 0.15s',
+            }}
+          >
+            <ArrowLeft style={{ width: '18px', height: '18px', color: c.textMuted }} />
+          </div>
         </Link>
-        <PageHeader title="Tambah Jemaah Baru" description="Masukkan data jemaah" />
+        <div>
+          <h1 style={{ fontSize: isMobile ? '22px' : '28px', fontWeight: '700', color: c.textPrimary, margin: 0 }}>
+            Tambah Jemaah Baru
+          </h1>
+          <p style={{ fontSize: '14px', color: c.textMuted, marginTop: '4px' }}>
+            Masukkan data jemaah
+          </p>
+        </div>
       </div>
 
+      {/* Error */}
       {error && (
-        <div className="rounded-xl border border-red-200 bg-red-50 p-4">
-          <p className="text-sm text-red-700">{error}</p>
+        <div
+          style={{
+            padding: '14px 20px',
+            borderRadius: '12px',
+            backgroundColor: c.errorLight,
+            border: `1px solid ${c.error}30`,
+          }}
+        >
+          <p style={{ fontSize: '14px', color: c.error, margin: 0 }}>{error}</p>
         </div>
       )}
 
-      <form onSubmit={handleSubmit}>
-        {/* Personal Information */}
-        <Card className="mb-6">
-          <CardContent className="p-6 space-y-6">
-            <h3 className="text-lg font-semibold text-[var(--charcoal)]">Data Pribadi</h3>
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="name">Nama Lengkap *</Label>
-                <Input
-                  id="name"
-                  required
-                  value={form.name}
-                  onChange={(e) => updateField('name', e.target.value)}
-                  placeholder="Ahmad Fauzi"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="nik">NIK *</Label>
-                <Input
-                  id="nik"
-                  required
-                  value={form.nik}
-                  onChange={(e) => updateField('nik', e.target.value.replace(/\D/g, ''))}
-                  placeholder="3201234567890001"
-                  maxLength={16}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="gender">Jenis Kelamin *</Label>
-                <select
-                  id="gender"
-                  required
-                  value={form.gender}
-                  onChange={(e) => updateField('gender', e.target.value)}
-                  className="flex h-11 w-full rounded-xl border border-[var(--gray-200)] bg-white px-4 py-2.5 text-sm text-[var(--charcoal)] transition-all duration-200 hover:border-[var(--gray-300)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gezma-red)]/20 focus-visible:border-[var(--gezma-red)]"
-                >
-                  <option value="male">Laki-laki</option>
-                  <option value="female">Perempuan</option>
-                </select>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="birthPlace">Tempat Lahir *</Label>
-                <Input
-                  id="birthPlace"
-                  required
-                  value={form.birthPlace}
-                  onChange={(e) => updateField('birthPlace', e.target.value)}
-                  placeholder="Jakarta"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="birthDate">Tanggal Lahir *</Label>
-                <Input
-                  id="birthDate"
-                  type="date"
-                  required
-                  value={form.birthDate}
-                  onChange={(e) => updateField('birthDate', e.target.value)}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="postalCode">Kode Pos</Label>
-                <Input
-                  id="postalCode"
-                  value={form.postalCode}
-                  onChange={(e) => updateField('postalCode', e.target.value.replace(/\D/g, ''))}
-                  placeholder="10310"
-                  maxLength={5}
-                />
-              </div>
-              <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="address">Alamat *</Label>
-                <Textarea
-                  id="address"
-                  required
-                  value={form.address}
-                  onChange={(e) => updateField('address', e.target.value)}
-                  placeholder="Jl. Merdeka No. 123, RT 01/RW 02, Kelurahan Menteng"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="city">Kota *</Label>
-                <Input
-                  id="city"
-                  required
-                  value={form.city}
-                  onChange={(e) => updateField('city', e.target.value)}
-                  placeholder="Jakarta Pusat"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="province">Provinsi *</Label>
-                <Input
-                  id="province"
-                  required
-                  value={form.province}
-                  onChange={(e) => updateField('province', e.target.value)}
-                  placeholder="DKI Jakarta"
-                />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
-        {/* Contact Info */}
-        <Card className="mb-6">
-          <CardContent className="p-6 space-y-6">
-            <h3 className="text-lg font-semibold text-[var(--charcoal)]">Kontak</h3>
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="phone">No. Telepon *</Label>
-                <Input
-                  id="phone"
-                  required
-                  value={form.phone}
-                  onChange={(e) => updateField('phone', e.target.value)}
-                  placeholder="081234567890"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="email">Email *</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  required
-                  value={form.email}
-                  onChange={(e) => updateField('email', e.target.value)}
-                  placeholder="ahmad@email.com"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="whatsapp">WhatsApp</Label>
-                <Input
-                  id="whatsapp"
-                  value={form.whatsapp}
-                  onChange={(e) => updateField('whatsapp', e.target.value)}
-                  placeholder="6281234567890"
-                />
-              </div>
+        {/* Data Pribadi */}
+        {sectionCard('Data Pribadi', <User style={{ width: '18px', height: '18px', color: c.textMuted }} />, (
+          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '20px' }}>
+            <div>
+              <label style={labelStyle}>Nama Lengkap *</label>
+              <input
+                required
+                value={form.name}
+                onChange={(e) => updateField('name', e.target.value)}
+                placeholder="Ahmad Fauzi"
+                style={inputStyle}
+              />
             </div>
-          </CardContent>
-        </Card>
+            <div>
+              <label style={labelStyle}>NIK *</label>
+              <input
+                required
+                value={form.nik}
+                onChange={(e) => updateField('nik', e.target.value.replace(/\D/g, ''))}
+                placeholder="3201234567890001"
+                maxLength={16}
+                style={inputStyle}
+              />
+            </div>
+            <div>
+              <label style={labelStyle}>Jenis Kelamin *</label>
+              <select
+                required
+                value={form.gender}
+                onChange={(e) => updateField('gender', e.target.value)}
+                style={selectStyle}
+              >
+                <option value="male">Laki-laki</option>
+                <option value="female">Perempuan</option>
+              </select>
+            </div>
+            <div>
+              <label style={labelStyle}>Tempat Lahir *</label>
+              <input
+                required
+                value={form.birthPlace}
+                onChange={(e) => updateField('birthPlace', e.target.value)}
+                placeholder="Jakarta"
+                style={inputStyle}
+              />
+            </div>
+            <div>
+              <label style={labelStyle}>Tanggal Lahir *</label>
+              <input
+                type="date"
+                required
+                value={form.birthDate}
+                onChange={(e) => updateField('birthDate', e.target.value)}
+                style={inputStyle}
+              />
+            </div>
+            <div>
+              <label style={labelStyle}>Kode Pos</label>
+              <input
+                value={form.postalCode}
+                onChange={(e) => updateField('postalCode', e.target.value.replace(/\D/g, ''))}
+                placeholder="10310"
+                maxLength={5}
+                style={inputStyle}
+              />
+            </div>
+            <div style={{ gridColumn: isMobile ? undefined : '1 / -1' }}>
+              <label style={labelStyle}>Alamat *</label>
+              <textarea
+                required
+                value={form.address}
+                onChange={(e) => updateField('address', e.target.value)}
+                placeholder="Jl. Merdeka No. 123, RT 01/RW 02, Kelurahan Menteng"
+                style={textareaStyle}
+              />
+            </div>
+            <div>
+              <label style={labelStyle}>Kota *</label>
+              <input
+                required
+                value={form.city}
+                onChange={(e) => updateField('city', e.target.value)}
+                placeholder="Jakarta Pusat"
+                style={inputStyle}
+              />
+            </div>
+            <div>
+              <label style={labelStyle}>Provinsi *</label>
+              <input
+                required
+                value={form.province}
+                onChange={(e) => updateField('province', e.target.value)}
+                placeholder="DKI Jakarta"
+                style={inputStyle}
+              />
+            </div>
+          </div>
+        ))}
 
-        {/* Emergency Contact */}
-        <Card className="mb-6">
-          <CardContent className="p-6 space-y-6">
-            <h3 className="text-lg font-semibold text-[var(--charcoal)]">Kontak Darurat</h3>
-            <div className="grid gap-4 md:grid-cols-3">
-              <div className="space-y-2">
-                <Label htmlFor="emergencyName">Nama *</Label>
-                <Input
-                  id="emergencyName"
-                  required
-                  value={form.emergencyName}
-                  onChange={(e) => updateField('emergencyName', e.target.value)}
-                  placeholder="Fatimah Azzahra"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="emergencyPhone">No. Telepon *</Label>
-                <Input
-                  id="emergencyPhone"
-                  required
-                  value={form.emergencyPhone}
-                  onChange={(e) => updateField('emergencyPhone', e.target.value)}
-                  placeholder="081234567891"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="emergencyRelation">Hubungan *</Label>
-                <Input
-                  id="emergencyRelation"
-                  required
-                  value={form.emergencyRelation}
-                  onChange={(e) => updateField('emergencyRelation', e.target.value)}
-                  placeholder="Istri"
-                />
-              </div>
+        {/* Kontak */}
+        {sectionCard('Kontak', <Phone style={{ width: '18px', height: '18px', color: c.textMuted }} />, (
+          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '20px' }}>
+            <div>
+              <label style={labelStyle}>No. Telepon *</label>
+              <input
+                required
+                value={form.phone}
+                onChange={(e) => updateField('phone', e.target.value)}
+                placeholder="081234567890"
+                style={inputStyle}
+              />
             </div>
-          </CardContent>
-        </Card>
+            <div>
+              <label style={labelStyle}>Email *</label>
+              <input
+                type="email"
+                required
+                value={form.email}
+                onChange={(e) => updateField('email', e.target.value)}
+                placeholder="ahmad@email.com"
+                style={inputStyle}
+              />
+            </div>
+            <div>
+              <label style={labelStyle}>WhatsApp</label>
+              <input
+                value={form.whatsapp}
+                onChange={(e) => updateField('whatsapp', e.target.value)}
+                placeholder="6281234567890"
+                style={inputStyle}
+              />
+            </div>
+          </div>
+        ))}
+
+        {/* Kontak Darurat */}
+        {sectionCard('Kontak Darurat', <Shield style={{ width: '18px', height: '18px', color: c.textMuted }} />, (
+          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr 1fr', gap: '20px' }}>
+            <div>
+              <label style={labelStyle}>Nama *</label>
+              <input
+                required
+                value={form.emergencyName}
+                onChange={(e) => updateField('emergencyName', e.target.value)}
+                placeholder="Fatimah Azzahra"
+                style={inputStyle}
+              />
+            </div>
+            <div>
+              <label style={labelStyle}>No. Telepon *</label>
+              <input
+                required
+                value={form.emergencyPhone}
+                onChange={(e) => updateField('emergencyPhone', e.target.value)}
+                placeholder="081234567891"
+                style={inputStyle}
+              />
+            </div>
+            <div>
+              <label style={labelStyle}>Hubungan *</label>
+              <input
+                required
+                value={form.emergencyRelation}
+                onChange={(e) => updateField('emergencyRelation', e.target.value)}
+                placeholder="Istri"
+                style={inputStyle}
+              />
+            </div>
+          </div>
+        ))}
 
         {/* Actions */}
-        <div className="flex justify-end gap-3">
-          <Link href="/pilgrims">
-            <Button type="button" variant="outline">
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', paddingTop: '8px' }}>
+          <Link href="/pilgrims" style={{ textDecoration: 'none' }}>
+            <button
+              type="button"
+              style={{
+                padding: '12px 24px',
+                fontSize: '14px',
+                fontWeight: '500',
+                color: c.textSecondary,
+                backgroundColor: c.cardBg,
+                border: `1px solid ${c.border}`,
+                borderRadius: '12px',
+                cursor: 'pointer',
+                transition: 'all 0.15s',
+              }}
+            >
               Batal
-            </Button>
+            </button>
           </Link>
-          <Button type="submit" disabled={saving}>
+          <button
+            type="submit"
+            disabled={saving}
+            style={{
+              padding: '12px 24px',
+              fontSize: '14px',
+              fontWeight: '600',
+              color: 'white',
+              backgroundColor: saving ? c.textMuted : c.primary,
+              border: 'none',
+              borderRadius: '12px',
+              cursor: saving ? 'not-allowed' : 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              transition: 'all 0.15s',
+            }}
+          >
             {saving ? (
               <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                <Loader2 style={{ width: '16px', height: '16px', animation: 'spin 1s linear infinite' }} />
                 Menyimpan...
               </>
             ) : (
               <>
-                <Save className="h-4 w-4 mr-2" />
+                <Save style={{ width: '16px', height: '16px' }} />
                 Simpan Jemaah
               </>
             )}
-          </Button>
+          </button>
         </div>
       </form>
     </div>

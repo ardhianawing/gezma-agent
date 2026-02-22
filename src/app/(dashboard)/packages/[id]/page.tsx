@@ -3,11 +3,9 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Edit, Trash2 } from 'lucide-react';
-import { PageHeader } from '@/components/layout/page-header';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { ArrowLeft, Edit, Trash2, DollarSign, Building2, FileText, CheckCircle, XCircle } from 'lucide-react';
+import { useTheme } from '@/lib/theme';
+import { useResponsive } from '@/lib/hooks/use-responsive';
 import { formatCurrency } from '@/lib/utils';
 import type { Package } from '@/types/package';
 
@@ -15,6 +13,8 @@ export default function PackageDetailPage() {
   const params = useParams();
   const router = useRouter();
   const id = params.id as string;
+  const { c } = useTheme();
+  const { isMobile } = useResponsive();
 
   const [pkg, setPkg] = useState<Package | null>(null);
   const [loading, setLoading] = useState(true);
@@ -45,145 +45,193 @@ export default function PackageDetailPage() {
   };
 
   if (loading) {
-    return <div style={{ padding: '40px', textAlign: 'center' }}>Memuat data...</div>;
+    return <div style={{ padding: '40px', textAlign: 'center', color: c.textMuted }}>Memuat data...</div>;
   }
 
   if (!pkg) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-center">
-          <p className="text-lg font-semibold text-[var(--charcoal)]">Paket tidak ditemukan</p>
-          <Link href="/packages">
-            <Button variant="outline" className="mt-4">
-              <ArrowLeft className="h-4 w-4 mr-2" />
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '400px' }}>
+        <div style={{ textAlign: 'center' }}>
+          <p style={{ fontSize: '18px', fontWeight: '600', color: c.textPrimary }}>Paket tidak ditemukan</p>
+          <Link href="/packages" style={{ textDecoration: 'none' }}>
+            <button style={{
+              display: 'inline-flex', alignItems: 'center', gap: '8px', marginTop: '16px',
+              backgroundColor: c.cardBg, color: c.textSecondary, border: `1px solid ${c.border}`,
+              borderRadius: '12px', padding: '12px 24px', fontSize: '14px', fontWeight: '600', cursor: 'pointer',
+            }}>
+              <ArrowLeft style={{ width: '16px', height: '16px' }} />
               Kembali ke Daftar
-            </Button>
+            </button>
           </Link>
         </div>
       </div>
     );
   }
 
+  const cardStyle: React.CSSProperties = {
+    backgroundColor: c.cardBg,
+    borderRadius: '16px',
+    border: `1px solid ${c.border}`,
+  };
+
+  const cardHeaderStyle: React.CSSProperties = {
+    padding: isMobile ? '16px 20px' : '20px 28px',
+    borderBottom: `1px solid ${c.border}`,
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+  };
+
+  const cardBodyStyle: React.CSSProperties = {
+    padding: isMobile ? '20px' : '28px',
+  };
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Link href="/packages">
-          <Button variant="ghost" size="icon">
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-        </Link>
-        <PageHeader
-          title={pkg.name}
-          description={`${pkg.duration} days \u2022 ${pkg.category.toUpperCase()}`}
-          actions={
-            <div className="flex gap-2">
-              <Link href={`/packages/${pkg.id}/edit`}>
-                <Button variant="outline">
-                  <Edit className="h-4 w-4" />
-                  Edit Package
-                </Button>
-              </Link>
-              <Button variant="outline" onClick={handleDelete}>
-                <Trash2 className="h-4 w-4" />
-                Hapus
-              </Button>
-            </div>
-          }
-        />
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <Link href="/packages" style={{ textDecoration: 'none' }}>
+            <button style={{
+              backgroundColor: 'transparent', border: 'none', cursor: 'pointer', padding: '8px',
+              borderRadius: '8px', color: c.textSecondary, display: 'flex', alignItems: 'center',
+            }}>
+              <ArrowLeft style={{ width: '20px', height: '20px' }} />
+            </button>
+          </Link>
+          <div>
+            <h1 style={{ fontSize: '24px', fontWeight: '700', color: c.textPrimary, margin: 0 }}>{pkg.name}</h1>
+            <p style={{ fontSize: '14px', color: c.textMuted, margin: '4px 0 0 0' }}>
+              {pkg.duration} days &bull; {pkg.category.toUpperCase()}
+            </p>
+          </div>
+        </div>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <Link href={`/packages/${pkg.id}/edit`} style={{ textDecoration: 'none' }}>
+            <button style={{
+              display: 'inline-flex', alignItems: 'center', gap: '8px',
+              backgroundColor: c.cardBg, color: c.textSecondary, border: `1px solid ${c.border}`,
+              borderRadius: '12px', padding: '12px 24px', fontSize: '14px', fontWeight: '600', cursor: 'pointer',
+            }}>
+              <Edit style={{ width: '16px', height: '16px' }} />
+              Edit Package
+            </button>
+          </Link>
+          <button onClick={handleDelete} style={{
+            display: 'inline-flex', alignItems: 'center', gap: '8px',
+            backgroundColor: c.cardBg, color: c.textSecondary, border: `1px solid ${c.border}`,
+            borderRadius: '12px', padding: '12px 24px', fontSize: '14px', fontWeight: '600', cursor: 'pointer',
+          }}>
+            <Trash2 style={{ width: '16px', height: '16px' }} />
+            Hapus
+          </button>
+        </div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div style={{
+        display: 'grid',
+        gap: '24px',
+        gridTemplateColumns: isMobile ? '1fr' : '1fr 2fr',
+      }}>
         {/* Pricing */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Pricing</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
+        <div style={cardStyle}>
+          <div style={cardHeaderStyle}>
+            <DollarSign style={{ width: '18px', height: '18px', color: c.textMuted }} />
+            <h3 style={{ fontSize: '16px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>Pricing</h3>
+          </div>
+          <div style={{ ...cardBodyStyle, display: 'flex', flexDirection: 'column', gap: '12px' }}>
             <div>
-              <p className="text-sm text-[var(--gray-600)]">Published Price</p>
-              <p className="text-2xl font-bold text-[var(--charcoal)]">{formatCurrency(pkg.publishedPrice)}</p>
+              <p style={{ fontSize: '14px', color: c.textMuted, margin: '0 0 4px 0' }}>Published Price</p>
+              <p style={{ fontSize: '24px', fontWeight: '700', color: c.textPrimary, margin: 0 }}>{formatCurrency(pkg.publishedPrice)}</p>
             </div>
             {pkg.isPromo && pkg.promoPrice && (
               <div>
-                <Badge variant="error">Promo Price</Badge>
-                <p className="text-xl font-bold text-[var(--gezma-red)] mt-1">{formatCurrency(pkg.promoPrice)}</p>
+                <span style={{
+                  display: 'inline-block', padding: '4px 10px', fontSize: '12px', fontWeight: '600',
+                  backgroundColor: c.errorLight, color: c.error, borderRadius: '8px',
+                }}>Promo Price</span>
+                <p style={{ fontSize: '20px', fontWeight: '700', color: c.error, margin: '4px 0 0 0' }}>{formatCurrency(pkg.promoPrice)}</p>
               </div>
             )}
-            <div className="pt-3 border-t border-[var(--gray-border)] space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-[var(--gray-600)]">HPP</span>
-                <span>{formatCurrency(pkg.totalHpp)}</span>
+            <div style={{ paddingTop: '12px', borderTop: `1px solid ${c.border}`, display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '14px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ color: c.textMuted }}>HPP</span>
+                <span style={{ color: c.textPrimary }}>{formatCurrency(pkg.totalHpp)}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-[var(--gray-600)]">Margin</span>
-                <span className="text-[var(--success)]">{pkg.margin}%</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ color: c.textMuted }}>Margin</span>
+                <span style={{ color: c.success }}>{pkg.margin}%</span>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* Hotels */}
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle>Hotels</CardTitle>
-          </CardHeader>
-          <CardContent className="grid gap-4 md:grid-cols-2">
+        <div style={cardStyle}>
+          <div style={cardHeaderStyle}>
+            <Building2 style={{ width: '18px', height: '18px', color: c.textMuted }} />
+            <h3 style={{ fontSize: '16px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>Hotels</h3>
+          </div>
+          <div style={{ ...cardBodyStyle, display: 'grid', gap: '16px', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr' }}>
             <div>
-              <p className="font-medium text-[var(--charcoal)]">Makkah</p>
-              <p className="text-sm text-[var(--gray-600)] mt-1">{pkg.makkahHotel}</p>
-              <p className="text-sm text-[var(--gray-600)]">{pkg.makkahHotelRating} star &bull; {pkg.makkahHotelDistance}</p>
+              <p style={{ fontWeight: '500', color: c.textPrimary, margin: '0 0 4px 0' }}>Makkah</p>
+              <p style={{ fontSize: '14px', color: c.textMuted, margin: '0 0 2px 0' }}>{pkg.makkahHotel}</p>
+              <p style={{ fontSize: '14px', color: c.textMuted, margin: 0 }}>{pkg.makkahHotelRating} star &bull; {pkg.makkahHotelDistance}</p>
             </div>
             <div>
-              <p className="font-medium text-[var(--charcoal)]">Madinah</p>
-              <p className="text-sm text-[var(--gray-600)] mt-1">{pkg.madinahHotel}</p>
-              <p className="text-sm text-[var(--gray-600)]">{pkg.madinahHotelRating} star &bull; {pkg.madinahHotelDistance}</p>
+              <p style={{ fontWeight: '500', color: c.textPrimary, margin: '0 0 4px 0' }}>Madinah</p>
+              <p style={{ fontSize: '14px', color: c.textMuted, margin: '0 0 2px 0' }}>{pkg.madinahHotel}</p>
+              <p style={{ fontSize: '14px', color: c.textMuted, margin: 0 }}>{pkg.madinahHotelRating} star &bull; {pkg.madinahHotelDistance}</p>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* Description */}
-        <Card className="lg:col-span-3">
-          <CardHeader>
-            <CardTitle>Package Description</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-[var(--gray-600)]">{pkg.description}</p>
-          </CardContent>
-        </Card>
+        <div style={{ ...cardStyle, gridColumn: isMobile ? undefined : '1 / -1' }}>
+          <div style={cardHeaderStyle}>
+            <FileText style={{ width: '18px', height: '18px', color: c.textMuted }} />
+            <h3 style={{ fontSize: '16px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>Package Description</h3>
+          </div>
+          <div style={cardBodyStyle}>
+            <p style={{ color: c.textMuted, margin: 0, lineHeight: '1.6' }}>{pkg.description}</p>
+          </div>
+        </div>
 
         {/* Inclusions */}
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle>Included</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ul className="space-y-2">
+        <div style={{ ...cardStyle, gridColumn: isMobile ? undefined : 'span 1' }}>
+          <div style={cardHeaderStyle}>
+            <CheckCircle style={{ width: '18px', height: '18px', color: c.success }} />
+            <h3 style={{ fontSize: '16px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>Included</h3>
+          </div>
+          <div style={cardBodyStyle}>
+            <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: '8px' }}>
               {pkg.inclusions.map((item, index) => (
-                <li key={index} className="flex items-start gap-2 text-sm text-[var(--gray-600)]">
-                  <span className="text-[var(--success)] mt-0.5">&#10003;</span>
+                <li key={index} style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '14px', color: c.textMuted }}>
+                  <span style={{ color: c.success, marginTop: '2px' }}>&#10003;</span>
                   {item}
                 </li>
               ))}
             </ul>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* Exclusions */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Not Included</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ul className="space-y-2">
+        <div style={cardStyle}>
+          <div style={cardHeaderStyle}>
+            <XCircle style={{ width: '18px', height: '18px', color: c.error }} />
+            <h3 style={{ fontSize: '16px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>Not Included</h3>
+          </div>
+          <div style={cardBodyStyle}>
+            <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: '8px' }}>
               {pkg.exclusions.map((item, index) => (
-                <li key={index} className="flex items-start gap-2 text-sm text-[var(--gray-600)]">
-                  <span className="text-[var(--error)] mt-0.5">&#10007;</span>
+                <li key={index} style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '14px', color: c.textMuted }}>
+                  <span style={{ color: c.error, marginTop: '2px' }}>&#10007;</span>
                   {item}
                 </li>
               ))}
             </ul>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     </div>
   );

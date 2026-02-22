@@ -2,11 +2,15 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTheme } from '@/lib/theme';
+import { useResponsive } from '@/lib/hooks/use-responsive';
 import { PackageForm } from '@/components/packages/package-form';
 import type { PackageFormData } from '@/lib/validations/package';
 
 export default function NewPackagePage() {
   const router = useRouter();
+  const { c } = useTheme();
+  const { isMobile } = useResponsive();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -37,7 +41,7 @@ export default function NewPackagePage() {
 
   return (
     <div style={{ maxWidth: '960px' }}>
-      <h1 style={{ fontSize: '24px', fontWeight: '700', marginBottom: '24px' }}>
+      <h1 style={{ fontSize: '24px', fontWeight: '700', marginBottom: '24px', color: c.textPrimary }}>
         Buat Paket Baru
       </h1>
 
@@ -46,8 +50,8 @@ export default function NewPackagePage() {
           padding: '12px 16px',
           marginBottom: '16px',
           borderRadius: '8px',
-          backgroundColor: '#FEF2F2',
-          color: '#DC2626',
+          backgroundColor: c.errorLight,
+          color: c.error,
           fontSize: '14px',
         }}>
           {error}

@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import { X, CheckCircle2, AlertCircle, Info, AlertTriangle } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 type ToastType = "success" | "error" | "warning" | "info";
 
@@ -53,11 +52,35 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
+const toastColors: Record<ToastType, { border: string; bg: string; icon: string }> = {
+  success: { border: 'var(--success)', bg: 'var(--success-light)', icon: 'var(--success)' },
+  error: { border: 'var(--error)', bg: 'var(--error-light)', icon: 'var(--error)' },
+  warning: { border: 'var(--warning)', bg: 'var(--warning-light)', icon: 'var(--warning)' },
+  info: { border: 'var(--info)', bg: 'var(--info-light)', icon: 'var(--info)' },
+};
+
+const iconMap: Record<ToastType, React.ComponentType<React.SVGProps<SVGSVGElement>>> = {
+  success: CheckCircle2,
+  error: AlertCircle,
+  warning: AlertTriangle,
+  info: Info,
+};
+
 function ToastContainer() {
   const { toasts, removeToast } = useToast();
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2">
+    <div
+      style={{
+        position: 'fixed',
+        bottom: '16px',
+        right: '16px',
+        zIndex: 50,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '8px',
+      }}
+    >
       {toasts.map((toast) => (
         <ToastItem key={toast.id} toast={toast} onClose={() => removeToast(toast.id)} />
       ))}
@@ -65,40 +88,46 @@ function ToastContainer() {
   );
 }
 
-const toastIcons: Record<ToastType, React.ReactNode> = {
-  success: <CheckCircle2 className="h-5 w-5 text-[var(--success)]" />,
-  error: <AlertCircle className="h-5 w-5 text-[var(--error)]" />,
-  warning: <AlertTriangle className="h-5 w-5 text-[var(--warning)]" />,
-  info: <Info className="h-5 w-5 text-[var(--info)]" />,
-};
-
-const toastStyles: Record<ToastType, string> = {
-  success: "border-[var(--success)] bg-[var(--success-light)]",
-  error: "border-[var(--error)] bg-[var(--error-light)]",
-  warning: "border-[var(--warning)] bg-[var(--warning-light)]",
-  info: "border-[var(--info)] bg-[var(--info-light)]",
-};
-
 function ToastItem({ toast, onClose }: { toast: Toast; onClose: () => void }) {
+  const colors = toastColors[toast.type];
+  const Icon = iconMap[toast.type];
+
   return (
     <div
-      className={cn(
-        "flex items-start gap-3 rounded-[12px] border p-4 shadow-lg animate-in slide-in-from-right-full duration-300 min-w-[300px] max-w-[400px]",
-        toastStyles[toast.type]
-      )}
+      style={{
+        display: 'flex',
+        alignItems: 'flex-start',
+        gap: '12px',
+        borderRadius: '12px',
+        border: `1px solid ${colors.border}`,
+        backgroundColor: colors.bg,
+        padding: '16px',
+        boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
+        minWidth: '300px',
+        maxWidth: '400px',
+      }}
     >
-      <div className="flex-shrink-0">{toastIcons[toast.type]}</div>
-      <div className="flex-1">
-        <p className="font-medium text-sm text-[var(--charcoal)]">{toast.title}</p>
+      <div style={{ flexShrink: 0 }}>
+        <Icon style={{ width: '20px', height: '20px', color: colors.icon }} />
+      </div>
+      <div style={{ flex: 1 }}>
+        <p style={{ fontWeight: '500', fontSize: '14px', color: 'var(--charcoal)', margin: 0 }}>{toast.title}</p>
         {toast.description && (
-          <p className="text-sm text-[var(--gray-600)] mt-1">{toast.description}</p>
+          <p style={{ fontSize: '14px', color: 'var(--gray-600)', marginTop: '4px', marginBottom: 0 }}>{toast.description}</p>
         )}
       </div>
       <button
         onClick={onClose}
-        className="flex-shrink-0 rounded-[8px] p-1 hover:bg-black/5 transition-colors"
+        style={{
+          flexShrink: 0,
+          borderRadius: '8px',
+          padding: '4px',
+          background: 'none',
+          border: 'none',
+          cursor: 'pointer',
+        }}
       >
-        <X className="h-4 w-4 text-[var(--gray-600)]" />
+        <X style={{ width: '16px', height: '16px', color: 'var(--gray-600)' }} />
       </button>
     </div>
   );

@@ -2,9 +2,7 @@
 
 import * as React from 'react';
 import { Upload, X, FileText, Check, AlertCircle, Clock } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { cn } from '@/lib/utils';
+import { useTheme } from '@/lib/theme';
 import type { PilgrimDocument } from '@/types/pilgrim';
 import type { DocumentType, DocumentStatus } from '@/types';
 
@@ -24,41 +22,42 @@ const documentTypes: { type: DocumentType; label: string; required: boolean }[] 
   { type: 'book_nikah', label: 'Marriage Certificate', required: false },
 ];
 
-const statusConfig: Record<DocumentStatus, { icon: React.ReactNode; color: string; bgColor: string; label: string }> = {
-  missing: {
-    icon: <AlertCircle className="h-4 w-4" />,
-    color: 'var(--gray-600)',
-    bgColor: 'var(--gray-100)',
-    label: 'Missing',
-  },
-  uploaded: {
-    icon: <Clock className="h-4 w-4" />,
-    color: 'var(--warning)',
-    bgColor: 'var(--warning-light)',
-    label: 'Pending Review',
-  },
-  verified: {
-    icon: <Check className="h-4 w-4" />,
-    color: 'var(--success)',
-    bgColor: 'var(--success-light)',
-    label: 'Verified',
-  },
-  expired: {
-    icon: <AlertCircle className="h-4 w-4" />,
-    color: 'var(--error)',
-    bgColor: 'var(--error-light)',
-    label: 'Expired',
-  },
-  rejected: {
-    icon: <X className="h-4 w-4" />,
-    color: 'var(--error)',
-    bgColor: 'var(--error-light)',
-    label: 'Rejected',
-  },
-};
-
 export function DocumentUpload({ documents, onUpload, onRemove, isEditable = true }: DocumentUploadProps) {
+  const { c } = useTheme();
   const fileInputRefs = React.useRef<Record<string, HTMLInputElement | null>>({});
+
+  const statusConfig: Record<DocumentStatus, { icon: React.ReactNode; color: string; bgColor: string; label: string }> = {
+    missing: {
+      icon: <AlertCircle style={{ width: '16px', height: '16px' }} />,
+      color: c.textMuted,
+      bgColor: c.cardBgHover,
+      label: 'Missing',
+    },
+    uploaded: {
+      icon: <Clock style={{ width: '16px', height: '16px' }} />,
+      color: c.warning,
+      bgColor: c.warningLight,
+      label: 'Pending Review',
+    },
+    verified: {
+      icon: <Check style={{ width: '16px', height: '16px' }} />,
+      color: c.success,
+      bgColor: c.successLight,
+      label: 'Verified',
+    },
+    expired: {
+      icon: <AlertCircle style={{ width: '16px', height: '16px' }} />,
+      color: c.error,
+      bgColor: c.errorLight,
+      label: 'Expired',
+    },
+    rejected: {
+      icon: <X style={{ width: '16px', height: '16px' }} />,
+      color: c.error,
+      bgColor: c.errorLight,
+      label: 'Rejected',
+    },
+  };
 
   const getDocumentByType = (type: DocumentType) => {
     return documents.find((d) => d.type === type);
@@ -72,12 +71,25 @@ export function DocumentUpload({ documents, onUpload, onRemove, isEditable = tru
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Documents</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+    <div
+      style={{
+        backgroundColor: c.cardBg,
+        borderRadius: '12px',
+        border: `1px solid ${c.border}`,
+        overflow: 'hidden',
+      }}
+    >
+      <div style={{ padding: '20px', borderBottom: `1px solid ${c.borderLight}` }}>
+        <h3 style={{ fontSize: '16px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>Documents</h3>
+      </div>
+      <div style={{ padding: '20px' }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
+            gap: '16px',
+          }}
+        >
           {documentTypes.map(({ type, label, required }) => {
             const doc = getDocumentByType(type);
             const status = doc?.status || 'missing';
@@ -86,25 +98,35 @@ export function DocumentUpload({ documents, onUpload, onRemove, isEditable = tru
             return (
               <div
                 key={type}
-                className={cn(
-                  'rounded-[12px] border-2 border-dashed p-4 transition-colors',
-                  status === 'missing'
-                    ? 'border-[var(--gray-border)] bg-[var(--gray-100)]/50'
-                    : 'border-transparent bg-white shadow-sm'
-                )}
                 style={{
-                  borderColor: status !== 'missing' ? config.color : undefined,
+                  borderRadius: '12px',
+                  border: status === 'missing'
+                    ? `2px dashed ${c.border}`
+                    : `2px dashed ${config.color}`,
+                  padding: '16px',
+                  backgroundColor: status === 'missing'
+                    ? c.cardBgHover
+                    : c.cardBg,
                 }}
               >
-                <div className="flex items-start justify-between mb-3">
+                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '12px' }}>
                   <div>
-                    <p className="font-medium text-sm text-[var(--charcoal)]">
+                    <p style={{ fontWeight: '500', fontSize: '14px', color: c.textPrimary, margin: 0 }}>
                       {label}
-                      {required && <span className="text-[var(--error)] ml-1">*</span>}
+                      {required && <span style={{ color: c.error, marginLeft: '4px' }}>*</span>}
                     </p>
                     <div
-                      className="inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded-full text-xs"
-                      style={{ backgroundColor: config.bgColor, color: config.color }}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        marginTop: '4px',
+                        padding: '2px 8px',
+                        borderRadius: '9999px',
+                        fontSize: '12px',
+                        backgroundColor: config.bgColor,
+                        color: config.color,
+                      }}
                     >
                       {config.icon}
                       {config.label}
@@ -114,17 +136,44 @@ export function DocumentUpload({ documents, onUpload, onRemove, isEditable = tru
                     <button
                       type="button"
                       onClick={() => onRemove(doc.id)}
-                      className="p-1 rounded-full hover:bg-[var(--gray-100)] transition-colors"
+                      style={{
+                        padding: '4px',
+                        borderRadius: '9999px',
+                        border: 'none',
+                        backgroundColor: 'transparent',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
                     >
-                      <X className="h-4 w-4 text-[var(--gray-600)]" />
+                      <X style={{ width: '16px', height: '16px', color: c.textMuted }} />
                     </button>
                   )}
                 </div>
 
                 {doc && doc.fileName ? (
-                  <div className="flex items-center gap-2 p-2 bg-[var(--gray-100)] rounded-[8px]">
-                    <FileText className="h-4 w-4 text-[var(--gray-600)]" />
-                    <span className="text-sm text-[var(--charcoal)] truncate flex-1">
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      padding: '8px',
+                      backgroundColor: c.cardBgHover,
+                      borderRadius: '8px',
+                    }}
+                  >
+                    <FileText style={{ width: '16px', height: '16px', color: c.textMuted, flexShrink: 0 }} />
+                    <span
+                      style={{
+                        fontSize: '14px',
+                        color: c.textPrimary,
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                        flex: 1,
+                      }}
+                    >
                       {doc.fileName}
                     </span>
                   </div>
@@ -135,25 +184,37 @@ export function DocumentUpload({ documents, onUpload, onRemove, isEditable = tru
                       ref={(el) => { fileInputRefs.current[type] = el; }}
                       onChange={(e) => handleFileChange(type, e)}
                       accept="image/*,.pdf"
-                      className="hidden"
+                      style={{ display: 'none' }}
                     />
-                    <Button
+                    <button
                       type="button"
-                      variant="outline"
-                      size="sm"
-                      className="w-full"
                       onClick={() => fileInputRefs.current[type]?.click()}
+                      style={{
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '8px',
+                        padding: '8px 16px',
+                        fontSize: '14px',
+                        fontWeight: '500',
+                        color: c.textSecondary,
+                        backgroundColor: 'transparent',
+                        border: `1px solid ${c.border}`,
+                        borderRadius: '8px',
+                        cursor: 'pointer',
+                      }}
                     >
-                      <Upload className="h-4 w-4 mr-2" />
+                      <Upload style={{ width: '16px', height: '16px' }} />
                       Upload
-                    </Button>
+                    </button>
                   </>
                 ) : (
-                  <p className="text-sm text-[var(--gray-600)]">No document uploaded</p>
+                  <p style={{ fontSize: '14px', color: c.textMuted, margin: 0 }}>No document uploaded</p>
                 )}
 
                 {doc?.expiryDate && (
-                  <p className="text-xs text-[var(--gray-600)] mt-2">
+                  <p style={{ fontSize: '12px', color: c.textMuted, margin: '8px 0 0 0' }}>
                     Expires: {new Date(doc.expiryDate).toLocaleDateString('id-ID')}
                   </p>
                 )}
@@ -161,7 +222,7 @@ export function DocumentUpload({ documents, onUpload, onRemove, isEditable = tru
             );
           })}
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

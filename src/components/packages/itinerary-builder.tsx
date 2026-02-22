@@ -1,13 +1,9 @@
 'use client';
 
 import * as React from 'react';
-import { Plus, Trash2, GripVertical, ChevronDown, ChevronUp } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { cn } from '@/lib/utils';
+import { Plus, Trash2, GripVertical, ChevronDown, ChevronUp, Calendar } from 'lucide-react';
+import { useTheme } from '@/lib/theme';
+import { useResponsive } from '@/lib/hooks/use-responsive';
 import type { ItineraryDay, ItineraryActivity, MealType } from '@/types/package';
 
 interface ItineraryBuilderProps {
@@ -24,7 +20,44 @@ const mealOptions: { value: MealType; label: string }[] = [
 ];
 
 export function ItineraryBuilder({ value, onChange, duration }: ItineraryBuilderProps) {
+  const { c } = useTheme();
+  const { isMobile } = useResponsive();
   const [expandedDays, setExpandedDays] = React.useState<number[]>([1]);
+
+  const inputStyle: React.CSSProperties = {
+    width: '100%',
+    padding: '12px 16px',
+    fontSize: '14px',
+    color: c.textPrimary,
+    backgroundColor: c.cardBgHover,
+    border: `1px solid ${c.border}`,
+    borderRadius: '12px',
+    outline: 'none',
+    boxSizing: 'border-box',
+  };
+
+  const selectStyle: React.CSSProperties = {
+    ...inputStyle,
+    appearance: 'none' as const,
+    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`,
+    backgroundRepeat: 'no-repeat',
+    backgroundPosition: 'right 16px center',
+    paddingRight: '40px',
+  };
+
+  const labelStyle: React.CSSProperties = {
+    display: 'block',
+    fontSize: '13px',
+    fontWeight: '500',
+    color: c.textMuted,
+    marginBottom: '8px',
+  };
+
+  const textareaStyle: React.CSSProperties = {
+    ...inputStyle,
+    minHeight: '60px',
+    resize: 'vertical' as const,
+  };
 
   const addDay = () => {
     const newDay: ItineraryDay = {
@@ -98,74 +131,133 @@ export function ItineraryBuilder({ value, onChange, duration }: ItineraryBuilder
   };
 
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>Itinerary ({value.length}/{duration} days)</CardTitle>
-        <Button type="button" variant="outline" size="sm" onClick={addDay} disabled={value.length >= duration}>
-          <Plus className="h-4 w-4 mr-1" />
+    <div
+      style={{
+        backgroundColor: c.cardBg,
+        borderRadius: '16px',
+        border: `1px solid ${c.border}`,
+        overflow: 'hidden',
+      }}
+    >
+      {/* Header */}
+      <div
+        style={{
+          padding: isMobile ? '16px 20px' : '20px 28px',
+          borderBottom: `1px solid ${c.border}`,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <Calendar style={{ width: '18px', height: '18px', color: c.textMuted }} />
+          <h3 style={{ fontSize: '16px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>
+            Itinerary ({value.length}/{duration} days)
+          </h3>
+        </div>
+        <button
+          type="button"
+          onClick={addDay}
+          disabled={value.length >= duration}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            padding: '8px 16px',
+            fontSize: '13px',
+            fontWeight: '500',
+            color: value.length >= duration ? c.textLight : c.textSecondary,
+            backgroundColor: c.cardBg,
+            border: `1px solid ${c.border}`,
+            borderRadius: '10px',
+            cursor: value.length >= duration ? 'not-allowed' : 'pointer',
+            opacity: value.length >= duration ? 0.5 : 1,
+          }}
+        >
+          <Plus style={{ width: '14px', height: '14px' }} />
           Add Day
-        </Button>
-      </CardHeader>
-      <CardContent className="space-y-4">
+        </button>
+      </div>
+
+      {/* Body */}
+      <div style={{ padding: isMobile ? '20px' : '28px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
         {value.length === 0 ? (
-          <div className="text-center py-8 text-[var(--gray-600)]">
-            <p>No itinerary yet. Click "Add Day" to start building.</p>
+          <div style={{ textAlign: 'center', padding: '32px 0', color: c.textMuted, fontSize: '14px' }}>
+            No itinerary yet. Click &quot;Add Day&quot; to start building.
           </div>
         ) : (
           value.map((day, dayIndex) => (
             <div
               key={day.day}
-              className="border border-[var(--gray-border)] rounded-[12px] overflow-hidden"
+              style={{
+                border: `1px solid ${c.border}`,
+                borderRadius: '12px',
+                overflow: 'hidden',
+              }}
             >
               {/* Day Header */}
               <div
-                className="flex items-center gap-3 p-4 bg-[var(--gray-100)] cursor-pointer"
                 onClick={() => toggleExpanded(day.day)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  padding: '14px 16px',
+                  backgroundColor: c.cardBgHover,
+                  cursor: 'pointer',
+                }}
               >
-                <GripVertical className="h-4 w-4 text-[var(--gray-400)]" />
-                <div className="flex-1">
-                  <span className="font-semibold text-[var(--charcoal)]">Day {day.day}</span>
-                  <span className="text-[var(--gray-600)] mx-2">-</span>
-                  <span className="text-[var(--gray-600)]">{day.title}</span>
-                  <span className="text-xs text-[var(--gray-400)] ml-2">({day.city})</span>
+                <GripVertical style={{ width: '16px', height: '16px', color: c.textLight }} />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <span style={{ fontWeight: '600', color: c.textPrimary, fontSize: '14px' }}>Day {day.day}</span>
+                  <span style={{ color: c.textMuted, margin: '0 8px' }}>-</span>
+                  <span style={{ color: c.textMuted, fontSize: '14px' }}>{day.title}</span>
+                  <span style={{ fontSize: '12px', color: c.textLight, marginLeft: '8px' }}>({day.city})</span>
                 </div>
-                <Button
+                <button
                   type="button"
-                  variant="ghost"
-                  size="sm"
                   onClick={(e) => {
                     e.stopPropagation();
                     removeDay(dayIndex);
                   }}
-                  className="text-[var(--error)]"
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    padding: '4px',
+                    color: c.error,
+                    display: 'flex',
+                    alignItems: 'center',
+                  }}
                 >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+                  <Trash2 style={{ width: '16px', height: '16px' }} />
+                </button>
                 {expandedDays.includes(day.day) ? (
-                  <ChevronUp className="h-4 w-4 text-[var(--gray-600)]" />
+                  <ChevronUp style={{ width: '16px', height: '16px', color: c.textMuted }} />
                 ) : (
-                  <ChevronDown className="h-4 w-4 text-[var(--gray-600)]" />
+                  <ChevronDown style={{ width: '16px', height: '16px', color: c.textMuted }} />
                 )}
               </div>
 
               {/* Day Content */}
               {expandedDays.includes(day.day) && (
-                <div className="p-4 space-y-4">
-                  <div className="grid gap-4 md:grid-cols-3">
+                <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr 1fr', gap: '16px' }}>
                     <div>
-                      <Label>Day Title</Label>
-                      <Input
+                      <label style={labelStyle}>Day Title</label>
+                      <input
                         value={day.title}
                         onChange={(e) => updateDay(dayIndex, { title: e.target.value })}
                         placeholder="e.g., Arrival in Madinah"
+                        style={inputStyle}
                       />
                     </div>
                     <div>
-                      <Label>City</Label>
+                      <label style={labelStyle}>City</label>
                       <select
                         value={day.city}
                         onChange={(e) => updateDay(dayIndex, { city: e.target.value })}
-                        className="w-full h-10 rounded-[12px] border border-[var(--gray-border)] px-3 text-sm"
+                        style={selectStyle}
                       >
                         {cities.map((city) => (
                           <option key={city} value={city}>{city}</option>
@@ -173,30 +265,36 @@ export function ItineraryBuilder({ value, onChange, duration }: ItineraryBuilder
                       </select>
                     </div>
                     <div>
-                      <Label>Hotel (Optional)</Label>
-                      <Input
+                      <label style={labelStyle}>Hotel (Optional)</label>
+                      <input
                         value={day.hotel || ''}
                         onChange={(e) => updateDay(dayIndex, { hotel: e.target.value })}
                         placeholder="Hotel name"
+                        style={inputStyle}
                       />
                     </div>
                   </div>
 
                   {/* Meals */}
                   <div>
-                    <Label>Meals Included</Label>
-                    <div className="flex gap-2 mt-2">
+                    <label style={labelStyle}>Meals Included</label>
+                    <div style={{ display: 'flex', gap: '8px' }}>
                       {mealOptions.map((meal) => (
                         <button
                           key={meal.value}
                           type="button"
                           onClick={() => toggleMeal(dayIndex, meal.value)}
-                          className={cn(
-                            'px-3 py-1.5 rounded-[8px] text-sm transition-colors',
-                            day.meals.includes(meal.value)
-                              ? 'bg-[var(--gezma-red)] text-white'
-                              : 'bg-[var(--gray-100)] text-[var(--gray-600)] hover:bg-[var(--gray-200)]'
-                          )}
+                          style={{
+                            padding: '8px 14px',
+                            borderRadius: '8px',
+                            fontSize: '13px',
+                            fontWeight: '500',
+                            border: 'none',
+                            cursor: 'pointer',
+                            transition: 'all 0.15s',
+                            backgroundColor: day.meals.includes(meal.value) ? c.primary : c.cardBgHover,
+                            color: day.meals.includes(meal.value) ? 'white' : c.textMuted,
+                          }}
                         >
                           {meal.label}
                         </button>
@@ -206,37 +304,59 @@ export function ItineraryBuilder({ value, onChange, duration }: ItineraryBuilder
 
                   {/* Activities */}
                   <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <Label>Activities</Label>
-                      <Button type="button" variant="ghost" size="sm" onClick={() => addActivity(dayIndex)}>
-                        <Plus className="h-3 w-3 mr-1" />
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                      <label style={{ ...labelStyle, marginBottom: 0 }}>Activities</label>
+                      <button
+                        type="button"
+                        onClick={() => addActivity(dayIndex)}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                          background: 'none',
+                          border: 'none',
+                          cursor: 'pointer',
+                          fontSize: '13px',
+                          fontWeight: '500',
+                          color: c.primary,
+                          padding: '4px 8px',
+                        }}
+                      >
+                        <Plus style={{ width: '14px', height: '14px' }} />
                         Add Activity
-                      </Button>
+                      </button>
                     </div>
-                    <div className="space-y-2">
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                       {day.activities.map((activity, actIndex) => (
-                        <div key={activity.id} className="flex gap-2 items-start">
-                          <Input
+                        <div key={activity.id} style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                          <input
                             type="time"
                             value={activity.time}
                             onChange={(e) => updateActivity(dayIndex, actIndex, { time: e.target.value })}
-                            className="w-28"
+                            style={{ ...inputStyle, width: '120px', flexShrink: 0 }}
                           />
-                          <Input
+                          <input
                             value={activity.title}
                             onChange={(e) => updateActivity(dayIndex, actIndex, { title: e.target.value })}
                             placeholder="Activity title"
-                            className="flex-1"
+                            style={{ ...inputStyle, flex: 1 }}
                           />
-                          <Button
+                          <button
                             type="button"
-                            variant="ghost"
-                            size="sm"
                             onClick={() => removeActivity(dayIndex, actIndex)}
-                            className="text-[var(--error)]"
+                            style={{
+                              background: 'none',
+                              border: 'none',
+                              cursor: 'pointer',
+                              padding: '4px',
+                              color: c.error,
+                              display: 'flex',
+                              alignItems: 'center',
+                              flexShrink: 0,
+                            }}
                           >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
+                            <Trash2 style={{ width: '16px', height: '16px' }} />
+                          </button>
                         </div>
                       ))}
                     </div>
@@ -244,12 +364,13 @@ export function ItineraryBuilder({ value, onChange, duration }: ItineraryBuilder
 
                   {/* Description */}
                   <div>
-                    <Label>Description (Optional)</Label>
-                    <Textarea
+                    <label style={labelStyle}>Description (Optional)</label>
+                    <textarea
                       value={day.description || ''}
                       onChange={(e) => updateDay(dayIndex, { description: e.target.value })}
                       placeholder="Additional notes for this day..."
                       rows={2}
+                      style={textareaStyle}
                     />
                   </div>
                 </div>
@@ -257,7 +378,7 @@ export function ItineraryBuilder({ value, onChange, duration }: ItineraryBuilder
             </div>
           ))
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

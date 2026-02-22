@@ -2,11 +2,9 @@
 
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Plane, User, FileText, StickyNote } from 'lucide-react';
+import { useTheme } from '@/lib/theme';
+import { useResponsive } from '@/lib/hooks/use-responsive';
 import { tripFormSchema, type TripFormData } from '@/lib/validations/trip';
 import { formatCurrency } from '@/lib/utils';
 import type { Trip } from '@/types/trip';
@@ -20,6 +18,9 @@ interface TripFormProps {
 }
 
 export function TripForm({ initialData, packages, onSubmit, onCancel, isLoading }: TripFormProps) {
+  const { c } = useTheme();
+  const { isMobile } = useResponsive();
+
   const {
     register,
     handleSubmit,
@@ -53,185 +54,313 @@ export function TripForm({ initialData, packages, onSubmit, onCancel, isLoading 
     },
   });
 
+  const inputStyle: React.CSSProperties = {
+    width: '100%',
+    padding: '12px 16px',
+    fontSize: '14px',
+    color: c.textPrimary,
+    backgroundColor: c.cardBgHover,
+    border: `1px solid ${c.border}`,
+    borderRadius: '12px',
+    outline: 'none',
+    transition: 'border-color 0.2s ease',
+    boxSizing: 'border-box',
+  };
+
+  const inputErrorStyle: React.CSSProperties = {
+    ...inputStyle,
+    border: `1px solid ${c.error}`,
+  };
+
+  const selectStyle: React.CSSProperties = {
+    ...inputStyle,
+    appearance: 'none' as const,
+    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`,
+    backgroundRepeat: 'no-repeat',
+    backgroundPosition: 'right 16px center',
+    paddingRight: '40px',
+  };
+
+  const textareaStyle: React.CSSProperties = {
+    ...inputStyle,
+    minHeight: '100px',
+    resize: 'vertical' as const,
+  };
+
+  const labelStyle: React.CSSProperties = {
+    display: 'block',
+    fontSize: '13px',
+    fontWeight: '500',
+    color: c.textMuted,
+    marginBottom: '8px',
+  };
+
+  const errorTextStyle: React.CSSProperties = {
+    color: c.error,
+    fontSize: '12px',
+    marginTop: '4px',
+  };
+
+  const sectionCard = (title: string, icon: React.ReactNode, children: React.ReactNode) => (
+    <div
+      style={{
+        backgroundColor: c.cardBg,
+        borderRadius: '16px',
+        border: `1px solid ${c.border}`,
+        overflow: 'hidden',
+      }}
+    >
+      <div
+        style={{
+          padding: isMobile ? '16px 20px' : '20px 28px',
+          borderBottom: `1px solid ${c.border}`,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+        }}
+      >
+        {icon}
+        <h3 style={{ fontSize: '16px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>
+          {title}
+        </h3>
+      </div>
+      <div style={{ padding: isMobile ? '20px' : '28px' }}>
+        {children}
+      </div>
+    </div>
+  );
+
+  const gridStyle: React.CSSProperties = {
+    display: 'grid',
+    gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
+    gap: '20px',
+  };
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+    <form onSubmit={handleSubmit(onSubmit)} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       {/* Basic Info */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Trip Information</CardTitle>
-        </CardHeader>
-        <CardContent className="grid gap-4 md:grid-cols-2">
-          <div className="md:col-span-2">
-            <Label htmlFor="name">Trip Name</Label>
-            <Input
+      {sectionCard(
+        'Trip Information',
+        <Plane style={{ width: '18px', height: '18px', color: c.primary }} />,
+        <>
+          <div style={{ marginBottom: '20px' }}>
+            <label htmlFor="name" style={labelStyle}>Trip Name</label>
+            <input
               id="name"
               placeholder="e.g., Umrah Reguler - Maret 2026"
+              style={errors.name ? inputErrorStyle : inputStyle}
               {...register('name')}
-              className={errors.name ? 'border-[var(--error)]' : ''}
             />
-            {errors.name && <p className="text-xs text-[var(--error)] mt-1">{errors.name.message}</p>}
+            {errors.name && <p style={errorTextStyle}>{errors.name.message}</p>}
           </div>
 
-          <div>
-            <Label htmlFor="packageId">Package</Label>
-            <select
-              id="packageId"
-              {...register('packageId')}
-              className={`w-full h-10 rounded-[12px] border px-3 text-sm ${errors.packageId ? 'border-[var(--error)]' : 'border-[var(--gray-border)]'}`}
-            >
-              <option value="">Select package</option>
-              {packages.map((pkg) => (
-                <option key={pkg.id} value={pkg.id}>
-                  {pkg.name} - {formatCurrency(pkg.publishedPrice)}
-                </option>
-              ))}
-            </select>
-            {errors.packageId && <p className="text-xs text-[var(--error)] mt-1">{errors.packageId.message}</p>}
-          </div>
+          <div style={gridStyle}>
+            <div>
+              <label htmlFor="packageId" style={labelStyle}>Package</label>
+              <select
+                id="packageId"
+                style={errors.packageId ? { ...selectStyle, border: `1px solid ${c.error}` } : selectStyle}
+                {...register('packageId')}
+              >
+                <option value="">Select package</option>
+                {packages.map((pkg) => (
+                  <option key={pkg.id} value={pkg.id}>
+                    {pkg.name} - {formatCurrency(pkg.publishedPrice)}
+                  </option>
+                ))}
+              </select>
+              {errors.packageId && <p style={errorTextStyle}>{errors.packageId.message}</p>}
+            </div>
 
-          <div>
-            <Label htmlFor="capacity">Capacity</Label>
-            <Input
-              id="capacity"
-              type="number"
-              min={10}
-              max={200}
-              {...register('capacity', { valueAsNumber: true })}
-              className={errors.capacity ? 'border-[var(--error)]' : ''}
-            />
-            {errors.capacity && <p className="text-xs text-[var(--error)] mt-1">{errors.capacity.message}</p>}
-          </div>
+            <div>
+              <label htmlFor="capacity" style={labelStyle}>Capacity</label>
+              <input
+                id="capacity"
+                type="number"
+                min={10}
+                max={200}
+                style={errors.capacity ? inputErrorStyle : inputStyle}
+                {...register('capacity', { valueAsNumber: true })}
+              />
+              {errors.capacity && <p style={errorTextStyle}>{errors.capacity.message}</p>}
+            </div>
 
-          <div>
-            <Label htmlFor="departureDate">Departure Date</Label>
-            <Input
-              id="departureDate"
-              type="date"
-              {...register('departureDate')}
-              className={errors.departureDate ? 'border-[var(--error)]' : ''}
-            />
-            {errors.departureDate && <p className="text-xs text-[var(--error)] mt-1">{errors.departureDate.message}</p>}
-          </div>
+            <div>
+              <label htmlFor="departureDate" style={labelStyle}>Departure Date</label>
+              <input
+                id="departureDate"
+                type="date"
+                style={errors.departureDate ? inputErrorStyle : inputStyle}
+                {...register('departureDate')}
+              />
+              {errors.departureDate && <p style={errorTextStyle}>{errors.departureDate.message}</p>}
+            </div>
 
-          <div>
-            <Label htmlFor="returnDate">Return Date</Label>
-            <Input
-              id="returnDate"
-              type="date"
-              {...register('returnDate')}
-              className={errors.returnDate ? 'border-[var(--error)]' : ''}
-            />
-            {errors.returnDate && <p className="text-xs text-[var(--error)] mt-1">{errors.returnDate.message}</p>}
-          </div>
+            <div>
+              <label htmlFor="returnDate" style={labelStyle}>Return Date</label>
+              <input
+                id="returnDate"
+                type="date"
+                style={errors.returnDate ? inputErrorStyle : inputStyle}
+                {...register('returnDate')}
+              />
+              {errors.returnDate && <p style={errorTextStyle}>{errors.returnDate.message}</p>}
+            </div>
 
-          <div>
-            <Label htmlFor="registrationCloseDate">Registration Close Date (Optional)</Label>
-            <Input id="registrationCloseDate" type="date" {...register('registrationCloseDate')} />
+            <div>
+              <label htmlFor="registrationCloseDate" style={labelStyle}>Registration Close Date (Optional)</label>
+              <input
+                id="registrationCloseDate"
+                type="date"
+                style={inputStyle}
+                {...register('registrationCloseDate')}
+              />
+            </div>
           </div>
+        </>
+      )}
 
+      {/* Guide / Muthawwif */}
+      {sectionCard(
+        'Guide / Muthawwif (Optional)',
+        <User style={{ width: '18px', height: '18px', color: c.primary }} />,
+        <div style={gridStyle}>
           <div>
-            <Label htmlFor="muthawwifName">Guide/Muthawwif Name (Optional)</Label>
-            <Input
+            <label htmlFor="muthawwifName" style={labelStyle}>Name</label>
+            <input
               id="muthawwifName"
               placeholder="e.g., Ustadz Ahmad"
+              style={inputStyle}
               {...register('muthawwifName')}
             />
           </div>
 
           <div>
-            <Label htmlFor="muthawwifPhone">Guide Phone (Optional)</Label>
-            <Input
+            <label htmlFor="muthawwifPhone" style={labelStyle}>Phone</label>
+            <input
               id="muthawwifPhone"
               placeholder="e.g., +62 812 3456 7890"
+              style={inputStyle}
               {...register('muthawwifPhone')}
             />
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      )}
 
-      {/* Flight Info */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Departure Flight</CardTitle>
-        </CardHeader>
-        <CardContent className="grid gap-4 md:grid-cols-2">
+      {/* Departure Flight */}
+      {sectionCard(
+        'Departure Flight',
+        <Plane style={{ width: '18px', height: '18px', color: c.primary }} />,
+        <div style={gridStyle}>
           <div>
-            <Label>Airline</Label>
-            <Input placeholder="e.g., Saudi Arabian Airlines" {...register('flightInfo.departureAirline')} />
+            <label style={labelStyle}>Airline</label>
+            <input placeholder="e.g., Saudi Arabian Airlines" style={inputStyle} {...register('flightInfo.departureAirline')} />
           </div>
           <div>
-            <Label>Flight Number</Label>
-            <Input placeholder="e.g., SV 817" {...register('flightInfo.departureFlightNo')} />
+            <label style={labelStyle}>Flight Number</label>
+            <input placeholder="e.g., SV 817" style={inputStyle} {...register('flightInfo.departureFlightNo')} />
           </div>
           <div>
-            <Label>Date</Label>
-            <Input type="date" {...register('flightInfo.departureDate')} />
+            <label style={labelStyle}>Date</label>
+            <input type="date" style={inputStyle} {...register('flightInfo.departureDate')} />
           </div>
           <div>
-            <Label>Time</Label>
-            <Input type="time" {...register('flightInfo.departureTime')} />
+            <label style={labelStyle}>Time</label>
+            <input type="time" style={inputStyle} {...register('flightInfo.departureTime')} />
           </div>
           <div>
-            <Label>Airport</Label>
-            <Input placeholder="CGK - Soekarno Hatta" {...register('flightInfo.departureAirport')} />
+            <label style={labelStyle}>Airport</label>
+            <input placeholder="CGK - Soekarno Hatta" style={inputStyle} {...register('flightInfo.departureAirport')} />
           </div>
           <div>
-            <Label>Terminal (Optional)</Label>
-            <Input placeholder="Terminal 3" {...register('flightInfo.departureTerminal')} />
+            <label style={labelStyle}>Terminal (Optional)</label>
+            <input placeholder="Terminal 3" style={inputStyle} {...register('flightInfo.departureTerminal')} />
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      )}
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Return Flight</CardTitle>
-        </CardHeader>
-        <CardContent className="grid gap-4 md:grid-cols-2">
+      {/* Return Flight */}
+      {sectionCard(
+        'Return Flight',
+        <Plane style={{ width: '18px', height: '18px', color: c.primary, transform: 'scaleX(-1)' }} />,
+        <div style={gridStyle}>
           <div>
-            <Label>Airline</Label>
-            <Input placeholder="e.g., Saudi Arabian Airlines" {...register('flightInfo.returnAirline')} />
+            <label style={labelStyle}>Airline</label>
+            <input placeholder="e.g., Saudi Arabian Airlines" style={inputStyle} {...register('flightInfo.returnAirline')} />
           </div>
           <div>
-            <Label>Flight Number</Label>
-            <Input placeholder="e.g., SV 816" {...register('flightInfo.returnFlightNo')} />
+            <label style={labelStyle}>Flight Number</label>
+            <input placeholder="e.g., SV 816" style={inputStyle} {...register('flightInfo.returnFlightNo')} />
           </div>
           <div>
-            <Label>Date</Label>
-            <Input type="date" {...register('flightInfo.returnDate')} />
+            <label style={labelStyle}>Date</label>
+            <input type="date" style={inputStyle} {...register('flightInfo.returnDate')} />
           </div>
           <div>
-            <Label>Time</Label>
-            <Input type="time" {...register('flightInfo.returnTime')} />
+            <label style={labelStyle}>Time</label>
+            <input type="time" style={inputStyle} {...register('flightInfo.returnTime')} />
           </div>
           <div>
-            <Label>Airport</Label>
-            <Input placeholder="JED - King Abdulaziz" {...register('flightInfo.returnAirport')} />
+            <label style={labelStyle}>Airport</label>
+            <input placeholder="JED - King Abdulaziz" style={inputStyle} {...register('flightInfo.returnAirport')} />
           </div>
           <div>
-            <Label>Terminal (Optional)</Label>
-            <Input {...register('flightInfo.returnTerminal')} />
+            <label style={labelStyle}>Terminal (Optional)</label>
+            <input style={inputStyle} {...register('flightInfo.returnTerminal')} />
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      )}
 
       {/* Notes */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Additional Notes (Optional)</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Textarea id="notes" placeholder="Any additional information..." {...register('notes')} rows={4} />
-        </CardContent>
-      </Card>
+      {sectionCard(
+        'Additional Notes (Optional)',
+        <StickyNote style={{ width: '18px', height: '18px', color: c.primary }} />,
+        <div>
+          <textarea
+            id="notes"
+            placeholder="Any additional information..."
+            rows={4}
+            style={textareaStyle}
+            {...register('notes')}
+          />
+        </div>
+      )}
 
       {/* Actions */}
-      <div className="flex gap-4 justify-end">
-        <Button type="button" variant="outline" onClick={onCancel}>
+      <div style={{ display: 'flex', gap: '16px', justifyContent: 'flex-end' }}>
+        <button
+          type="button"
+          onClick={onCancel}
+          style={{
+            padding: '12px 24px',
+            backgroundColor: c.cardBg,
+            color: c.textSecondary,
+            border: `1px solid ${c.border}`,
+            borderRadius: '12px',
+            fontSize: '14px',
+            fontWeight: '600',
+            cursor: 'pointer',
+          }}
+        >
           Cancel
-        </Button>
-        <Button type="submit" disabled={isLoading}>
+        </button>
+        <button
+          type="submit"
+          disabled={isLoading}
+          style={{
+            padding: '12px 24px',
+            backgroundColor: c.primary,
+            color: 'white',
+            border: 'none',
+            borderRadius: '12px',
+            fontSize: '14px',
+            fontWeight: '600',
+            cursor: isLoading ? 'not-allowed' : 'pointer',
+            opacity: isLoading ? 0.7 : 1,
+          }}
+        >
           {isLoading ? 'Saving...' : initialData?.id ? 'Update Trip' : 'Create Trip'}
-        </Button>
+        </button>
       </div>
     </form>
   );

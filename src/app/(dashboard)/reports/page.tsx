@@ -59,9 +59,9 @@ export default function ReportsPage() {
   const collectionRate = data.totalPilgrims > 0 ? Math.round((data.paidPilgrims / data.totalPilgrims) * 100) : 0;
 
   const stats = [
-    { label: 'Total Pemasukan', value: formatCurrency(data.totalRevenue), icon: DollarSign, color: '#16A34A', bg: '#D1FAE5' },
-    { label: 'Outstanding', value: formatCurrency(data.totalOutstanding), icon: AlertCircle, color: '#DC2626', bg: '#FEE2E2' },
-    { label: 'Jemaah Lunas', value: `${data.paidPilgrims}/${data.totalPilgrims}`, icon: Users, color: '#3B82F6', bg: '#DBEAFE' },
+    { label: 'Total Pemasukan', value: formatCurrency(data.totalRevenue), icon: DollarSign, color: c.success, bg: c.successLight },
+    { label: 'Outstanding', value: formatCurrency(data.totalOutstanding), icon: AlertCircle, color: c.error, bg: c.errorLight },
+    { label: 'Jemaah Lunas', value: `${data.paidPilgrims}/${data.totalPilgrims}`, icon: Users, color: c.info, bg: c.infoLight },
     { label: 'Collection Rate', value: `${collectionRate}%`, icon: TrendingUp, color: '#7C3AED', bg: '#F3E8FF' },
   ];
 
@@ -124,9 +124,9 @@ export default function ReportsPage() {
                     <p style={{ fontSize: '12px', color: c.textMuted, margin: '2px 0 0 0' }}>{trip.pilgrimCount} jemaah</p>
                   </div>
                   <div style={{ textAlign: isMobile ? 'left' : 'right' }}>
-                    <p style={{ fontSize: '14px', fontWeight: '600', color: '#16A34A', margin: 0 }}>{formatCurrency(trip.revenue)}</p>
+                    <p style={{ fontSize: '14px', fontWeight: '600', color: c.success, margin: 0 }}>{formatCurrency(trip.revenue)}</p>
                     {trip.outstanding > 0 && (
-                      <p style={{ fontSize: '12px', color: '#DC2626', margin: '2px 0 0 0' }}>Sisa: {formatCurrency(trip.outstanding)}</p>
+                      <p style={{ fontSize: '12px', color: c.error, margin: '2px 0 0 0' }}>Sisa: {formatCurrency(trip.outstanding)}</p>
                     )}
                   </div>
                 </div>
@@ -153,7 +153,7 @@ export default function ReportsPage() {
                       <span style={{ fontSize: '13px', fontWeight: '600', color: c.textPrimary }}>{formatCurrency(amount)}</span>
                     </div>
                     <div style={{ height: '6px', backgroundColor: c.cardBgHover, borderRadius: '3px', overflow: 'hidden' }}>
-                      <div style={{ height: '100%', width: `${pct}%`, backgroundColor: '#3B82F6', borderRadius: '3px' }} />
+                      <div style={{ height: '100%', width: `${pct}%`, backgroundColor: c.info, borderRadius: '3px' }} />
                     </div>
                   </div>
                 );
@@ -180,7 +180,7 @@ export default function ReportsPage() {
                       <span style={{ fontSize: '13px', fontWeight: '600', color: c.textPrimary }}>{formatCurrency(amount)}</span>
                     </div>
                     <div style={{ height: '6px', backgroundColor: c.cardBgHover, borderRadius: '3px', overflow: 'hidden' }}>
-                      <div style={{ height: '100%', width: `${pct}%`, backgroundColor: '#10B981', borderRadius: '3px' }} />
+                      <div style={{ height: '100%', width: `${pct}%`, backgroundColor: c.success, borderRadius: '3px' }} />
                     </div>
                   </div>
                 );
@@ -208,7 +208,7 @@ export default function ReportsPage() {
                     style={{
                       height: '100%',
                       width: `${(m.amount / maxMonthly) * 100}%`,
-                      background: 'linear-gradient(90deg, #3B82F6, #60A5FA)',
+                      background: `linear-gradient(90deg, ${c.info}, ${c.info}88)`,
                       borderRadius: '6px',
                       minWidth: '2px',
                     }}

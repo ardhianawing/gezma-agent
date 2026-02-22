@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { PageHeader } from '@/components/layout/page-header';
+import { useTheme } from '@/lib/theme';
+import { useResponsive } from '@/lib/hooks/use-responsive';
 import { TripForm } from '@/components/trips/trip-form';
 import type { TripFormData } from '@/lib/validations/trip';
 import type { Trip } from '@/types/trip';
@@ -19,6 +19,8 @@ interface PackageOption {
 export default function EditTripPage() {
   const params = useParams();
   const router = useRouter();
+  const { c } = useTheme();
+  const { isMobile } = useResponsive();
   const id = params.id as string;
 
   const [trip, setTrip] = useState<Trip | null>(null);
@@ -82,19 +84,43 @@ export default function EditTripPage() {
   };
 
   if (loading) {
-    return <div style={{ padding: '40px', textAlign: 'center' }}>Memuat data...</div>;
+    return <div style={{ padding: '40px', textAlign: 'center', color: c.textMuted }}>Memuat data...</div>;
   }
 
   if (!trip) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-center">
-          <p className="text-lg font-semibold text-[var(--charcoal)]">{error || 'Trip tidak ditemukan'}</p>
-          <Link href="/trips">
-            <Button variant="outline" className="mt-4">
-              <ArrowLeft className="h-4 w-4 mr-2" />
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          minHeight: '400px',
+        }}
+      >
+        <div style={{ textAlign: 'center' }}>
+          <p style={{ fontSize: '18px', fontWeight: '600', color: c.textPrimary }}>
+            {error || 'Trip tidak ditemukan'}
+          </p>
+          <Link href="/trips" style={{ textDecoration: 'none' }}>
+            <button
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                marginTop: '16px',
+                padding: '12px 24px',
+                backgroundColor: c.cardBg,
+                color: c.textSecondary,
+                border: `1px solid ${c.border}`,
+                borderRadius: '12px',
+                fontSize: '14px',
+                fontWeight: '600',
+                cursor: 'pointer',
+              }}
+            >
+              <ArrowLeft style={{ width: '16px', height: '16px' }} />
               Kembali ke Daftar
-            </Button>
+            </button>
           </Link>
         </div>
       </div>
@@ -112,18 +138,47 @@ export default function EditTripPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Link href={`/trips/${id}`}>
-          <Button variant="ghost" size="icon">
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+        <Link href={`/trips/${id}`} style={{ textDecoration: 'none' }}>
+          <div
+            style={{
+              width: '40px',
+              height: '40px',
+              borderRadius: '10px',
+              backgroundColor: c.cardBg,
+              border: `1px solid ${c.border}`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+            }}
+          >
+            <ArrowLeft style={{ width: '18px', height: '18px', color: c.textMuted }} />
+          </div>
         </Link>
-        <PageHeader title="Edit Trip" description={trip.name} />
+        <div>
+          <h1 style={{ fontSize: isMobile ? '22px' : '28px', fontWeight: '700', color: c.textPrimary, margin: 0 }}>
+            Edit Trip
+          </h1>
+          <p style={{ fontSize: '14px', color: c.textMuted, margin: '4px 0 0 0' }}>
+            {trip.name}
+          </p>
+        </div>
       </div>
 
       {error && (
-        <div className="rounded-[12px] border border-[var(--error)] bg-[var(--error-light)] p-4 text-sm text-[var(--error)]">
+        <div
+          style={{
+            borderRadius: '12px',
+            border: `1px solid ${c.error}`,
+            backgroundColor: c.errorLight,
+            padding: '16px',
+            fontSize: '14px',
+            color: c.error,
+          }}
+        >
           {error}
         </div>
       )}

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { CheckCircle2, XCircle, Building2, Phone, Mail, MapPin, Calendar, Shield, Loader2 } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
+import { useTheme } from '@/lib/theme';
 
 interface AgencyVerification {
   id: string;
@@ -19,6 +19,7 @@ interface AgencyVerification {
 }
 
 export default function VerifyPage() {
+  const { c } = useTheme();
   const params = useParams<{ code: string }>();
   const [agency, setAgency] = useState<AgencyVerification | null>(null);
   const [loading, setLoading] = useState(true);
@@ -43,107 +44,128 @@ export default function VerifyPage() {
     fetchAgency();
   }, [params.code]);
 
+  const pageStyle: React.CSSProperties = {
+    minHeight: '100vh',
+    backgroundColor: c.pageBg,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '16px',
+  };
+
+  const cardStyle: React.CSSProperties = {
+    backgroundColor: c.cardBg,
+    borderRadius: '16px',
+    border: `1px solid ${c.border}`,
+    padding: '24px',
+  };
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-[var(--gray-100)] flex items-center justify-center p-4">
-        <Loader2 className="h-8 w-8 animate-spin text-[var(--gray-600)]" />
+      <div style={pageStyle}>
+        <Loader2 style={{ width: '32px', height: '32px', color: c.textMuted, animation: 'spin 1s linear infinite' }} />
       </div>
     );
   }
 
   if (notFound || !agency) {
     return (
-      <div className="min-h-screen bg-[var(--gray-100)] flex items-center justify-center p-4">
-        <Card className="w-full max-w-md">
-          <CardContent className="p-8 text-center">
-            <div className="mx-auto w-16 h-16 rounded-full bg-[var(--error-light)] flex items-center justify-center mb-4">
-              <XCircle className="h-8 w-8 text-[var(--error)]" />
-            </div>
-            <h1 className="text-xl font-bold text-[var(--charcoal)] mb-2">Verification Failed</h1>
-            <p className="text-[var(--gray-600)]">
-              This verification code is not valid. Please check the code and try again.
-            </p>
-          </CardContent>
-        </Card>
+      <div style={pageStyle}>
+        <div style={{ ...cardStyle, width: '100%', maxWidth: '448px', textAlign: 'center', padding: '32px' }}>
+          <div style={{
+            width: '64px', height: '64px', borderRadius: '50%',
+            backgroundColor: c.errorLight, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            margin: '0 auto 16px',
+          }}>
+            <XCircle style={{ width: '32px', height: '32px', color: c.error }} />
+          </div>
+          <h1 style={{ fontSize: '20px', fontWeight: '700', color: c.textPrimary, margin: '0 0 8px 0' }}>Verification Failed</h1>
+          <p style={{ color: c.textMuted, margin: 0, fontSize: '14px' }}>
+            This verification code is not valid. Please check the code and try again.
+          </p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[var(--gray-100)] py-8 px-4">
-      <div className="max-w-lg mx-auto space-y-6">
+    <div style={{ minHeight: '100vh', backgroundColor: c.pageBg, padding: '32px 16px' }}>
+      <div style={{ maxWidth: '512px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '24px' }}>
         {/* Header */}
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-[var(--charcoal)]">Agency Verification</h1>
-          <p className="text-[var(--gray-600)] mt-1">GEZMA Verified Travel Agency</p>
+        <div style={{ textAlign: 'center' }}>
+          <h1 style={{ fontSize: '24px', fontWeight: '700', color: c.textPrimary, margin: 0 }}>Agency Verification</h1>
+          <p style={{ color: c.textMuted, marginTop: '4px', fontSize: '14px' }}>GEZMA Verified Travel Agency</p>
         </div>
 
         {/* Verification Status */}
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center gap-4">
-              <div className={`w-16 h-16 rounded-full flex items-center justify-center ${agency.isVerified ? 'bg-[var(--success-light)]' : 'bg-[var(--error-light)]'}`}>
-                {agency.isVerified ? (
-                  <CheckCircle2 className="h-8 w-8 text-[var(--success)]" />
-                ) : (
-                  <XCircle className="h-8 w-8 text-[var(--error)]" />
-                )}
-              </div>
-              <div>
-                <h2 className="text-lg font-bold text-[var(--charcoal)]">
-                  {agency.isVerified ? 'Verified Agency' : 'Not Verified'}
-                </h2>
-                <p className="text-sm text-[var(--gray-600)]">
-                  {agency.isVerified
-                    ? 'This travel agency is officially registered and verified'
-                    : 'This agency could not be verified'
-                  }
-                </p>
-              </div>
+        <div style={cardStyle}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <div style={{
+              width: '64px', height: '64px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              backgroundColor: agency.isVerified ? c.successLight : c.errorLight,
+            }}>
+              {agency.isVerified ? (
+                <CheckCircle2 style={{ width: '32px', height: '32px', color: c.success }} />
+              ) : (
+                <XCircle style={{ width: '32px', height: '32px', color: c.error }} />
+              )}
             </div>
-          </CardContent>
-        </Card>
+            <div>
+              <h2 style={{ fontSize: '18px', fontWeight: '700', color: c.textPrimary, margin: 0 }}>
+                {agency.isVerified ? 'Verified Agency' : 'Not Verified'}
+              </h2>
+              <p style={{ fontSize: '14px', color: c.textMuted, margin: '4px 0 0 0' }}>
+                {agency.isVerified
+                  ? 'This travel agency is officially registered and verified'
+                  : 'This agency could not be verified'}
+              </p>
+            </div>
+          </div>
+        </div>
 
         {/* Agency Info */}
-        <Card>
-          <CardContent className="p-6 space-y-4">
-            <div className="flex items-center gap-3 pb-4 border-b border-[var(--gray-border)]">
-              <div className="w-12 h-12 rounded-[12px] bg-[var(--gezma-red-light)] flex items-center justify-center">
-                <Building2 className="h-6 w-6 text-[var(--gezma-red)]" />
-              </div>
-              <div>
-                <h3 className="font-bold text-[var(--charcoal)]">{agency.name}</h3>
-                <p className="text-sm text-[var(--gray-600)]">{agency.legalName}</p>
-              </div>
+        <div style={{ ...cardStyle, display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', paddingBottom: '16px', borderBottom: `1px solid ${c.border}` }}>
+            <div style={{
+              width: '48px', height: '48px', borderRadius: '12px',
+              backgroundColor: c.primaryLight, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <Building2 style={{ width: '24px', height: '24px', color: c.primary }} />
             </div>
+            <div>
+              <h3 style={{ fontWeight: '700', color: c.textPrimary, margin: 0 }}>{agency.name}</h3>
+              <p style={{ fontSize: '14px', color: c.textMuted, margin: '2px 0 0 0' }}>{agency.legalName}</p>
+            </div>
+          </div>
 
-            <div className="space-y-3">
-              {agency.ppiuNumber && <InfoRow icon={Shield} label="PPIU Number" value={agency.ppiuNumber} />}
-              {agency.ppiuExpiryDate && <InfoRow icon={Calendar} label="Valid Until" value={formatDate(agency.ppiuExpiryDate)} />}
-              {agency.city && agency.province && <InfoRow icon={MapPin} label="Address" value={`${agency.city}, ${agency.province}`} />}
-              <InfoRow icon={Phone} label="Phone" value={agency.phone} />
-              <InfoRow icon={Mail} label="Email" value={agency.email} />
-            </div>
-          </CardContent>
-        </Card>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {agency.ppiuNumber && <InfoRow icon={Shield} label="PPIU Number" value={agency.ppiuNumber} c={c} />}
+            {agency.ppiuExpiryDate && <InfoRow icon={Calendar} label="Valid Until" value={formatDate(agency.ppiuExpiryDate)} c={c} />}
+            {agency.city && agency.province && <InfoRow icon={MapPin} label="Address" value={`${agency.city}, ${agency.province}`} c={c} />}
+            <InfoRow icon={Phone} label="Phone" value={agency.phone} c={c} />
+            <InfoRow icon={Mail} label="Email" value={agency.email} c={c} />
+          </div>
+        </div>
 
         {/* Footer */}
-        <div className="text-center text-sm text-[var(--gray-600)]">
-          <p>Verified by GEZMA</p>
-          <p className="mt-1">Verification Code: <span className="font-mono">{params.code}</span></p>
+        <div style={{ textAlign: 'center', fontSize: '14px', color: c.textMuted }}>
+          <p style={{ margin: 0 }}>Verified by GEZMA</p>
+          <p style={{ marginTop: '4px' }}>Verification Code: <span style={{ fontFamily: 'monospace' }}>{params.code}</span></p>
         </div>
       </div>
     </div>
   );
 }
 
-function InfoRow({ icon: Icon, label, value }: { icon: React.ComponentType<React.SVGProps<SVGSVGElement>>; label: string; value: string }) {
+interface ThemeColors { textMuted: string; textPrimary: string; [key: string]: string }
+
+function InfoRow({ icon: Icon, label, value, c }: { icon: React.ComponentType<React.SVGProps<SVGSVGElement>>; label: string; value: string; c: ThemeColors }) {
   return (
-    <div className="flex items-start gap-3">
-      <Icon className="h-5 w-5 text-[var(--gray-600)] flex-shrink-0 mt-0.5" />
+    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+      <Icon style={{ width: '20px', height: '20px', color: c.textMuted, flexShrink: 0, marginTop: '2px' }} />
       <div>
-        <p className="text-xs text-[var(--gray-600)]">{label}</p>
-        <p className="text-sm text-[var(--charcoal)]">{value}</p>
+        <p style={{ fontSize: '12px', color: c.textMuted, margin: 0 }}>{label}</p>
+        <p style={{ fontSize: '14px', color: c.textPrimary, margin: '2px 0 0 0' }}>{value}</p>
       </div>
     </div>
   );

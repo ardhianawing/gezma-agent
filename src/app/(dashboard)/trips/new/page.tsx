@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { PageHeader } from '@/components/layout/page-header';
+import { useTheme } from '@/lib/theme';
+import { useResponsive } from '@/lib/hooks/use-responsive';
 import { TripForm } from '@/components/trips/trip-form';
 import type { TripFormData } from '@/lib/validations/trip';
 
@@ -17,6 +17,8 @@ interface PackageOption {
 
 export default function NewTripPage() {
   const router = useRouter();
+  const { c } = useTheme();
+  const { isMobile } = useResponsive();
   const [packages, setPackages] = useState<PackageOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -68,22 +70,51 @@ export default function NewTripPage() {
   };
 
   if (loading) {
-    return <div style={{ padding: '40px', textAlign: 'center' }}>Memuat data...</div>;
+    return <div style={{ padding: '40px', textAlign: 'center', color: c.textMuted }}>Memuat data...</div>;
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Link href="/trips">
-          <Button variant="ghost" size="icon">
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+        <Link href="/trips" style={{ textDecoration: 'none' }}>
+          <div
+            style={{
+              width: '40px',
+              height: '40px',
+              borderRadius: '10px',
+              backgroundColor: c.cardBg,
+              border: `1px solid ${c.border}`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+            }}
+          >
+            <ArrowLeft style={{ width: '18px', height: '18px', color: c.textMuted }} />
+          </div>
         </Link>
-        <PageHeader title="Buat Trip Baru" description="Isi informasi trip dan penerbangan" />
+        <div>
+          <h1 style={{ fontSize: isMobile ? '22px' : '28px', fontWeight: '700', color: c.textPrimary, margin: 0 }}>
+            Buat Trip Baru
+          </h1>
+          <p style={{ fontSize: '14px', color: c.textMuted, margin: '4px 0 0 0' }}>
+            Isi informasi trip dan penerbangan
+          </p>
+        </div>
       </div>
 
       {error && (
-        <div className="rounded-[12px] border border-[var(--error)] bg-[var(--error-light)] p-4 text-sm text-[var(--error)]">
+        <div
+          style={{
+            borderRadius: '12px',
+            border: `1px solid ${c.error}`,
+            backgroundColor: c.errorLight,
+            padding: '16px',
+            fontSize: '14px',
+            color: c.error,
+          }}
+        >
           {error}
         </div>
       )}
