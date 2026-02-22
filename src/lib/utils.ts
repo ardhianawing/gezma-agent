@@ -52,3 +52,10 @@ export function slugify(text: string): string {
     .replace(/[\s_-]+/g, '-')
     .replace(/^-+|-+$/g, '')
 }
+
+export function computePricing(hpp: Record<string, number>, margin: number) {
+  const totalHpp = Object.values(hpp).reduce((sum, val) => sum + (val || 0), 0)
+  const marginAmount = Math.round(totalHpp * (margin / 100))
+  const publishedPrice = totalHpp + marginAmount
+  return { totalHpp, marginAmount, publishedPrice }
+}
