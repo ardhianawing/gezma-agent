@@ -2,7 +2,7 @@
 
 import { useState, useEffect, use } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, Printer } from 'lucide-react';
 import { PageHeader } from '@/components/layout/page-header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -68,6 +68,20 @@ export default function TripDetailPage({ params }: { params: Promise<{ id: strin
       .catch(() => setError('Trip tidak ditemukan'))
       .finally(() => setLoading(false));
   }, [id]);
+
+  function handlePrintManifest() {
+    if (!trip) return;
+    const rows = (trip.manifest || [])
+      .map((e, i) => `<tr><td style="padding:8px;border:1px solid #ddd;text-align:center">${i + 1}</td><td style="padding:8px;border:1px solid #ddd">${e.pilgrimName}</td><td style="padding:8px;border:1px solid #ddd;text-align:center">${e.pilgrimStatus}</td><td style="padding:8px;border:1px solid #ddd;text-align:center">${e.documentsComplete}/${e.documentsTotal}</td><td style="padding:8px;border:1px solid #ddd;text-align:center">${e.roomNumber || '-'}</td></tr>`)
+      .join('');
+    const html = `<!DOCTYPE html><html><head><title>Manifest - ${trip.name}</title><style>body{font-family:sans-serif;padding:24px}table{width:100%;border-collapse:collapse}th{background:#f1f5f9;padding:8px;border:1px solid #ddd;text-align:left;font-size:12px;text-transform:uppercase}td{font-size:13px}h1{font-size:20px;margin:0 0 4px 0}p{color:#666;font-size:13px;margin:0 0 16px 0}@media print{body{padding:0}}</style></head><body><h1>${trip.name}</h1><p>Keberangkatan: ${trip.departureDate ? new Date(trip.departureDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '-'} &bull; ${trip.manifest?.length || 0} jemaah</p><table><thead><tr><th style="width:40px">No</th><th>Nama</th><th style="width:100px">Status</th><th style="width:100px">Dokumen</th><th style="width:80px">Kamar</th></tr></thead><tbody>${rows}</tbody></table></body></html>`;
+    const w = window.open('', '_blank');
+    if (w) {
+      w.document.write(html);
+      w.document.close();
+      w.print();
+    }
+  }
 
   if (loading) {
     return <div className="p-6 text-center text-[var(--gray-600)]">Memuat data trip...</div>;
@@ -171,8 +185,14 @@ export default function TripDetailPage({ params }: { params: Promise<{ id: strin
 
         {/* Manifest */}
         <Card className="lg:col-span-3">
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>Trip Manifest ({trip.manifest?.length || 0} pilgrims)</CardTitle>
+            {trip.manifest && trip.manifest.length > 0 && (
+              <Button size="sm" variant="outline" onClick={handlePrintManifest}>
+                <Printer className="h-4 w-4 mr-1" />
+                Print
+              </Button>
+            )}
           </CardHeader>
           <CardContent>
             {(!trip.manifest || trip.manifest.length === 0) ? (

@@ -9,6 +9,7 @@ import {
   Package,
   Plane,
   FileText,
+  BarChart3,
   Building2,
   Settings,
   HelpCircle,
@@ -40,6 +41,7 @@ const menuItems: MenuItem[] = [
   { label: 'Paket', href: '/packages', icon: Package },
   { label: 'Perjalanan', href: '/trips', icon: Plane },
   { label: 'Dokumen', href: '/documents', icon: FileText },
+  { label: 'Laporan', href: '/reports', icon: BarChart3 },
   { label: 'Agensi', href: '/agency', icon: Building2 },
 ];
 

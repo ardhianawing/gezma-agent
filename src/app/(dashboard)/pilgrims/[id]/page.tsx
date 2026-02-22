@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Edit, Plus, Trash2 } from 'lucide-react';
+import { ArrowLeft, Edit, Plus, Trash2, Plane } from 'lucide-react';
 import { PageHeader } from '@/components/layout/page-header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -34,6 +34,42 @@ export default function PilgrimDetailPage() {
     notes: '',
   });
   const [savingPayment, setSavingPayment] = useState(false);
+
+  // Trip assignment
+  const [trips, setTrips] = useState<{ id: string; name: string; status: string; departureDate: string | null }[]>([]);
+  const [savingTrip, setSavingTrip] = useState(false);
+
+  useEffect(() => {
+    fetch('/api/trips')
+      .then((res) => res.json())
+      .then((json) => setTrips(json.data || []))
+      .catch(() => {});
+  }, []);
+
+  async function handleTripChange(tripId: string) {
+    if (!pilgrim) return;
+    const newTripId = tripId || undefined;
+    if (newTripId === pilgrim.tripId) return;
+    setSavingTrip(true);
+    try {
+      const res = await fetch(`/api/pilgrims/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...pilgrim,
+          tripId: newTripId,
+          emergencyContact: pilgrim.emergencyContact,
+        }),
+      });
+      if (res.ok) {
+        setPilgrim((prev) => prev ? { ...prev, tripId: newTripId as string | undefined } : prev);
+      }
+    } catch {
+      // silently fail
+    } finally {
+      setSavingTrip(false);
+    }
+  }
 
   useEffect(() => {
     async function fetchPilgrim() {
@@ -269,6 +305,27 @@ export default function PilgrimDetailPage() {
             <div>
               <p className="text-sm font-medium text-[var(--gray-600)]">Remaining</p>
               <p className="text-lg font-bold text-[var(--error)]">{formatCurrency(pilgrim.remainingBalance)}</p>
+            </div>
+            <div className="pt-4 border-t border-[var(--gray-border)]">
+              <p className="text-sm font-medium text-[var(--gray-600)] mb-2 flex items-center gap-2">
+                <Plane className="h-4 w-4" />
+                Trip Assignment
+              </p>
+              <select
+                value={pilgrim.tripId || ''}
+                onChange={(e) => handleTripChange(e.target.value)}
+                disabled={savingTrip}
+                className="w-full h-10 rounded-xl border border-[var(--gray-200)] bg-white px-3 text-sm text-[var(--charcoal)] cursor-pointer disabled:opacity-50"
+              >
+                <option value="">— Belum ditugaskan —</option>
+                {trips
+                  .filter((t) => t.status !== 'completed' && t.status !== 'cancelled')
+                  .map((t) => (
+                    <option key={t.id} value={t.id}>
+                      {t.name} {t.departureDate ? `(${formatDate(t.departureDate)})` : ''}
+                    </option>
+                  ))}
+              </select>
             </div>
           </CardContent>
         </Card>
