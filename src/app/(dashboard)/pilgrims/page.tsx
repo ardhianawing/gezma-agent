@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Eye, Edit2, Trash2 } from 'lucide-react';
 import { StatusBadge } from '@/components/shared/status-badge';
@@ -27,13 +28,22 @@ interface Pagination {
 }
 
 export default function PilgrimsPage() {
+  return (
+    <Suspense fallback={<div style={{ padding: '40px', textAlign: 'center' }}>Memuat data...</div>}>
+      <PilgrimsPageContent />
+    </Suspense>
+  );
+}
+
+function PilgrimsPageContent() {
   const { t } = useLanguage();
   const { c } = useTheme();
   const { isMobile } = useResponsive();
+  const searchParams = useSearchParams();
 
   const [pilgrims, setPilgrims] = useState<PilgrimRow[]>([]);
   const [pagination, setPagination] = useState<Pagination>({ page: 1, limit: 20, total: 0, totalPages: 0 });
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState(searchParams.get('search') || '');
   const [statusFilter, setStatusFilter] = useState('');
   const [loading, setLoading] = useState(true);
 

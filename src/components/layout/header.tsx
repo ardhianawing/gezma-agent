@@ -1,5 +1,7 @@
 'use client';
 
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Bell, Search, Menu, ChevronDown } from 'lucide-react';
 import { LanguageToggle } from '@/components/shared/language-toggle';
 import { ThemeToggle } from '@/components/shared/theme-toggle';
@@ -18,6 +20,17 @@ export function Header({ onMenuClick, showMenuButton = false }: HeaderProps) {
   const { c } = useTheme();
   const { isMobile } = useResponsive();
   const { user } = useAuth();
+  const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState('');
+
+  function handleSearch(e: React.FormEvent) {
+    e.preventDefault();
+    const q = searchQuery.trim();
+    if (q) {
+      router.push(`/pilgrims?search=${encodeURIComponent(q)}`);
+      setSearchQuery('');
+    }
+  }
 
   return (
     <header
@@ -66,7 +79,7 @@ export function Header({ onMenuClick, showMenuButton = false }: HeaderProps) {
 
           {/* Search - hide on mobile */}
           {!isMobile && (
-            <div style={{ position: 'relative', width: '100%', maxWidth: '400px' }}>
+            <form onSubmit={handleSearch} style={{ position: 'relative', width: '100%', maxWidth: '400px' }}>
               <Search
                 style={{
                   position: 'absolute',
@@ -82,6 +95,8 @@ export function Header({ onMenuClick, showMenuButton = false }: HeaderProps) {
               <input
                 type="search"
                 placeholder={t.header.searchPlaceholder}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 style={{
                   width: '100%',
                   height: '48px',
@@ -96,12 +111,13 @@ export function Header({ onMenuClick, showMenuButton = false }: HeaderProps) {
                   transition: 'all 0.2s ease',
                 }}
               />
-            </div>
+            </form>
           )}
 
           {/* Mobile search icon */}
           {isMobile && (
             <button
+              onClick={() => router.push('/pilgrims')}
               style={{
                 padding: '10px',
                 borderRadius: '12px',

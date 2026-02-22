@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 import { pilgrimStatusSchema } from '@/lib/validations/pilgrim';
+import { logActivity } from '@/lib/activity-logger';
 
 type Context = { params: Promise<{ id: string }> };
 
@@ -33,6 +34,16 @@ export async function PATCH(req: NextRequest, { params }: Context) {
     const pilgrim = await prisma.pilgrim.update({
       where: { id },
       data: { status: parsed.data.status },
+    });
+
+    logActivity({
+      type: 'pilgrim',
+      action: 'updated',
+      title: 'Status jemaah diubah',
+      description: `${existing.name} - Status diubah dari "${existing.status}" ke "${parsed.data.status}"`,
+      userId: auth.userId,
+      agencyId: auth.agencyId,
+      metadata: { entityId: id, oldStatus: existing.status, newStatus: parsed.data.status },
     });
 
     return NextResponse.json(pilgrim);

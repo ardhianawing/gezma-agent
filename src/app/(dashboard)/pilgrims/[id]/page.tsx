@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Edit, Plus } from 'lucide-react';
+import { ArrowLeft, Edit, Plus, Trash2 } from 'lucide-react';
 import { PageHeader } from '@/components/layout/page-header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,6 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Input } from '@/components/ui/input';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import type { Pilgrim } from '@/types/pilgrim';
+import { PILGRIM_STATUS_CONFIG } from '@/types';
 import type { PilgrimStatus, DocumentType } from '@/types';
 
 export default function PilgrimDetailPage() {
@@ -91,6 +92,43 @@ export default function PilgrimDetailPage() {
       // silently fail
     } finally {
       setSavingPayment(false);
+    }
+  }
+
+  async function handleStatusChange(newStatus: string) {
+    if (!pilgrim || newStatus === pilgrim.status) return;
+    try {
+      const res = await fetch(`/api/pilgrims/${id}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      if (!res.ok) return;
+      setPilgrim((prev) => prev ? { ...prev, status: newStatus as PilgrimStatus } : prev);
+    } catch {
+      // silently fail
+    }
+  }
+
+  async function handlePaymentDelete(paymentId: string, amount: number) {
+    if (!confirm('Hapus pembayaran ini?')) return;
+    try {
+      const res = await fetch(`/api/pilgrims/${id}/payments/${paymentId}`, {
+        method: 'DELETE',
+      });
+      if (!res.ok) return;
+      setPilgrim((prev) =>
+        prev
+          ? {
+              ...prev,
+              payments: (prev.payments || []).filter((p) => p.id !== paymentId),
+              totalPaid: prev.totalPaid - amount,
+              remainingBalance: prev.remainingBalance + amount,
+            }
+          : prev
+      );
+    } catch {
+      // silently fail
     }
   }
 
@@ -205,7 +243,15 @@ export default function PilgrimDetailPage() {
           <CardContent className="space-y-4">
             <div>
               <p className="text-sm font-medium text-[var(--gray-600)] mb-2">Current Status</p>
-              <StatusBadge status={pilgrim.status} />
+              <select
+                value={pilgrim.status}
+                onChange={(e) => handleStatusChange(e.target.value)}
+                className="w-full h-10 rounded-xl border border-[var(--gray-200)] bg-white px-3 text-sm text-[var(--charcoal)] cursor-pointer"
+              >
+                {Object.entries(PILGRIM_STATUS_CONFIG).map(([value, cfg]) => (
+                  <option key={value} value={value}>{cfg.label}</option>
+                ))}
+              </select>
             </div>
             <div>
               <p className="text-sm font-medium text-[var(--gray-600)]">Total Paid</p>
@@ -371,9 +417,18 @@ export default function PilgrimDetailPage() {
                       <p className="text-sm font-medium text-[var(--charcoal)] capitalize">{payment.type}</p>
                       <p className="text-xs text-[var(--gray-600)]">{formatDate(payment.date)} &bull; {payment.method}</p>
                     </div>
-                    <p className={`text-sm font-bold ${payment.type === 'refund' ? 'text-[var(--error)]' : 'text-[var(--success)]'}`}>
-                      {payment.type === 'refund' ? '- ' : '+ '}{formatCurrency(payment.amount)}
-                    </p>
+                    <div className="flex items-center gap-3">
+                      <p className={`text-sm font-bold ${payment.type === 'refund' ? 'text-[var(--error)]' : 'text-[var(--success)]'}`}>
+                        {payment.type === 'refund' ? '- ' : '+ '}{formatCurrency(payment.amount)}
+                      </p>
+                      <button
+                        onClick={() => handlePaymentDelete(payment.id, payment.amount)}
+                        className="p-1 rounded-lg text-[var(--gray-600)] hover:text-[var(--error)] hover:bg-[var(--gray-100)] transition-colors"
+                        title="Hapus pembayaran"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
