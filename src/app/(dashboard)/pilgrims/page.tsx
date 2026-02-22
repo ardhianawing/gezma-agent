@@ -262,8 +262,16 @@ function PilgrimsPageContent() {
         }}
       >
         {loading ? (
-          <div style={{ padding: '40px', textAlign: 'center', color: c.textMuted }}>
-            Memuat data...
+          <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '8px' }}>
+                <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: c.cardBgHover, animation: 'pulse 1.5s ease-in-out infinite' }} />
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <div style={{ height: '14px', width: '60%', borderRadius: '6px', backgroundColor: c.cardBgHover, animation: 'pulse 1.5s ease-in-out infinite' }} />
+                  <div style={{ height: '10px', width: '40%', borderRadius: '6px', backgroundColor: c.cardBgHover, animation: 'pulse 1.5s ease-in-out infinite' }} />
+                </div>
+              </div>
+            ))}
           </div>
         ) : pilgrims.length === 0 ? (
           <div style={{ padding: '40px', textAlign: 'center', color: c.textMuted }}>

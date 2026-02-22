@@ -4,6 +4,7 @@ import "./globals.css";
 import { LanguageProvider } from "@/components/providers/language-provider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { AuthProvider } from "@/lib/auth";
+import { ToastProvider } from "@/components/ui/toast";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   variable: "--font-sans",
@@ -54,7 +55,9 @@ export default function RootLayout({
         <ThemeProvider>
           <AuthProvider>
             <LanguageProvider>
-              {children}
+              <ToastProvider>
+                {children}
+              </ToastProvider>
             </LanguageProvider>
           </AuthProvider>
         </ThemeProvider>

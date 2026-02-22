@@ -133,7 +133,16 @@ export default function PilgrimDetailPage() {
   }
 
   if (loading) {
-    return <div style={{ padding: '40px', textAlign: 'center' }}>Memuat data...</div>;
+    return (
+      <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <div style={{ height: '24px', width: '200px', borderRadius: '8px', backgroundColor: '#E2E8F0', animation: 'pulse 1.5s ease-in-out infinite' }} />
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
+          {[1, 2, 3].map((i) => (
+            <div key={i} style={{ height: '180px', borderRadius: '12px', backgroundColor: '#E2E8F0', animation: 'pulse 1.5s ease-in-out infinite' }} />
+          ))}
+        </div>
+      </div>
+    );
   }
 
   if (error || !pilgrim) {
