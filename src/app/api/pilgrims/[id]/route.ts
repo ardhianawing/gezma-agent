@@ -71,27 +71,47 @@ export async function PUT(req: NextRequest, { params }: Context) {
       }
     }
 
-    const pilgrim = await prisma.pilgrim.update({
-      where: { id },
-      data: {
-        nik: data.nik,
-        name: data.name,
-        gender: data.gender,
-        birthPlace: data.birthPlace,
-        birthDate: data.birthDate,
-        address: data.address,
-        city: data.city,
-        province: data.province,
-        postalCode: data.postalCode || null,
-        phone: data.phone,
-        email: data.email,
-        whatsapp: data.whatsapp || null,
-        emergencyContact: data.emergencyContact,
-        notes: data.notes || null,
-        ...(body.roomNumber !== undefined && { roomNumber: body.roomNumber || null }),
-        ...(body.roomType !== undefined && { roomType: body.roomType || null }),
-      },
-      include: { documents: true, payments: true },
+    const newTripId = body.tripId !== undefined ? (body.tripId || null) : existing.tripId;
+    const oldTripId = existing.tripId;
+
+    const pilgrim = await prisma.$transaction(async (tx) => {
+      const updated = await tx.pilgrim.update({
+        where: { id },
+        data: {
+          nik: data.nik,
+          name: data.name,
+          gender: data.gender,
+          birthPlace: data.birthPlace,
+          birthDate: data.birthDate,
+          address: data.address,
+          city: data.city,
+          province: data.province,
+          postalCode: data.postalCode || null,
+          phone: data.phone,
+          email: data.email,
+          whatsapp: data.whatsapp || null,
+          emergencyContact: data.emergencyContact,
+          notes: data.notes || null,
+          ...(body.roomNumber !== undefined && { roomNumber: body.roomNumber || null }),
+          ...(body.roomType !== undefined && { roomType: body.roomType || null }),
+          ...(body.tripId !== undefined && { tripId: newTripId }),
+        },
+        include: { documents: true, payments: true },
+      });
+
+      // Update trip registeredCount when trip assignment changes
+      if (oldTripId !== newTripId) {
+        if (oldTripId) {
+          const oldCount = await tx.pilgrim.count({ where: { tripId: oldTripId } });
+          await tx.trip.update({ where: { id: oldTripId }, data: { registeredCount: oldCount } });
+        }
+        if (newTripId) {
+          const newCount = await tx.pilgrim.count({ where: { tripId: newTripId } });
+          await tx.trip.update({ where: { id: newTripId }, data: { registeredCount: newCount } });
+        }
+      }
+
+      return updated;
     });
 
     logActivity({

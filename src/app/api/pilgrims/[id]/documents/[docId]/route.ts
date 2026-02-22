@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
+import { logActivity } from '@/lib/activity-logger';
 
 type Context = { params: Promise<{ id: string; docId: string }> };
 
@@ -30,6 +31,16 @@ export async function DELETE(req: NextRequest, { params }: Context) {
     }
 
     await prisma.pilgrimDocument.delete({ where: { id: docId } });
+
+    logActivity({
+      type: 'document',
+      action: 'deleted',
+      title: 'Dokumen dihapus',
+      description: `Dokumen ${doc.type} milik ${pilgrim.name} telah dihapus`,
+      userId: auth.userId,
+      agencyId: auth.agencyId,
+      metadata: { entityId: docId, pilgrimId: id, docType: doc.type },
+    });
 
     return NextResponse.json({ message: 'Dokumen berhasil dihapus' });
   } catch (error) {

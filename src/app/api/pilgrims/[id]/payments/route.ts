@@ -97,7 +97,7 @@ export async function POST(req: NextRequest, { params }: Context) {
 
     logActivity({
       type: 'payment',
-      action: 'paid',
+      action: 'created',
       title: 'Pembayaran diterima',
       description: `${pilgrim.name} - ${type} sebesar Rp ${amount.toLocaleString('id-ID')}`,
       userId: auth.userId,
