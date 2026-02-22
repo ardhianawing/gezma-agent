@@ -81,6 +81,8 @@ export async function PUT(req: NextRequest, { params }: Context) {
         registrationCloseDate: data.registrationCloseDate ? new Date(data.registrationCloseDate) : null,
         capacity: data.capacity,
         flightInfo: JSON.parse(JSON.stringify(data.flightInfo)),
+        muthawwifName: data.muthawwifName || null,
+        muthawwifPhone: data.muthawwifPhone || null,
       },
     });
 

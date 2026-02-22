@@ -146,7 +146,15 @@ export async function DELETE(req: NextRequest, { params }: Context) {
       return NextResponse.json({ error: 'Jemaah tidak ditemukan' }, { status: 404 });
     }
 
-    await prisma.pilgrim.delete({ where: { id } });
+    await prisma.$transaction(async (tx) => {
+      await tx.pilgrim.delete({ where: { id } });
+
+      // Decrement trip registeredCount if pilgrim was assigned to a trip
+      if (existing.tripId) {
+        const count = await tx.pilgrim.count({ where: { tripId: existing.tripId } });
+        await tx.trip.update({ where: { id: existing.tripId }, data: { registeredCount: count } });
+      }
+    });
 
     logActivity({
       type: 'pilgrim',

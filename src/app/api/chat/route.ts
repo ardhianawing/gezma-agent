@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
@@ -121,6 +122,9 @@ Jawab dengan sopan: "Mohon maaf, fitur tersebut masih dalam tahap pengembangan (
 Selalu jawab dalam Bahasa Indonesia kecuali user bertanya dalam bahasa lain.`;
 
 export async function POST(request: NextRequest) {
+  const auth = getAuthPayload(request);
+  if (!auth) return unauthorizedResponse();
+
   try {
     const { messages } = await request.json();
 

@@ -1,6 +1,5 @@
 'use client';
 
-import * as React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
@@ -24,8 +23,6 @@ export function TripForm({ initialData, packages, onSubmit, onCancel, isLoading 
   const {
     register,
     handleSubmit,
-    watch,
-    setValue,
     formState: { errors },
   } = useForm<TripFormData>({
     resolver: zodResolver(tripFormSchema),
@@ -36,7 +33,8 @@ export function TripForm({ initialData, packages, onSubmit, onCancel, isLoading 
       returnDate: initialData?.returnDate || '',
       registrationCloseDate: initialData?.registrationCloseDate || '',
       capacity: initialData?.capacity || 45,
-      pricePerPerson: initialData?.pricePerPerson || 0,
+      muthawwifName: initialData?.muthawwifName || '',
+      muthawwifPhone: initialData?.muthawwifPhone || '',
       notes: initialData?.notes || '',
       flightInfo: initialData?.flightInfo || {
         departureAirline: '',
@@ -54,16 +52,6 @@ export function TripForm({ initialData, packages, onSubmit, onCancel, isLoading 
       },
     },
   });
-
-  const selectedPackageId = watch('packageId');
-  const selectedPackage = packages.find((p) => p.id === selectedPackageId);
-
-  // Auto-fill price when package is selected
-  React.useEffect(() => {
-    if (selectedPackage) {
-      setValue('pricePerPerson', selectedPackage.publishedPrice);
-    }
-  }, [selectedPackage, setValue]);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -142,16 +130,21 @@ export function TripForm({ initialData, packages, onSubmit, onCancel, isLoading 
           </div>
 
           <div>
-            <Label htmlFor="pricePerPerson">Price Per Person</Label>
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[var(--gray-600)]">Rp</span>
-              <Input
-                id="pricePerPerson"
-                type="number"
-                {...register('pricePerPerson', { valueAsNumber: true })}
-                className="pl-10"
-              />
-            </div>
+            <Label htmlFor="muthawwifName">Guide/Muthawwif Name (Optional)</Label>
+            <Input
+              id="muthawwifName"
+              placeholder="e.g., Ustadz Ahmad"
+              {...register('muthawwifName')}
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="muthawwifPhone">Guide Phone (Optional)</Label>
+            <Input
+              id="muthawwifPhone"
+              placeholder="e.g., +62 812 3456 7890"
+              {...register('muthawwifPhone')}
+            />
           </div>
         </CardContent>
       </Card>

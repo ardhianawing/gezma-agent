@@ -74,6 +74,8 @@ export async function POST(req: NextRequest) {
         registrationCloseDate: data.registrationCloseDate ? new Date(data.registrationCloseDate) : null,
         capacity: data.capacity,
         flightInfo: JSON.parse(JSON.stringify(data.flightInfo)),
+        muthawwifName: data.muthawwifName || null,
+        muthawwifPhone: data.muthawwifPhone || null,
         checklist: defaultChecklist,
         status: 'open',
         registeredCount: 0,

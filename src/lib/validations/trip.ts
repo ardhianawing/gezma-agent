@@ -31,7 +31,8 @@ export const tripFormSchema = z.object({
 
   flightInfo: flightInfoSchema,
 
-  pricePerPerson: z.number().min(0),
+  muthawwifName: z.string().optional(),
+  muthawwifPhone: z.string().optional(),
 
   notes: z.string().optional(),
 }).refine((data) => {

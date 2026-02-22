@@ -9,15 +9,10 @@ export async function GET(req: NextRequest) {
   const { agencyId } = auth;
 
   try {
-    // Get all pilgrims with payments for this agency
+    // Get all pilgrims with payments
     const pilgrims = await prisma.pilgrim.findMany({
       where: { agencyId },
-      select: {
-        id: true,
-        name: true,
-        totalPaid: true,
-        remainingBalance: true,
-        tripId: true,
+      include: {
         payments: {
           select: {
             amount: true,
@@ -30,17 +25,29 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    // Get trips for grouping
+    // Get trips and packages for outstanding calculation
     const trips = await prisma.trip.findMany({
       where: { agencyId },
-      select: { id: true, name: true, status: true },
     });
 
-    const tripMap = new Map(trips.map((t) => [t.id, t]));
+    const packageIds = [...new Set(trips.map((t) => t.packageId).filter(Boolean))] as string[];
+    const packages = packageIds.length > 0
+      ? await prisma.package.findMany({
+          where: { id: { in: packageIds } },
+          select: { id: true, publishedPrice: true },
+        })
+      : [];
+    const packageMap = new Map(packages.map((p) => [p.id, p.publishedPrice]));
+
+    const tripMap = new Map(trips.map((t) => [
+      t.id,
+      { ...t, packagePrice: t.packageId ? (packageMap.get(t.packageId) || 0) : 0 },
+    ]));
 
     // Aggregate totals
     let totalRevenue = 0;
     let totalOutstanding = 0;
+    let paidPilgrims = 0;
     const methodBreakdown: Record<string, number> = {};
     const typeBreakdown: Record<string, number> = {};
     const tripRevenue: Record<string, { name: string; revenue: number; outstanding: number; pilgrimCount: number }> = {};
@@ -48,12 +55,20 @@ export async function GET(req: NextRequest) {
 
     for (const p of pilgrims) {
       totalRevenue += p.totalPaid;
-      totalOutstanding += p.remainingBalance;
+
+      // Calculate outstanding from package price via trip
+      const trip = p.tripId ? tripMap.get(p.tripId) : null;
+      const packagePrice = trip?.packagePrice || 0;
+      const outstanding = Math.max(0, packagePrice - p.totalPaid);
+      totalOutstanding += outstanding;
+
+      if (outstanding <= 0 && p.totalPaid > 0) {
+        paidPilgrims++;
+      }
 
       // Group by trip
       const tripId = p.tripId || '_unassigned';
       if (!tripRevenue[tripId]) {
-        const trip = p.tripId ? tripMap.get(p.tripId) : null;
         tripRevenue[tripId] = {
           name: trip?.name || 'Belum ditugaskan',
           revenue: 0,
@@ -62,7 +77,7 @@ export async function GET(req: NextRequest) {
         };
       }
       tripRevenue[tripId].revenue += p.totalPaid;
-      tripRevenue[tripId].outstanding += p.remainingBalance;
+      tripRevenue[tripId].outstanding += outstanding;
       tripRevenue[tripId].pilgrimCount += 1;
 
       for (const pay of p.payments) {
@@ -89,7 +104,7 @@ export async function GET(req: NextRequest) {
       totalRevenue,
       totalOutstanding,
       totalPilgrims: pilgrims.length,
-      paidPilgrims: pilgrims.filter((p) => p.remainingBalance <= 0).length,
+      paidPilgrims,
       methodBreakdown,
       typeBreakdown,
       tripRevenue: tripRevenueSorted,

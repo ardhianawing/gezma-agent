@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { Users, Package, Plane, FileText, Calendar, Clock } from 'lucide-react';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
@@ -260,8 +261,8 @@ export default function DashboardPage() {
                   label: trip.status,
                 };
                 return (
+                  <Link key={trip.id} href={`/trips/${trip.id}`} style={{ textDecoration: 'none' }}>
                   <div
-                    key={trip.id}
                     style={{
                       padding: '14px',
                       borderRadius: '8px',
@@ -341,6 +342,7 @@ export default function DashboardPage() {
                       </span>
                     </div>
                   </div>
+                  </Link>
                 );
               })
             )}

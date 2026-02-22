@@ -91,9 +91,6 @@ export interface Trip {
   muthawwifName?: string;
   muthawwifPhone?: string;
 
-  // Pricing (from package, can be overridden)
-  pricePerPerson: number;
-
   // Notes
   notes?: string;
 
