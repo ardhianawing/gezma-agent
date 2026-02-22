@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { Eye, Edit2, Trash2 } from 'lucide-react';
+import { Eye, Edit2, Trash2, Download } from 'lucide-react';
 import { StatusBadge } from '@/components/shared/status-badge';
 import { useLanguage } from '@/lib/i18n';
 import { useTheme } from '@/lib/theme';
@@ -82,6 +82,46 @@ function PilgrimsPageContent() {
     }
   };
 
+  const handleExportCSV = async () => {
+    try {
+      const params = new URLSearchParams({ page: '1', limit: '10000' });
+      if (search) params.set('search', search);
+      if (statusFilter) params.set('status', statusFilter);
+      const res = await fetch(`/api/pilgrims?${params}`);
+      if (!res.ok) return;
+      const json = await res.json();
+      const rows = json.data as PilgrimRow[];
+      if (rows.length === 0) return;
+
+      const header = ['Nama', 'NIK', 'Email', 'Telepon', 'Status', 'Dokumen Lengkap'];
+      const csvRows = [
+        header.join(','),
+        ...rows.map((r) => {
+          const docsComplete = r.documents?.filter((d) => d.status !== 'missing').length || 0;
+          const docsTotal = r.documents?.length || 0;
+          return [
+            `"${r.name}"`,
+            `"${r.nik}"`,
+            `"${r.email}"`,
+            `"${r.phone}"`,
+            r.status,
+            `${docsComplete}/${docsTotal}`,
+          ].join(',');
+        }),
+      ];
+
+      const blob = new Blob([csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `jamaah-${new Date().toISOString().split('T')[0]}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      // silently fail
+    }
+  };
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '16px' : '24px' }}>
 
@@ -96,30 +136,53 @@ function PilgrimsPageContent() {
           </p>
         </div>
 
-        <Link href="/pilgrims/new" style={{ textDecoration: 'none' }}>
+        <div style={{ display: 'flex', gap: '8px', flexDirection: isMobile ? 'column' : 'row', width: isMobile ? '100%' : 'auto' }}>
           <button
+            onClick={handleExportCSV}
             style={{
               display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: '10px',
-              backgroundColor: c.primary,
-              color: 'white',
+              gap: '8px',
+              backgroundColor: c.cardBg,
+              color: c.textSecondary,
               fontSize: '14px',
               fontWeight: '500',
-              padding: '12px 20px',
+              padding: '12px 16px',
               borderRadius: '8px',
-              border: 'none',
+              border: `1px solid ${c.border}`,
               cursor: 'pointer',
               width: isMobile ? '100%' : 'auto',
             }}
           >
-            <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-            </svg>
-            {t.pilgrims.addPilgrim}
+            <Download style={{ width: '16px', height: '16px' }} />
+            Export CSV
           </button>
-        </Link>
+          <Link href="/pilgrims/new" style={{ textDecoration: 'none' }}>
+            <button
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '10px',
+                backgroundColor: c.primary,
+                color: 'white',
+                fontSize: '14px',
+                fontWeight: '500',
+                padding: '12px 20px',
+                borderRadius: '8px',
+                border: 'none',
+                cursor: 'pointer',
+                width: isMobile ? '100%' : 'auto',
+              }}
+            >
+              <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+              </svg>
+              {t.pilgrims.addPilgrim}
+            </button>
+          </Link>
+        </div>
       </div>
 
       {/* ==================== SEARCH & FILTER ==================== */}

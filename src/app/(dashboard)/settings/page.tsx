@@ -19,7 +19,10 @@ import {
   Smartphone,
   Moon,
   Sun,
-  Check
+  Check,
+  Lock,
+  Eye,
+  EyeOff,
 } from 'lucide-react';
 
 interface AgencyInfo {
@@ -33,6 +36,52 @@ export default function SettingsPage() {
   const [emailAlerts, setEmailAlerts] = useState(true);
   const [pushNotifs, setPushNotifs] = useState(false);
   const [agency, setAgency] = useState<AgencyInfo | null>(null);
+
+  // Password change
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showCurrentPw, setShowCurrentPw] = useState(false);
+  const [showNewPw, setShowNewPw] = useState(false);
+  const [pwLoading, setPwLoading] = useState(false);
+  const [pwMessage, setPwMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  const handlePasswordChange = async () => {
+    setPwMessage(null);
+    if (!currentPassword || !newPassword) {
+      setPwMessage({ type: 'error', text: 'Semua field harus diisi' });
+      return;
+    }
+    if (newPassword.length < 6) {
+      setPwMessage({ type: 'error', text: 'Password baru minimal 6 karakter' });
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setPwMessage({ type: 'error', text: 'Konfirmasi password tidak cocok' });
+      return;
+    }
+    setPwLoading(true);
+    try {
+      const res = await fetch('/api/auth/password', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ currentPassword, newPassword }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setPwMessage({ type: 'error', text: data.error || 'Gagal mengubah password' });
+      } else {
+        setPwMessage({ type: 'success', text: 'Password berhasil diubah' });
+        setCurrentPassword('');
+        setNewPassword('');
+        setConfirmPassword('');
+      }
+    } catch {
+      setPwMessage({ type: 'error', text: 'Terjadi kesalahan' });
+    } finally {
+      setPwLoading(false);
+    }
+  };
 
   useEffect(() => {
     fetch('/api/agency')
@@ -64,7 +113,7 @@ export default function SettingsPage() {
       description: t.settings.securityDesc,
       color: c.success,
       bgColor: c.successLight,
-      href: null,
+      href: '#security',
     },
     {
       icon: CreditCard,
@@ -366,6 +415,145 @@ export default function SettingsPage() {
                   />
                 </button>
               </div>
+            </div>
+          </div>
+
+          {/* Security - Password Change */}
+          <div
+            style={{
+              backgroundColor: c.cardBg,
+              borderRadius: '12px',
+              border: `1px solid ${c.border}`,
+              overflow: 'hidden',
+            }}
+          >
+            <div style={{ padding: isMobile ? '16px' : '20px', borderBottom: `1px solid ${c.borderLight}` }}>
+              <h3 style={{ fontSize: '14px', fontWeight: '600', color: c.textPrimary, margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Lock style={{ width: '16px', height: '16px', color: c.textMuted }} />
+                Ubah Password
+              </h3>
+            </div>
+            <div style={{ padding: isMobile ? '16px' : '20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {/* Current Password */}
+              <div>
+                <label style={{ fontSize: '12px', fontWeight: '500', color: c.textSecondary, marginBottom: '4px', display: 'block' }}>
+                  Password Saat Ini
+                </label>
+                <div style={{ position: 'relative' }}>
+                  <input
+                    type={showCurrentPw ? 'text' : 'password'}
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    style={{
+                      width: '100%',
+                      height: '40px',
+                      padding: '0 40px 0 12px',
+                      fontSize: '14px',
+                      border: `1px solid ${c.border}`,
+                      borderRadius: '8px',
+                      backgroundColor: c.inputBg,
+                      color: c.textPrimary,
+                      outline: 'none',
+                      boxSizing: 'border-box',
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowCurrentPw(!showCurrentPw)}
+                    style={{ position: 'absolute', right: '8px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}
+                  >
+                    {showCurrentPw ? <EyeOff style={{ width: '16px', height: '16px', color: c.textMuted }} /> : <Eye style={{ width: '16px', height: '16px', color: c.textMuted }} />}
+                  </button>
+                </div>
+              </div>
+
+              {/* New Password */}
+              <div>
+                <label style={{ fontSize: '12px', fontWeight: '500', color: c.textSecondary, marginBottom: '4px', display: 'block' }}>
+                  Password Baru
+                </label>
+                <div style={{ position: 'relative' }}>
+                  <input
+                    type={showNewPw ? 'text' : 'password'}
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    style={{
+                      width: '100%',
+                      height: '40px',
+                      padding: '0 40px 0 12px',
+                      fontSize: '14px',
+                      border: `1px solid ${c.border}`,
+                      borderRadius: '8px',
+                      backgroundColor: c.inputBg,
+                      color: c.textPrimary,
+                      outline: 'none',
+                      boxSizing: 'border-box',
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowNewPw(!showNewPw)}
+                    style={{ position: 'absolute', right: '8px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}
+                  >
+                    {showNewPw ? <EyeOff style={{ width: '16px', height: '16px', color: c.textMuted }} /> : <Eye style={{ width: '16px', height: '16px', color: c.textMuted }} />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Confirm Password */}
+              <div>
+                <label style={{ fontSize: '12px', fontWeight: '500', color: c.textSecondary, marginBottom: '4px', display: 'block' }}>
+                  Konfirmasi Password Baru
+                </label>
+                <input
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  style={{
+                    width: '100%',
+                    height: '40px',
+                    padding: '0 12px',
+                    fontSize: '14px',
+                    border: `1px solid ${c.border}`,
+                    borderRadius: '8px',
+                    backgroundColor: c.inputBg,
+                    color: c.textPrimary,
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                  }}
+                />
+              </div>
+
+              {/* Message */}
+              {pwMessage && (
+                <p style={{
+                  fontSize: '13px',
+                  color: pwMessage.type === 'success' ? c.success : c.error,
+                  margin: 0,
+                }}>
+                  {pwMessage.text}
+                </p>
+              )}
+
+              {/* Submit */}
+              <button
+                onClick={handlePasswordChange}
+                disabled={pwLoading}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  borderRadius: '8px',
+                  border: 'none',
+                  backgroundColor: c.primary,
+                  color: 'white',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  cursor: pwLoading ? 'not-allowed' : 'pointer',
+                  opacity: pwLoading ? 0.7 : 1,
+                }}
+              >
+                {pwLoading ? 'Menyimpan...' : 'Ubah Password'}
+              </button>
             </div>
           </div>
 
