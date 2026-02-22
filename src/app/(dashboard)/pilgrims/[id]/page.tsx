@@ -327,6 +327,18 @@ export default function PilgrimDetailPage() {
           </CardContent>
         </Card>
 
+        {/* Notes */}
+        {pilgrim.notes && (
+          <Card className="lg:col-span-3">
+            <CardHeader>
+              <CardTitle>Catatan</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-[var(--charcoal)] whitespace-pre-wrap">{pilgrim.notes}</p>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Payment History — always visible */}
         <Card className="lg:col-span-3">
           <CardHeader className="flex flex-row items-center justify-between">

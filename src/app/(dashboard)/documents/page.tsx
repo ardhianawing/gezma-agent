@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { PageHeader } from '@/components/layout/page-header';
-import { FileText, Upload, Download, Eye, Calendar, AlertCircle, CheckCircle2, Clock } from 'lucide-react';
+import Link from 'next/link';
+import { FileText, Calendar, AlertCircle, CheckCircle2, Clock, ExternalLink } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
 import { useTheme } from '@/lib/theme';
 import { useLanguage } from '@/lib/i18n';
@@ -118,7 +119,8 @@ export default function DocumentsPage() {
         title={t.documents.title}
         description={t.documents.description}
         actions={
-          <button
+          <Link
+            href="/agency"
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -128,15 +130,14 @@ export default function DocumentsPage() {
               color: 'white',
               padding: '10px 16px',
               borderRadius: '8px',
-              border: 'none',
               fontWeight: '500',
-              cursor: 'pointer',
+              textDecoration: 'none',
               width: isMobile ? '100%' : 'auto',
             }}
           >
-            <Upload style={{ width: '20px', height: '20px' }} />
-            <span>{t.documents.uploadDocument}</span>
-          </button>
+            <ExternalLink style={{ width: '20px', height: '20px' }} />
+            <span>Kelola di Profil Agensi</span>
+          </Link>
         }
       />
 
@@ -352,39 +353,24 @@ export default function DocumentsPage() {
                     </div>
                   </div>
 
-                  {/* Actions */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', alignSelf: isMobile ? 'flex-end' : 'center' }}>
-                    <button
-                      style={{
-                        width: '36px',
-                        height: '36px',
-                        borderRadius: '8px',
-                        border: 'none',
-                        backgroundColor: 'transparent',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}
-                    >
-                      <Eye style={{ width: '16px', height: '16px', color: c.textMuted }} />
-                    </button>
-                    <button
-                      style={{
-                        width: '36px',
-                        height: '36px',
-                        borderRadius: '8px',
-                        border: 'none',
-                        backgroundColor: 'transparent',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}
-                    >
-                      <Download style={{ width: '16px', height: '16px', color: c.textMuted }} />
-                    </button>
-                  </div>
+                  {/* Link to agency profile */}
+                  <Link
+                    href="/agency"
+                    style={{
+                      alignSelf: isMobile ? 'flex-end' : 'center',
+                      fontSize: '13px',
+                      color: c.primary,
+                      textDecoration: 'none',
+                      fontWeight: '500',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      flexShrink: 0,
+                    }}
+                  >
+                    Lihat
+                    <ExternalLink style={{ width: '14px', height: '14px' }} />
+                  </Link>
                 </div>
               );
             })
