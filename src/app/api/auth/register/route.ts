@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { sendVerificationEmail } from '@/lib/mailer';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-change-me';
+import crypto from 'crypto';
 
 export async function POST(req: NextRequest) {
   try {
@@ -76,7 +75,11 @@ export async function POST(req: NextRequest) {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 12);
 
-    // Create agency + user in transaction (auto-verified, no email verification needed)
+    // Generate verification code (24 hour expiry)
+    const verificationCode = crypto.randomBytes(32).toString('hex');
+    const verificationExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+    // Create agency + user in transaction (unverified, requires email verification)
     const result = await prisma.$transaction(async (tx) => {
       const agency = await tx.agency.create({
         data: {
@@ -85,7 +88,7 @@ export async function POST(req: NextRequest) {
           ppiuNumber: ppiuNumber || null,
           email: picEmail,
           phone: agencyPhone,
-          isVerified: true,
+          isVerified: false,
         },
       });
 
@@ -98,58 +101,29 @@ export async function POST(req: NextRequest) {
           position: picPosition || 'Direktur',
           role: 'owner',
           agencyId: agency.id,
-          isVerified: true,
+          isVerified: false,
+          verificationCode,
+          verificationExpiry,
         },
       });
 
       return { agency, user };
     });
 
-    // Update last login
-    await prisma.user.update({
-      where: { id: result.user.id },
-      data: { lastLoginAt: new Date() },
-    });
+    // Send verification email
+    try {
+      await sendVerificationEmail(picEmail, verificationCode);
+    } catch (emailError) {
+      console.error('Failed to send verification email:', emailError);
+    }
 
-    // Generate JWT token (auto-login after register)
-    const token = jwt.sign(
+    return NextResponse.json(
       {
-        userId: result.user.id,
-        email: result.user.email,
-        role: result.user.role,
-        agencyId: result.user.agencyId,
-      },
-      JWT_SECRET,
-      { expiresIn: 60 * 60 * 24 * 7 } // 7 days
-    );
-
-    const response = NextResponse.json(
-      {
-        message: 'Registrasi berhasil!',
-        user: {
-          id: result.user.id,
-          name: result.user.name,
-          email: result.user.email,
-          role: result.user.role,
-          position: result.user.position,
-          agency: {
-            id: result.agency.id,
-            name: result.agency.name,
-          },
-        },
+        message: 'Registrasi berhasil! Silakan cek email untuk verifikasi akun.',
+        requireVerification: true,
       },
       { status: 201 }
     );
-
-    response.cookies.set('token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60, // 7 days
-      path: '/',
-    });
-
-    return response;
   } catch (error) {
     console.error('Register error:', error);
     return NextResponse.json(

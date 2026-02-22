@@ -100,8 +100,8 @@ export default function RegisterPage() {
         return;
       }
 
-      // Auto-login: redirect to dashboard
-      router.push('/dashboard');
+      // Redirect to verify email page
+      router.push('/register/verify');
     } catch {
       setError('Terjadi kesalahan. Silakan coba lagi.');
       setIsLoading(false);

@@ -47,16 +47,22 @@ export async function GET(
       );
     }
 
-    // Verify user
-    await prisma.user.update({
-      where: { id: user.id },
-      data: {
-        isVerified: true,
-        verificationCode: null,
-        verificationExpiry: null,
-        lastLoginAt: new Date(),
-      },
-    });
+    // Verify user and agency
+    await prisma.$transaction([
+      prisma.user.update({
+        where: { id: user.id },
+        data: {
+          isVerified: true,
+          verificationCode: null,
+          verificationExpiry: null,
+          lastLoginAt: new Date(),
+        },
+      }),
+      prisma.agency.update({
+        where: { id: user.agencyId },
+        data: { isVerified: true },
+      }),
+    ]);
 
     // Auto-login: generate JWT token
     const token = jwt.sign(
