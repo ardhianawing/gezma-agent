@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { sendResetPasswordEmail } from '@/lib/mailer';
 import crypto from 'crypto';
 
 export async function POST(req: NextRequest) {
@@ -29,8 +30,12 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // In production, send email here. For now, log the code.
-    console.log(`[RESET PASSWORD] User: ${email}, Code: ${code}`);
+    // Send reset password email
+    try {
+      await sendResetPasswordEmail(email, code);
+    } catch (emailError) {
+      console.error('Failed to send reset email:', emailError);
+    }
 
     return NextResponse.json({ message: 'Jika email terdaftar, kode reset telah dikirim.' });
   } catch (error) {
