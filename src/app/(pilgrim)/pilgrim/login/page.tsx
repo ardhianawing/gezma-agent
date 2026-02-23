@@ -20,7 +20,7 @@ export default function PilgrimLoginPage() {
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
@@ -31,16 +31,13 @@ export default function PilgrimLoginPage() {
 
     setIsSubmitting(true);
 
-    // Simulate a brief loading delay
-    setTimeout(() => {
-      const success = login(bookingCode);
-      if (success) {
-        router.replace('/pilgrim');
-      } else {
-        setError('Kode booking tidak ditemukan. Periksa kembali kode Anda.');
-        setIsSubmitting(false);
-      }
-    }, 500);
+    const result = await login(bookingCode);
+    if (result.success) {
+      router.replace('/pilgrim');
+    } else {
+      setError(result.error || 'Kode booking tidak ditemukan. Periksa kembali kode Anda.');
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -203,25 +200,6 @@ export default function PilgrimLoginPage() {
               {isSubmitting ? 'Memverifikasi...' : 'Masuk'}
             </button>
           </form>
-        </div>
-
-        {/* Demo hint */}
-        <div style={{
-          marginTop: '16px',
-          padding: '12px 16px',
-          backgroundColor: PILGRIM_GREEN_LIGHT,
-          borderRadius: '10px',
-          width: '100%',
-          textAlign: 'center',
-        }}>
-          <p style={{
-            fontSize: '12px',
-            color: PILGRIM_GREEN_HOVER,
-            margin: 0,
-            fontWeight: 500,
-          }}>
-            Demo: gunakan kode <strong>UMR-2026-0001</strong>
-          </p>
         </div>
 
         {/* Footer */}

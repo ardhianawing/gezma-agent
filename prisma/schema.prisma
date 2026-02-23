@@ -118,6 +118,9 @@ model Pilgrim {
   // Checklist (JSON)
   checklist         Json     @default("{}")
 
+  // Booking
+  bookingCode       String?
+
   // Status & Assignment
   status            String   @default("lead") // lead, dp, lunas, dokumen, visa, ready, departed, completed
   tripId            String?
@@ -146,6 +149,7 @@ model Pilgrim {
   updatedAt         DateTime @updatedAt
 
   @@unique([nik, agencyId])
+  @@unique([agencyId, bookingCode])
   @@map("pilgrims")
 }
 
