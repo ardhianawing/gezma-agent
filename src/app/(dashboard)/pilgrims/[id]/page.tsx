@@ -3,11 +3,11 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Edit, Plus, Trash2, Plane, User, CreditCard, ClipboardCheck, FileText, DollarSign, StickyNote } from 'lucide-react';
-import { StatusBadge } from '@/components/shared/status-badge';
+import { Edit, Plus, Trash2, Plane, User, CreditCard, ClipboardCheck, FileText, DollarSign, StickyNote } from 'lucide-react';
+import { StatusBadge, SectionCard, BackButton, DetailSkeleton, EmptyState, ConfirmDialog } from '@/components/shared';
 import { DocumentUpload } from '@/components/pilgrims/document-upload';
+import { useFormStyles } from '@/lib/hooks/use-form-styles';
 import { formatCurrency, formatDate } from '@/lib/utils';
-import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
 import type { Pilgrim } from '@/types/pilgrim';
 import { PILGRIM_STATUS_CONFIG } from '@/types';
@@ -16,7 +16,7 @@ import type { PilgrimStatus, DocumentType } from '@/types';
 export default function PilgrimDetailPage() {
   const params = useParams();
   const id = params.id as string;
-  const { c } = useTheme();
+  const { inputStyle, selectStyle, labelStyle, c } = useFormStyles();
   const { isMobile } = useResponsive();
 
   const [pilgrim, setPilgrim] = useState<Pilgrim | null>(null);
@@ -33,6 +33,9 @@ export default function PilgrimDetailPage() {
     notes: '',
   });
   const [savingPayment, setSavingPayment] = useState(false);
+
+  // Delete payment confirm
+  const [deletePayment, setDeletePayment] = useState<{ id: string; amount: number } | null>(null);
 
   // Trip assignment
   const [trips, setTrips] = useState<{ id: string; name: string; status: string; departureDate: string | null }[]>([]);
@@ -116,13 +119,7 @@ export default function PilgrimDetailPage() {
           : prev
       );
       setShowPayment(false);
-      setPaymentForm({
-        amount: '',
-        type: 'dp',
-        method: 'transfer',
-        date: new Date().toISOString().split('T')[0],
-        notes: '',
-      });
+      setPaymentForm({ amount: '', type: 'dp', method: 'transfer', date: new Date().toISOString().split('T')[0], notes: '' });
     } catch {
       // silently fail
     } finally {
@@ -145,132 +142,37 @@ export default function PilgrimDetailPage() {
     }
   }
 
-  async function handlePaymentDelete(paymentId: string, amount: number) {
-    if (!confirm('Hapus pembayaran ini?')) return;
+  async function handlePaymentDelete() {
+    if (!deletePayment) return;
     try {
-      const res = await fetch(`/api/pilgrims/${id}/payments/${paymentId}`, {
-        method: 'DELETE',
-      });
+      const res = await fetch(`/api/pilgrims/${id}/payments/${deletePayment.id}`, { method: 'DELETE' });
       if (!res.ok) return;
       setPilgrim((prev) =>
         prev
           ? {
               ...prev,
-              payments: (prev.payments || []).filter((p) => p.id !== paymentId),
-              totalPaid: prev.totalPaid - amount,
-              remainingBalance: prev.remainingBalance + amount,
+              payments: (prev.payments || []).filter((p) => p.id !== deletePayment.id),
+              totalPaid: prev.totalPaid - deletePayment.amount,
+              remainingBalance: prev.remainingBalance + deletePayment.amount,
             }
           : prev
       );
     } catch {
       // silently fail
+    } finally {
+      setDeletePayment(null);
     }
   }
 
-  // Shared styles
-  const inputStyle: React.CSSProperties = {
-    width: '100%',
-    padding: '12px 16px',
-    fontSize: '14px',
-    color: c.textPrimary,
-    backgroundColor: c.cardBgHover,
-    border: `1px solid ${c.border}`,
-    borderRadius: '12px',
-    outline: 'none',
-    transition: 'border-color 0.2s ease',
-  };
-
-  const selectStyle: React.CSSProperties = {
-    ...inputStyle,
-    appearance: 'none' as const,
-    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`,
-    backgroundRepeat: 'no-repeat',
-    backgroundPosition: 'right 16px center',
-    paddingRight: '40px',
-    cursor: 'pointer',
-  };
-
-  const labelStyle: React.CSSProperties = {
-    display: 'block',
-    fontSize: '13px',
-    fontWeight: '500',
-    color: c.textMuted,
-    marginBottom: '8px',
-  };
-
-  const sectionCard = (title: string, icon: React.ReactNode, children: React.ReactNode, headerRight?: React.ReactNode) => (
-    <div
-      style={{
-        backgroundColor: c.cardBg,
-        borderRadius: '16px',
-        border: `1px solid ${c.border}`,
-        overflow: 'hidden',
-      }}
-    >
-      <div
-        style={{
-          padding: isMobile ? '16px 20px' : '20px 28px',
-          borderBottom: `1px solid ${c.border}`,
-          display: 'flex',
-          alignItems: 'center',
-          gap: '10px',
-        }}
-      >
-        {icon}
-        <h3 style={{ fontSize: '16px', fontWeight: '600', color: c.textPrimary, margin: 0, flex: 1 }}>
-          {title}
-        </h3>
-        {headerRight}
-      </div>
-      <div style={{ padding: isMobile ? '20px' : '28px' }}>
-        {children}
-      </div>
-    </div>
-  );
-
-  if (loading) {
-    return (
-      <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-        <div style={{ height: '24px', width: '200px', borderRadius: '8px', backgroundColor: c.border, animation: 'pulse 1.5s ease-in-out infinite' }} />
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
-          {[1, 2, 3].map((i) => (
-            <div key={i} style={{ height: '180px', borderRadius: '12px', backgroundColor: c.border, animation: 'pulse 1.5s ease-in-out infinite' }} />
-          ))}
-        </div>
-      </div>
-    );
-  }
+  if (loading) return <DetailSkeleton />;
 
   if (error || !pilgrim) {
     return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '400px' }}>
-        <div style={{ textAlign: 'center' }}>
-          <p style={{ fontSize: '18px', fontWeight: '600', color: c.textPrimary }}>{error || 'Jemaah tidak ditemukan'}</p>
-          <Link href="/pilgrims" style={{ textDecoration: 'none' }}>
-            <button
-              type="button"
-              style={{
-                marginTop: '16px',
-                padding: '12px 24px',
-                fontSize: '14px',
-                fontWeight: '500',
-                color: c.textSecondary,
-                backgroundColor: c.cardBg,
-                border: `1px solid ${c.border}`,
-                borderRadius: '12px',
-                cursor: 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '8px',
-                transition: 'all 0.15s',
-              }}
-            >
-              <ArrowLeft style={{ width: '16px', height: '16px' }} />
-              Kembali ke Daftar
-            </button>
-          </Link>
-        </div>
-      </div>
+      <EmptyState
+        title={error || 'Jemaah tidak ditemukan'}
+        description="Data tidak dapat ditemukan. Kembali ke daftar jemaah."
+        action={{ label: 'Kembali ke Daftar', href: '/pilgrims' }}
+      />
     );
   }
 
@@ -281,31 +183,12 @@ export default function PilgrimDetailPage() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-        <Link href="/pilgrims" style={{ textDecoration: 'none' }}>
-          <div
-            style={{
-              width: '40px',
-              height: '40px',
-              borderRadius: '10px',
-              backgroundColor: c.cardBg,
-              border: `1px solid ${c.border}`,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              transition: 'background-color 0.15s',
-            }}
-          >
-            <ArrowLeft style={{ width: '18px', height: '18px', color: c.textMuted }} />
-          </div>
-        </Link>
+        <BackButton href="/pilgrims" />
         <div style={{ flex: 1 }}>
           <h1 style={{ fontSize: isMobile ? '22px' : '28px', fontWeight: '700', color: c.textPrimary, margin: 0 }}>
             {pilgrim.name}
           </h1>
-          <p style={{ fontSize: '14px', color: c.textMuted, marginTop: '4px' }}>
-            {pilgrim.email}
-          </p>
+          <p style={{ fontSize: '14px', color: c.textMuted, marginTop: '4px' }}>{pilgrim.email}</p>
         </div>
         <Link href={`/pilgrims/${pilgrim.id}/edit`} style={{ textDecoration: 'none' }}>
           <button
@@ -322,7 +205,6 @@ export default function PilgrimDetailPage() {
               display: 'inline-flex',
               alignItems: 'center',
               gap: '8px',
-              transition: 'all 0.15s',
             }}
           >
             <Edit style={{ width: '16px', height: '16px' }} />
@@ -334,70 +216,38 @@ export default function PilgrimDetailPage() {
       <div style={{ display: 'grid', gap: '24px', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr 1fr' }}>
         {/* Personal Info */}
         <div style={{ gridColumn: isMobile ? undefined : 'span 2' }}>
-          {sectionCard('Personal Information', <User style={{ width: '18px', height: '18px', color: c.textMuted }} />, (
+          <SectionCard title="Personal Information" icon={<User style={{ width: '18px', height: '18px', color: c.textMuted }} />}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div style={{ display: 'grid', gap: '16px', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr' }}>
-                <div>
-                  <p style={{ fontSize: '13px', fontWeight: '500', color: c.textMuted, margin: 0 }}>Full Name</p>
-                  <p style={{ fontSize: '14px', color: c.textPrimary, margin: '4px 0 0' }}>{pilgrim.name}</p>
-                </div>
-                <div>
-                  <p style={{ fontSize: '13px', fontWeight: '500', color: c.textMuted, margin: 0 }}>NIK</p>
-                  <p style={{ fontSize: '14px', color: c.textPrimary, margin: '4px 0 0', fontFamily: 'monospace' }}>{pilgrim.nik}</p>
-                </div>
-                <div>
-                  <p style={{ fontSize: '13px', fontWeight: '500', color: c.textMuted, margin: 0 }}>Gender</p>
-                  <p style={{ fontSize: '14px', color: c.textPrimary, margin: '4px 0 0' }}>{pilgrim.gender === 'male' ? 'Male' : 'Female'}</p>
-                </div>
-                <div>
-                  <p style={{ fontSize: '13px', fontWeight: '500', color: c.textMuted, margin: 0 }}>Birth</p>
-                  <p style={{ fontSize: '14px', color: c.textPrimary, margin: '4px 0 0' }}>{pilgrim.birthPlace}, {formatDate(pilgrim.birthDate)}</p>
-                </div>
+                <InfoField label="Full Name" value={pilgrim.name} c={c} />
+                <InfoField label="NIK" value={pilgrim.nik} c={c} mono />
+                <InfoField label="Gender" value={pilgrim.gender === 'male' ? 'Male' : 'Female'} c={c} />
+                <InfoField label="Birth" value={`${pilgrim.birthPlace}, ${formatDate(pilgrim.birthDate)}`} c={c} />
                 <div style={{ gridColumn: isMobile ? undefined : '1 / -1' }}>
-                  <p style={{ fontSize: '13px', fontWeight: '500', color: c.textMuted, margin: 0 }}>Address</p>
-                  <p style={{ fontSize: '14px', color: c.textPrimary, margin: '4px 0 0' }}>{pilgrim.address}, {pilgrim.city}, {pilgrim.province}</p>
+                  <InfoField label="Address" value={`${pilgrim.address}, ${pilgrim.city}, ${pilgrim.province}`} c={c} />
                 </div>
-                <div>
-                  <p style={{ fontSize: '13px', fontWeight: '500', color: c.textMuted, margin: 0 }}>Phone</p>
-                  <p style={{ fontSize: '14px', color: c.textPrimary, margin: '4px 0 0' }}>{pilgrim.phone}</p>
-                </div>
-                <div>
-                  <p style={{ fontSize: '13px', fontWeight: '500', color: c.textMuted, margin: 0 }}>Email</p>
-                  <p style={{ fontSize: '14px', color: c.textPrimary, margin: '4px 0 0' }}>{pilgrim.email}</p>
-                </div>
+                <InfoField label="Phone" value={pilgrim.phone} c={c} />
+                <InfoField label="Email" value={pilgrim.email} c={c} />
               </div>
 
               <div style={{ borderTop: `1px solid ${c.border}`, paddingTop: '16px' }}>
                 <p style={{ fontSize: '13px', fontWeight: '500', color: c.textMuted, margin: '0 0 12px' }}>Emergency Contact</p>
-                <div style={{ display: 'grid', gap: '16px', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr' }}>
-                  <div>
-                    <p style={{ fontSize: '12px', color: c.textMuted, margin: 0 }}>Name</p>
-                    <p style={{ fontSize: '14px', color: c.textPrimary, margin: '4px 0 0' }}>{emergencyContact.name}</p>
-                  </div>
-                  <div>
-                    <p style={{ fontSize: '12px', color: c.textMuted, margin: 0 }}>Relation</p>
-                    <p style={{ fontSize: '14px', color: c.textPrimary, margin: '4px 0 0' }}>{emergencyContact.relation}</p>
-                  </div>
-                  <div>
-                    <p style={{ fontSize: '12px', color: c.textMuted, margin: 0 }}>Phone</p>
-                    <p style={{ fontSize: '14px', color: c.textPrimary, margin: '4px 0 0' }}>{emergencyContact.phone}</p>
-                  </div>
+                <div style={{ display: 'grid', gap: '16px', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr 1fr' }}>
+                  <InfoField label="Name" value={emergencyContact.name} c={c} small />
+                  <InfoField label="Relation" value={emergencyContact.relation} c={c} small />
+                  <InfoField label="Phone" value={emergencyContact.phone} c={c} small />
                 </div>
               </div>
             </div>
-          ))}
+          </SectionCard>
         </div>
 
         {/* Status & Payment */}
-        {sectionCard('Status & Payment', <CreditCard style={{ width: '18px', height: '18px', color: c.textMuted }} />, (
+        <SectionCard title="Status & Payment" icon={<CreditCard style={{ width: '18px', height: '18px', color: c.textMuted }} />}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <div>
               <p style={{ fontSize: '13px', fontWeight: '500', color: c.textMuted, margin: '0 0 8px' }}>Current Status</p>
-              <select
-                value={pilgrim.status}
-                onChange={(e) => handleStatusChange(e.target.value)}
-                style={selectStyle}
-              >
+              <select value={pilgrim.status} onChange={(e) => handleStatusChange(e.target.value)} style={selectStyle}>
                 {Object.entries(PILGRIM_STATUS_CONFIG).map(([value, cfg]) => (
                   <option key={value} value={value}>{cfg.label}</option>
                 ))}
@@ -420,11 +270,7 @@ export default function PilgrimDetailPage() {
                 value={pilgrim.tripId || ''}
                 onChange={(e) => handleTripChange(e.target.value)}
                 disabled={savingTrip}
-                style={{
-                  ...selectStyle,
-                  opacity: savingTrip ? 0.5 : 1,
-                  cursor: savingTrip ? 'not-allowed' : 'pointer',
-                }}
+                style={{ ...selectStyle, opacity: savingTrip ? 0.5 : 1, cursor: savingTrip ? 'not-allowed' : 'pointer' }}
               >
                 <option value="">— Belum ditugaskan —</option>
                 {trips
@@ -437,7 +283,7 @@ export default function PilgrimDetailPage() {
               </select>
             </div>
           </div>
-        ))}
+        </SectionCard>
 
         {/* Documents */}
         <div style={{ gridColumn: isMobile ? undefined : 'span 2' }}>
@@ -448,42 +294,25 @@ export default function PilgrimDetailPage() {
                 const res = await fetch(`/api/pilgrims/${id}/documents`, {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({
-                    type,
-                    status: 'uploaded',
-                    fileName: file.name,
-                    fileSize: file.size,
-                  }),
+                  body: JSON.stringify({ type, status: 'uploaded', fileName: file.name, fileSize: file.size }),
                 });
                 if (!res.ok) return;
                 const newDoc = await res.json();
-                setPilgrim((prev) => prev ? {
-                  ...prev,
-                  documents: [newDoc, ...(prev.documents || [])],
-                } : prev);
-              } catch {
-                // silently fail
-              }
+                setPilgrim((prev) => prev ? { ...prev, documents: [newDoc, ...(prev.documents || [])] } : prev);
+              } catch { /* silently fail */ }
             }}
             onRemove={async (documentId: string) => {
               try {
-                const res = await fetch(`/api/pilgrims/${id}/documents/${documentId}`, {
-                  method: 'DELETE',
-                });
+                const res = await fetch(`/api/pilgrims/${id}/documents/${documentId}`, { method: 'DELETE' });
                 if (!res.ok) return;
-                setPilgrim((prev) => prev ? {
-                  ...prev,
-                  documents: (prev.documents || []).filter((d) => d.id !== documentId),
-                } : prev);
-              } catch {
-                // silently fail
-              }
+                setPilgrim((prev) => prev ? { ...prev, documents: (prev.documents || []).filter((d) => d.id !== documentId) } : prev);
+              } catch { /* silently fail */ }
             }}
           />
         </div>
 
         {/* Checklist */}
-        {sectionCard('Checklist', <ClipboardCheck style={{ width: '18px', height: '18px', color: c.textMuted }} />, (
+        <SectionCard title="Checklist" icon={<ClipboardCheck style={{ width: '18px', height: '18px', color: c.textMuted }} />}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             <ChecklistItem label="KTP Uploaded" checked={!!checklist.ktpUploaded} c={c} />
             <ChecklistItem label="Passport Uploaded" checked={!!checklist.passportUploaded} c={c} />
@@ -495,23 +324,46 @@ export default function PilgrimDetailPage() {
             <ChecklistItem label="Visa Received" checked={!!checklist.visaReceived} c={c} />
             <ChecklistItem label="Health Certificate" checked={!!checklist.healthCertificate} c={c} />
           </div>
-        ))}
+        </SectionCard>
 
         {/* Notes */}
         {pilgrim.notes && (
           <div style={{ gridColumn: isMobile ? undefined : '1 / -1' }}>
-            {sectionCard('Catatan', <StickyNote style={{ width: '18px', height: '18px', color: c.textMuted }} />, (
+            <SectionCard title="Catatan" icon={<StickyNote style={{ width: '18px', height: '18px', color: c.textMuted }} />}>
               <p style={{ fontSize: '14px', color: c.textPrimary, margin: 0, whiteSpace: 'pre-wrap' }}>{pilgrim.notes}</p>
-            ))}
+            </SectionCard>
           </div>
         )}
 
         {/* Payment History */}
         <div style={{ gridColumn: isMobile ? undefined : '1 / -1' }}>
-          {sectionCard(
-            'Payment History',
-            <DollarSign style={{ width: '18px', height: '18px', color: c.textMuted }} />,
-            pilgrim.payments && pilgrim.payments.length > 0 ? (
+          <SectionCard
+            title="Payment History"
+            icon={<DollarSign style={{ width: '18px', height: '18px', color: c.textMuted }} />}
+            headerRight={
+              <button
+                type="button"
+                onClick={() => setShowPayment(true)}
+                style={{
+                  padding: '8px 16px',
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  color: 'white',
+                  backgroundColor: c.primary,
+                  border: 'none',
+                  borderRadius: '10px',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                }}
+              >
+                <Plus style={{ width: '14px', height: '14px' }} />
+                Tambah Pembayaran
+              </button>
+            }
+          >
+            {pilgrim.payments && pilgrim.payments.length > 0 ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {pilgrim.payments.map((payment) => (
                   <div
@@ -534,20 +386,9 @@ export default function PilgrimDetailPage() {
                         {payment.type === 'refund' ? '- ' : '+ '}{formatCurrency(payment.amount)}
                       </p>
                       <button
-                        onClick={() => handlePaymentDelete(payment.id, payment.amount)}
+                        onClick={() => setDeletePayment({ id: payment.id, amount: payment.amount })}
                         title="Hapus pembayaran"
-                        style={{
-                          padding: '4px',
-                          borderRadius: '8px',
-                          color: c.textMuted,
-                          backgroundColor: 'transparent',
-                          border: 'none',
-                          cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          transition: 'color 0.15s',
-                        }}
+                        style={{ padding: '4px', borderRadius: '8px', color: c.textMuted, backgroundColor: 'transparent', border: 'none', cursor: 'pointer', display: 'flex' }}
                       >
                         <Trash2 style={{ width: '16px', height: '16px' }} />
                       </button>
@@ -557,31 +398,8 @@ export default function PilgrimDetailPage() {
               </div>
             ) : (
               <p style={{ fontSize: '14px', color: c.textMuted, textAlign: 'center', padding: '32px 0', margin: 0 }}>Belum ada pembayaran</p>
-            ),
-            (
-              <button
-                type="button"
-                onClick={() => setShowPayment(true)}
-                style={{
-                  padding: '8px 16px',
-                  fontSize: '13px',
-                  fontWeight: '600',
-                  color: 'white',
-                  backgroundColor: c.primary,
-                  border: 'none',
-                  borderRadius: '10px',
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  transition: 'all 0.15s',
-                }}
-              >
-                <Plus style={{ width: '14px', height: '14px' }} />
-                Tambah Pembayaran
-              </button>
-            )
-          )}
+            )}
+          </SectionCard>
         </div>
       </div>
 
@@ -594,24 +412,12 @@ export default function PilgrimDetailPage() {
             <form onSubmit={handlePaymentSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div>
                 <label style={labelStyle}>Jumlah (Rp)</label>
-                <input
-                  type="number"
-                  min="1"
-                  required
-                  value={paymentForm.amount}
-                  onChange={(e) => setPaymentForm((f) => ({ ...f, amount: e.target.value }))}
-                  placeholder="5000000"
-                  style={inputStyle}
-                />
+                <input type="number" min="1" required value={paymentForm.amount} onChange={(e) => setPaymentForm((f) => ({ ...f, amount: e.target.value }))} placeholder="5000000" style={inputStyle} />
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                 <div>
                   <label style={labelStyle}>Tipe</label>
-                  <select
-                    value={paymentForm.type}
-                    onChange={(e) => setPaymentForm((f) => ({ ...f, type: e.target.value as typeof f.type }))}
-                    style={selectStyle}
-                  >
+                  <select value={paymentForm.type} onChange={(e) => setPaymentForm((f) => ({ ...f, type: e.target.value as typeof f.type }))} style={selectStyle}>
                     <option value="dp">DP</option>
                     <option value="installment">Cicilan</option>
                     <option value="full">Lunas</option>
@@ -620,11 +426,7 @@ export default function PilgrimDetailPage() {
                 </div>
                 <div>
                   <label style={labelStyle}>Metode</label>
-                  <select
-                    value={paymentForm.method}
-                    onChange={(e) => setPaymentForm((f) => ({ ...f, method: e.target.value as typeof f.method }))}
-                    style={selectStyle}
-                  >
+                  <select value={paymentForm.method} onChange={(e) => setPaymentForm((f) => ({ ...f, method: e.target.value as typeof f.method }))} style={selectStyle}>
                     <option value="transfer">Transfer</option>
                     <option value="cash">Cash</option>
                     <option value="card">Kartu</option>
@@ -633,56 +435,17 @@ export default function PilgrimDetailPage() {
               </div>
               <div>
                 <label style={labelStyle}>Tanggal</label>
-                <input
-                  type="date"
-                  required
-                  value={paymentForm.date}
-                  onChange={(e) => setPaymentForm((f) => ({ ...f, date: e.target.value }))}
-                  style={inputStyle}
-                />
+                <input type="date" required value={paymentForm.date} onChange={(e) => setPaymentForm((f) => ({ ...f, date: e.target.value }))} style={inputStyle} />
               </div>
               <div>
                 <label style={labelStyle}>Catatan</label>
-                <input
-                  value={paymentForm.notes}
-                  onChange={(e) => setPaymentForm((f) => ({ ...f, notes: e.target.value }))}
-                  placeholder="Opsional"
-                  style={inputStyle}
-                />
+                <input value={paymentForm.notes} onChange={(e) => setPaymentForm((f) => ({ ...f, notes: e.target.value }))} placeholder="Opsional" style={inputStyle} />
               </div>
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', paddingTop: '8px' }}>
-                <button
-                  type="button"
-                  onClick={() => setShowPayment(false)}
-                  style={{
-                    padding: '12px 24px',
-                    fontSize: '14px',
-                    fontWeight: '500',
-                    color: c.textSecondary,
-                    backgroundColor: c.cardBg,
-                    border: `1px solid ${c.border}`,
-                    borderRadius: '12px',
-                    cursor: 'pointer',
-                    transition: 'all 0.15s',
-                  }}
-                >
+                <button type="button" onClick={() => setShowPayment(false)} style={{ padding: '12px 24px', fontSize: '14px', fontWeight: '500', color: c.textSecondary, backgroundColor: c.cardBg, border: `1px solid ${c.border}`, borderRadius: '12px', cursor: 'pointer' }}>
                   Batal
                 </button>
-                <button
-                  type="submit"
-                  disabled={savingPayment}
-                  style={{
-                    padding: '12px 24px',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    color: 'white',
-                    backgroundColor: savingPayment ? c.textMuted : c.primary,
-                    border: 'none',
-                    borderRadius: '12px',
-                    cursor: savingPayment ? 'not-allowed' : 'pointer',
-                    transition: 'all 0.15s',
-                  }}
-                >
+                <button type="submit" disabled={savingPayment} style={{ padding: '12px 24px', fontSize: '14px', fontWeight: '600', color: 'white', backgroundColor: savingPayment ? c.textMuted : c.primary, border: 'none', borderRadius: '12px', cursor: savingPayment ? 'not-allowed' : 'pointer' }}>
                   {savingPayment ? 'Menyimpan...' : 'Simpan'}
                 </button>
               </div>
@@ -690,6 +453,26 @@ export default function PilgrimDetailPage() {
           </div>
         </div>
       )}
+
+      {/* Delete Payment Confirmation */}
+      <ConfirmDialog
+        open={!!deletePayment}
+        onClose={() => setDeletePayment(null)}
+        onConfirm={handlePaymentDelete}
+        title="Hapus pembayaran ini?"
+        description="Pembayaran akan dihapus dan saldo jemaah akan diperbarui."
+        confirmLabel="Hapus"
+        variant="destructive"
+      />
+    </div>
+  );
+}
+
+function InfoField({ label, value, c, mono, small }: { label: string; value: string; c: Record<string, string>; mono?: boolean; small?: boolean }) {
+  return (
+    <div>
+      <p style={{ fontSize: small ? '12px' : '13px', fontWeight: '500', color: c.textMuted, margin: 0 }}>{label}</p>
+      <p style={{ fontSize: '14px', color: c.textPrimary, margin: '4px 0 0', fontFamily: mono ? 'monospace' : undefined }}>{value}</p>
     </div>
   );
 }

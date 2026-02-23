@@ -7,6 +7,8 @@ export { Pagination } from './pagination';
 export { ConfirmDialog } from './confirm-dialog';
 export { DataTable } from './data-table';
 export type { Column } from './data-table';
+export { SectionCard } from './section-card';
+export { BackButton } from './back-button';
 export {
   SkeletonBox,
   TableRowSkeleton,
