@@ -1,6 +1,6 @@
 # GEZMA Agent — Development Checkpoint
 
-> **Last Updated:** 2026-02-23 (Session 2)
+> **Last Updated:** 2026-02-23 (Session 3)
 > **Blueprint Reference:** `GEZMA-AGENT-PLAN-v2.md`, `DEVELOPMENT-PLAN-v3.md`
 
 ---
@@ -12,7 +12,7 @@
 | **Phase 1: Core Agent Dashboard** | ✅ 100% Done | Semua modul + API |
 | **Phase 2A: Platform Pages** | ✅ Done | 6 halaman dengan mock data |
 | **Phase 2B: Agent Backlog** | ✅ Done | Manifest CRUD, Timeline, Bulk, Import CSV |
-| **Phase 2C: Gezma Pilgrim MVP** | ✅ Done | 6 halaman + layout + mock data |
+| **Phase 2C: Gezma Pilgrim MVP** | ✅ Done | 6 halaman + layout + real DB |
 | **Phase 3: Integrasi** | ✅ Prep Done | 4 service layers + 15 API endpoints + 7 UI pages (mock) |
 | **PWA** | ✅ Done | Service Worker, Install Prompt, Offline |
 | **Deployment** | ✅ Ready | Docker + Nginx + Traefik |
@@ -134,8 +134,12 @@ App terpisah untuk jemaah (route group `(pilgrim)`) dengan layout mobile-first, 
 | Fitur | Status | Keterangan |
 |-------|--------|------------|
 | Layout + Navigation | ✅ | Bottom nav (mobile) + top nav (desktop), green accent (#059669) |
-| Pilgrim Context | ✅ | Login state via localStorage, auto-login on mount |
-| Login dengan booking code | ✅ | Mock auth (UMR-2026-0001), demo hint, error handling |
+| Pilgrim Context | ✅ | Login state via httpOnly cookie (JWT), auto-restore session via `/me` API |
+| Login dengan booking code | ✅ | Real DB auth via API, JWT token (30-day), error handling |
+| **Pilgrim Auth (JWT)** | ✅ NEW | `auth-pilgrim.ts` — sign/verify pilgrim_token cookie, separate from agent auth |
+| **Pilgrim Portal API** | ✅ NEW | 3 endpoints: login, me, logout (`/api/pilgrim-portal/*`) |
+| **Data Transformer** | ✅ NEW | `pilgrim-portal.service.ts` — DB rows → PilgrimPortalData shape |
+| **DB Migration** | ✅ NEW | `bookingCode` field + unique constraint `[agencyId, bookingCode]` |
 | Dashboard jemaah | ✅ | Welcome, status progress (8 step), quick info, payment summary, docs, agency contact |
 | Detail perjalanan | ✅ | Countdown timer, flight info, hotels, muthawwif, room assignment, itinerary timeline |
 | Manasik digital | ✅ | 8 materi (Ihram, Tawaf, Sa'i, Tahallul, dll), category filter, progress tracking, mark complete |
@@ -166,7 +170,7 @@ Semua menggunakan mock data, siap connect real API ketika key tersedia:
 
 ---
 
-## F. API ENDPOINTS (48 Total)
+## F. API ENDPOINTS (51 Total)
 
 ```
 Auth:          7 endpoints (login, register, verify, password, etc)
@@ -176,6 +180,7 @@ Trips:         7 endpoints (CRUD + checklist + manifest + manifest/remove)
 Dashboard:     3 endpoints (stats, alerts, activities)
 Reports:       1 endpoint  (financial)
 Integrations: 15 endpoints (nusuk: 3, payment: 4, whatsapp: 5, umrahcash: 3)
+Pilgrim Portal: 3 endpoints (login, me, logout)
 Other:         3 endpoints (agency, users, chat AI)
 ```
 
@@ -207,7 +212,7 @@ src/
 │   ├── (auth)/          → 4 pages
 │   ├── (dashboard)/     → 22 pages (6 platform + 16 operasional)
 │   ├── (pilgrim)/       → 6 pages (login, home, trip, manasik, doa, profile) + layout
-│   ├── api/             → 33 API endpoints
+│   ├── api/             → 36 API endpoints (incl. pilgrim-portal: 3)
 │   └── offline/         → PWA offline page
 ├── components/
 │   ├── shared/          → 12 reusable components
@@ -220,7 +225,7 @@ src/
 │   └── ai-assistant/    → 1 (ChatWidget)
 ├── data/                → 8 mock data files (+pilgrim-portal, manasik, doa)
 ├── lib/
-│   ├── services/        → 6 service files
+│   ├── services/        → 7 service files (incl. pilgrim-portal.service)
 │   ├── hooks/           → 4 hooks
 │   ├── contexts/        → 1 (pilgrim-context)
 │   ├── validations/     → 5 schemas
@@ -231,20 +236,22 @@ src/
 
 ---
 
-## H. GIT LOG (Session 2)
+## H. GIT LOG (Session 3)
 
 ```
+5fec158 feat: connect Pilgrim Portal to real database via Prisma
+20c498b docs: update CHECKPOINT.md with Phase 3 integration status
+df2820c feat: Phase 3 — integration preparation (Nusuk, Payment, WhatsApp, UmrahCash)
+a8ebe52 feat: Phase 2C — Gezma Pilgrim MVP (6 pages + layout + mock data)
+8d66480 docs: update CHECKPOINT.md with Phase 2A + 2B completion status
 6da6555 feat: Phase 2B — manifest CRUD, status timeline, bulk actions, CSV import
-aec5928 feat: build 6 platform pages with mock data (Phase 2A)
-aac7d40 docs: add CHECKPOINT.md — full development status vs blueprint
-9352da0 refactor: pilgrim pages use reusable components, remove ~800 lines duplication
-6244f41 feat: add PWA support and reusable shared components
 ```
 
 ---
 
 ## I. NEXT STEPS
 
-1. **Phase 3: Integrasi** — Nusuk API, Payment Gateway, WhatsApp API
-2. **Phase 4: Advanced** — Gamifikasi, Blockchain, Command Center, Mobile Native
-3. **Low Priority Backlog** — Brochure Generator, Package Duplicate, QR Verification, Granular Roles
+1. **Pilgrim Portal Enhancements** — Document upload dari portal, payment status realtime
+2. **Phase 3: Integrasi** — Nusuk API, Payment Gateway, WhatsApp API (connect real keys)
+3. **Phase 4: Advanced** — Gamifikasi, Blockchain, Command Center, Mobile Native
+4. **Low Priority Backlog** — Brochure Generator, Package Duplicate, QR Verification, Granular Roles
