@@ -50,6 +50,8 @@ model Agency {
   packages        Package[]
   trips           Trip[]
   activityLogs    ActivityLog[]
+  manasikLessons  ManasikLesson[]
+  doaPrayers      DoaPrayer[]
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -144,6 +146,8 @@ model Pilgrim {
   // Relations
   documents         PilgrimDocument[]
   payments          PaymentRecord[]
+  manasikProgress   PilgrimManasikProgress[]
+  doaFavorites      PilgrimDoaFavorite[]
 
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
@@ -302,4 +306,75 @@ model ActivityLog {
   createdAt   DateTime @default(now())
 
   @@map("activity_logs")
+}
+
+model ManasikLesson {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  category    String   // persiapan, ihram, tawaf, sai, tahallul, sunnah
+  order       Int
+  duration    Int      // minutes
+  videoUrl    String?
+  content     String   // Rich text / markdown
+  tips        String[] @default([])
+  isImportant Boolean  @default(false)
+  emoji       String   @default("📖")
+
+  agencyId    String
+  agency      Agency   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+
+  progress    PilgrimManasikProgress[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("manasik_lessons")
+}
+
+model DoaPrayer {
+  id          String   @id @default(uuid())
+  title       String
+  category    String   // umrah, harian, perjalanan, masjid, munajat
+  arabic      String
+  latin       String
+  translation String
+  occasion    String
+  source      String
+  emoji       String   @default("🤲")
+  order       Int      @default(0)
+
+  agencyId    String
+  agency      Agency   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+
+  favorites   PilgrimDoaFavorite[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("doa_prayers")
+}
+
+model PilgrimManasikProgress {
+  id          String   @id @default(uuid())
+  pilgrimId   String
+  pilgrim     Pilgrim  @relation(fields: [pilgrimId], references: [id], onDelete: Cascade)
+  lessonId    String
+  lesson      ManasikLesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  completedAt DateTime @default(now())
+
+  @@unique([pilgrimId, lessonId])
+  @@map("pilgrim_manasik_progress")
+}
+
+model PilgrimDoaFavorite {
+  id        String   @id @default(uuid())
+  pilgrimId String
+  pilgrim   Pilgrim  @relation(fields: [pilgrimId], references: [id], onDelete: Cascade)
+  doaId     String
+  doa       DoaPrayer @relation(fields: [doaId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([pilgrimId, doaId])
+  @@map("pilgrim_doa_favorites")
 }

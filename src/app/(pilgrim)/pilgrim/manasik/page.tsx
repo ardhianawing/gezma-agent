@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
-import { manasikCategories, manasikLessons, ManasikCategory, ManasikLesson } from '@/data/mock-manasik';
+import { manasikCategories, ManasikCategory } from '@/data/mock-manasik';
+import type { ManasikLesson } from '@/data/mock-manasik';
 
 const GREEN = '#059669';
 const GREEN_LIGHT = '#ECFDF5';
@@ -15,40 +16,64 @@ export default function ManasikPage() {
   const [activeCategory, setActiveCategory] = useState<ManasikCategory>('all');
   const [selectedLesson, setSelectedLesson] = useState<ManasikLesson | null>(null);
   const [completedIds, setCompletedIds] = useState<Set<string>>(new Set());
+  const [lessons, setLessons] = useState<ManasikLesson[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/pilgrim-portal/manasik', { credentials: 'same-origin' })
+      .then(res => res.ok ? res.json() : null)
+      .then(json => {
+        if (json) {
+          setLessons(json.lessons);
+          setCompletedIds(new Set(json.completedIds));
+        }
+      })
+      .catch(() => {})
+      .finally(() => setIsLoading(false));
+  }, []);
 
   const filteredLessons = useMemo(() => {
-    const lessons = activeCategory === 'all'
-      ? manasikLessons
-      : manasikLessons.filter(l => l.category === activeCategory);
-    return lessons.sort((a, b) => a.order - b.order);
-  }, [activeCategory]);
+    const list = activeCategory === 'all'
+      ? lessons
+      : lessons.filter(l => l.category === activeCategory);
+    return list.sort((a, b) => a.order - b.order);
+  }, [activeCategory, lessons]);
 
   const completedCount = completedIds.size;
-  const totalCount = manasikLessons.length;
-  const progressPercent = Math.round((completedCount / totalCount) * 100);
+  const totalCount = lessons.length;
+  const progressPercent = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
 
-  const toggleComplete = (id: string) => {
+  const toggleComplete = useCallback((id: string) => {
     setCompletedIds(prev => {
       const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
+      const willComplete = !next.has(id);
+      if (willComplete) next.add(id);
+      else next.delete(id);
+
+      fetch('/api/pilgrim-portal/manasik/progress', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ lessonId: id, completed: willComplete }),
+      }).catch(() => {});
+
       return next;
     });
-  };
+  }, []);
 
   const goToNext = () => {
     if (!selectedLesson) return;
-    const currentIndex = manasikLessons.findIndex(l => l.id === selectedLesson.id);
-    if (currentIndex < manasikLessons.length - 1) {
-      setSelectedLesson(manasikLessons[currentIndex + 1]);
+    const currentIndex = lessons.findIndex(l => l.id === selectedLesson.id);
+    if (currentIndex < lessons.length - 1) {
+      setSelectedLesson(lessons[currentIndex + 1]);
     }
   };
 
   const goToPrev = () => {
     if (!selectedLesson) return;
-    const currentIndex = manasikLessons.findIndex(l => l.id === selectedLesson.id);
+    const currentIndex = lessons.findIndex(l => l.id === selectedLesson.id);
     if (currentIndex > 0) {
-      setSelectedLesson(manasikLessons[currentIndex - 1]);
+      setSelectedLesson(lessons[currentIndex - 1]);
     }
   };
 
@@ -59,11 +84,26 @@ export default function ManasikPage() {
     padding: '20px',
   };
 
+  if (isLoading) {
+    return (
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '300px',
+        color: c.textMuted,
+        fontSize: '15px',
+      }}>
+        Memuat materi manasik...
+      </div>
+    );
+  }
+
   // Lesson detail view
   if (selectedLesson) {
-    const currentIndex = manasikLessons.findIndex(l => l.id === selectedLesson.id);
+    const currentIndex = lessons.findIndex(l => l.id === selectedLesson.id);
     const hasPrev = currentIndex > 0;
-    const hasNext = currentIndex < manasikLessons.length - 1;
+    const hasNext = currentIndex < lessons.length - 1;
     const isCompleted = completedIds.has(selectedLesson.id);
     const catInfo = manasikCategories.find(cat => cat.id === selectedLesson.category);
 

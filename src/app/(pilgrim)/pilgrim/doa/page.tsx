@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
-import { doaCategories, doaList, DoaCategory, Doa } from '@/data/mock-doa';
+import { doaCategories, DoaCategory } from '@/data/mock-doa';
+import type { Doa } from '@/data/mock-doa';
 
 const GREEN = '#059669';
 const GREEN_LIGHT = '#ECFDF5';
@@ -16,9 +17,24 @@ export default function DoaPage() {
   const [selectedDoa, setSelectedDoa] = useState<Doa | null>(null);
   const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set());
   const [searchQuery, setSearchQuery] = useState('');
+  const [doas, setDoas] = useState<Doa[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/pilgrim-portal/doa', { credentials: 'same-origin' })
+      .then(res => res.ok ? res.json() : null)
+      .then(json => {
+        if (json) {
+          setDoas(json.doas.map((d: Doa) => ({ ...d, isFavorite: false })));
+          setFavoriteIds(new Set(json.favoriteIds));
+        }
+      })
+      .catch(() => {})
+      .finally(() => setIsLoading(false));
+  }, []);
 
   const filteredDoas = useMemo(() => {
-    let list = doaList;
+    let list = doas;
     if (activeCategory !== 'all') {
       list = list.filter(d => d.category === activeCategory);
     }
@@ -31,17 +47,26 @@ export default function DoaPage() {
       );
     }
     return list;
-  }, [activeCategory, searchQuery]);
+  }, [activeCategory, searchQuery, doas]);
 
-  const toggleFavorite = (id: string, e?: React.MouseEvent) => {
+  const toggleFavorite = useCallback((id: string, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
     setFavoriteIds(prev => {
       const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
+      const willFavorite = !next.has(id);
+      if (willFavorite) next.add(id);
+      else next.delete(id);
+
+      fetch('/api/pilgrim-portal/doa/favorites', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ doaId: id, favorite: willFavorite }),
+      }).catch(() => {});
+
       return next;
     });
-  };
+  }, []);
 
   const cardStyle: React.CSSProperties = {
     backgroundColor: c.cardBg,
@@ -50,11 +75,26 @@ export default function DoaPage() {
     padding: '20px',
   };
 
+  if (isLoading) {
+    return (
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '300px',
+        color: c.textMuted,
+        fontSize: '15px',
+      }}>
+        Memuat panduan doa...
+      </div>
+    );
+  }
+
   // Detail view
   if (selectedDoa) {
-    const currentIndex = doaList.findIndex(d => d.id === selectedDoa.id);
+    const currentIndex = doas.findIndex(d => d.id === selectedDoa.id);
     const hasPrev = currentIndex > 0;
-    const hasNext = currentIndex < doaList.length - 1;
+    const hasNext = currentIndex < doas.length - 1;
     const isFav = favoriteIds.has(selectedDoa.id);
     const catInfo = doaCategories.find(cat => cat.id === selectedDoa.category);
 
@@ -225,7 +265,7 @@ export default function DoaPage() {
         {/* Navigation */}
         <div style={{ display: 'flex', gap: '12px' }}>
           <button
-            onClick={() => { if (hasPrev) setSelectedDoa(doaList[currentIndex - 1]); }}
+            onClick={() => { if (hasPrev) setSelectedDoa(doas[currentIndex - 1]); }}
             disabled={!hasPrev}
             style={{
               flex: 1,
@@ -242,7 +282,7 @@ export default function DoaPage() {
             ← Sebelumnya
           </button>
           <button
-            onClick={() => { if (hasNext) setSelectedDoa(doaList[currentIndex + 1]); }}
+            onClick={() => { if (hasNext) setSelectedDoa(doas[currentIndex + 1]); }}
             disabled={!hasNext}
             style={{
               flex: 1,
@@ -346,7 +386,7 @@ export default function DoaPage() {
             ❤️ Favorit ({favoriteIds.size})
           </h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            {doaList.filter(d => favoriteIds.has(d.id)).map(doa => (
+            {doas.filter(d => favoriteIds.has(d.id)).map(doa => (
               <div
                 key={doa.id}
                 onClick={() => setSelectedDoa(doa)}
