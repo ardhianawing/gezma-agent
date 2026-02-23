@@ -14,6 +14,7 @@ import {
   Globe,
   CreditCard,
   Users,
+  Plug,
   ChevronRight,
   Mail,
   Smartphone,
@@ -130,6 +131,14 @@ export default function SettingsPage() {
       color: c.primary,
       bgColor: c.primaryLight,
       href: '/settings/users',
+    },
+    {
+      icon: Plug,
+      title: 'Integrasi',
+      description: 'Nusuk API, Payment Gateway, WhatsApp',
+      color: '#059669',
+      bgColor: '#ECFDF5',
+      href: '/settings/integrations',
     },
     {
       icon: Globe,
