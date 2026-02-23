@@ -12,7 +12,7 @@
 | **Phase 1: Core Agent Dashboard** | ✅ 100% Done | Semua modul + API |
 | **Phase 2A: Platform Pages** | ✅ Done | 6 halaman dengan mock data |
 | **Phase 2B: Agent Backlog** | ✅ Done | Manifest CRUD, Timeline, Bulk, Import CSV |
-| **Phase 2C: Gezma Pilgrim MVP** | ❌ Belum | App untuk jemaah |
+| **Phase 2C: Gezma Pilgrim MVP** | ✅ Done | 6 halaman + layout + mock data |
 | **Phase 3: Integrasi** | ❌ Belum | Nusuk, Payment Gateway, WhatsApp |
 | **PWA** | ✅ Done | Service Worker, Install Prompt, Offline |
 | **Deployment** | ✅ Ready | Docker + Nginx + Traefik |
@@ -127,18 +127,20 @@ Semua 6 halaman sudah dibangun dengan mock data (bukan Coming Soon lagi):
 
 ---
 
-## D. PHASE 2C — GEZMA PILGRIM MVP (0%)
+## D. PHASE 2C — GEZMA PILGRIM MVP (100%)
 
-App untuk jemaah (bukan travel agent):
+App terpisah untuk jemaah (route group `(pilgrim)`) dengan layout mobile-first, bottom nav, green theme:
 
-| Fitur | Status |
-|-------|--------|
-| Login dengan booking code | ❌ |
-| Dashboard jemaah | ❌ |
-| Detail perjalanan | ❌ |
-| Manasik digital (text + video) | ❌ |
-| Panduan doa | ❌ |
-| Profile & dokumen | ❌ |
+| Fitur | Status | Keterangan |
+|-------|--------|------------|
+| Layout + Navigation | ✅ | Bottom nav (mobile) + top nav (desktop), green accent (#059669) |
+| Pilgrim Context | ✅ | Login state via localStorage, auto-login on mount |
+| Login dengan booking code | ✅ | Mock auth (UMR-2026-0001), demo hint, error handling |
+| Dashboard jemaah | ✅ | Welcome, status progress (8 step), quick info, payment summary, docs, agency contact |
+| Detail perjalanan | ✅ | Countdown timer, flight info, hotels, muthawwif, room assignment, itinerary timeline |
+| Manasik digital | ✅ | 8 materi (Ihram, Tawaf, Sa'i, Tahallul, dll), category filter, progress tracking, mark complete |
+| Panduan doa | ✅ | 16 doa (Umrah, Harian, Perjalanan, Masjid, Munajat), Arabic+Latin+terjemahan, favorit, search |
+| Profile & dokumen | ✅ | Data pribadi, kontak, kamar, dokumen checklist, travel agent info, logout |
 
 ---
 
@@ -181,6 +183,7 @@ src/
 ├── app/
 │   ├── (auth)/          → 4 pages
 │   ├── (dashboard)/     → 22 pages (6 platform + 16 operasional)
+│   ├── (pilgrim)/       → 6 pages (login, home, trip, manasik, doa, profile) + layout
 │   ├── api/             → 33 API endpoints
 │   └── offline/         → PWA offline page
 ├── components/
@@ -192,10 +195,11 @@ src/
 │   ├── dashboard/       → 2 (action-center, quick-actions)
 │   ├── pwa/             → 4 (sw-register, offline, install, update)
 │   └── ai-assistant/    → 1 (ChatWidget)
-├── data/                → 5 mock data files
+├── data/                → 8 mock data files (+pilgrim-portal, manasik, doa)
 ├── lib/
 │   ├── services/        → 6 service files
 │   ├── hooks/           → 4 hooks
+│   ├── contexts/        → 1 (pilgrim-context)
 │   ├── validations/     → 5 schemas
 │   ├── i18n/            → ID + EN translations
 │   └── theme/           → Light + Dark color system
@@ -218,6 +222,6 @@ aac7d40 docs: add CHECKPOINT.md — full development status vs blueprint
 
 ## I. NEXT STEPS
 
-1. **Phase 2C: Gezma Pilgrim MVP** — App untuk jemaah (login booking code, manasik, doa, trip tracker)
-2. **Phase 3: Integrasi** — Nusuk API, Payment Gateway, WhatsApp API
-3. **Phase 4: Advanced** — Gamifikasi, Blockchain, Command Center, Mobile Native
+1. **Phase 3: Integrasi** — Nusuk API, Payment Gateway, WhatsApp API
+2. **Phase 4: Advanced** — Gamifikasi, Blockchain, Command Center, Mobile Native
+3. **Low Priority Backlog** — Brochure Generator, Package Duplicate, QR Verification, Granular Roles
