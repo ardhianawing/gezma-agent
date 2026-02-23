@@ -49,6 +49,9 @@ interface DataTableProps<T> {
 
   // Header slot (above the table, inside the card)
   headerSlot?: ReactNode;
+
+  // Custom row style (e.g. for selection highlight)
+  rowStyle?: (row: T) => React.CSSProperties | undefined;
 }
 
 export function DataTable<T>({
@@ -64,6 +67,7 @@ export function DataTable<T>({
   onRowClick,
   skeletonRows = 5,
   headerSlot,
+  rowStyle,
 }: DataTableProps<T>) {
   const { c } = useTheme();
   const { isMobile } = useResponsive();
@@ -119,7 +123,9 @@ export function DataTable<T>({
               </tr>
             </thead>
             <tbody>
-              {data.map((row, index) => (
+              {data.map((row, index) => {
+                const customRowStyle = rowStyle ? rowStyle(row) : undefined;
+                return (
                 <tr
                   key={keyExtractor(row)}
                   onClick={onRowClick ? () => onRowClick(row) : undefined}
@@ -127,12 +133,13 @@ export function DataTable<T>({
                     borderBottom: index < data.length - 1 ? `1px solid ${c.borderLight}` : 'none',
                     cursor: onRowClick ? 'pointer' : 'default',
                     transition: 'background 150ms ease',
+                    ...customRowStyle,
                   }}
                   onMouseEnter={(e) => {
                     if (onRowClick) e.currentTarget.style.background = c.cardBgHover;
                   }}
                   onMouseLeave={(e) => {
-                    if (onRowClick) e.currentTarget.style.background = '';
+                    if (onRowClick) e.currentTarget.style.background = customRowStyle?.backgroundColor as string || '';
                   }}
                 >
                   {visibleColumns.map((col) => (
@@ -150,7 +157,8 @@ export function DataTable<T>({
                     </td>
                   ))}
                 </tr>
-              ))}
+                );
+              })}
             </tbody>
           </table>
         </div>

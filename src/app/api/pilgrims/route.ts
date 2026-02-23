@@ -25,6 +25,11 @@ export async function GET(req: NextRequest) {
     where.tripId = tripId;
   }
 
+  const available = searchParams.get('available');
+  if (available === '1') {
+    where.tripId = null;
+  }
+
   if (search) {
     where.OR = [
       { name: { contains: search, mode: 'insensitive' } },

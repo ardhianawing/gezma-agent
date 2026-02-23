@@ -3,9 +3,10 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { Edit, Plus, Trash2, Plane, User, CreditCard, ClipboardCheck, FileText, DollarSign, StickyNote } from 'lucide-react';
+import { Edit, Plus, Trash2, Plane, User, CreditCard, ClipboardCheck, FileText, DollarSign, StickyNote, History } from 'lucide-react';
 import { StatusBadge, SectionCard, BackButton, DetailSkeleton, EmptyState, ConfirmDialog } from '@/components/shared';
 import { DocumentUpload } from '@/components/pilgrims/document-upload';
+import { StatusTimeline } from '@/components/pilgrims/status-timeline';
 import { useFormStyles } from '@/lib/hooks/use-form-styles';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { useResponsive } from '@/lib/hooks/use-responsive';
@@ -33,6 +34,9 @@ export default function PilgrimDetailPage() {
     notes: '',
   });
   const [savingPayment, setSavingPayment] = useState(false);
+
+  // Status history
+  const [statusHistory, setStatusHistory] = useState<Array<{ id: string; action: string; details: Record<string, unknown>; createdAt: string }>>([]);
 
   // Delete payment confirm
   const [deletePayment, setDeletePayment] = useState<{ id: string; amount: number } | null>(null);
@@ -89,6 +93,14 @@ export default function PilgrimDetailPage() {
     fetchPilgrim();
   }, [id]);
 
+  // Fetch status history
+  useEffect(() => {
+    fetch(`/api/pilgrims/${id}/history`)
+      .then((res) => res.json())
+      .then((json) => setStatusHistory(json.data || []))
+      .catch(() => {});
+  }, [id]);
+
   async function handlePaymentSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!pilgrim) return;
@@ -137,6 +149,11 @@ export default function PilgrimDetailPage() {
       });
       if (!res.ok) return;
       setPilgrim((prev) => prev ? { ...prev, status: newStatus as PilgrimStatus } : prev);
+      // Refresh status history after change
+      fetch(`/api/pilgrims/${id}/history`)
+        .then((r) => r.json())
+        .then((json) => setStatusHistory(json.data || []))
+        .catch(() => {});
     } catch {
       // silently fail
     }
@@ -325,6 +342,13 @@ export default function PilgrimDetailPage() {
             <ChecklistItem label="Health Certificate" checked={!!checklist.healthCertificate} c={c} />
           </div>
         </SectionCard>
+
+        {/* Status Timeline */}
+        <div style={{ gridColumn: isMobile ? undefined : '1 / -1' }}>
+          <SectionCard title="Riwayat Status" icon={<History style={{ width: '18px', height: '18px', color: c.textMuted }} />}>
+            <StatusTimeline currentStatus={pilgrim.status} history={statusHistory} />
+          </SectionCard>
+        </div>
 
         {/* Notes */}
         {pilgrim.notes && (

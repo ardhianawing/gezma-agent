@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useEffect, use } from 'react';
+import { useState, useEffect, useCallback, useRef, use } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, CheckCircle2, Printer, Plane, ClipboardCheck, Users } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, Printer, Plane, ClipboardCheck, Users, Plus, Search, X, Trash2 } from 'lucide-react';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
 import { StatusBadge } from '@/components/shared/status-badge';
+import { ConfirmDialog } from '@/components/shared/confirm-dialog';
 import { formatDate, formatCurrency } from '@/lib/utils';
 import type { TripStatus, PilgrimStatus } from '@/types';
 
@@ -15,7 +16,16 @@ interface ManifestEntry {
   pilgrimStatus: string;
   documentsComplete: number;
   documentsTotal: number;
-  roomNumber?: string;
+  roomNumber?: string | null;
+  roomType?: string | null;
+}
+
+interface AvailablePilgrim {
+  id: string;
+  name: string;
+  nik: string;
+  phone: string;
+  status: string;
 }
 
 interface TripDetail {
@@ -51,6 +61,14 @@ interface TripDetail {
   manifest: ManifestEntry[];
 }
 
+const ROOM_TYPES = [
+  { value: '', label: '-' },
+  { value: 'single', label: 'Single' },
+  { value: 'double', label: 'Double' },
+  { value: 'triple', label: 'Triple' },
+  { value: 'quad', label: 'Quad' },
+];
+
 export default function TripDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const { c } = useTheme();
@@ -59,7 +77,25 @@ export default function TripDetailPage({ params }: { params: Promise<{ id: strin
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  useEffect(() => {
+  // Add pilgrim modal state
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [availablePilgrims, setAvailablePilgrims] = useState<AvailablePilgrim[]>([]);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [addingPilgrimId, setAddingPilgrimId] = useState<string | null>(null);
+
+  // Remove pilgrim state
+  const [removeTarget, setRemoveTarget] = useState<ManifestEntry | null>(null);
+  const [removing, setRemoving] = useState(false);
+
+  // Room editing state
+  const [editingRoom, setEditingRoom] = useState<string | null>(null);
+  const [roomNumberDraft, setRoomNumberDraft] = useState('');
+  const [roomTypeDraft, setRoomTypeDraft] = useState('');
+
+  const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const fetchTrip = useCallback(() => {
     fetch(`/api/trips/${id}`)
       .then((res) => {
         if (!res.ok) throw new Error('Not found');
@@ -70,12 +106,140 @@ export default function TripDetailPage({ params }: { params: Promise<{ id: strin
       .finally(() => setLoading(false));
   }, [id]);
 
+  useEffect(() => {
+    fetchTrip();
+  }, [fetchTrip]);
+
+  // Search available pilgrims when modal opens or query changes
+  useEffect(() => {
+    if (!showAddModal) return;
+
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    searchTimeoutRef.current = setTimeout(() => {
+      setSearchLoading(true);
+      const params = new URLSearchParams({ available: '1' });
+      if (searchQuery.trim()) {
+        params.set('search', searchQuery.trim());
+      }
+      fetch(`/api/pilgrims?${params.toString()}`)
+        .then((res) => res.json())
+        .then((data) => {
+          // Filter out pilgrims already in manifest
+          const manifestIds = new Set((trip?.manifest || []).map((m) => m.pilgrimId));
+          const filtered = (data.data || data.pilgrims || []).filter(
+            (p: AvailablePilgrim) => !manifestIds.has(p.id)
+          );
+          setAvailablePilgrims(filtered);
+        })
+        .catch(() => setAvailablePilgrims([]))
+        .finally(() => setSearchLoading(false));
+    }, 300);
+
+    return () => {
+      if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+    };
+  }, [showAddModal, searchQuery, trip?.manifest]);
+
+  async function handleAddPilgrim(pilgrimId: string) {
+    setAddingPilgrimId(pilgrimId);
+    try {
+      const res = await fetch(`/api/trips/${id}/manifest`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pilgrimId }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        alert(data.error || 'Gagal menambahkan jemaah');
+        return;
+      }
+
+      // Refresh trip data
+      fetchTrip();
+      // Remove from available list
+      setAvailablePilgrims((prev) => prev.filter((p) => p.id !== pilgrimId));
+    } catch {
+      alert('Terjadi kesalahan');
+    } finally {
+      setAddingPilgrimId(null);
+    }
+  }
+
+  async function handleRemovePilgrim() {
+    if (!removeTarget) return;
+    setRemoving(true);
+    try {
+      const res = await fetch(`/api/trips/${id}/manifest/${removeTarget.pilgrimId}`, {
+        method: 'DELETE',
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        alert(data.error || 'Gagal menghapus jemaah');
+        return;
+      }
+
+      fetchTrip();
+      setRemoveTarget(null);
+    } catch {
+      alert('Terjadi kesalahan');
+    } finally {
+      setRemoving(false);
+    }
+  }
+
+  async function handleSaveRoom(pilgrimId: string) {
+    try {
+      const res = await fetch(`/api/trips/${id}/manifest`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          pilgrimId,
+          roomNumber: roomNumberDraft,
+          roomType: roomTypeDraft,
+        }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        alert(data.error || 'Gagal update room');
+        return;
+      }
+
+      // Update local state
+      setTrip((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          manifest: prev.manifest.map((m) =>
+            m.pilgrimId === pilgrimId
+              ? { ...m, roomNumber: roomNumberDraft || null, roomType: roomTypeDraft || null }
+              : m
+          ),
+        };
+      });
+      setEditingRoom(null);
+    } catch {
+      alert('Terjadi kesalahan');
+    }
+  }
+
+  function startEditRoom(entry: ManifestEntry) {
+    setEditingRoom(entry.pilgrimId);
+    setRoomNumberDraft(entry.roomNumber || '');
+    setRoomTypeDraft(entry.roomType || '');
+  }
+
   function handlePrintManifest() {
     if (!trip) return;
     const rows = (trip.manifest || [])
-      .map((e, i) => `<tr><td style="padding:8px;border:1px solid #ddd;text-align:center">${i + 1}</td><td style="padding:8px;border:1px solid #ddd">${e.pilgrimName}</td><td style="padding:8px;border:1px solid #ddd;text-align:center">${e.pilgrimStatus}</td><td style="padding:8px;border:1px solid #ddd;text-align:center">${e.documentsComplete}/${e.documentsTotal}</td><td style="padding:8px;border:1px solid #ddd;text-align:center">${e.roomNumber || '-'}</td></tr>`)
+      .map((e, i) => `<tr><td style="padding:8px;border:1px solid #ddd;text-align:center">${i + 1}</td><td style="padding:8px;border:1px solid #ddd">${e.pilgrimName}</td><td style="padding:8px;border:1px solid #ddd;text-align:center">${e.pilgrimStatus}</td><td style="padding:8px;border:1px solid #ddd;text-align:center">${e.documentsComplete}/${e.documentsTotal}</td><td style="padding:8px;border:1px solid #ddd;text-align:center">${e.roomNumber || '-'}</td><td style="padding:8px;border:1px solid #ddd;text-align:center">${e.roomType || '-'}</td></tr>`)
       .join('');
-    const html = `<!DOCTYPE html><html><head><title>Manifest - ${trip.name}</title><style>body{font-family:sans-serif;padding:24px}table{width:100%;border-collapse:collapse}th{background:#f1f5f9;padding:8px;border:1px solid #ddd;text-align:left;font-size:12px;text-transform:uppercase}td{font-size:13px}h1{font-size:20px;margin:0 0 4px 0}p{color:#666;font-size:13px;margin:0 0 16px 0}@media print{body{padding:0}}</style></head><body><h1>${trip.name}</h1><p>Keberangkatan: ${trip.departureDate ? new Date(trip.departureDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '-'} &bull; ${trip.manifest?.length || 0} jemaah</p><table><thead><tr><th style="width:40px">No</th><th>Nama</th><th style="width:100px">Status</th><th style="width:100px">Dokumen</th><th style="width:80px">Kamar</th></tr></thead><tbody>${rows}</tbody></table></body></html>`;
+    const html = `<!DOCTYPE html><html><head><title>Manifest - ${trip.name}</title><style>body{font-family:sans-serif;padding:24px}table{width:100%;border-collapse:collapse}th{background:#f1f5f9;padding:8px;border:1px solid #ddd;text-align:left;font-size:12px;text-transform:uppercase}td{font-size:13px}h1{font-size:20px;margin:0 0 4px 0}p{color:#666;font-size:13px;margin:0 0 16px 0}@media print{body{padding:0}}</style></head><body><h1>${trip.name}</h1><p>Keberangkatan: ${trip.departureDate ? new Date(trip.departureDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '-'} &bull; ${trip.manifest?.length || 0} jemaah</p><table><thead><tr><th style="width:40px">No</th><th>Nama</th><th style="width:100px">Status</th><th style="width:100px">Dokumen</th><th style="width:80px">Kamar</th><th style="width:80px">Tipe</th></tr></thead><tbody>${rows}</tbody></table></body></html>`;
     const w = window.open('', '_blank');
     if (w) {
       w.document.write(html);
@@ -111,6 +275,8 @@ export default function TripDetailPage({ params }: { params: Promise<{ id: strin
     { label: 'Insurance processed', checked: checklist.insuranceProcessed },
     { label: 'Departure briefing done', checked: checklist.departureBriefingDone },
   ];
+
+  const capacityPercent = trip.capacity > 0 ? Math.round((trip.registeredCount / trip.capacity) * 100) : 0;
 
   const thStyle: React.CSSProperties = {
     padding: '10px 16px',
@@ -305,63 +471,228 @@ export default function TripDetailPage({ params }: { params: Promise<{ id: strin
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: '12px',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <Users style={{ width: '18px', height: '18px', color: c.primary }} />
             <h3 style={{ fontSize: '16px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>
-              Trip Manifest ({trip.manifest?.length || 0} pilgrims)
+              Trip Manifest
             </h3>
           </div>
-          {trip.manifest && trip.manifest.length > 0 && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <button
-              onClick={handlePrintManifest}
+              onClick={() => { setShowAddModal(true); setSearchQuery(''); }}
               style={{
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px',
                 padding: '8px 16px',
-                backgroundColor: c.cardBg,
-                color: c.textSecondary,
-                border: `1px solid ${c.border}`,
+                backgroundColor: c.primary,
+                color: 'white',
+                border: 'none',
                 borderRadius: '12px',
                 fontSize: '13px',
                 fontWeight: '500',
                 cursor: 'pointer',
               }}
             >
-              <Printer style={{ width: '14px', height: '14px' }} />
-              Print
+              <Plus style={{ width: '14px', height: '14px' }} />
+              Tambah Jemaah
             </button>
-          )}
+            {trip.manifest && trip.manifest.length > 0 && (
+              <button
+                onClick={handlePrintManifest}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '8px 16px',
+                  backgroundColor: c.cardBg,
+                  color: c.textSecondary,
+                  border: `1px solid ${c.border}`,
+                  borderRadius: '12px',
+                  fontSize: '13px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                }}
+              >
+                <Printer style={{ width: '14px', height: '14px' }} />
+                Print
+              </button>
+            )}
+          </div>
         </div>
+
+        {/* Capacity indicator */}
+        <div style={{ padding: isMobile ? '16px 20px 0' : '20px 28px 0' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+            <span style={{ fontSize: '14px', fontWeight: '600', color: c.textPrimary }}>
+              {trip.registeredCount}/{trip.capacity} Jemaah
+            </span>
+            <span style={{ fontSize: '12px', color: c.textMuted }}>
+              {capacityPercent}%
+            </span>
+          </div>
+          <div
+            style={{
+              width: '100%',
+              height: '8px',
+              backgroundColor: c.border,
+              borderRadius: '4px',
+              overflow: 'hidden',
+            }}
+          >
+            <div
+              style={{
+                width: `${Math.min(capacityPercent, 100)}%`,
+                height: '100%',
+                backgroundColor: capacityPercent >= 100 ? '#EF4444' : capacityPercent >= 80 ? '#F59E0B' : c.primary,
+                borderRadius: '4px',
+                transition: 'width 0.3s ease',
+              }}
+            />
+          </div>
+        </div>
+
         <div style={{ padding: isMobile ? '20px' : '28px' }}>
           {(!trip.manifest || trip.manifest.length === 0) ? (
             <p style={{ textAlign: 'center', fontSize: '14px', color: c.textMuted, padding: '16px 0' }}>
-              No pilgrims added yet
+              Belum ada jemaah. Klik &quot;Tambah Jemaah&quot; untuk menambahkan.
             </p>
           ) : (
             <div style={{ overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
                   <tr style={{ borderBottom: `1px solid ${c.border}` }}>
-                    <th style={thStyle}>Name</th>
+                    <th style={thStyle}>Nama</th>
                     <th style={thStyle}>Status</th>
-                    <th style={thStyle}>Documents</th>
-                    <th style={thStyle}>Room</th>
+                    <th style={thStyle}>Dokumen</th>
+                    <th style={thStyle}>Kamar</th>
+                    <th style={thStyle}>Tipe Kamar</th>
+                    <th style={{ ...thStyle, textAlign: 'center', width: '80px' }}>Aksi</th>
                   </tr>
                 </thead>
                 <tbody>
                   {trip.manifest.map((entry) => (
                     <tr key={entry.pilgrimId}>
-                      <td style={{ ...tdStyle, color: c.textPrimary }}>{entry.pilgrimName}</td>
+                      <td style={{ ...tdStyle, color: c.textPrimary, fontWeight: '500' }}>
+                        {entry.pilgrimName}
+                      </td>
                       <td style={tdStyle}>
                         <StatusBadge status={entry.pilgrimStatus as PilgrimStatus} size="sm" />
                       </td>
                       <td style={{ ...tdStyle, color: c.textMuted }}>
                         {entry.documentsComplete}/{entry.documentsTotal}
                       </td>
-                      <td style={{ ...tdStyle, color: c.textMuted }}>{entry.roomNumber || '-'}</td>
+                      <td style={tdStyle}>
+                        {editingRoom === entry.pilgrimId ? (
+                          <input
+                            type="text"
+                            value={roomNumberDraft}
+                            onChange={(e) => setRoomNumberDraft(e.target.value)}
+                            placeholder="No. Kamar"
+                            style={{
+                              width: '80px',
+                              padding: '4px 8px',
+                              fontSize: '13px',
+                              border: `1px solid ${c.border}`,
+                              borderRadius: '6px',
+                              backgroundColor: c.cardBg,
+                              color: c.textPrimary,
+                              outline: 'none',
+                            }}
+                          />
+                        ) : (
+                          <span
+                            onClick={() => startEditRoom(entry)}
+                            style={{ color: c.textMuted, cursor: 'pointer' }}
+                            title="Klik untuk edit"
+                          >
+                            {entry.roomNumber || '-'}
+                          </span>
+                        )}
+                      </td>
+                      <td style={tdStyle}>
+                        {editingRoom === entry.pilgrimId ? (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                            <select
+                              value={roomTypeDraft}
+                              onChange={(e) => setRoomTypeDraft(e.target.value)}
+                              style={{
+                                padding: '4px 8px',
+                                fontSize: '13px',
+                                border: `1px solid ${c.border}`,
+                                borderRadius: '6px',
+                                backgroundColor: c.cardBg,
+                                color: c.textPrimary,
+                                outline: 'none',
+                              }}
+                            >
+                              {ROOM_TYPES.map((rt) => (
+                                <option key={rt.value} value={rt.value}>{rt.label}</option>
+                              ))}
+                            </select>
+                            <button
+                              onClick={() => handleSaveRoom(entry.pilgrimId)}
+                              style={{
+                                padding: '4px 10px',
+                                fontSize: '12px',
+                                fontWeight: '500',
+                                backgroundColor: c.primary,
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '6px',
+                                cursor: 'pointer',
+                              }}
+                            >
+                              Simpan
+                            </button>
+                            <button
+                              onClick={() => setEditingRoom(null)}
+                              style={{
+                                padding: '4px 8px',
+                                fontSize: '12px',
+                                backgroundColor: 'transparent',
+                                color: c.textMuted,
+                                border: `1px solid ${c.border}`,
+                                borderRadius: '6px',
+                                cursor: 'pointer',
+                              }}
+                            >
+                              Batal
+                            </button>
+                          </div>
+                        ) : (
+                          <span
+                            onClick={() => startEditRoom(entry)}
+                            style={{ color: c.textMuted, cursor: 'pointer', textTransform: 'capitalize' }}
+                            title="Klik untuk edit"
+                          >
+                            {entry.roomType || '-'}
+                          </span>
+                        )}
+                      </td>
+                      <td style={{ ...tdStyle, textAlign: 'center' }}>
+                        <button
+                          onClick={() => setRemoveTarget(entry)}
+                          style={{
+                            padding: '6px',
+                            backgroundColor: 'transparent',
+                            border: 'none',
+                            borderRadius: '6px',
+                            cursor: 'pointer',
+                            color: '#EF4444',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                          }}
+                          title="Hapus dari manifest"
+                        >
+                          <Trash2 style={{ width: '16px', height: '16px' }} />
+                        </button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -370,6 +701,174 @@ export default function TripDetailPage({ params }: { params: Promise<{ id: strin
           )}
         </div>
       </div>
+
+      {/* Add Pilgrim Modal */}
+      {showAddModal && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 9999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '16px',
+          }}
+        >
+          <div
+            onClick={() => setShowAddModal(false)}
+            style={{
+              position: 'absolute',
+              inset: 0,
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            }}
+          />
+          <div
+            style={{
+              position: 'relative',
+              backgroundColor: c.cardBg,
+              borderRadius: '16px',
+              width: '100%',
+              maxWidth: '520px',
+              maxHeight: '80vh',
+              display: 'flex',
+              flexDirection: 'column',
+              boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)',
+            }}
+          >
+            {/* Modal Header */}
+            <div
+              style={{
+                padding: '20px 24px',
+                borderBottom: `1px solid ${c.border}`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+              }}
+            >
+              <h3 style={{ fontSize: '16px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>
+                Tambah Jemaah ke Manifest
+              </h3>
+              <button
+                onClick={() => setShowAddModal(false)}
+                style={{
+                  padding: '4px',
+                  backgroundColor: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                  color: c.textMuted,
+                  display: 'flex',
+                  alignItems: 'center',
+                }}
+              >
+                <X style={{ width: '20px', height: '20px' }} />
+              </button>
+            </div>
+
+            {/* Search input */}
+            <div style={{ padding: '16px 24px', borderBottom: `1px solid ${c.border}` }}>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  padding: '10px 14px',
+                  backgroundColor: c.pageBg,
+                  borderRadius: '10px',
+                  border: `1px solid ${c.border}`,
+                }}
+              >
+                <Search style={{ width: '16px', height: '16px', color: c.textMuted, flexShrink: 0 }} />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Cari berdasarkan nama atau NIK..."
+                  autoFocus
+                  style={{
+                    flex: 1,
+                    border: 'none',
+                    backgroundColor: 'transparent',
+                    fontSize: '14px',
+                    color: c.textPrimary,
+                    outline: 'none',
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Pilgrim List */}
+            <div style={{ flex: 1, overflowY: 'auto', padding: '8px 24px 24px' }}>
+              {searchLoading ? (
+                <p style={{ textAlign: 'center', fontSize: '14px', color: c.textMuted, padding: '24px 0' }}>
+                  Mencari...
+                </p>
+              ) : availablePilgrims.length === 0 ? (
+                <p style={{ textAlign: 'center', fontSize: '14px', color: c.textMuted, padding: '24px 0' }}>
+                  {searchQuery ? 'Tidak ada jemaah yang cocok' : 'Tidak ada jemaah yang tersedia'}
+                </p>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', paddingTop: '8px' }}>
+                  {availablePilgrims.map((p) => (
+                    <div
+                      key={p.id}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        padding: '12px 16px',
+                        borderRadius: '10px',
+                        border: `1px solid ${c.border}`,
+                        gap: '12px',
+                      }}
+                    >
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <p style={{ fontSize: '14px', fontWeight: '500', color: c.textPrimary, margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {p.name}
+                        </p>
+                        <p style={{ fontSize: '12px', color: c.textMuted, margin: '2px 0 0 0' }}>
+                          NIK: {p.nik} &bull; {p.phone}
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => handleAddPilgrim(p.id)}
+                        disabled={addingPilgrimId === p.id}
+                        style={{
+                          padding: '6px 14px',
+                          fontSize: '13px',
+                          fontWeight: '500',
+                          backgroundColor: c.primary,
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '8px',
+                          cursor: addingPilgrimId === p.id ? 'not-allowed' : 'pointer',
+                          opacity: addingPilgrimId === p.id ? 0.7 : 1,
+                          flexShrink: 0,
+                        }}
+                      >
+                        {addingPilgrimId === p.id ? '...' : 'Tambah'}
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Remove Confirmation Dialog */}
+      <ConfirmDialog
+        open={!!removeTarget}
+        onClose={() => setRemoveTarget(null)}
+        onConfirm={handleRemovePilgrim}
+        title="Hapus dari Manifest"
+        description={`Yakin ingin menghapus ${removeTarget?.pilgrimName} dari manifest trip ini? Data kamar akan direset.`}
+        confirmLabel="Hapus"
+        cancelLabel="Batal"
+        variant="destructive"
+        loading={removing}
+      />
     </div>
   );
 }

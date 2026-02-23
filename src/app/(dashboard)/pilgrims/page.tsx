@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect, useCallback, Suspense } from 'react';
+import { useState, useEffect, useCallback, useRef, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { Eye, Edit2, Trash2, Download, Users } from 'lucide-react';
+import { Eye, Edit2, Trash2, Download, Upload, Users, ChevronDown, X, CheckSquare, Loader2 } from 'lucide-react';
 import { DataTable, Column, SearchInput, FilterSelect, StatusBadge, ConfirmDialog } from '@/components/shared';
+import { ImportModal } from '@/components/pilgrims/import-modal';
 import { useLanguage } from '@/lib/i18n';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
@@ -25,6 +26,14 @@ interface Pagination {
   limit: number;
   total: number;
   totalPages: number;
+}
+
+interface TripOption {
+  id: string;
+  name: string;
+  capacity: number;
+  registeredCount: number;
+  status: string;
 }
 
 const STATUS_OPTIONS = [
@@ -58,8 +67,51 @@ function PilgrimsPageContent() {
   const [statusFilter, setStatusFilter] = useState('');
   const [loading, setLoading] = useState(true);
 
-  // Delete confirm dialog
+  // Delete confirm dialog (single)
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
+
+  // Bulk selection state
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkLoading, setBulkLoading] = useState(false);
+  const [bulkMessage, setBulkMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  // Import modal
+  const [showImportModal, setShowImportModal] = useState(false);
+
+  // Bulk action dropdowns
+  const [showStatusDropdown, setShowStatusDropdown] = useState(false);
+  const [showTripDropdown, setShowTripDropdown] = useState(false);
+  const [bulkDeleteConfirm, setBulkDeleteConfirm] = useState(false);
+
+  // Trips for assign dropdown
+  const [trips, setTrips] = useState<TripOption[]>([]);
+  const [tripsLoaded, setTripsLoaded] = useState(false);
+
+  // Refs for dropdown positioning
+  const statusDropdownRef = useRef<HTMLDivElement>(null);
+  const tripDropdownRef = useRef<HTMLDivElement>(null);
+
+  // Clear bulk message after 4 seconds
+  useEffect(() => {
+    if (!bulkMessage) return;
+    const timer = setTimeout(() => setBulkMessage(null), 4000);
+    return () => clearTimeout(timer);
+  }, [bulkMessage]);
+
+  // Close dropdowns on outside click
+  useEffect(() => {
+    if (!showStatusDropdown && !showTripDropdown) return;
+    const handler = (e: MouseEvent) => {
+      if (statusDropdownRef.current && !statusDropdownRef.current.contains(e.target as Node)) {
+        setShowStatusDropdown(false);
+      }
+      if (tripDropdownRef.current && !tripDropdownRef.current.contains(e.target as Node)) {
+        setShowTripDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [showStatusDropdown, showTripDropdown]);
 
   const fetchPilgrims = useCallback(async (page = 1) => {
     setLoading(true);
@@ -85,6 +137,111 @@ function PilgrimsPageContent() {
     const timer = setTimeout(() => fetchPilgrims(1), 300);
     return () => clearTimeout(timer);
   }, [fetchPilgrims]);
+
+  // Clear selection when data changes (page change, filter change)
+  useEffect(() => {
+    setSelectedIds(new Set());
+  }, [pilgrims]);
+
+  const fetchTrips = useCallback(async () => {
+    if (tripsLoaded) return;
+    try {
+      const res = await fetch('/api/trips?status=open');
+      if (res.ok) {
+        const json = await res.json();
+        setTrips(json.data || []);
+        setTripsLoaded(true);
+      }
+    } catch {
+      // silently fail
+    }
+  }, [tripsLoaded]);
+
+  // Selection helpers
+  const toggleSelect = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (pilgrims.length === 0) return;
+    const allCurrentPageIds = pilgrims.map((p) => p.id);
+    const allSelected = allCurrentPageIds.every((id) => selectedIds.has(id));
+    if (allSelected) {
+      // Deselect all current page
+      setSelectedIds((prev) => {
+        const next = new Set(prev);
+        allCurrentPageIds.forEach((id) => next.delete(id));
+        return next;
+      });
+    } else {
+      // Select all current page
+      setSelectedIds((prev) => {
+        const next = new Set(prev);
+        allCurrentPageIds.forEach((id) => next.add(id));
+        return next;
+      });
+    }
+  };
+
+  const clearSelection = () => {
+    setSelectedIds(new Set());
+    setShowStatusDropdown(false);
+    setShowTripDropdown(false);
+  };
+
+  // Bulk action handlers
+  const executeBulkAction = async (action: string, extra: Record<string, string> = {}) => {
+    setBulkLoading(true);
+    setShowStatusDropdown(false);
+    setShowTripDropdown(false);
+    try {
+      const res = await fetch('/api/pilgrims/bulk', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action,
+          pilgrimIds: Array.from(selectedIds),
+          ...extra,
+        }),
+      });
+      const json = await res.json();
+      if (res.ok) {
+        const msg = json.failed > 0
+          ? `${json.success} berhasil, ${json.failed} gagal`
+          : `${json.success} jemaah berhasil diproses`;
+        setBulkMessage({ type: 'success', text: msg });
+        setSelectedIds(new Set());
+        fetchPilgrims(pagination.page);
+      } else {
+        setBulkMessage({ type: 'error', text: json.error || 'Terjadi kesalahan' });
+      }
+    } catch {
+      setBulkMessage({ type: 'error', text: 'Gagal menghubungi server' });
+    } finally {
+      setBulkLoading(false);
+    }
+  };
+
+  const handleBulkStatusChange = (status: string) => {
+    executeBulkAction('update_status', { status });
+  };
+
+  const handleBulkAssignTrip = (tripId: string) => {
+    executeBulkAction('assign_trip', { tripId });
+  };
+
+  const handleBulkDelete = () => {
+    setBulkDeleteConfirm(false);
+    executeBulkAction('delete');
+  };
 
   const handleDelete = async () => {
     if (!deleteTarget) return;
@@ -138,7 +295,34 @@ function PilgrimsPageContent() {
     }
   };
 
+  // Check if all current page items are selected
+  const allPageSelected = pilgrims.length > 0 && pilgrims.every((p) => selectedIds.has(p.id));
+  const somePageSelected = pilgrims.some((p) => selectedIds.has(p.id)) && !allPageSelected;
+
   const columns: Column<PilgrimRow>[] = [
+    {
+      key: 'select',
+      header: '',
+      width: '48px',
+      render: (row) => (
+        <div
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <input
+            type="checkbox"
+            checked={selectedIds.has(row.id)}
+            onChange={() => toggleSelect(row.id)}
+            style={{
+              width: '18px',
+              height: '18px',
+              cursor: 'pointer',
+              accentColor: c.primary,
+            }}
+          />
+        </div>
+      ),
+    },
     {
       key: 'pilgrim',
       header: t.pilgrims.tableHeaders.pilgrim,
@@ -252,8 +436,21 @@ function PilgrimsPageContent() {
     color: c.textLight,
   };
 
+  const bulkBarBtnStyle: React.CSSProperties = {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '8px 14px',
+    fontSize: '13px',
+    fontWeight: '500',
+    borderRadius: '8px',
+    border: 'none',
+    cursor: 'pointer',
+    whiteSpace: 'nowrap',
+  };
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '16px' : '24px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '16px' : '24px', paddingBottom: selectedIds.size > 0 ? '80px' : '0' }}>
 
       {/* Header */}
       <div style={{ display: 'flex', alignItems: isMobile ? 'stretch' : 'flex-start', justifyContent: 'space-between', flexDirection: isMobile ? 'column' : 'row', gap: '16px' }}>
@@ -267,6 +464,27 @@ function PilgrimsPageContent() {
         </div>
 
         <div style={{ display: 'flex', gap: '8px', flexDirection: isMobile ? 'column' : 'row', width: isMobile ? '100%' : 'auto' }}>
+          <button
+            onClick={() => setShowImportModal(true)}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              backgroundColor: c.cardBg,
+              color: c.textSecondary,
+              fontSize: '14px',
+              fontWeight: '500',
+              padding: '12px 16px',
+              borderRadius: '8px',
+              border: `1px solid ${c.border}`,
+              cursor: 'pointer',
+              width: isMobile ? '100%' : 'auto',
+            }}
+          >
+            <Upload style={{ width: '16px', height: '16px' }} />
+            Import CSV
+          </button>
           <button
             onClick={handleExportCSV}
             style={{
@@ -330,6 +548,31 @@ function PilgrimsPageContent() {
         />
       </div>
 
+      {/* Bulk success/error message */}
+      {bulkMessage && (
+        <div
+          style={{
+            padding: '12px 16px',
+            borderRadius: '8px',
+            fontSize: '14px',
+            fontWeight: '500',
+            backgroundColor: bulkMessage.type === 'success' ? '#D1FAE5' : '#FEE2E2',
+            color: bulkMessage.type === 'success' ? '#065F46' : '#991B1B',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
+          <span>{bulkMessage.text}</span>
+          <button
+            onClick={() => setBulkMessage(null)}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', color: 'inherit' }}
+          >
+            <X style={{ width: '16px', height: '16px' }} />
+          </button>
+        </div>
+      )}
+
       {/* Table */}
       <DataTable
         columns={columns}
@@ -347,9 +590,256 @@ function PilgrimsPageContent() {
           onPageChange: (p) => fetchPilgrims(p),
           itemLabel: t.pilgrims.pilgrimsLabel,
         }}
+        headerSlot={
+          pilgrims.length > 0 ? (
+            <div style={{ padding: '8px 24px 0 24px' }}>
+              <label
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  cursor: 'pointer',
+                  fontSize: '13px',
+                  color: c.textSecondary,
+                  userSelect: 'none',
+                }}
+              >
+                <input
+                  type="checkbox"
+                  checked={allPageSelected}
+                  ref={(el) => {
+                    if (el) el.indeterminate = somePageSelected;
+                  }}
+                  onChange={toggleSelectAll}
+                  style={{ width: '16px', height: '16px', accentColor: c.primary, cursor: 'pointer' }}
+                />
+                Pilih semua di halaman ini
+              </label>
+            </div>
+          ) : undefined
+        }
+        rowStyle={(row) =>
+          selectedIds.has(row.id)
+            ? { backgroundColor: c.primaryLight || '#EFF6FF' }
+            : undefined
+        }
       />
 
-      {/* Delete Confirmation */}
+      {/* Floating Bulk Action Bar */}
+      {selectedIds.size > 0 && (
+        <div
+          style={{
+            position: 'fixed',
+            bottom: '24px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 1000,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            backgroundColor: c.cardBg,
+            border: `1px solid ${c.border}`,
+            borderRadius: '9999px',
+            padding: '10px 20px',
+            boxShadow: '0 10px 40px rgba(0,0,0,0.15)',
+            flexWrap: isMobile ? 'wrap' : 'nowrap',
+            justifyContent: 'center',
+            maxWidth: isMobile ? 'calc(100% - 32px)' : 'auto',
+          }}
+        >
+          {/* Count badge */}
+          <div
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '4px 12px',
+              backgroundColor: c.primary,
+              color: 'white',
+              borderRadius: '9999px',
+              fontSize: '13px',
+              fontWeight: '600',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            <CheckSquare style={{ width: '14px', height: '14px' }} />
+            {selectedIds.size} jemaah dipilih
+          </div>
+
+          {/* Ubah Status button + dropdown */}
+          <div style={{ position: 'relative' }} ref={statusDropdownRef}>
+            <button
+              onClick={() => {
+                setShowTripDropdown(false);
+                setShowStatusDropdown((v) => !v);
+              }}
+              disabled={bulkLoading}
+              style={{
+                ...bulkBarBtnStyle,
+                backgroundColor: c.primary,
+                color: 'white',
+                opacity: bulkLoading ? 0.7 : 1,
+              }}
+            >
+              {bulkLoading ? <Loader2 style={{ width: '14px', height: '14px', animation: 'spin 1s linear infinite' }} /> : null}
+              Ubah Status
+              <ChevronDown style={{ width: '14px', height: '14px' }} />
+            </button>
+            {showStatusDropdown && (
+              <div
+                style={{
+                  position: 'absolute',
+                  bottom: '100%',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  marginBottom: '8px',
+                  backgroundColor: c.cardBg,
+                  border: `1px solid ${c.border}`,
+                  borderRadius: '10px',
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+                  overflow: 'hidden',
+                  minWidth: '160px',
+                  zIndex: 1001,
+                }}
+              >
+                {STATUS_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.value}
+                    onClick={() => handleBulkStatusChange(opt.value)}
+                    style={{
+                      display: 'block',
+                      width: '100%',
+                      padding: '10px 16px',
+                      fontSize: '13px',
+                      color: c.textPrimary,
+                      backgroundColor: 'transparent',
+                      border: 'none',
+                      cursor: 'pointer',
+                      textAlign: 'left',
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = c.cardBgHover; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+                  >
+                    <StatusBadge status={opt.value as PilgrimStatus} size="sm" />
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Assign ke Trip button + dropdown */}
+          <div style={{ position: 'relative' }} ref={tripDropdownRef}>
+            <button
+              onClick={() => {
+                setShowStatusDropdown(false);
+                setShowTripDropdown((v) => !v);
+                fetchTrips();
+              }}
+              disabled={bulkLoading}
+              style={{
+                ...bulkBarBtnStyle,
+                backgroundColor: c.cardBg,
+                color: c.textPrimary,
+                border: `1px solid ${c.border}`,
+                opacity: bulkLoading ? 0.7 : 1,
+              }}
+            >
+              Assign ke Trip
+              <ChevronDown style={{ width: '14px', height: '14px' }} />
+            </button>
+            {showTripDropdown && (
+              <div
+                style={{
+                  position: 'absolute',
+                  bottom: '100%',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  marginBottom: '8px',
+                  backgroundColor: c.cardBg,
+                  border: `1px solid ${c.border}`,
+                  borderRadius: '10px',
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+                  overflow: 'hidden',
+                  minWidth: '220px',
+                  maxHeight: '240px',
+                  overflowY: 'auto',
+                  zIndex: 1001,
+                }}
+              >
+                {trips.length === 0 ? (
+                  <div style={{ padding: '16px', fontSize: '13px', color: c.textMuted, textAlign: 'center' }}>
+                    {tripsLoaded ? 'Tidak ada trip yang tersedia' : 'Memuat...'}
+                  </div>
+                ) : (
+                  trips.map((trip) => {
+                    const remaining = trip.capacity > 0 ? trip.capacity - trip.registeredCount : null;
+                    return (
+                      <button
+                        key={trip.id}
+                        onClick={() => handleBulkAssignTrip(trip.id)}
+                        style={{
+                          display: 'block',
+                          width: '100%',
+                          padding: '10px 16px',
+                          fontSize: '13px',
+                          color: c.textPrimary,
+                          backgroundColor: 'transparent',
+                          border: 'none',
+                          cursor: 'pointer',
+                          textAlign: 'left',
+                        }}
+                        onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = c.cardBgHover; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+                      >
+                        <div style={{ fontWeight: '500' }}>{trip.name}</div>
+                        <div style={{ fontSize: '11px', color: c.textMuted, marginTop: '2px' }}>
+                          {trip.registeredCount}/{trip.capacity || '-'} terdaftar
+                          {remaining !== null && remaining >= 0 ? ` (sisa ${remaining})` : ''}
+                        </div>
+                      </button>
+                    );
+                  })
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Hapus button */}
+          <button
+            onClick={() => {
+              setShowStatusDropdown(false);
+              setShowTripDropdown(false);
+              setBulkDeleteConfirm(true);
+            }}
+            disabled={bulkLoading}
+            style={{
+              ...bulkBarBtnStyle,
+              backgroundColor: '#FEE2E2',
+              color: '#DC2626',
+              opacity: bulkLoading ? 0.7 : 1,
+            }}
+          >
+            <Trash2 style={{ width: '14px', height: '14px' }} />
+            Hapus
+          </button>
+
+          {/* Batal button */}
+          <button
+            onClick={clearSelection}
+            disabled={bulkLoading}
+            style={{
+              ...bulkBarBtnStyle,
+              backgroundColor: 'transparent',
+              color: c.textMuted,
+            }}
+          >
+            <X style={{ width: '14px', height: '14px' }} />
+            Batal
+          </button>
+        </div>
+      )}
+
+      {/* Single Delete Confirmation */}
       <ConfirmDialog
         open={!!deleteTarget}
         onClose={() => setDeleteTarget(null)}
@@ -359,6 +849,33 @@ function PilgrimsPageContent() {
         confirmLabel="Hapus"
         variant="destructive"
       />
+
+      {/* Bulk Delete Confirmation */}
+      <ConfirmDialog
+        open={bulkDeleteConfirm}
+        onClose={() => setBulkDeleteConfirm(false)}
+        onConfirm={handleBulkDelete}
+        title={`Hapus ${selectedIds.size} jemaah?`}
+        description="Semua data jemaah yang dipilih beserta dokumen dan pembayarannya akan dihapus permanen. Tindakan ini tidak dapat dibatalkan."
+        confirmLabel={`Hapus ${selectedIds.size} Jemaah`}
+        variant="destructive"
+        loading={bulkLoading}
+      />
+
+      {/* Import Modal */}
+      <ImportModal
+        isOpen={showImportModal}
+        onClose={() => setShowImportModal(false)}
+        onImported={() => fetchPilgrims(1)}
+      />
+
+      {/* Spin keyframe for loader */}
+      <style>{`
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   );
 }
