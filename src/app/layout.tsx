@@ -5,6 +5,7 @@ import { LanguageProvider } from "@/components/providers/language-provider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { AuthProvider } from "@/lib/auth";
 import { ToastProvider } from "@/components/ui/toast";
+import { SWRegister } from "@/components/pwa/sw-register";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   variable: "--font-sans",
@@ -47,6 +48,7 @@ export default function RootLayout({
   return (
     <html lang="id" suppressHydrationWarning>
       <head>
+        <link rel="apple-touch-icon" href="/icons/icon-192.svg" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -56,6 +58,7 @@ export default function RootLayout({
           <AuthProvider>
             <LanguageProvider>
               <ToastProvider>
+                <SWRegister />
                 {children}
               </ToastProvider>
             </LanguageProvider>

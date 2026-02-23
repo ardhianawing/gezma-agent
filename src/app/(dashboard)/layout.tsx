@@ -6,6 +6,9 @@ import { Header } from '@/components/layout/header';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
 import ChatWidget from '@/components/ai-assistant/ChatWidget';
+import { OfflineIndicator } from '@/components/pwa/offline-indicator';
+import { InstallPrompt } from '@/components/pwa/install-prompt';
+import { UpdatePrompt } from '@/components/pwa/update-prompt';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -53,6 +56,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           {children}
         </main>
       </div>
+
+      {/* PWA Components */}
+      <OfflineIndicator />
+      <InstallPrompt />
+      <UpdatePrompt />
 
       {/* AI Assistant Chat Widget */}
       <ChatWidget />
