@@ -1,7 +1,7 @@
 # GEZMA Agent — Development Checkpoint
 
-> **Last Updated:** 2026-02-23
-> **Blueprint Reference:** `GEZMA-AGENT-PLAN-v2.md`
+> **Last Updated:** 2026-02-23 (Session 2)
+> **Blueprint Reference:** `GEZMA-AGENT-PLAN-v2.md`, `DEVELOPMENT-PLAN-v3.md`
 
 ---
 
@@ -9,194 +9,146 @@
 
 | Kategori | Status | Keterangan |
 |----------|--------|------------|
-| **Core (Agent Dashboard)** | ✅ 90% Done | Semua modul utama sudah real + API |
-| **Platform (Marketplace dll)** | ⏸ Placeholder | 6 halaman Coming Soon |
+| **Phase 1: Core Agent Dashboard** | ✅ 100% Done | Semua modul + API |
+| **Phase 2A: Platform Pages** | ✅ Done | 6 halaman dengan mock data |
+| **Phase 2B: Agent Backlog** | ✅ Done | Manifest CRUD, Timeline, Bulk, Import CSV |
+| **Phase 2C: Gezma Pilgrim MVP** | ❌ Belum | App untuk jemaah |
+| **Phase 3: Integrasi** | ❌ Belum | Nusuk, Payment Gateway, WhatsApp |
 | **PWA** | ✅ Done | Service Worker, Install Prompt, Offline |
 | **Deployment** | ✅ Ready | Docker + Nginx + Traefik |
 
 ---
 
-## A. APA YANG SUDAH JADI (REAL & BERFUNGSI)
+## A. PHASE 1 — CORE AGENT DASHBOARD (100%)
 
 ### 1. Authentication & Security
-| Fitur | Status | Catatan |
-|-------|--------|---------|
-| Login | ✅ Real | JWT cookie, 7 hari |
-| Register | ✅ Real | 3 step: Agency → PIC → Password |
-| Email Verification | ✅ Real | Wajib saat registrasi |
-| Forgot Password | ✅ Real | Email SMTP reset link |
-| Change Password | ✅ Real | Di halaman Settings |
-| Auth Middleware | ✅ Real | Proteksi semua route dashboard |
-| Role System | ✅ Real | owner, admin, staff, marketing |
+| Fitur | Status |
+|-------|--------|
+| Login (JWT cookie, 7 hari) | ✅ |
+| Register (3 step: Agency → PIC → Password) | ✅ |
+| Email Verification | ✅ |
+| Forgot Password (SMTP) | ✅ |
+| Change Password | ✅ |
+| Auth Middleware | ✅ |
+| Role System (owner, admin, staff, marketing) | ✅ |
 
-### 2. Pilgrims (CRM Jemaah) — **LENGKAP**
-| Fitur | Status | Route |
-|-------|--------|-------|
-| List + Search + Filter + Pagination | ✅ Real | `/pilgrims` |
-| Tambah Jemaah | ✅ Real | `/pilgrims/new` |
-| Detail Jemaah | ✅ Real | `/pilgrims/[id]` |
-| Edit Jemaah | ✅ Real | `/pilgrims/[id]/edit` |
-| Hapus Jemaah | ✅ Real | ConfirmDialog |
-| Upload Dokumen (KTP, Paspor, dll) | ✅ Real | API + UI |
-| Hapus Dokumen | ✅ Real | Dengan logging |
-| Status Lifecycle (lead → completed) | ✅ Real | 8 status dengan badge warna |
-| Checklist per Jemaah | ✅ Real | 9 item checklist |
-| Payment Records (DP, Cicilan, Lunas, Refund) | ✅ Real | CRUD |
-| Trip Assignment | ✅ Real | Dari detail jemaah |
-| Export CSV | ✅ Real | Download filtered data |
+### 2. Pilgrims (CRM Jemaah)
+| Fitur | Status |
+|-------|--------|
+| CRUD + Search + Filter + Pagination | ✅ |
+| Upload/Hapus Dokumen (KTP, Paspor, dll) | ✅ |
+| Status Lifecycle (8 status + badge warna) | ✅ |
+| Status Timeline Visual | ✅ NEW |
+| Checklist per Jemaah (9 item) | ✅ |
+| Payment Records (DP, Cicilan, Lunas, Refund) | ✅ |
+| Trip Assignment | ✅ |
+| Export CSV | ✅ |
+| Import CSV (upload, preview, mapping, validate) | ✅ NEW |
+| Bulk Actions (status, trip assign, delete) | ✅ NEW |
 
-### 3. Packages (Paket Umrah) — **LENGKAP**
-| Fitur | Status | Route |
-|-------|--------|-------|
-| List + Search + Filter | ✅ Real | `/packages` |
-| Buat Paket | ✅ Real | `/packages/new` |
-| Detail Paket | ✅ Real | `/packages/[id]` |
-| Edit Paket | ✅ Real | `/packages/[id]/edit` |
-| Hapus Paket | ✅ Real | |
-| HPP Calculator (9 komponen biaya) | ✅ Real | Airline, Hotel, Visa, dll |
-| Margin & Published Price | ✅ Real | Auto-calculate |
-| Itinerary Builder (day-by-day) | ✅ Real | Component |
-| Kategori (Regular/Plus/VIP/Ramadhan/Budget) | ✅ Real | |
+### 3. Packages (Paket Umrah)
+| Fitur | Status |
+|-------|--------|
+| CRUD + Search + Filter | ✅ |
+| HPP Calculator (9 komponen biaya) | ✅ |
+| Margin & Published Price (auto-calculate) | ✅ |
+| Itinerary Builder (day-by-day) | ✅ |
+| Kategori (Regular/Plus/VIP/Ramadhan/Budget) | ✅ |
 
-### 4. Trips (Keberangkatan) — **LENGKAP**
-| Fitur | Status | Route |
-|-------|--------|-------|
-| List + Search + Filter | ✅ Real | `/trips` |
-| Buat Trip | ✅ Real | `/trips/new` |
-| Detail Trip | ✅ Real | `/trips/[id]` |
-| Edit Trip | ✅ Real | `/trips/[id]/edit` |
-| Hapus Trip | ✅ Real | |
-| Auto-generate Manifest | ✅ Real | Dari jemaah yang assigned |
-| Operational Checklist | ✅ Real | PATCH API |
-| Print Manifest | ✅ Real | |
-| Capacity Tracking | ✅ Real | registered vs confirmed |
+### 4. Trips (Keberangkatan)
+| Fitur | Status |
+|-------|--------|
+| CRUD + Search + Filter | ✅ |
+| Manifest CRUD (add/remove pilgrim) | ✅ NEW |
+| Room Assignment (inline editing) | ✅ NEW |
+| Capacity Progress Bar | ✅ NEW |
+| Operational Checklist (8 item) | ✅ |
+| Print Manifest | ✅ |
 
-### 5. Dashboard — **REAL**
-| Fitur | Status | Catatan |
-|-------|--------|---------|
-| Stats Summary | ✅ Real | Total jemaah, paket aktif, trip, dokumen pending |
-| Activity Log | ✅ Real | Real-time dari database |
-| Action Center / Alerts | ✅ Real | Operational alerts |
-| Quick Actions | ✅ Real | |
-| Upcoming Trips | ✅ Real | |
+### 5. Dashboard
+| Fitur | Status |
+|-------|--------|
+| Stats Summary, Activity Log, Alerts, Quick Actions, Upcoming Trips | ✅ |
 
-### 6. Financial Reports — **REAL**
-| Fitur | Status | Catatan |
-|-------|--------|---------|
-| Total Revenue | ✅ Real | |
-| Outstanding Balance | ✅ Real | |
-| Collection Rate | ✅ Real | |
-| Breakdown by Method (Transfer/Cash/Card) | ✅ Real | |
-| Breakdown by Type (DP/Cicilan/Lunas/Refund) | ✅ Real | |
-| Revenue per Trip | ✅ Real | |
-| Monthly Revenue Trend | ✅ Real | |
+### 6. Financial Reports
+| Fitur | Status |
+|-------|--------|
+| Revenue, Outstanding, Collection Rate, Breakdown, Trend | ✅ |
 
-### 7. Settings — **REAL**
-| Fitur | Status | Catatan |
-|-------|--------|---------|
-| Theme Toggle (Light/Dark) | ✅ Real | |
-| Language (ID/EN) | ✅ Real | i18n |
-| Change Password | ✅ Real | |
-| User/Staff Management | ✅ Real | CRUD |
-| Agency Profile | ✅ Real | |
+### 7. Settings
+| Fitur | Status |
+|-------|--------|
+| Theme (Light/Dark), Language (ID/EN), Password, Users, Agency Profile | ✅ |
 
-### 8. AI Assistant — **REAL**
-| Fitur | Status | Catatan |
-|-------|--------|---------|
-| Chat Widget | ✅ Real | Floating bottom-right |
-| Gemini 2.0 Flash | ✅ Real | Context-aware tentang PPIU/Umrah |
+### 8. AI Assistant
+| Fitur | Status |
+|-------|--------|
+| Chat Widget + Gemini 2.0 Flash | ✅ |
 
-### 9. PWA — **REAL**
-| Fitur | Status | Catatan |
-|-------|--------|---------|
-| Web App Manifest | ✅ Real | Installable |
-| Service Worker | ✅ Real | Cache-first static, network-first API |
-| Offline Fallback Page | ✅ Real | `/offline` |
-| Offline Indicator Bar | ✅ Real | Red bar saat offline |
-| Install Prompt | ✅ Real | Banner di bottom |
-| Update Prompt | ✅ Real | Notifikasi versi baru |
-
-### 10. Infrastructure
-| Fitur | Status | Catatan |
-|-------|--------|---------|
-| Docker | ✅ Ready | Dockerfile + docker-compose |
-| Nginx Reverse Proxy | ✅ Ready | |
-| Traefik SSL | ✅ Ready | |
-| Deploy Script | ✅ Ready | `deploy.sh` |
-| Prisma + PostgreSQL | ✅ Real | 8 models |
-| Activity Logging | ✅ Real | Audit trail semua operasi |
-| Zod Validation | ✅ Real | Server-side |
-| API Client + Service Layer | ✅ Real | Clean architecture |
+### 9. PWA
+| Fitur | Status |
+|-------|--------|
+| Manifest, Service Worker, Offline, Install Prompt, Update Prompt | ✅ |
 
 ---
 
-## B. BELUM JADI (DARI BLUEPRINT)
+## B. PHASE 2A — PLATFORM PAGES (100%)
 
-### Blueprint Section 5 — Fitur yang Kurang
-| Fitur | Status | Prioritas | Effort |
-|-------|--------|-----------|--------|
-| Rooming List Management | ❌ Belum | HIGH | Medium |
-| Trip Manifest CRUD (add/remove pilgrim) | ❌ Belum | HIGH | Small |
-| Pilgrim Status Timeline (visual) | ❌ Belum | MEDIUM | Small |
-| Bulk Actions (pilgrim list) | ❌ Belum | MEDIUM | Small |
-| Import Data Jemaah (CSV/Excel) | ❌ Belum | MEDIUM | Medium |
-| Brochure Generator (PDF/Image) | ❌ Belum | LOW | Large |
-| Package Duplicate | ❌ Belum | LOW | Small |
-| QR Verification Page | ❌ Belum | LOW | Small |
-| Roles & Permissions (granular) | ❌ Belum | LOW | Medium |
-| Notification Preferences | ❌ Belum | LOW | Small |
+Semua 6 halaman sudah dibangun dengan mock data (bukan Coming Soon lagi):
 
-### Blueprint Section — Reusable Components
-| Component | Status | Catatan |
-|-----------|--------|---------|
-| DataTable | ✅ Done | Generic, reusable |
-| EmptyState | ✅ Done | |
-| LoadingSkeleton (6 varian) | ✅ Done | |
-| SearchInput | ✅ Done | |
-| FilterSelect | ✅ Done | |
-| Pagination | ✅ Done | |
-| ConfirmDialog | ✅ Done | |
-| SectionCard | ✅ Done | |
-| BackButton | ✅ Done | |
-| StatusBadge | ✅ Done | |
-| StatCard | ✅ Done | |
-| Breadcrumb | ❌ Belum | |
-| Mobile Nav (dedicated) | ❌ Belum | Ada sidebar overlay |
-
-### Platform Pages (Fase Berikutnya — Bukan Blueprint Phase 1)
-| Page | Status | Catatan |
-|------|--------|---------|
-| Marketplace | ⏸ Coming Soon | B2B marketplace |
-| Forum | ⏸ Coming Soon | Komunitas |
-| News/Blog | ⏸ Coming Soon | Portal berita |
-| Academy | ⏸ Coming Soon | E-learning |
-| Trade Centre | ⏸ Coming Soon | Export produk |
-| Services | ⏸ Coming Soon | Layanan tambahan |
+| Page | Mock Data | Fitur Utama |
+|------|-----------|-------------|
+| Berita | 10 artikel | Featured section, kategori, search, breaking badge |
+| Akademi | 12 kursus | Stats, kategori+level filter, progress bar, rating |
+| Layanan | static | 6 service cards, download dokumen, kontak |
+| Trade Centre | 20 produk | Tabs, sertifikasi, stepper pengajuan |
+| Marketplace | 30 item | Category tabs, sort, filter hotel, rating |
+| Forum | 12 thread | Table layout, sort, pinned/hot/solved, pagination |
 
 ---
 
-## C. DATABASE MODELS (Prisma)
+## C. PHASE 2B — AGENT BACKLOG (100%)
 
-```
-Agency ──┬── User (staff)
-         ├── Pilgrim ──┬── PilgrimDocument
-         │             └── PaymentRecord
-         ├── Package
-         ├── Trip
-         └── ActivityLog
-```
+| Fitur | Status | API | UI |
+|-------|--------|-----|-----|
+| Manifest CRUD | ✅ | POST/PATCH/DELETE `/trips/[id]/manifest` | Modal add, inline room edit, remove |
+| Status Timeline | ✅ | GET `/pilgrims/[id]/history` | Horizontal progress + vertical timeline |
+| Bulk Actions | ✅ | POST `/pilgrims/bulk` | Checkboxes, floating bar, dropdowns |
+| Import CSV | ✅ | POST `/pilgrims/import` | 3-step modal, template download |
 
-8 model, semua multi-tenant (agencyId), semua dengan real API.
+### Belum Dikerjakan (LOW priority)
+| Fitur | Status | Prioritas |
+|-------|--------|-----------|
+| Brochure Generator (PDF) | ❌ | LOW |
+| Package Duplicate | ❌ | LOW |
+| QR Verification Page | ❌ | LOW |
+| Granular Roles & Permissions | ❌ | LOW |
+| Notification Preferences | ❌ | LOW |
 
 ---
 
-## D. API ENDPOINTS (28 Total)
+## D. PHASE 2C — GEZMA PILGRIM MVP (0%)
+
+App untuk jemaah (bukan travel agent):
+
+| Fitur | Status |
+|-------|--------|
+| Login dengan booking code | ❌ |
+| Dashboard jemaah | ❌ |
+| Detail perjalanan | ❌ |
+| Manasik digital (text + video) | ❌ |
+| Panduan doa | ❌ |
+| Profile & dokumen | ❌ |
+
+---
+
+## E. API ENDPOINTS (33 Total)
 
 ```
 Auth:        7 endpoints (login, register, verify, password, etc)
-Pilgrims:   10 endpoints (CRUD + documents + payments + status)
+Pilgrims:   13 endpoints (CRUD + documents + payments + status + history + bulk + import)
 Packages:    5 endpoints (full CRUD)
-Trips:       5 endpoints (CRUD + checklist)
+Trips:       7 endpoints (CRUD + checklist + manifest + manifest/remove)
 Dashboard:   3 endpoints (stats, alerts, activities)
 Reports:     1 endpoint  (financial)
 Other:       3 endpoints (agency, users, chat AI)
@@ -204,44 +156,43 @@ Other:       3 endpoints (agency, users, chat AI)
 
 ---
 
-## E. TECH STACK AKTUAL
+## F. TECH STACK
 
 | Layer | Tech |
 |-------|------|
 | Framework | Next.js 16 (App Router) |
 | Language | TypeScript |
-| Styling | Tailwind CSS v4 + inline styles |
+| Styling | 100% inline styles + useTheme() |
 | Database | PostgreSQL + Prisma v7 |
 | Auth | JWT (HTTP-only cookies) |
 | Email | Nodemailer (SMTP) |
 | AI | Google Gemini 2.0 Flash |
 | Validation | Zod v4 |
-| State | React hooks (no Zustand used yet) |
 | Charts | Recharts |
 | Icons | Lucide React |
-| Forms | React Hook Form + Zod |
 | Deployment | Docker + Nginx + Traefik |
 
 ---
 
-## F. FILE STRUCTURE SUMMARY
+## G. FILE STRUCTURE
 
 ```
 src/
 ├── app/
-│   ├── (auth)/          → 4 pages (login, register, verify, forgot)
-│   ├── (dashboard)/     → 16 pages (dashboard, pilgrims, packages, trips, etc)
-│   ├── api/             → 28 API endpoints
+│   ├── (auth)/          → 4 pages
+│   ├── (dashboard)/     → 22 pages (6 platform + 16 operasional)
+│   ├── api/             → 33 API endpoints
 │   └── offline/         → PWA offline page
 ├── components/
 │   ├── shared/          → 12 reusable components
 │   ├── layout/          → 3 (sidebar, header, page-header)
 │   ├── packages/        → 3 (form, itinerary, pricing)
-│   ├── pilgrims/        → 1 (document-upload)
+│   ├── pilgrims/        → 3 (document-upload, status-timeline, import-modal)
 │   ├── trips/           → 1 (trip-form)
 │   ├── dashboard/       → 2 (action-center, quick-actions)
 │   ├── pwa/             → 4 (sw-register, offline, install, update)
 │   └── ai-assistant/    → 1 (ChatWidget)
+├── data/                → 5 mock data files
 ├── lib/
 │   ├── services/        → 6 service files
 │   ├── hooks/           → 4 hooks
@@ -253,10 +204,20 @@ src/
 
 ---
 
-## G. KESIMPULAN
+## H. GIT LOG (Session 2)
 
-**GEZMA Agent sudah ~90% selesai untuk Blueprint Phase 1 (Agent Dashboard).**
+```
+6da6555 feat: Phase 2B — manifest CRUD, status timeline, bulk actions, CSV import
+aec5928 feat: build 6 platform pages with mock data (Phase 2A)
+aac7d40 docs: add CHECKPOINT.md — full development status vs blueprint
+9352da0 refactor: pilgrim pages use reusable components, remove ~800 lines duplication
+6244f41 feat: add PWA support and reusable shared components
+```
 
-Yang tersisa adalah fitur pendukung (rooming list, manifest CRUD, import, brochure) yang bersifat enhancement, bukan core. Semua modul utama (Pilgrims, Packages, Trips, Dashboard, Reports, Auth, Settings, AI, PWA) sudah **real dan berfungsi** dengan database PostgreSQL.
+---
 
-Platform pages (Marketplace, Forum, News, Academy) adalah **Phase 2** dan memang belum di-scope di Blueprint v2.
+## I. NEXT STEPS
+
+1. **Phase 2C: Gezma Pilgrim MVP** — App untuk jemaah (login booking code, manasik, doa, trip tracker)
+2. **Phase 3: Integrasi** — Nusuk API, Payment Gateway, WhatsApp API
+3. **Phase 4: Advanced** — Gamifikasi, Blockchain, Command Center, Mobile Native
