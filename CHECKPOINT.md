@@ -142,8 +142,11 @@ App terpisah untuk jemaah (route group `(pilgrim)`) dengan layout mobile-first, 
 | **DB Migration** | ✅ NEW | `bookingCode` field + unique constraint `[agencyId, bookingCode]` |
 | Dashboard jemaah | ✅ | Welcome, status progress (8 step), quick info, payment summary, docs, agency contact |
 | Detail perjalanan | ✅ | Countdown timer, flight info, hotels, muthawwif, room assignment, itinerary timeline |
-| Manasik digital | ✅ | 8 materi (Ihram, Tawaf, Sa'i, Tahallul, dll), category filter, progress tracking, mark complete |
-| Panduan doa | ✅ | 16 doa (Umrah, Harian, Perjalanan, Masjid, Munajat), Arabic+Latin+terjemahan, favorit, search |
+| Manasik digital | ✅ | 8 materi dari DB per-agency, progress tracking persisten via API |
+| Panduan doa | ✅ | 16 doa dari DB per-agency, favorit persisten via API |
+| **Manasik & Doa DB** | ✅ NEW | 4 tabel: manasik_lessons, doa_prayers, pilgrim_manasik_progress, pilgrim_doa_favorites |
+| **Manasik & Doa API** | ✅ NEW | 4 endpoints: GET manasik, POST progress, GET doa, POST favorites |
+| **Seed Script** | ✅ NEW | `prisma/seed-manasik-doa.ts` — seed default content per-agency |
 | Profile & dokumen | ✅ | Data pribadi, kontak, kamar, dokumen checklist, travel agent info, logout |
 
 ---
@@ -170,7 +173,7 @@ Semua menggunakan mock data, siap connect real API ketika key tersedia:
 
 ---
 
-## F. API ENDPOINTS (51 Total)
+## F. API ENDPOINTS (55 Total)
 
 ```
 Auth:          7 endpoints (login, register, verify, password, etc)
@@ -180,7 +183,7 @@ Trips:         7 endpoints (CRUD + checklist + manifest + manifest/remove)
 Dashboard:     3 endpoints (stats, alerts, activities)
 Reports:       1 endpoint  (financial)
 Integrations: 15 endpoints (nusuk: 3, payment: 4, whatsapp: 5, umrahcash: 3)
-Pilgrim Portal: 3 endpoints (login, me, logout)
+Pilgrim Portal: 7 endpoints (login, me, logout, manasik, manasik/progress, doa, doa/favorites)
 Other:         3 endpoints (agency, users, chat AI)
 ```
 
@@ -212,7 +215,7 @@ src/
 │   ├── (auth)/          → 4 pages
 │   ├── (dashboard)/     → 22 pages (6 platform + 16 operasional)
 │   ├── (pilgrim)/       → 6 pages (login, home, trip, manasik, doa, profile) + layout
-│   ├── api/             → 36 API endpoints (incl. pilgrim-portal: 3)
+│   ├── api/             → 40 API endpoints (incl. pilgrim-portal: 7)
 │   └── offline/         → PWA offline page
 ├── components/
 │   ├── shared/          → 12 reusable components
@@ -239,6 +242,8 @@ src/
 ## H. GIT LOG (Session 3)
 
 ```
+0ff9765 feat: connect Manasik & Doa to real database
+67343b3 docs: update CHECKPOINT.md with Pilgrim Portal DB integration
 5fec158 feat: connect Pilgrim Portal to real database via Prisma
 20c498b docs: update CHECKPOINT.md with Phase 3 integration status
 df2820c feat: Phase 3 — integration preparation (Nusuk, Payment, WhatsApp, UmrahCash)
