@@ -13,7 +13,7 @@
 | **Phase 2A: Platform Pages** | ✅ Done | 6 halaman dengan mock data |
 | **Phase 2B: Agent Backlog** | ✅ Done | Manifest CRUD, Timeline, Bulk, Import CSV |
 | **Phase 2C: Gezma Pilgrim MVP** | ✅ Done | 6 halaman + layout + mock data |
-| **Phase 3: Integrasi** | ❌ Belum | Nusuk, Payment Gateway, WhatsApp |
+| **Phase 3: Integrasi** | ✅ Prep Done | 4 service layers + 15 API endpoints + 7 UI pages (mock) |
 | **PWA** | ✅ Done | Service Worker, Install Prompt, Offline |
 | **Deployment** | ✅ Ready | Docker + Nginx + Traefik |
 
@@ -144,16 +144,39 @@ App terpisah untuk jemaah (route group `(pilgrim)`) dengan layout mobile-first, 
 
 ---
 
-## E. API ENDPOINTS (33 Total)
+## E. PHASE 3 — INTEGRASI (Preparation Done)
+
+Semua menggunakan mock data, siap connect real API ketika key tersedia:
+
+| Integrasi | Service | API Endpoints | UI Pages | Status |
+|-----------|---------|---------------|----------|--------|
+| **Nusuk API** | nusuk.service.ts | 3 (config, hotels, visa) | Settings + detail config | ✅ Mock |
+| **Payment Gateway** | payment-gateway.service.ts | 4 (config, invoices, webhook) | Settings + pilgrim invoice | ✅ Mock |
+| **WhatsApp** | whatsapp.service.ts | 5 (config, test, send, broadcast, templates) | Settings + trip broadcast | ✅ Mock |
+| **UmrahCash** | umrahcash.service.ts | 3 (config, rate, transfer) | Settings + calculator | ✅ Mock |
+
+**Halaman Baru:**
+- `/settings/integrations` — Hub semua integrasi
+- `/settings/integrations/nusuk` — Config Nusuk API
+- `/settings/integrations/payment` — Config Payment Gateway (Midtrans/Xendit/Duitku)
+- `/settings/integrations/whatsapp` — Config WhatsApp + template editor
+- `/settings/integrations/umrahcash` — Exchange rate calculator + transfer
+- `/pilgrims/[id]/invoice` — Buat & kelola invoice pembayaran
+- `/trips/[id]/broadcast` — Broadcast WhatsApp ke jemaah
+
+---
+
+## F. API ENDPOINTS (48 Total)
 
 ```
-Auth:        7 endpoints (login, register, verify, password, etc)
-Pilgrims:   13 endpoints (CRUD + documents + payments + status + history + bulk + import)
-Packages:    5 endpoints (full CRUD)
-Trips:       7 endpoints (CRUD + checklist + manifest + manifest/remove)
-Dashboard:   3 endpoints (stats, alerts, activities)
-Reports:     1 endpoint  (financial)
-Other:       3 endpoints (agency, users, chat AI)
+Auth:          7 endpoints (login, register, verify, password, etc)
+Pilgrims:     13 endpoints (CRUD + documents + payments + status + history + bulk + import)
+Packages:      5 endpoints (full CRUD)
+Trips:         7 endpoints (CRUD + checklist + manifest + manifest/remove)
+Dashboard:     3 endpoints (stats, alerts, activities)
+Reports:       1 endpoint  (financial)
+Integrations: 15 endpoints (nusuk: 3, payment: 4, whatsapp: 5, umrahcash: 3)
+Other:         3 endpoints (agency, users, chat AI)
 ```
 
 ---
