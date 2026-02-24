@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
+import { createNoteSchema } from '@/lib/validations/note';
+import { logActivity } from '@/lib/activity-logger';
 
 type Context = { params: Promise<{ id: string }> };
 
@@ -41,11 +43,14 @@ export async function POST(req: NextRequest, { params }: Context) {
 
   try {
     const body = await req.json();
-    const content = body.content?.trim();
+    const parsed = createNoteSchema.safeParse(body);
 
-    if (!content || content.length < 1) {
-      return NextResponse.json({ error: 'Konten catatan tidak boleh kosong' }, { status: 400 });
+    if (!parsed.success) {
+      const errors = parsed.error.flatten().fieldErrors;
+      return NextResponse.json({ error: 'Validasi gagal', errors }, { status: 400 });
     }
+
+    const content = parsed.data.content.trim();
 
     // Verify pilgrim belongs to agency
     const pilgrim = await prisma.pilgrim.findFirst({
@@ -71,6 +76,16 @@ export async function POST(req: NextRequest, { params }: Context) {
         authorName: user?.name || auth.email,
         agencyId: auth.agencyId,
       },
+    });
+
+    logActivity({
+      type: 'pilgrim',
+      action: 'created',
+      title: 'Catatan ditambahkan',
+      description: `Catatan baru untuk jemaah`,
+      userId: auth.userId,
+      agencyId: auth.agencyId,
+      metadata: { entityId: note.id, pilgrimId: id },
     });
 
     return NextResponse.json(note, { status: 201 });

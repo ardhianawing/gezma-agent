@@ -3,9 +3,15 @@ import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 import { changePasswordSchema } from '@/lib/validations/security';
+import { rateLimit } from '@/lib/rate-limiter';
 
 export async function POST(req: NextRequest) {
   try {
+    const { allowed } = rateLimit(req, { limit: 3, window: 60 });
+    if (!allowed) {
+      return NextResponse.json({ error: 'Terlalu banyak percobaan. Silakan coba lagi nanti.' }, { status: 429 });
+    }
+
     const auth = getAuthPayload(req);
     if (!auth) return unauthorizedResponse();
 

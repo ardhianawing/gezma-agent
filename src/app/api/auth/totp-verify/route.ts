@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import { verifyToken } from '@/lib/services/totp.service';
+import { rateLimit } from '@/lib/rate-limiter';
 
 const JWT_SECRET = process.env.JWT_SECRET!;
 
@@ -14,6 +15,11 @@ interface TotpPendingPayload {
 
 export async function POST(req: NextRequest) {
   try {
+    const { allowed } = rateLimit(req, { limit: 5, window: 60 });
+    if (!allowed) {
+      return NextResponse.json({ error: 'Terlalu banyak percobaan. Silakan coba lagi nanti.' }, { status: 429 });
+    }
+
     const body = await req.json();
     const { tempToken, token: totpCode } = body;
 

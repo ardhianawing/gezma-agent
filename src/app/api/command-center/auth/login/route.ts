@@ -3,9 +3,15 @@ import bcrypt from 'bcryptjs';
 import { prisma } from '@/lib/prisma';
 import { signCCToken, setCCTokenCookie } from '@/lib/auth-command-center';
 import { ccLoginSchema } from '@/lib/validations/command-center';
+import { rateLimit } from '@/lib/rate-limiter';
 
 export async function POST(req: NextRequest) {
   try {
+    const { allowed } = rateLimit(req, { limit: 5, window: 60 });
+    if (!allowed) {
+      return NextResponse.json({ error: 'Terlalu banyak percobaan. Silakan coba lagi nanti.' }, { status: 429 });
+    }
+
     const body = await req.json();
     const parsed = ccLoginSchema.safeParse(body);
     if (!parsed.success) {

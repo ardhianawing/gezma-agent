@@ -4,6 +4,7 @@ import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 import { checkPermission } from '@/lib/auth-permissions';
 import { PERMISSIONS } from '@/lib/permissions';
 import { logActivity } from '@/lib/activity-logger';
+import { createPaymentSchema } from '@/lib/validations/payment';
 
 type Context = { params: Promise<{ id: string }> };
 
@@ -57,21 +58,14 @@ export async function POST(req: NextRequest, { params }: Context) {
     }
 
     const body = await req.json();
-    const { amount, type, method, date, notes } = body;
+    const parsed = createPaymentSchema.safeParse(body);
 
-    // Validate required fields
-    if (!amount || typeof amount !== 'number' || amount <= 0) {
-      return NextResponse.json({ error: 'Jumlah pembayaran harus lebih dari 0' }, { status: 400 });
+    if (!parsed.success) {
+      const errors = parsed.error.flatten().fieldErrors;
+      return NextResponse.json({ error: 'Validasi gagal', errors }, { status: 400 });
     }
-    if (!type || !VALID_TYPES.includes(type)) {
-      return NextResponse.json({ error: 'Tipe pembayaran tidak valid' }, { status: 400 });
-    }
-    if (!method || !VALID_METHODS.includes(method)) {
-      return NextResponse.json({ error: 'Metode pembayaran tidak valid' }, { status: 400 });
-    }
-    if (!date) {
-      return NextResponse.json({ error: 'Tanggal pembayaran wajib diisi' }, { status: 400 });
-    }
+
+    const { amount, type, method, date, notes } = parsed.data;
 
     // Create payment and update totalPaid in a transaction
     const payment = await prisma.$transaction(async (tx) => {

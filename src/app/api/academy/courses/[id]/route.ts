@@ -11,6 +11,7 @@ export async function GET(
 
   const { id } = await params;
 
+  try {
   const course = await prisma.academyCourse.findUnique({
     where: { id },
     include: {
@@ -72,4 +73,8 @@ export async function GET(
         }
       : null,
   });
+  } catch (error) {
+    console.error('[ACADEMY_COURSE_GET] error:', error);
+    return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
+  }
 }

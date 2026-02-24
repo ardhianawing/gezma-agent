@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
+import { createScheduledReportSchema } from '@/lib/validations/scheduled-report';
+import { logActivity } from '@/lib/activity-logger';
 
 export async function GET(req: NextRequest) {
   const auth = getAuthPayload(req);
@@ -25,19 +27,14 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { frequency, reportType, dayOfWeek, dayOfMonth, emailTo } = body;
+    const parsed = createScheduledReportSchema.safeParse(body);
 
-    if (!frequency || !reportType || !emailTo) {
-      return NextResponse.json({ error: 'frequency, reportType, dan emailTo wajib diisi' }, { status: 400 });
+    if (!parsed.success) {
+      const errors = parsed.error.flatten().fieldErrors;
+      return NextResponse.json({ error: 'Validasi gagal', errors }, { status: 400 });
     }
 
-    if (!['weekly', 'monthly'].includes(frequency)) {
-      return NextResponse.json({ error: 'Frequency harus weekly atau monthly' }, { status: 400 });
-    }
-
-    if (!['financial', 'pilgrim', 'trip'].includes(reportType)) {
-      return NextResponse.json({ error: 'Report type harus financial, pilgrim, atau trip' }, { status: 400 });
-    }
+    const { frequency, reportType, dayOfWeek, dayOfMonth, emailTo } = parsed.data;
 
     const report = await prisma.scheduledReport.create({
       data: {
@@ -49,6 +46,16 @@ export async function POST(req: NextRequest) {
         isActive: true,
         agencyId: auth.agencyId,
       },
+    });
+
+    logActivity({
+      type: 'settings',
+      action: 'created',
+      title: 'Laporan terjadwal dibuat',
+      description: `Laporan ${reportType} (${frequency}) ke ${emailTo}`,
+      userId: auth.userId,
+      agencyId: auth.agencyId,
+      metadata: { entityId: report.id },
     });
 
     return NextResponse.json(report, { status: 201 });

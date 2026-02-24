@@ -42,11 +42,20 @@ describe('changePasswordSchema', () => {
     }
   });
 
-  it('accepts minimum 6 char newPassword', () => {
+  it('rejects passwords shorter than 8 chars', () => {
     const result = changePasswordSchema.safeParse({
       currentPassword: 'old123',
-      newPassword: '123456',
-      confirmPassword: '123456',
+      newPassword: '1234567',
+      confirmPassword: '1234567',
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it('accepts minimum 8 char newPassword', () => {
+    const result = changePasswordSchema.safeParse({
+      currentPassword: 'old123',
+      newPassword: '12345678',
+      confirmPassword: '12345678',
     });
     expect(result.success).toBe(true);
   });

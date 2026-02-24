@@ -6,6 +6,7 @@ export async function GET(req: NextRequest) {
   const auth = getAuthPayload(req);
   if (!auth) return unauthorizedResponse();
 
+  try {
   const progressList = await prisma.academyCourseProgress.findMany({
     where: { userId: auth.userId },
     include: {
@@ -40,4 +41,8 @@ export async function GET(req: NextRequest) {
   }));
 
   return NextResponse.json({ progress: data });
+  } catch (error) {
+    console.error('[ACADEMY_PROGRESS_GET] error:', error);
+    return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
+  }
 }

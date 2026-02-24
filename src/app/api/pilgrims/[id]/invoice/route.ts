@@ -12,6 +12,7 @@ export async function GET(
 
   const { id } = await params;
 
+  try {
   const pilgrim = await prisma.pilgrim.findFirst({
     where: { id, agencyId: auth.agencyId },
     include: {
@@ -76,4 +77,11 @@ export async function GET(
       'Content-Disposition': `attachment; filename="${fileName}"`,
     },
   });
+  } catch (error) {
+    console.error('[INVOICE_GET] error:', error);
+    return new Response(JSON.stringify({ error: 'Terjadi kesalahan server' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
 }

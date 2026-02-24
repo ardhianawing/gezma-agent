@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getPilgrimPayload } from '@/lib/auth-pilgrim';
 import { prisma } from '@/lib/prisma';
 import { awardPilgrimPoints } from '@/lib/services/pilgrim-gamification.service';
+import { z } from 'zod';
+
+const useReferralSchema = z.object({
+  referralCode: z.string().min(1, 'Kode referral diperlukan'),
+});
 
 // POST: use a referral code
 export async function POST(req: NextRequest) {
@@ -12,11 +17,14 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { referralCode } = body;
+    const parsed = useReferralSchema.safeParse(body);
 
-    if (!referralCode || typeof referralCode !== 'string') {
-      return NextResponse.json({ error: 'Kode referral diperlukan' }, { status: 400 });
+    if (!parsed.success) {
+      const errors = parsed.error.flatten().fieldErrors;
+      return NextResponse.json({ error: 'Validasi gagal', errors }, { status: 400 });
     }
+
+    const { referralCode } = parsed.data;
 
     // Find the referral
     const referral = await prisma.referral.findUnique({

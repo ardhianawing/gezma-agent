@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 export const changePasswordSchema = z.object({
   currentPassword: z.string().min(1, 'Password saat ini harus diisi'),
-  newPassword: z.string().min(6, 'Password baru minimal 6 karakter').max(100),
+  newPassword: z.string().min(8, 'Password baru minimal 8 karakter').max(100),
   confirmPassword: z.string().min(1, 'Konfirmasi password harus diisi'),
 }).refine((data) => data.newPassword === data.confirmPassword, {
   message: 'Konfirmasi password tidak cocok',

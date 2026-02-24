@@ -1,7 +1,7 @@
-import { z } from 'zod/v4';
+import { z } from 'zod';
 
 export const ccLoginSchema = z.object({
-  email: z.email('Email tidak valid'),
+  email: z.string().email('Email tidak valid'),
   password: z.string().min(1, 'Password wajib diisi'),
 });
 

@@ -10,6 +10,8 @@ export async function POST(
   if (!auth) return unauthorizedResponse();
 
   const { courseId } = await params;
+
+  try {
   const body = await req.json();
   const { lessonId } = body as { lessonId: string };
 
@@ -98,4 +100,8 @@ export async function POST(
           : 0,
     },
   });
+  } catch (error) {
+    console.error('[ACADEMY_PROGRESS_POST] error:', error);
+    return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
+  }
 }

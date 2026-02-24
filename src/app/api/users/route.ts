@@ -4,6 +4,8 @@ import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 import { checkPermission } from '@/lib/auth-permissions';
 import { PERMISSIONS, VALID_ROLES } from '@/lib/permissions';
 import bcrypt from 'bcryptjs';
+import { createUserSchema } from '@/lib/validations/user';
+import { logActivity } from '@/lib/activity-logger';
 
 export async function GET(req: NextRequest) {
   const auth = getAuthPayload(req);
@@ -42,29 +44,18 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { name, email, password, role, position, phone } = body;
+    const parsed = createUserSchema.safeParse(body);
 
-    // Validate role
-    if (role && !VALID_ROLES.includes(role)) {
-      return NextResponse.json({ error: 'Role tidak valid' }, { status: 400 });
+    if (!parsed.success) {
+      const errors = parsed.error.flatten().fieldErrors;
+      return NextResponse.json({ error: 'Validasi gagal', errors }, { status: 400 });
     }
+
+    const { name, email, password, role, position, phone } = parsed.data;
+
     // Non-owner cannot create owner accounts
     if (role === 'owner' && auth.role !== 'owner') {
       return NextResponse.json({ error: 'Hanya owner yang bisa membuat akun owner' }, { status: 403 });
-    }
-
-    if (!name || !email || !password) {
-      return NextResponse.json(
-        { error: 'Nama, email, dan password wajib diisi' },
-        { status: 400 }
-      );
-    }
-
-    if (password.length < 8) {
-      return NextResponse.json(
-        { error: 'Password minimal 8 karakter' },
-        { status: 400 }
-      );
     }
 
     // Check email uniqueness
@@ -92,6 +83,16 @@ export async function POST(req: NextRequest) {
         agencyId: auth.agencyId,
         isVerified: true,
       },
+    });
+
+    logActivity({
+      type: 'user',
+      action: 'created',
+      title: 'User baru dibuat',
+      description: `User ${user.name} (${user.email}) dengan role ${user.role}`,
+      userId: auth.userId,
+      agencyId: auth.agencyId,
+      metadata: { entityId: user.id },
     });
 
     return NextResponse.json(

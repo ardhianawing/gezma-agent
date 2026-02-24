@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPilgrimPayload } from '@/lib/auth-pilgrim';
 import { prisma } from '@/lib/prisma';
+import { z } from 'zod';
+
+const galleryUploadSchema = z.object({
+  url: z.string().url('URL foto tidak valid'),
+  caption: z.string().max(500).optional(),
+});
 
 export async function GET(req: NextRequest) {
   try {
@@ -32,11 +38,14 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { url, caption } = body;
+    const parsed = galleryUploadSchema.safeParse(body);
 
-    if (!url || typeof url !== 'string') {
-      return NextResponse.json({ error: 'URL foto diperlukan' }, { status: 400 });
+    if (!parsed.success) {
+      const errors = parsed.error.flatten().fieldErrors;
+      return NextResponse.json({ error: 'Validasi gagal', errors }, { status: 400 });
     }
+
+    const { url, caption } = parsed.data;
 
     // Get pilgrim's tripId
     const pilgrim = await prisma.pilgrim.findUnique({

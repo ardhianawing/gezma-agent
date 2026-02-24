@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 import { revokeCertificate } from '@/lib/services/blockchain.service';
+import { logActivity } from '@/lib/activity-logger';
 
 export async function POST(
   req: NextRequest,
@@ -13,6 +14,17 @@ export async function POST(
 
   try {
     const certificate = await revokeCertificate(id, auth.agencyId);
+
+    logActivity({
+      type: 'system',
+      action: 'revoked',
+      title: 'Sertifikat dicabut',
+      description: `Sertifikat blockchain ${id} dicabut`,
+      userId: auth.userId,
+      agencyId: auth.agencyId,
+      metadata: { entityId: id },
+    });
+
     return NextResponse.json({ data: certificate });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Terjadi kesalahan server';

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
+import { logActivity } from '@/lib/activity-logger';
 import nodemailer from 'nodemailer';
 
 const transporter = nodemailer.createTransport({
@@ -158,6 +159,16 @@ export async function POST(req: NextRequest) {
     await prisma.scheduledReport.update({
       where: { id: reportId },
       data: { lastSentAt: now },
+    });
+
+    logActivity({
+      type: 'system',
+      action: 'sent',
+      title: 'Laporan terjadwal dikirim',
+      description: `Laporan ${report.reportType} dikirim ke ${report.emailTo}`,
+      userId: auth.userId,
+      agencyId: auth.agencyId,
+      metadata: { entityId: reportId },
     });
 
     return NextResponse.json({ success: true, sentTo: report.emailTo });

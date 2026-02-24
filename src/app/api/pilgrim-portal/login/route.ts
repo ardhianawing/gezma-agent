@@ -1,9 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { signPilgrimToken } from '@/lib/auth-pilgrim';
 import { findPilgrimByBookingCode } from '@/lib/services/pilgrim-portal.service';
+import { rateLimit } from '@/lib/rate-limiter';
 
 export async function POST(req: NextRequest) {
   try {
+    const { allowed } = rateLimit(req, { limit: 5, window: 60 });
+    if (!allowed) {
+      return NextResponse.json({ error: 'Terlalu banyak percobaan. Silakan coba lagi nanti.' }, { status: 429 });
+    }
+
     const body = await req.json();
     const { bookingCode } = body;
 

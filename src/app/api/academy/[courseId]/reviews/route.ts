@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
+import { createReviewSchema } from '@/lib/validations/academy-review';
 
 export async function GET(
   req: NextRequest,
@@ -50,11 +51,14 @@ export async function POST(
 
   try {
     const body = await req.json();
-    const { rating, comment } = body;
+    const parsed = createReviewSchema.safeParse(body);
 
-    if (!rating || rating < 1 || rating > 5) {
-      return NextResponse.json({ error: 'Rating harus antara 1-5' }, { status: 400 });
+    if (!parsed.success) {
+      const errors = parsed.error.flatten().fieldErrors;
+      return NextResponse.json({ error: 'Validasi gagal', errors }, { status: 400 });
     }
+
+    const { rating, comment } = parsed.data;
 
     // Check course exists
     const course = await prisma.academyCourse.findUnique({ where: { id: courseId } });

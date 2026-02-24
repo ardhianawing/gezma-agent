@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPilgrimPayload } from '@/lib/auth-pilgrim';
 import { prisma } from '@/lib/prisma';
+import { z } from 'zod';
+
+const testimonialSchema = z.object({
+  rating: z.number().int().min(1, 'Rating harus antara 1-5').max(5, 'Rating harus antara 1-5'),
+  comment: z.string().min(1, 'Komentar diperlukan').max(2000),
+});
 
 export async function GET(req: NextRequest) {
   try {
@@ -51,15 +57,14 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { rating, comment } = body;
+    const parsed = testimonialSchema.safeParse(body);
 
-    // Validate
-    if (!rating || typeof rating !== 'number' || rating < 1 || rating > 5) {
-      return NextResponse.json({ error: 'Rating harus antara 1-5' }, { status: 400 });
+    if (!parsed.success) {
+      const errors = parsed.error.flatten().fieldErrors;
+      return NextResponse.json({ error: 'Validasi gagal', errors }, { status: 400 });
     }
-    if (!comment || typeof comment !== 'string' || comment.trim().length === 0) {
-      return NextResponse.json({ error: 'Komentar diperlukan' }, { status: 400 });
-    }
+
+    const { rating, comment } = parsed.data;
 
     // Check pilgrim status
     const pilgrim = await prisma.pilgrim.findUnique({

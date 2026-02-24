@@ -1,4 +1,4 @@
-import { z } from 'zod/v4';
+import { z } from 'zod';
 
 export const leaderboardQuerySchema = z.object({
   month: z.coerce.number().min(1).max(12).optional(),

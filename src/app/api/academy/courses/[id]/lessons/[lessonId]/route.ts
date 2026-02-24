@@ -11,25 +11,30 @@ export async function GET(
 
   const { id, lessonId } = await params;
 
-  const lesson = await prisma.academyLesson.findFirst({
-    where: {
-      id: lessonId,
-      courseId: id,
-    },
-    select: {
-      id: true,
-      courseId: true,
-      title: true,
-      content: true,
-      videoUrl: true,
-      order: true,
-      duration: true,
-    },
-  });
+  try {
+    const lesson = await prisma.academyLesson.findFirst({
+      where: {
+        id: lessonId,
+        courseId: id,
+      },
+      select: {
+        id: true,
+        courseId: true,
+        title: true,
+        content: true,
+        videoUrl: true,
+        order: true,
+        duration: true,
+      },
+    });
 
-  if (!lesson) {
-    return NextResponse.json({ error: 'Pelajaran tidak ditemukan' }, { status: 404 });
+    if (!lesson) {
+      return NextResponse.json({ error: 'Pelajaran tidak ditemukan' }, { status: 404 });
+    }
+
+    return NextResponse.json(lesson);
+  } catch (error) {
+    console.error('[ACADEMY_LESSON_GET] error:', error);
+    return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
-
-  return NextResponse.json(lesson);
 }

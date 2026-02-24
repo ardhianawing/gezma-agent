@@ -1,6 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPilgrimPayload } from '@/lib/auth-pilgrim';
 import { prisma } from '@/lib/prisma';
+import { z } from 'zod';
+
+const roommateSchema = z.object({
+  gender: z.string().min(1, 'Gender wajib diisi'),
+  ageRange: z.string().min(1, 'Rentang usia wajib diisi'),
+  smokingPref: z.string().min(1, 'Preferensi merokok wajib diisi'),
+  snoringPref: z.string().min(1, 'Preferensi mendengkur wajib diisi'),
+  languagePref: z.string().min(1, 'Preferensi bahasa wajib diisi'),
+  notes: z.string().max(500).optional(),
+  tripId: z.string().optional(),
+});
 
 export async function GET(req: NextRequest) {
   const auth = getPilgrimPayload(req);
@@ -28,11 +39,14 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { gender, ageRange, smokingPref, snoringPref, languagePref, notes, tripId } = body;
+    const parsed = roommateSchema.safeParse(body);
 
-    if (!gender || !ageRange || !smokingPref || !snoringPref || !languagePref) {
-      return NextResponse.json({ error: 'Semua field wajib diisi' }, { status: 400 });
+    if (!parsed.success) {
+      const errors = parsed.error.flatten().fieldErrors;
+      return NextResponse.json({ error: 'Validasi gagal', errors }, { status: 400 });
     }
+
+    const { gender, ageRange, smokingPref, snoringPref, languagePref, notes, tripId } = parsed.data;
 
     const preference = await prisma.roommatePreference.upsert({
       where: { pilgrimId: auth.pilgrimId },

@@ -3,6 +3,8 @@ import { prisma } from '@/lib/prisma';
 import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 import { checkPermission } from '@/lib/auth-permissions';
 import { PERMISSIONS, VALID_ROLES } from '@/lib/permissions';
+import { updateUserSchema } from '@/lib/validations/user';
+import { logActivity } from '@/lib/activity-logger';
 
 type Context = { params: Promise<{ id: string }> };
 
@@ -50,6 +52,12 @@ export async function PUT(req: NextRequest, { params }: Context) {
 
   try {
     const body = await req.json();
+    const parsed = updateUserSchema.safeParse(body);
+
+    if (!parsed.success) {
+      const errors = parsed.error.flatten().fieldErrors;
+      return NextResponse.json({ error: 'Validasi gagal', errors }, { status: 400 });
+    }
 
     const existing = await prisma.user.findFirst({
       where: { id, agencyId: auth.agencyId },
@@ -59,13 +67,10 @@ export async function PUT(req: NextRequest, { params }: Context) {
       return NextResponse.json({ error: 'User tidak ditemukan' }, { status: 404 });
     }
 
-    const { name, role, position, phone, isActive } = body;
+    const { name, role, position, phone, isActive } = parsed.data;
 
     // Validate role if provided
     if (role !== undefined) {
-      if (!VALID_ROLES.includes(role)) {
-        return NextResponse.json({ error: 'Role tidak valid' }, { status: 400 });
-      }
       if (role === 'owner' && auth.role !== 'owner') {
         return NextResponse.json({ error: 'Hanya owner yang bisa mengatur role owner' }, { status: 403 });
       }
@@ -92,6 +97,16 @@ export async function PUT(req: NextRequest, { params }: Context) {
         lastLoginAt: true,
         createdAt: true,
       },
+    });
+
+    logActivity({
+      type: 'user',
+      action: 'updated',
+      title: 'User diperbarui',
+      description: `User ${user.name} diperbarui`,
+      userId: auth.userId,
+      agencyId: auth.agencyId,
+      metadata: { entityId: user.id },
     });
 
     return NextResponse.json(user);
@@ -128,6 +143,16 @@ export async function DELETE(req: NextRequest, { params }: Context) {
     }
 
     await prisma.user.delete({ where: { id } });
+
+    logActivity({
+      type: 'user',
+      action: 'deleted',
+      title: 'User dihapus',
+      description: `User ${existing.name} (${existing.email}) dihapus`,
+      userId: auth.userId,
+      agencyId: auth.agencyId,
+      metadata: { entityId: id },
+    });
 
     return NextResponse.json({ message: 'User berhasil dihapus' });
   } catch (error) {

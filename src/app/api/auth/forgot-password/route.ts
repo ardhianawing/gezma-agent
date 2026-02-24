@@ -2,9 +2,15 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { sendResetPasswordEmail } from '@/lib/mailer';
 import crypto from 'crypto';
+import { rateLimit } from '@/lib/rate-limiter';
 
 export async function POST(req: NextRequest) {
   try {
+    const { allowed } = rateLimit(req, { limit: 3, window: 60 });
+    if (!allowed) {
+      return NextResponse.json({ error: 'Terlalu banyak percobaan. Silakan coba lagi nanti.' }, { status: 429 });
+    }
+
     const { email } = await req.json();
 
     if (!email) {
