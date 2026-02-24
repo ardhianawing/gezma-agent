@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { Edit, Plus, Trash2, Plane, User, CreditCard, ClipboardCheck, FileText, DollarSign, StickyNote, History } from 'lucide-react';
+import { Edit, Plus, Trash2, Plane, User, CreditCard, ClipboardCheck, FileText, DollarSign, StickyNote, History, QrCode, Download, Link2 } from 'lucide-react';
 import { StatusBadge, SectionCard, BackButton, DetailSkeleton, EmptyState, ConfirmDialog } from '@/components/shared';
 import { DocumentUpload } from '@/components/pilgrims/document-upload';
 import { StatusTimeline } from '@/components/pilgrims/status-timeline';
@@ -40,6 +40,10 @@ export default function PilgrimDetailPage() {
 
   // Delete payment confirm
   const [deletePayment, setDeletePayment] = useState<{ id: string; amount: number } | null>(null);
+
+  // QR Code
+  const [qrData, setQrData] = useState<{ qrDataUrl: string; verifyUrl: string } | null>(null);
+  const [loadingQr, setLoadingQr] = useState(false);
 
   // Trip assignment
   const [trips, setTrips] = useState<{ id: string; name: string; status: string; departureDate: string | null }[]>([]);
@@ -179,6 +183,35 @@ export default function PilgrimDetailPage() {
     } finally {
       setDeletePayment(null);
     }
+  }
+
+  async function fetchQrCode() {
+    if (loadingQr) return;
+    setLoadingQr(true);
+    try {
+      const res = await fetch(`/api/pilgrims/${id}/qr`);
+      if (res.ok) {
+        const json = await res.json();
+        setQrData(json.data);
+      }
+    } catch {
+      // silently fail
+    } finally {
+      setLoadingQr(false);
+    }
+  }
+
+  function handleDownloadQr() {
+    if (!qrData) return;
+    const a = document.createElement('a');
+    a.href = qrData.qrDataUrl;
+    a.download = `qr-${pilgrim?.name || 'pilgrim'}.png`;
+    a.click();
+  }
+
+  function handleCopyLink() {
+    if (!qrData) return;
+    navigator.clipboard.writeText(qrData.verifyUrl).catch(() => {});
   }
 
   if (loading) return <DetailSkeleton />;
@@ -340,6 +373,68 @@ export default function PilgrimDetailPage() {
             <ChecklistItem label="Visa Submitted" checked={!!checklist.visaSubmitted} c={c} />
             <ChecklistItem label="Visa Received" checked={!!checklist.visaReceived} c={c} />
             <ChecklistItem label="Health Certificate" checked={!!checklist.healthCertificate} c={c} />
+          </div>
+        </SectionCard>
+
+        {/* QR Verification */}
+        <SectionCard title="QR Verifikasi" icon={<QrCode style={{ width: '18px', height: '18px', color: c.textMuted }} />}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
+            {!qrData ? (
+              <button
+                type="button"
+                onClick={fetchQrCode}
+                disabled={loadingQr}
+                style={{
+                  padding: '12px 24px',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  color: 'white',
+                  backgroundColor: loadingQr ? c.textMuted : c.primary,
+                  border: 'none',
+                  borderRadius: '12px',
+                  cursor: loadingQr ? 'not-allowed' : 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                }}
+              >
+                <QrCode style={{ width: '16px', height: '16px' }} />
+                {loadingQr ? 'Generating...' : 'Generate QR Code'}
+              </button>
+            ) : (
+              <>
+                <img src={qrData.qrDataUrl} alt="QR Code" style={{ width: '200px', height: '200px', borderRadius: '8px' }} />
+                <p style={{ fontSize: '12px', color: c.textMuted, margin: 0, textAlign: 'center', wordBreak: 'break-all' }}>
+                  {qrData.verifyUrl}
+                </p>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button
+                    type="button"
+                    onClick={handleDownloadQr}
+                    style={{
+                      padding: '8px 16px', fontSize: '13px', fontWeight: '500',
+                      color: c.textSecondary, backgroundColor: c.cardBg, border: `1px solid ${c.border}`,
+                      borderRadius: '10px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px',
+                    }}
+                  >
+                    <Download style={{ width: '14px', height: '14px' }} />
+                    Download
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleCopyLink}
+                    style={{
+                      padding: '8px 16px', fontSize: '13px', fontWeight: '500',
+                      color: c.textSecondary, backgroundColor: c.cardBg, border: `1px solid ${c.border}`,
+                      borderRadius: '10px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px',
+                    }}
+                  >
+                    <Link2 style={{ width: '14px', height: '14px' }} />
+                    Copy Link
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </SectionCard>
 

@@ -73,6 +73,9 @@ model User {
   // Role
   role            String   @default("admin") // owner, admin, staff, marketing
 
+  // Granular Permissions (JSON override per-user)
+  permissions     Json?
+
   // Status
   isActive        Boolean  @default(true)
   isVerified      Boolean  @default(false)
@@ -88,6 +91,7 @@ model User {
 
   // Relations
   activityLogs    ActivityLog[]
+  notificationPrefs NotificationPreference?
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -122,6 +126,9 @@ model Pilgrim {
 
   // Booking
   bookingCode       String?
+
+  // Verification
+  verificationCode  String?  @unique
 
   // Status & Assignment
   status            String   @default("lead") // lead, dp, lunas, dokumen, visa, ready, departed, completed
@@ -377,4 +384,15 @@ model PilgrimDoaFavorite {
 
   @@unique([pilgrimId, doaId])
   @@map("pilgrim_doa_favorites")
+}
+
+model NotificationPreference {
+  id          String   @id @default(uuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  preferences Json     @default("{}")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("notification_preferences")
 }

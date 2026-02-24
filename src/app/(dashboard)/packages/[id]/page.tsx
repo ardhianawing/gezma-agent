@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Edit, Trash2, DollarSign, Building2, FileText, CheckCircle, XCircle } from 'lucide-react';
+import { ArrowLeft, Edit, Trash2, DollarSign, Building2, FileText, CheckCircle, XCircle, Copy, Download } from 'lucide-react';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
 import { formatCurrency } from '@/lib/utils';
@@ -18,6 +18,8 @@ export default function PackageDetailPage() {
 
   const [pkg, setPkg] = useState<Package | null>(null);
   const [loading, setLoading] = useState(true);
+  const [duplicating, setDuplicating] = useState(false);
+  const [generatingPdf, setGeneratingPdf] = useState(false);
 
   useEffect(() => {
     async function fetchPackage() {
@@ -41,6 +43,43 @@ export default function PackageDetailPage() {
       if (res.ok) router.push('/packages');
     } catch (err) {
       console.error('Failed to delete package:', err);
+    }
+  };
+
+  const handleDuplicate = async () => {
+    if (!pkg || duplicating) return;
+    setDuplicating(true);
+    try {
+      const res = await fetch(`/api/packages/${id}/duplicate`, { method: 'POST' });
+      if (res.ok) {
+        const newPkg = await res.json();
+        router.push(`/packages/${newPkg.id}`);
+      }
+    } catch (err) {
+      console.error('Failed to duplicate package:', err);
+    } finally {
+      setDuplicating(false);
+    }
+  };
+
+  const handleBrochure = async () => {
+    if (!pkg || generatingPdf) return;
+    setGeneratingPdf(true);
+    try {
+      const res = await fetch(`/api/packages/${id}/brochure`, { method: 'POST' });
+      if (res.ok) {
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `brosur-${pkg.slug || pkg.name}.pdf`;
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+    } catch (err) {
+      console.error('Failed to generate brochure:', err);
+    } finally {
+      setGeneratingPdf(false);
     }
   };
 
@@ -106,7 +145,25 @@ export default function PackageDetailPage() {
             </p>
           </div>
         </div>
-        <div style={{ display: 'flex', gap: '8px' }}>
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+          <button onClick={handleBrochure} disabled={generatingPdf} style={{
+            display: 'inline-flex', alignItems: 'center', gap: '8px',
+            backgroundColor: c.cardBg, color: c.textSecondary, border: `1px solid ${c.border}`,
+            borderRadius: '12px', padding: '12px 24px', fontSize: '14px', fontWeight: '600',
+            cursor: generatingPdf ? 'not-allowed' : 'pointer', opacity: generatingPdf ? 0.6 : 1,
+          }}>
+            <Download style={{ width: '16px', height: '16px' }} />
+            {generatingPdf ? 'Generating...' : 'Brosur PDF'}
+          </button>
+          <button onClick={handleDuplicate} disabled={duplicating} style={{
+            display: 'inline-flex', alignItems: 'center', gap: '8px',
+            backgroundColor: c.cardBg, color: c.textSecondary, border: `1px solid ${c.border}`,
+            borderRadius: '12px', padding: '12px 24px', fontSize: '14px', fontWeight: '600',
+            cursor: duplicating ? 'not-allowed' : 'pointer', opacity: duplicating ? 0.6 : 1,
+          }}>
+            <Copy style={{ width: '16px', height: '16px' }} />
+            {duplicating ? 'Menduplikasi...' : 'Duplikat'}
+          </button>
           <Link href={`/packages/${pkg.id}/edit`} style={{ textDecoration: 'none' }}>
             <button style={{
               display: 'inline-flex', alignItems: 'center', gap: '8px',

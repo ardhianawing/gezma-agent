@@ -52,6 +52,7 @@ export async function GET(req: NextRequest) {
         role: user.role,
         position: user.position,
         avatarUrl: user.avatarUrl,
+        permissions: user.permissions || null,
         agency: {
           id: user.agency.id,
           name: user.agency.name,

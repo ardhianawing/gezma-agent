@@ -4,7 +4,10 @@ import { useState, useEffect } from 'react';
 import { PageHeader } from '@/components/layout/page-header';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
-import { Plus, Edit2, Trash2, X } from 'lucide-react';
+import { Plus, Edit2, Trash2, X, Shield } from 'lucide-react';
+import { usePermission } from '@/lib/hooks/use-permissions';
+import { PERMISSIONS } from '@/lib/permissions';
+import { ROLE_PERMISSIONS, PERMISSION_GROUPS } from '@/lib/permissions';
 
 interface UserData {
   id: string;
@@ -34,7 +37,9 @@ const emptyForm: UserForm = { name: '', email: '', password: '', role: 'staff', 
 export default function UsersPage() {
   const { c } = useTheme();
   const { isMobile } = useResponsive();
+  const { can } = usePermission();
   const [users, setUsers] = useState<UserData[]>([]);
+  const [showPermissions, setShowPermissions] = useState(false);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -244,17 +249,75 @@ export default function UsersPage() {
                           >
                             <Edit2 style={{ width: '16px', height: '16px' }} />
                           </button>
-                          <button
-                            onClick={() => handleDelete(user.id, user.name)}
-                            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', color: '#dc2626' }}
-                          >
-                            <Trash2 style={{ width: '16px', height: '16px' }} />
-                          </button>
+                          {can(PERMISSIONS.USERS_DELETE) && (
+                            <button
+                              onClick={() => handleDelete(user.id, user.name)}
+                              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', color: '#dc2626' }}
+                            >
+                              <Trash2 style={{ width: '16px', height: '16px' }} />
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>
                   );
                 })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* Permission Matrix */}
+      <div style={{ backgroundColor: c.cardBg, borderRadius: '12px', border: `1px solid ${c.border}`, overflow: 'hidden' }}>
+        <button
+          onClick={() => setShowPermissions(!showPermissions)}
+          style={{
+            width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            padding: '16px 20px', background: 'none', border: 'none', cursor: 'pointer', color: c.textPrimary,
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Shield style={{ width: '18px', height: '18px', color: c.textMuted }} />
+            <span style={{ fontSize: '14px', fontWeight: '600' }}>Permission Matrix per Role</span>
+          </div>
+          <span style={{ fontSize: '12px', color: c.textMuted }}>{showPermissions ? 'Tutup' : 'Lihat'}</span>
+        </button>
+        {showPermissions && (
+          <div style={{ overflowX: 'auto', borderTop: `1px solid ${c.border}` }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead>
+                <tr style={{ borderBottom: `1px solid ${c.border}` }}>
+                  <th style={{ padding: '10px 16px', textAlign: 'left', fontSize: '12px', fontWeight: '600', color: c.textSecondary }}>Modul</th>
+                  <th style={{ padding: '10px 16px', textAlign: 'left', fontSize: '12px', fontWeight: '600', color: c.textSecondary }}>Aksi</th>
+                  {['owner', 'admin', 'staff', 'marketing'].map((role) => (
+                    <th key={role} style={{ padding: '10px 12px', textAlign: 'center', fontSize: '12px', fontWeight: '600', color: c.textSecondary, textTransform: 'capitalize' }}>{role}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {PERMISSION_GROUPS.map((group) =>
+                  group.permissions.map((perm, i) => (
+                    <tr key={perm.key} style={{ borderBottom: `1px solid ${c.borderLight}` }}>
+                      {i === 0 && (
+                        <td rowSpan={group.permissions.length} style={{ padding: '8px 16px', fontSize: '13px', fontWeight: '500', color: c.textPrimary, verticalAlign: 'top' }}>
+                          {group.label}
+                        </td>
+                      )}
+                      <td style={{ padding: '8px 16px', fontSize: '13px', color: c.textSecondary }}>{perm.label}</td>
+                      {['owner', 'admin', 'staff', 'marketing'].map((role) => {
+                        const has = (ROLE_PERMISSIONS[role] || []).includes(perm.key as never);
+                        return (
+                          <td key={role} style={{ padding: '8px 12px', textAlign: 'center' }}>
+                            <span style={{ fontSize: '14px', color: has ? '#16a34a' : '#d1d5db' }}>
+                              {has ? '\u2713' : '\u2717'}
+                            </span>
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>

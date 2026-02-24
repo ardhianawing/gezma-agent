@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
+import { checkPermission } from '@/lib/auth-permissions';
+import { PERMISSIONS } from '@/lib/permissions';
 import { packageFormSchema } from '@/lib/validations/package';
 import { logActivity } from '@/lib/activity-logger';
 
@@ -134,6 +136,9 @@ export async function PUT(req: NextRequest, { params }: Context) {
 export async function DELETE(req: NextRequest, { params }: Context) {
   const auth = getAuthPayload(req);
   if (!auth) return unauthorizedResponse();
+
+  const denied = await checkPermission(auth, PERMISSIONS.PACKAGES_DELETE);
+  if (denied) return denied;
 
   const { id } = await params;
 

@@ -106,7 +106,7 @@ export default function SettingsPage() {
       description: t.settings.notificationsDesc,
       color: c.info,
       bgColor: c.infoLight,
-      href: null,
+      href: '/settings/notifications',
     },
     {
       icon: Shield,
