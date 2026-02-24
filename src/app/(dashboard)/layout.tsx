@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Sidebar } from '@/components/layout/sidebar';
 import { Header } from '@/components/layout/header';
 import { useTheme } from '@/lib/theme';
@@ -9,11 +9,20 @@ import ChatWidget from '@/components/ai-assistant/ChatWidget';
 import { OfflineIndicator } from '@/components/pwa/offline-indicator';
 import { InstallPrompt } from '@/components/pwa/install-prompt';
 import { UpdatePrompt } from '@/components/pwa/update-prompt';
+import { BrandingProvider, useBranding } from '@/lib/contexts/branding-context';
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { c } = useTheme();
+  const { c, setBrandingOverride } = useTheme();
   const { isMobile, isTablet } = useResponsive();
+  const { branding } = useBranding();
+
+  useEffect(() => {
+    if (branding.primaryColor && branding.primaryColor !== '#F60000') {
+      setBrandingOverride({ primaryColor: branding.primaryColor });
+    }
+    return () => setBrandingOverride(null);
+  }, [branding.primaryColor, setBrandingOverride]);
 
   const showSidebarOverlay = isMobile || isTablet;
 
@@ -65,5 +74,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {/* AI Assistant Chat Widget */}
       <ChatWidget />
     </div>
+  );
+}
+
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <BrandingProvider>
+      <DashboardLayoutInner>{children}</DashboardLayoutInner>
+    </BrandingProvider>
   );
 }

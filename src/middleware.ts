@@ -1,11 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const protectedPaths = ['/dashboard', '/pilgrims', '/packages', '/trips', '/documents', '/agency', '/settings', '/marketplace', '/trade', '/forum', '/news', '/academy', '/services', '/help', '/reports', '/activities'];
+const protectedPaths = ['/dashboard', '/pilgrims', '/packages', '/trips', '/documents', '/agency', '/settings', '/marketplace', '/trade', '/forum', '/news', '/academy', '/services', '/help', '/reports', '/activities', '/gamification'];
 const authPaths = ['/login', '/register'];
 
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
   const token = req.cookies.get('token')?.value;
+
+  // Command Center auth (separate system)
+  if (pathname.startsWith('/command-center') && pathname !== '/command-center/login') {
+    const ccToken = req.cookies.get('cc_token')?.value;
+    if (!ccToken) {
+      return NextResponse.redirect(new URL('/command-center/login', req.url));
+    }
+    return NextResponse.next();
+  }
 
   // Check if accessing protected route without token
   const isProtected = protectedPaths.some(path => pathname === path || pathname.startsWith(path + '/'));

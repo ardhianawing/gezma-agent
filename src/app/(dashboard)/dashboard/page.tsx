@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Users, Package, Plane, FileText, Calendar, Clock } from 'lucide-react';
+import { Users, Package, Plane, FileText, Calendar, Clock, Trophy, Star, Medal, TrendingUp } from 'lucide-react';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
 import { StatCard } from '@/components/shared/stat-card';
@@ -71,6 +71,13 @@ export default function DashboardPage() {
   const [activities, setActivities] = useState<Activity[]>([]);
   const [activitiesLoading, setActivitiesLoading] = useState(true);
   const [charts, setCharts] = useState<ChartsData | null>(null);
+  const [gamification, setGamification] = useState<{ totalPoints: number; level: number; badgeCount: number; rank: number } | null>(null);
+  const [leaderboardMini, setLeaderboardMini] = useState<{ rank: number; agencyName: string; totalPoints: number }[]>([]);
+
+  useEffect(() => {
+    fetch('/api/gamification/stats').then(r => r.json()).then(setGamification).catch(() => {});
+    fetch('/api/gamification/leaderboard').then(r => r.json()).then(d => setLeaderboardMini((d.leaderboard || []).slice(0, 5))).catch(() => {});
+  }, []);
 
   useEffect(() => {
     async function fetchCharts() {
@@ -237,6 +244,85 @@ export default function DashboardPage() {
           </div>
           <PilgrimStatusChart data={charts.pilgrimStatus} />
           <TripCapacityChart data={charts.tripCapacity} />
+        </div>
+      )}
+
+      {/* GAMIFICATION WIDGET */}
+      {gamification && (
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: isMobile || isTablet ? '1fr' : '1fr 1fr',
+            gap: isMobile ? '12px' : '16px',
+          }}
+        >
+          {/* Points & Level Card */}
+          <div
+            style={{
+              background: 'linear-gradient(135deg, #7C3AED 0%, #A855F7 100%)',
+              borderRadius: '12px',
+              padding: isMobile ? '20px' : '24px',
+              boxShadow: '0 4px 16px rgba(124, 58, 237, 0.25)',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+              <Trophy style={{ width: '20px', height: '20px', color: '#FDE68A' }} />
+              <h3 style={{ fontSize: '16px', fontWeight: '600', color: 'white', margin: 0 }}>Gamifikasi</h3>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
+              {[
+                { icon: Star, label: 'Poin', value: gamification.totalPoints, color: '#FDE68A' },
+                { icon: TrendingUp, label: 'Level', value: gamification.level, color: '#93C5FD' },
+                { icon: Medal, label: 'Badge', value: gamification.badgeCount, color: '#6EE7B7' },
+                { icon: Trophy, label: 'Rank', value: `#${gamification.rank}`, color: '#FCA5A5' },
+              ].map(item => {
+                const Icon = item.icon;
+                return (
+                  <div key={item.label} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <Icon style={{ width: '18px', height: '18px', color: item.color, flexShrink: 0 }} />
+                    <div>
+                      <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.7)', margin: 0 }}>{item.label}</p>
+                      <p style={{ fontSize: '20px', fontWeight: '700', color: 'white', margin: 0 }}>{item.value}</p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Mini Leaderboard */}
+          <div
+            style={{
+              backgroundColor: c.cardBg,
+              borderRadius: '12px',
+              border: `1px solid ${c.border}`,
+              padding: isMobile ? '20px' : '24px',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+              <Trophy style={{ width: '18px', height: '18px', color: '#8B5CF6' }} />
+              <h3 style={{ fontSize: '16px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>Top 5 Bulan Ini</h3>
+            </div>
+            {leaderboardMini.length === 0 ? (
+              <p style={{ fontSize: '13px', color: c.textMuted }}>Belum ada data.</p>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {leaderboardMini.map(entry => (
+                  <div key={entry.rank} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <span style={{ width: '24px', fontSize: '14px', fontWeight: '700', color: entry.rank <= 3 ? '#F59E0B' : c.textMuted, textAlign: 'center' }}>
+                      {entry.rank}
+                    </span>
+                    <span style={{ flex: 1, fontSize: '13px', color: c.textPrimary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {entry.agencyName}
+                    </span>
+                    <span style={{ fontSize: '13px', fontWeight: '600', color: '#F59E0B' }}>
+                      {entry.totalPoints.toLocaleString('id-ID')}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       )}
 

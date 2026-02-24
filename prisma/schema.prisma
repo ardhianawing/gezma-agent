@@ -44,6 +44,16 @@ model Agency {
   currency        String   @default("IDR")
   timezone        String   @default("Asia/Jakarta")
 
+  // White-label Branding
+  secondaryColor  String?
+  faviconUrl      String?
+  logoLightUrl    String?
+  logoDarkUrl     String?
+  appTitle        String?
+
+  // Gamification
+  totalPoints     Int      @default(0)
+
   // Relations
   users           User[]
   pilgrims        Pilgrim[]
@@ -52,6 +62,8 @@ model Agency {
   activityLogs    ActivityLog[]
   manasikLessons  ManasikLesson[]
   doaPrayers      DoaPrayer[]
+  leaderboard     AgencyLeaderboard[]
+  pointEvents     PointEvent[]
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -82,6 +94,10 @@ model User {
   verificationCode String? @unique
   verificationExpiry DateTime?
 
+  // Gamification
+  totalPoints     Int      @default(0)
+  level           Int      @default(1)
+
   // Agency relation
   agencyId        String
   agency          Agency   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
@@ -92,6 +108,8 @@ model User {
   // Relations
   activityLogs    ActivityLog[]
   notificationPrefs NotificationPreference?
+  pointEvents     PointEvent[]
+  badges          UserBadge[]
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -395,4 +413,65 @@ model NotificationPreference {
   updatedAt   DateTime @updatedAt
 
   @@map("notification_preferences")
+}
+
+// === GAMIFIKASI ===
+
+model PointEvent {
+  id          String   @id @default(uuid())
+  type        String   // pilgrim, package, trip, payment, document
+  action      String   // created, updated, deleted, uploaded, paid, completed, departed, lunas
+  points      Int
+  description String
+
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  agencyId    String
+  agency      Agency   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+
+  @@map("point_events")
+}
+
+model UserBadge {
+  id          String   @id @default(uuid())
+  badgeKey    String
+  unlockedAt  DateTime @default(now())
+
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, badgeKey])
+  @@map("user_badges")
+}
+
+model AgencyLeaderboard {
+  id            String @id @default(uuid())
+  agencyId      String
+  agency        Agency @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  totalPoints   Int    @default(0)
+  pilgrimCount  Int    @default(0)
+  level         Int    @default(1)
+  month         Int
+  year          Int
+
+  @@unique([agencyId, month, year])
+  @@map("agency_leaderboard")
+}
+
+// === COMMAND CENTER ===
+
+model SystemAdmin {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String   // bcrypt hashed
+  role      String   @default("super_admin")
+  isActive  Boolean  @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("system_admins")
 }

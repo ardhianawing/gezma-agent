@@ -24,10 +24,12 @@ import {
   HeadphonesIcon,
   Globe,
   Clock,
+  Trophy,
 } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n';
 import { useTheme } from '@/lib/theme';
 import { useAuth } from '@/lib/auth';
+import { useBranding } from '@/lib/contexts/branding-context';
 
 interface MenuItem {
   label: string;
@@ -44,6 +46,7 @@ const menuItems: MenuItem[] = [
   { label: 'Dokumen', href: '/documents', icon: FileText },
   { label: 'Laporan', href: '/reports', icon: BarChart3 },
   { label: 'Aktivitas', href: '/activities', icon: Clock },
+  { label: 'Gamifikasi', href: '/gamification', icon: Trophy },
   { label: 'Agensi', href: '/agency', icon: Building2 },
 ];
 
@@ -74,6 +77,7 @@ export function Sidebar({ isOpen, onClose, isOverlay = false }: SidebarProps) {
   const { t } = useLanguage();
   const { theme, c } = useTheme();
   const { user, logout } = useAuth();
+  const { branding } = useBranding();
 
   const isActive = (href: string) => {
     if (href === '/') {
@@ -178,8 +182,12 @@ export function Sidebar({ isOpen, onClose, isOverlay = false }: SidebarProps) {
         >
           <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '12px' }} onClick={onClose}>
             <Image
-              src={theme === 'dark' ? '/logo-dark.png' : '/logo-light.png'}
-              alt="Gezma Logo"
+              src={
+                theme === 'dark'
+                  ? (branding.logoDarkUrl || '/logo-dark.png')
+                  : (branding.logoLightUrl || '/logo-light.png')
+              }
+              alt={`${branding.appTitle || 'Gezma'} Logo`}
               width={40}
               height={40}
               style={{
@@ -189,7 +197,7 @@ export function Sidebar({ isOpen, onClose, isOverlay = false }: SidebarProps) {
               priority
             />
             <span style={{ fontSize: '20px', fontWeight: '700', color: theme === 'dark' ? 'white' : c.primary }}>
-              GEZMA
+              {branding.appTitle || 'GEZMA'}
             </span>
           </Link>
 

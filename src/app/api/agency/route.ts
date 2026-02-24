@@ -41,6 +41,8 @@ export async function PUT(req: NextRequest) {
       'name', 'legalName', 'tagline', 'description',
       'phone', 'whatsapp', 'website',
       'address', 'city', 'province', 'postalCode',
+      'primaryColor', 'secondaryColor', 'faviconUrl',
+      'logoLightUrl', 'logoDarkUrl', 'appTitle',
     ] as const;
 
     const updateData: Record<string, unknown> = {};
