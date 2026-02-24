@@ -39,7 +39,7 @@ export async function sendResetPasswordEmail(to: string, code: string) {
 }
 
 export async function sendVerificationEmail(to: string, code: string) {
-  const verifyUrl = `${APP_URL}/verify/${code}`;
+  const verifyUrl = `${APP_URL}/register/verify?code=${code}`;
 
   await transporter.sendMail({
     from: `"${APP_NAME}" <${FROM}>`,
