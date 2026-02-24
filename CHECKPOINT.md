@@ -1,6 +1,6 @@
 # GEZMA Agent — Development Checkpoint
 
-> **Last Updated:** 2026-02-24 (Session 4)
+> **Last Updated:** 2026-02-24 (Session 5 — Review & Fix)
 > **Blueprint Reference:** `GEZMA-AGENT-PLAN-v2.md`, `DEVELOPMENT-PLAN-v3.md`
 
 ---
@@ -11,7 +11,7 @@
 |----------|--------|------------|
 | **Phase 1: Core Agent Dashboard** | ✅ 100% Done | Semua modul + API |
 | **Phase 2A: Platform Pages** | ✅ Done | 6 halaman dengan mock data |
-| **Phase 2B: Agent Backlog** | ✅ 100% Done | Manifest, Timeline, Bulk, Import CSV + 5 low-priority backlog |
+| **Phase 2B: Agent Backlog** | ✅ 100% Done | Manifest, Timeline, Bulk, Import CSV + 5 low-priority backlog + 28 bug fixes |
 | **Phase 2C: Gezma Pilgrim MVP** | ✅ Done | 6 halaman + layout + real DB |
 | **Phase 3: Integrasi** | ✅ Prep Done | 4 service layers + 15 API endpoints + 7 UI pages (mock) |
 | **PWA** | ✅ Done | Service Worker, Install Prompt, Offline |
@@ -79,6 +79,8 @@
 | Fitur | Status |
 |-------|--------|
 | Theme (Light/Dark), Language (ID/EN), Password, Users, Agency Profile | ✅ |
+| Notification Preferences (5 kategori × 3 channel) | ✅ |
+| Granular Permissions (25 permissions, role matrix, UI gates) | ✅ |
 
 ### 8. AI Assistant
 | Fitur | Status |
@@ -116,7 +118,7 @@ Semua 6 halaman sudah dibangun dengan mock data (bukan Coming Soon lagi):
 | Bulk Actions | ✅ | POST `/pilgrims/bulk` | Checkboxes, floating bar, dropdowns |
 | Import CSV | ✅ | POST `/pilgrims/import` | 3-step modal, template download |
 
-### Low Priority Backlog — ✅ All Done (Session 4)
+### Low Priority Backlog — ✅ All Done (Session 4) + Hardened (Session 5)
 | Fitur | Status | Keterangan |
 |-------|--------|------------|
 | Brochure Generator (PDF) | ✅ Done | jsPDF + jspdf-autotable, download dari detail paket |
@@ -124,6 +126,19 @@ Semua 6 halaman sudah dibangun dengan mock data (bukan Coming Soon lagi):
 | QR Verification Page | ✅ Done | Generate QR per jemaah, public verify page |
 | Granular Roles & Permissions | ✅ Done | 25 permissions, role matrix, per-user overrides, API guards |
 | Notification Preferences | ✅ Done | 5 kategori × 3 channel, toggle grid UI |
+
+### Session 5 — Review & Bug Fix (28 Issues Resolved)
+
+Comprehensive code review + end-to-end testing (84/84 tests PASS). All issues fixed:
+
+| Severity | Count | Fixes |
+|----------|-------|-------|
+| CRITICAL | 4 | Permission guards (`checkPermission`) on all 15+ API mutating routes, role validation, owner-only restrictions |
+| HIGH | 8 | Brochure null safety (category/airline/hotels/activities/inclusions), PDF download cross-browser fix, remove broken Quick Notifications UI, Zod schema dynamic, mergeWithDefaults immutable |
+| MEDIUM | 8 | QR URL env var (`NEXT_PUBLIC_APP_URL`), NIK masking `>=10`, slug strip hyphens, notification toggle disabled during save, copy link feedback, verify API select cleanup |
+| LOW | 8 | `usePermission` returns false during loading, `formatDate` isNaN validation, `isVerified` checks `ppiuStatus`, JWT fallback secret removed (5 files), UI permission gates on list pages |
+
+**Files changed:** 43 | **Insertions:** 236 | **Deletions:** 172
 
 ---
 
@@ -185,8 +200,9 @@ Reports:       1 endpoint  (financial)
 Settings:      1 endpoint  (notification preferences GET/PUT)
 Integrations: 15 endpoints (nusuk: 3, payment: 4, whatsapp: 5, umrahcash: 3)
 Pilgrim Portal: 7 endpoints (login, me, logout, manasik, manasik/progress, doa, doa/favorites)
-Verify:        1 endpoint  (public pilgrim QR verification)
-Other:         3 endpoints (agency, users, chat AI)
+Verify:        2 endpoints (public pilgrim QR + agency QR verification)
+Users:         2 endpoints (CRUD + role management)
+Other:         2 endpoints (agency, chat AI)
 ```
 
 ---
@@ -241,9 +257,11 @@ src/
 
 ---
 
-## H. GIT LOG (Session 3-4)
+## H. GIT LOG (Session 3-5)
 
 ```
+b4c5033 fix: resolve 28 review issues across 5 backlog features
+2af763f docs: update tracking documents — mark 5 low-priority backlog features as done
 72ff2f9 feat: implement 5 low-priority backlog features (brochure, duplicate, QR, permissions, notifications)
 0ff9765 feat: connect Manasik & Doa to real database
 67343b3 docs: update CHECKPOINT.md with Pilgrim Portal DB integration
