@@ -1,6 +1,6 @@
 # 🕋 GEZMA — Blueprint Tracking Document
 
-> **Last Synced:** 2026-02-24 (Session 6)
+> **Last Synced:** 2026-02-24 (Session 7)
 > **Repository:** github.com/ardhianawing/gezma-agent
 > **Blueprint Sources:**
 > 1. Cetak Biru Strategis v1 (Generasi Emas Z & Milenial)
@@ -13,14 +13,16 @@
 
 | Komponen | Blueprint | Implemented | Completion |
 |----------|-----------|-------------|------------|
-| **Gezma Agent** (Core B2B) | ✓ | ✅ | **95%** |
+| **Gezma Agent** (Core B2B) | ✓ | ✅ | **98%** |
 | **Gezma Pilgrim** (B2C App) | ✓ | ✅ MVP | **85%** |
 | **Gezma Academy** (LMS) | ✓ | ⏸️ Mock UI | 15% |
-| **Gezma Command Center** | ✓ | 🔲 | 0% |
+| **Gezma Command Center** | ✓ | ✅ Done | **70%** |
 | **Platform Pages** | ✓ | ✅ Mock UI | 60% |
 | **Nusuk Integration** | ✓ Critical | ⏸️ Mock Service | 10% |
 | **Fintech Integration** | ✓ | ⏸️ Mock Service | 10% |
 | **Blockchain Verification** | ✓ | 🔲 | 0% |
+| **Gamifikasi** | ✓ | ✅ Done | **90%** |
+| **White-label Branding** | ✓ | ✅ Done | **80%** |
 
 ---
 
@@ -38,13 +40,13 @@
 │  ┌─────────────────┐  ┌─────────────────┐                      │
 │  │  GEZMA AGENT    │  │  GEZMA PILGRIM  │                      │
 │  │  (B2B Travel)   │  │  (B2C Jemaah)   │                      │
-│  │  ✅ 95% Done    │  │  ✅ MVP 85%     │                      │
+│  │  ✅ 98% Done    │  │  ✅ MVP 85%     │                      │
 │  └─────────────────┘  └─────────────────┘                      │
 │                                                                 │
 │  ┌─────────────────┐  ┌─────────────────┐                      │
 │  │ GEZMA COMMAND   │  │ GEZMA ACADEMY   │                      │
 │  │ CENTER (Admin)  │  │     (LMS)       │                      │
-│  │  🔲 0% Done     │  │  ⏸️ Placeholder │                      │
+│  │  ✅ 70% Done    │  │  ⏸️ Placeholder │                      │
 │  └─────────────────┘  └─────────────────┘                      │
 │                                                                 │
 │  ┌───────────────────────────────────────────────────────────┐ │
@@ -62,7 +64,7 @@
 - Cetak Biru v2, BAB 3.2: Modul Gezma Agent
 - Frontend Plan v2.0, Section 5.1: Module Structure
 
-### Status: ✅ 95% Complete
+### Status: ✅ 98% Complete
 
 | Fitur (Blueprint) | Route | Status | Notes |
 |-------------------|-------|--------|-------|
@@ -118,7 +120,7 @@
 | **Agency Profile** | `/agency` | ✅ Done | |
 | ↳ Company Info | | ✅ Real | |
 | ↳ **Bank Accounts** | | ⚠️ Partial | UI ada, data basic |
-| ↳ **Branding Settings** | | ❌ Belum | White-label |
+| ↳ **Branding Settings** | `/settings/branding` | ✅ Done | Color picker, logo, title, live preview |
 | ↳ **QR Verification Page** | `/verify/pilgrim/[code]` | ✅ Done | QR generate + public verify |
 | **Reports** | `/reports` | ✅ UPGRADED | 5-tab layout |
 | ↳ Tab Keuangan: Revenue, Outstanding, Collection Rate, Breakdown | | ✅ Real | |
@@ -256,16 +258,22 @@
 ### Referensi Blueprint:
 - Cetak Biru v2, BAB 3.4: Gezma Command Center
 
-### Status: 🔲 0% — Belum Dimulai
+### Status: ✅ 70% — Core Done (Session 7)
 
 | Fitur (Blueprint) | Status | Notes |
 |-------------------|--------|-------|
+| **Admin Auth (SystemAdmin)** | ✅ Done | Independent JWT (cc_token), login/me/logout |
+| **Dashboard Global** | ✅ Done | Total agencies, pilgrims, trips, revenue, recent agencies |
+| **Agency List** | ✅ Done | Search, status filter, pagination |
+| **Agency Detail** | ✅ Done | Info, users, stats, approve/suspend |
+| **Audit Log API** | ✅ Done | Cross-agency activity logs, filterable |
+| **Blue Theme Layout** | ✅ Done | Independent layout, dark sidebar, #2563EB primary |
 | **Big Data Analytics** | 🔲 | |
 | ↳ Tren Jemaah Nasional | 🔲 | |
 | ↳ Preferensi Hotel | 🔲 | |
 | ↳ Pola Belanja | 🔲 | |
-| **Sistem Verifikasi & Audit** | 🔲 | |
-| ↳ Monitor Izin PPIU Anggota | 🔲 | |
+| **Sistem Verifikasi & Audit** | ⚠️ Partial | Agency status management done |
+| ↳ Monitor Izin PPIU Anggota | ✅ Done | Status filter (pending/active/expiring/expired/suspended) |
 | ↳ Auto-block Expired License | 🔲 | |
 | ↳ Notifikasi Expiry | 🔲 | |
 | **Compliance Dashboard** | 🔲 | |
@@ -357,15 +365,18 @@
 ### Referensi Blueprint:
 - Cetak Biru v1 (Exclusive): Semua fitur gamifikasi dan lifestyle
 
-### Status: 🔲 0% — Belum Dimulai
+### Status: ⚠️ Partial — Gamifikasi Done (Session 7)
 
 | Fitur | Blueprint v1 Section | Status | Notes |
 |-------|---------------------|--------|-------|
-| **Gamifikasi** | BAB 3.1 | 🔲 | |
-| ↳ Sistem Poin | | 🔲 | Aktivitas manasik = poin |
-| ↳ Badge System | | 🔲 | "Hafalan Doa Tawaf" dll |
-| ↳ Leaderboard | | 🔲 | Kompetisi grup |
-| ↳ Reward (diskon, sedekah) | | 🔲 | |
+| **Gamifikasi** | BAB 3.1 | ✅ Done | Agent-level gamification |
+| ↳ Sistem Poin | | ✅ Done | 8 action rules, auto-award via activity logger |
+| ↳ Badge System | | ✅ Done | 11 badges, auto-check thresholds |
+| ↳ Leaderboard | | ✅ Done | Top 10 agencies per month |
+| ↳ Level System | | ✅ Done | Every 100 points = 1 level |
+| ↳ Gamification Page | | ✅ Done | Stats, badges, leaderboard, history |
+| ↳ Dashboard Widget | | ✅ Done | Points/Level card + mini top 5 |
+| ↳ Reward (diskon, sedekah) | | 🔲 | Needs fintech integration |
 | **Paket Modular** | BAB 3.2 | 🔲 | |
 | ↳ Umrah Backpacker | | 🔲 | Semi-DIY |
 | ↳ BYO Ticket (LA only) | | 🔲 | Jual komponen terpisah |
@@ -398,7 +409,7 @@
 |-----------|---------------|--------|-------|
 | **Backend** | Golang | Next.js API Routes | ⚠️ Different |
 | **Mobile** | Flutter | PWA (Web) | ⚠️ Different approach |
-| **Database** | PostgreSQL + MongoDB | PostgreSQL + Prisma 7 | ✅ Partial |
+| **Database** | PostgreSQL + MongoDB | PostgreSQL + Prisma 7 (17 models) | ✅ Partial |
 | **API Gateway** | Kong/Apigee | - | ❌ Not implemented |
 | **Blockchain** | Hyperledger Fabric | - | ❌ Not implemented |
 | **Cloud** | GCP Jakarta | Docker + Nginx + Traefik | ⚠️ Self-hosted |
@@ -419,14 +430,18 @@
 - Cetak Biru v2, BAB 3.1: White-Labeling
 - Frontend Plan v2.0, Section 3.4: White-Label Architecture
 
-### Status: ⚠️ Architecture Ready, Not Implemented
+### Status: ✅ 80% — Core Done (Session 7)
 
 | Fitur | Status | Notes |
 |-------|--------|-------|
 | Multi-tenant DB structure | ✅ Ready | agencyId di semua model |
-| Tenant context provider | ⚠️ Partial | Basic implementation |
-| Custom branding per tenant | 🔲 Belum | Logo, colors override |
-| Custom domain per tenant | 🔲 Belum | |
+| Tenant context provider | ✅ Done | BrandingProvider + useBranding hook |
+| Custom branding per tenant | ✅ Done | primaryColor, secondaryColor, logos, favicon, appTitle |
+| Theme override from branding | ✅ Done | Dynamic primary/primaryLight/primaryHover/sidebarActiveItem |
+| Color utils | ✅ Done | lighten, darken, hexToRgba |
+| Sidebar branding | ✅ Done | Uses agency logo + appTitle |
+| Branding Settings UI | ✅ Done | `/settings/branding` — color picker, URLs, live preview |
+| Custom domain per tenant | 🔲 Belum | Needs DNS/proxy configuration |
 | Hexagonal Architecture | 🔲 Belum | Satu codebase, banyak brand |
 
 ---
@@ -464,15 +479,15 @@
 3. **WhatsApp Notifications** — Mock service ready, perlu API key
 
 ### Medium Priority
-4. **Gezma Command Center** — Admin asosiasi dashboard (0%)
-5. **Gezma Academy** — Full LMS (currently mock UI)
-6. **Unit & E2E Testing** — Playwright, Jest
+4. **Gezma Academy** — Full LMS (currently mock UI)
+5. **Unit & E2E Testing** — Add tests for Phase 4 features, Playwright
+6. **Command Center Polish** — Audit Log UI page, responsive mobile, analytics
 
 ### Low Priority (Nice to Have)
-7. Gamifikasi features
-8. Blockchain verification
-9. Mobile native app (Flutter)
-10. White-label branding
+7. Blockchain verification (mock)
+8. Mobile native app (Flutter)
+9. Custom domain per tenant (white-label)
+10. Gamifikasi rewards (diskon, sedekah — needs fintech)
 
 ---
 
@@ -486,14 +501,15 @@
 ### Implementation Files
 - `CHECKPOINT.md` — Development checkpoint (in repo)
 - `DEVELOPMENT-PLAN-v3.md` — Phase 2 & 3 execution plan
-- `prisma/schema.prisma` — Database models (13 models)
-- `src/app/api/` — 72 API endpoints
-- `src/app/(dashboard)/` — 23 dashboard pages
+- `prisma/schema.prisma` — Database models (17 models)
+- `src/app/api/` — 83 API endpoints
+- `src/app/(dashboard)/` — 25 dashboard pages
+- `src/app/(command-center)/` — 5 command center pages
 - `src/app/(pilgrim)/` — 8 pilgrim portal pages
 
 ---
 
 *Document Version: 2.0*
 *Created: 2026-02-23*
-*Updated: 2026-02-24 (Session 6 — 7 internal features)*
-*Next Review: After Phase 3 integration with real API keys*
+*Updated: 2026-02-24 (Session 7 — Phase 4: Gamifikasi + Command Center + White-label)*
+*Next Review: After Phase 3 real API integration or Phase 4 completion*

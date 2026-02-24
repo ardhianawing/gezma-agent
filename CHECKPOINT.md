@@ -1,6 +1,6 @@
 # GEZMA Agent — Development Checkpoint
 
-> **Last Updated:** 2026-02-24 (Session 6 — 7 Internal Features)
+> **Last Updated:** 2026-02-24 (Session 7 — Phase 4: Gamifikasi + Command Center + White-label)
 > **Blueprint Reference:** `GEZMA-AGENT-PLAN-v2.md`, `DEVELOPMENT-PLAN-v3.md`
 
 ---
@@ -15,6 +15,7 @@
 | **Phase 2C: Gezma Pilgrim MVP** | ✅ Done | 6 → 8 halaman (+ documents, payments) + layout + real DB |
 | **Phase 2D: Internal Features** | ✅ Done | 7 fitur: charts, reports, activity log, doc upload, CSV export |
 | **Phase 3: Integrasi** | ✅ Prep Done | 4 service layers + 15 API endpoints + 7 UI pages (mock) |
+| **Phase 4: Advanced** | ✅ 3/5 Done | Gamifikasi, Command Center, White-label Branding |
 | **PWA** | ✅ Done | Service Worker, Install Prompt, Offline |
 | **Deployment** | ✅ Ready | Docker + Nginx + Traefik |
 
@@ -211,34 +212,77 @@ Semua menggunakan mock data, siap connect real API ketika key tersedia:
 
 ---
 
-## G. API ENDPOINTS (72 Total)
+## G. PHASE 4 — ADVANCED FEATURES (Session 7) ✅ 3/5 Done
+
+3 fitur Phase 4 diimplementasi dalam 1 session:
+
+### Gamifikasi ✅
+| Fitur | Status | Keterangan |
+|-------|--------|------------|
+| Point System (8 rules) | ✅ | Auto-award via activity logger hook (fire-and-forget) |
+| Badge System (11 badges) | ✅ | Auto-check after points awarded |
+| Leaderboard | ✅ | Top 10 agencies per month, AgencyLeaderboard model |
+| Level System | ✅ | Every 100 points = 1 level |
+| Gamification Page | ✅ | Stats bar, badge showcase, leaderboard, point history |
+| Dashboard Widget | ✅ | Points/Level card + mini top 5 leaderboard |
+
+### Command Center (Admin Asosiasi) ✅
+| Fitur | Status | Keterangan |
+|-------|--------|------------|
+| SystemAdmin Model | ✅ | Terpisah dari User, independent JWT (cc_token) |
+| Auth System | ✅ | Login, me, logout — 3 API endpoints |
+| Dashboard | ✅ | Global stats (agencies, pilgrims, trips, revenue), recent agencies |
+| Agencies List | ✅ | Search, status filter, pagination |
+| Agency Detail | ✅ | Info, users, stats, approve/suspend actions |
+| Audit Log API | ✅ | Cross-agency activity logs, filterable |
+| Blue Theme Layout | ✅ | Independent layout, dark sidebar, #2563EB primary |
+
+### White-label Branding ✅
+| Fitur | Status | Keterangan |
+|-------|--------|------------|
+| Agency Branding Fields | ✅ | primaryColor, secondaryColor, faviconUrl, logoLightUrl, logoDarkUrl, appTitle |
+| BrandingProvider | ✅ | Context + useBranding hook, auto-fetch on mount |
+| Theme Override | ✅ | Dynamic primary/primaryLight/primaryHover/sidebarActiveItem from branding |
+| Color Utils | ✅ | lighten, darken, hexToRgba helper functions |
+| Sidebar Branding | ✅ | Uses branding logo + appTitle |
+| Settings Page | ✅ | Color picker, logo URLs, favicon, live preview |
+
+**DB Changes:** +4 models (PointEvent, UserBadge, AgencyLeaderboard, SystemAdmin), extended User (+totalPoints, level), extended Agency (+branding fields, totalPoints)
+**New files:** 24 | **Modified:** 8 | **Total insertions:** 2671
+**Default SystemAdmin:** `admin@gezma.id` / `admin123!`
+
+---
+
+## H. API ENDPOINTS (83 Total)
 
 ```
-Auth:           7 endpoints (login, register, verify, password, etc)
-Pilgrims:      15 endpoints (CRUD + documents + payments + status + history + bulk + import + QR + export)
-Packages:       7 endpoints (CRUD + duplicate + brochure)
-Trips:          7 endpoints (CRUD + checklist + manifest + manifest/remove)
-Dashboard:      4 endpoints (stats, alerts, activities, charts)
-Reports:        5 endpoints (financial, demographics, documents, payment-aging, conversion)
+Auth:            7 endpoints (login, register, verify, password, etc)
+Pilgrims:       15 endpoints (CRUD + documents + payments + status + history + bulk + import + QR + export)
+Packages:        7 endpoints (CRUD + duplicate + brochure)
+Trips:           7 endpoints (CRUD + checklist + manifest + manifest/remove)
+Dashboard:       4 endpoints (stats, alerts, activities, charts)
+Reports:         5 endpoints (financial, demographics, documents, payment-aging, conversion)
 Reports Export:  1 endpoint  (financial/export)
-Settings:       1 endpoint  (notification preferences GET/PUT)
-Integrations:  15 endpoints (nusuk: 3, payment: 4, whatsapp: 5, umrahcash: 3)
-Pilgrim Portal: 9 endpoints (login, me, logout, documents GET/POST, manasik, manasik/progress, doa, doa/favorites)
-Verify:         2 endpoints (public pilgrim QR + agency QR verification)
-Users:          2 endpoints (CRUD + role management)
-Other:          2 endpoints (agency, chat AI)
+Settings:        1 endpoint  (notification preferences GET/PUT)
+Integrations:   15 endpoints (nusuk: 3, payment: 4, whatsapp: 5, umrahcash: 3)
+Pilgrim Portal:  9 endpoints (login, me, logout, documents GET/POST, manasik, manasik/progress, doa, doa/favorites)
+Verify:          2 endpoints (public pilgrim QR + agency QR verification)
+Users:           2 endpoints (CRUD + role management)
+Other:           2 endpoints (agency, chat AI)
+Gamification:    4 endpoints (stats, badges, leaderboard, history)
+Command Center:  7 endpoints (login, me, logout, agencies, agencies/[id], stats, audit-log)
 ```
 
 ---
 
-## H. TECH STACK
+## I. TECH STACK
 
 | Layer | Tech |
 |-------|------|
 | Framework | Next.js 16 (App Router) |
 | Language | TypeScript |
 | Styling | 100% inline styles + useTheme() |
-| Database | PostgreSQL + Prisma v7 |
+| Database | PostgreSQL + Prisma v7 (17 models) |
 | Auth | JWT (HTTP-only cookies) |
 | Email | Nodemailer (SMTP) |
 | AI | Google Gemini 2.0 Flash |
@@ -251,42 +295,48 @@ Other:          2 endpoints (agency, chat AI)
 
 ---
 
-## I. FILE STRUCTURE
+## J. FILE STRUCTURE
 
 ```
 src/
 ├── app/
-│   ├── (auth)/          → 4 pages
-│   ├── (dashboard)/     → 23 pages (6 platform + 17 operasional, incl. /activities)
-│   ├── (pilgrim)/       → 8 pages (login, home, trip, manasik, doa, documents, payments, profile) + layout
-│   ├── api/             → 72 API endpoints
-│   └── offline/         → PWA offline page
+│   ├── (auth)/           → 4 pages
+│   ├── (dashboard)/      → 25 pages (6 platform + 19 operasional, incl. gamification, settings/branding)
+│   ├── (command-center)/ → 5 pages (login, dashboard, agencies list, agency detail) + layout  ← NEW
+│   ├── (pilgrim)/        → 8 pages (login, home, trip, manasik, doa, documents, payments, profile) + layout
+│   ├── api/              → 83 API endpoints (+4 gamification, +7 command-center)
+│   └── offline/          → PWA offline page
 ├── components/
-│   ├── shared/          → 12 reusable components
-│   ├── layout/          → 3 (sidebar, header, page-header)
-│   ├── packages/        → 3 (form, itinerary, pricing)
-│   ├── pilgrims/        → 3 (document-upload, status-timeline, import-modal)
-│   ├── trips/           → 1 (trip-form)
-│   ├── dashboard/       → 5 (action-center, quick-actions, revenue-chart, pilgrim-status-chart, trip-capacity-chart)
-│   ├── pwa/             → 4 (sw-register, offline, install, update)
-│   └── ai-assistant/    → 1 (ChatWidget)
-├── data/                → 8 mock data files (+pilgrim-portal, manasik, doa)
+│   ├── shared/           → 12 reusable components
+│   ├── layout/           → 3 (sidebar, header, page-header)
+│   ├── packages/         → 3 (form, itinerary, pricing)
+│   ├── pilgrims/         → 3 (document-upload, status-timeline, import-modal)
+│   ├── trips/            → 1 (trip-form)
+│   ├── dashboard/        → 5 (action-center, quick-actions, revenue-chart, pilgrim-status-chart, trip-capacity-chart)
+│   ├── pwa/              → 4 (sw-register, offline, install, update)
+│   └── ai-assistant/     → 1 (ChatWidget)
+├── data/                 → 8 mock data files (+pilgrim-portal, manasik, doa)
 ├── lib/
-│   ├── services/        → 7 service files (incl. pilgrim-portal.service)
-│   ├── hooks/           → 4 hooks
-│   ├── contexts/        → 1 (pilgrim-context)
-│   ├── validations/     → 5 schemas
-│   ├── csv-export.ts    → UTF-8 BOM CSV generator
-│   ├── i18n/            → ID + EN translations
-│   └── theme/           → Light + Dark color system
-└── types/               → 5 type definition files
+│   ├── services/         → 8 service files (+gamification.service)
+│   ├── hooks/            → 4 hooks
+│   ├── contexts/         → 2 (pilgrim-context, branding-context)         ← NEW
+│   ├── validations/      → 7 schemas (+gamification, command-center)     ← NEW
+│   ├── auth-command-center.ts → CC JWT auth (sign, verify, cookie)       ← NEW
+│   ├── csv-export.ts     → UTF-8 BOM CSV generator
+│   ├── i18n/             → ID + EN translations
+│   └── theme/            → Light + Dark + color-utils + branding override ← UPDATED
+└── types/                → 5 type definition files
 ```
 
 ---
 
-## J. GIT LOG (Session 3-6)
+## K. GIT LOG (Session 3-7)
 
 ```
+747c92e feat: implement Phase 4 — Gamifikasi, Command Center, White-label Branding
+d745e74 chore: remove 5 unused utility files
+b35f4bc fix: add missing auth protection for /reports and /activities routes
+540663c test: add Vitest unit testing setup with 151 tests across 11 files
 973b771 feat: implement 7 internal features — charts, reports, activity log, document upload, CSV export
 081a204 docs: update CHECKPOINT.md with Session 5 review & 28 bug fixes
 b4c5033 fix: resolve 28 review issues across 5 backlog features
@@ -304,9 +354,10 @@ a8ebe52 feat: Phase 2C — Gezma Pilgrim MVP (6 pages + layout + mock data)
 
 ---
 
-## K. NEXT STEPS
+## L. NEXT STEPS
 
-1. **Phase 3: Integrasi** — Connect real API keys (Nusuk, Payment Gateway, WhatsApp, UmrahCash)
-2. **Phase 4: Advanced** — Gamifikasi, Blockchain, Command Center, Mobile Native
-3. **GEZMA Command Center** — Admin Asosiasi dashboard (0%)
-4. **Testing** — Unit tests, E2E tests with Playwright
+1. **Phase 3: Real API** — Connect real API keys (Nusuk, Payment Gateway, WhatsApp, UmrahCash)
+2. **Phase 4: Remaining** — Blockchain Verification (mock), Mobile Native (Flutter — di luar scope)
+3. **Testing** — Add unit tests for Phase 4 features (gamification service, CC auth, color-utils)
+4. **Polish** — Command Center responsive, Audit Log UI page, Command Center mobile layout
+5. **Production** — Change SystemAdmin default password, secure JWT_SECRET

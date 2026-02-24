@@ -1,8 +1,8 @@
 # 🕋 GEZMA Development Plan v3.0
 
 > **Created:** 2026-02-23
-> **Last Updated:** 2026-02-24 (Session 6)
-> **Status:** Phase 2 Complete, Phase 3 Prep Done
+> **Last Updated:** 2026-02-24 (Session 7)
+> **Status:** Phase 1-3 Complete, Phase 4 Partial (3/5)
 > **Scope:** Phase 2 (Platform & Ecosystem) + Phase 3 (Integration) + Phase 4 (Advanced)
 
 ---
@@ -97,9 +97,19 @@
 | WhatsApp | ✅ Mock | Service + 5 API + Settings UI + Broadcast |
 | UmrahCash | ✅ Mock | Service + 3 API + Settings UI + Calculator |
 
-### 🔲 Phase 4 — Advanced (0%)
+### ✅ Phase 4 — Advanced (3/5 Done)
 
-Belum dimulai.
+| Feature | Status | Notes |
+|---------|--------|-------|
+| Gamifikasi | ✅ Done | Point system (8 rules), 11 badges, leaderboard, auto-award via activity logger |
+| Command Center | ✅ Done | SystemAdmin auth (cc_token), 7 API endpoints, blue-themed layout, agencies CRUD |
+| White-label Branding | ✅ Done | Custom colors/logo/title per agency, BrandingProvider, live preview settings |
+| Blockchain Verification | 🔲 Belum | Hyperledger, dokumen verification |
+| Mobile Native | 🔲 Belum | Flutter app (di luar scope Next.js) |
+
+**New DB models:** PointEvent, UserBadge, AgencyLeaderboard, SystemAdmin
+**Extended:** User (+totalPoints, level), Agency (+branding fields, totalPoints)
+**New files:** 24 | **Modified:** 8 | **Total insertions:** 2671
 
 ---
 
@@ -168,12 +178,12 @@ Belum dimulai.
 │                                                                 │
 │  ─────────────────────────────────────────────────────────────  │
 │                                                                 │
-│  PHASE 4 🔲 ─── Advanced Features                              │
-│  ├── Gamifikasi                                                │
-│  ├── Blockchain Verification                                   │
-│  ├── Command Center (Admin Asosiasi)                           │
-│  ├── White-label Full                                          │
-│  └── Mobile Native (Flutter)                                   │
+│  PHASE 4 🔄 ─── Advanced Features (3/5)                        │
+│  ├── Gamifikasi                          ✅                    │
+│  ├── Command Center (Admin Asosiasi)     ✅                    │
+│  ├── White-label Branding                ✅                    │
+│  ├── Blockchain Verification             🔲                    │
+│  └── Mobile Native (Flutter)             🔲                    │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -493,20 +503,89 @@ Semua menggunakan mock data. Siap connect real API ketika key tersedia.
 
 ---
 
-## 8. PHASE 4: ADVANCED FEATURES 🔲
+## 8. PHASE 4: ADVANCED FEATURES (3/5 Done)
 
-### Future Scope (Belum Dimulai)
+### Session 7 — Gamifikasi + Command Center + White-label (2026-02-24)
 
-| Feature | Complexity | Notes |
-|---------|------------|-------|
-| Gamifikasi | HIGH | Poin, badge, leaderboard |
-| Blockchain Verification | HIGH | Hyperledger, dokumen verification |
-| Command Center | MEDIUM | Admin asosiasi dashboard |
-| White-label Full | MEDIUM | Custom domain, full branding |
-| Mobile Native | HIGH | Flutter app |
-| Paket Modular | MEDIUM | Umrah backpacker, component-based |
-| Tabungan Umrah | HIGH | Fintech partnership needed |
-| PayLater Syariah | HIGH | Lembaga keuangan partnership |
+| Feature | Complexity | Status | Notes |
+|---------|------------|--------|-------|
+| **Gamifikasi** | HIGH | ✅ Done | 8 point rules, 11 badges, leaderboard, auto-award via activity logger |
+| **Command Center** | MEDIUM | ✅ Done | SystemAdmin model, independent JWT auth (cc_token), blue layout, agencies CRUD |
+| **White-label Branding** | MEDIUM | ✅ Done | Custom primaryColor/logo/title per agency, BrandingProvider, theme override |
+| Blockchain Verification | HIGH | 🔲 | Hyperledger, dokumen verification |
+| Mobile Native | HIGH | 🔲 | Flutter app (di luar scope Next.js) |
+| Paket Modular | MEDIUM | 🔲 | Umrah backpacker, component-based |
+| Tabungan Umrah | HIGH | 🔲 | Fintech partnership needed |
+| PayLater Syariah | HIGH | 🔲 | Lembaga keuangan partnership |
+
+### 8.1 GAMIFIKASI ✅
+
+**DB Models:** `PointEvent`, `UserBadge`, `AgencyLeaderboard` + extended `User` (totalPoints, level) + `Agency` (totalPoints)
+
+**Point System (8 rules):**
+| Action | Points |
+|--------|--------|
+| Tambah jemaah | +10 |
+| Jemaah lunas | +25 |
+| Jemaah completed | +50 |
+| Buat paket | +15 |
+| Buat trip | +20 |
+| Upload dokumen | +5 |
+| Catat pembayaran | +10 |
+| Jemaah departed | +30 |
+
+**11 Badges:** first_pilgrim, pilgrim_10/50/100, first_trip, trip_master, first_package, revenue_10m/100m, level_5/10
+
+**Files:**
+- `src/lib/services/gamification.service.ts` — awardPoints, checkAndAwardBadges, calculateLevel, getLeaderboard
+- `src/lib/validations/gamification.ts` — Zod schemas
+- `src/app/api/gamification/` — 4 endpoints (stats, badges, leaderboard, history)
+- `src/app/(dashboard)/gamification/page.tsx` — Full page (stats, badges, leaderboard, history)
+- `src/lib/activity-logger.ts` — Modified: auto-award points on every logged action
+
+---
+
+### 8.2 COMMAND CENTER ✅
+
+**DB Model:** `SystemAdmin` (terpisah dari User, bukan multi-tenant)
+
+**Auth:** `cc_token` cookie (httpOnly, 7 days), independent JWT sign/verify
+
+**API Endpoints (7):**
+```
+POST /api/command-center/auth/login
+GET  /api/command-center/auth/me
+POST /api/command-center/auth/logout
+GET  /api/command-center/agencies
+GET  /api/command-center/agencies/[id]
+PATCH /api/command-center/agencies/[id]
+GET  /api/command-center/stats
+GET  /api/command-center/audit-log
+```
+
+**UI Pages (5):**
+- `(command-center)/layout.tsx` — Independent layout, blue theme (#2563EB), dark sidebar
+- `command-center/login/page.tsx` — Admin login
+- `command-center/page.tsx` — Dashboard (global stats, recent agencies)
+- `command-center/agencies/page.tsx` — Agency list (search, status filter, pagination)
+- `command-center/agencies/[id]/page.tsx` — Agency detail (info, users, approve/suspend)
+
+**Default Admin:** `admin@gezma.id` / `admin123!`
+
+---
+
+### 8.3 WHITE-LABEL BRANDING ✅
+
+**Extended Agency Model:** +secondaryColor, faviconUrl, logoLightUrl, logoDarkUrl, appTitle
+
+**Files:**
+- `src/lib/theme/color-utils.ts` — lighten, darken, hexToRgba
+- `src/lib/contexts/branding-context.tsx` — BrandingProvider + useBranding hook
+- `src/lib/theme/index.tsx` — Modified: accepts branding override for dynamic primary color
+- `src/components/layout/sidebar.tsx` — Modified: uses branding logo + appTitle
+- `src/app/(dashboard)/layout.tsx` — Modified: wraps with BrandingProvider
+- `src/app/(dashboard)/settings/branding/page.tsx` — Color picker, logo URLs, live preview
+- `src/app/api/agency/route.ts` — Modified: PUT accepts branding fields
 
 ---
 
@@ -672,13 +751,13 @@ await logActivity({ agencyId: auth.agencyId, userId: auth.userId, ... });
 ✅ UMRAHCASH — Service + 3 API + Settings UI + Calculator (mock)
 ```
 
-### Phase 4: Advanced 🔲
+### Phase 4: Advanced (3/5 Done)
 
 ```
-□ GAMIFIKASI — Poin, badge, leaderboard
+✅ GAMIFIKASI — 8 point rules, 11 badges, leaderboard, auto-award, dashboard widget, full page
+✅ COMMAND CENTER — SystemAdmin auth, 7 API endpoints, blue layout, agencies CRUD, audit log
+✅ WHITE-LABEL — BrandingProvider, color-utils, theme override, settings page, sidebar branding
 □ BLOCKCHAIN — Hyperledger, dokumen verification
-□ COMMAND CENTER — Admin asosiasi dashboard
-□ WHITE-LABEL — Custom domain, full branding
 □ MOBILE NATIVE — Flutter app
 ```
 
@@ -686,22 +765,24 @@ await logActivity({ agencyId: auth.agencyId, userId: auth.userId, ... });
 
 ## 📎 APPENDIX
 
-### A. API Count Summary (72 Total)
+### A. API Count Summary (83 Total)
 
 ```
-Auth:           7 endpoints
-Pilgrims:      15 endpoints (CRUD + docs + payments + status + history + bulk + import + QR + export)
-Packages:       7 endpoints (CRUD + duplicate + brochure)
-Trips:          7 endpoints (CRUD + checklist + manifest + manifest/remove)
-Dashboard:      4 endpoints (stats, alerts, activities, charts)
-Reports:        5 endpoints (financial, demographics, documents, payment-aging, conversion)
+Auth:            7 endpoints
+Pilgrims:       15 endpoints (CRUD + docs + payments + status + history + bulk + import + QR + export)
+Packages:        7 endpoints (CRUD + duplicate + brochure)
+Trips:           7 endpoints (CRUD + checklist + manifest + manifest/remove)
+Dashboard:       4 endpoints (stats, alerts, activities, charts)
+Reports:         5 endpoints (financial, demographics, documents, payment-aging, conversion)
 Reports Export:  1 endpoint  (financial/export)
-Settings:       1 endpoint  (notification preferences GET/PUT)
-Integrations:  15 endpoints (nusuk: 3, payment: 4, whatsapp: 5, umrahcash: 3)
-Pilgrim Portal: 9 endpoints (login, me, logout, documents GET/POST, manasik, manasik/progress, doa, doa/favorites)
-Verify:         2 endpoints (pilgrim QR + agency QR)
-Users:          2 endpoints (CRUD + role management)
-Other:          2 endpoints (agency, chat AI)
+Settings:        1 endpoint  (notification preferences GET/PUT)
+Integrations:   15 endpoints (nusuk: 3, payment: 4, whatsapp: 5, umrahcash: 3)
+Pilgrim Portal:  9 endpoints (login, me, logout, documents GET/POST, manasik, manasik/progress, doa, doa/favorites)
+Verify:          2 endpoints (pilgrim QR + agency QR)
+Users:           2 endpoints (CRUD + role management)
+Other:           2 endpoints (agency, chat AI)
+Gamification:    4 endpoints (stats, badges, leaderboard, history)        ← NEW
+Command Center:  7 endpoints (login, me, logout, agencies, agencies/[id], stats, audit-log) ← NEW
 ```
 
 ### B. Color Reference
@@ -732,7 +813,7 @@ Other:          2 endpoints (agency, chat AI)
 
 ---
 
-*Plan Version: 3.1*
+*Plan Version: 3.2*
 *Created: 2026-02-23*
-*Updated: 2026-02-24 (Phase 2 Complete)*
-*Next: Phase 3 real API integration + Phase 4 advanced features*
+*Updated: 2026-02-24 (Phase 4 Partial — Gamifikasi + Command Center + White-label)*
+*Next: Blockchain Verification (mock), or connect real API keys for Phase 3*
