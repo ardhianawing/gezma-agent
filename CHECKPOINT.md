@@ -1,6 +1,6 @@
 # GEZMA Agent — Development Checkpoint
 
-> **Last Updated:** 2026-02-25 (Session 10 — Mega Feature Session: 37 Features)
+> **Last Updated:** 2026-02-25 (Session 11 — Codebase Hardening & Quality)
 > **Blueprint Reference:** `GEZMA-AGENT-PLAN-v2.md`, `DEVELOPMENT-PLAN-v3.md`
 
 ---
@@ -18,6 +18,7 @@
 | **Phase 4: Advanced** | ✅ 5/5 Done | Gamifikasi, Command Center, White-label, Blockchain, Academy LMS |
 | **Session 9: Polish** | ✅ Done | Error Boundaries, Security Settings, Pilgrim Gamification, CC Analytics |
 | **Session 10: Mega Features** | ✅ Done | 37 features: Security, Productivity, Pilgrim Portal, Platform, Academy, CC |
+| **Session 11: Hardening** | ✅ Done | Zod validation, rate limiting, try/catch, logActivity, cleanup, 85 new tests |
 | **PWA** | ✅ Done | Service Worker, Install Prompt, Offline |
 | **Deployment** | ✅ Ready | Docker + Nginx + Traefik |
 
@@ -479,7 +480,62 @@ Semua menggunakan mock data, siap connect real API ketika key tersedia:
 
 ---
 
-## K. API ENDPOINTS (~133 Total)  ← UPDATED
+## K. SESSION 11 — CODEBASE HARDENING & QUALITY ✅
+
+Comprehensive audit + fix of ~50 quality/security gaps across the codebase:
+
+### Batch 1: Foundation ✅
+| Perubahan | Keterangan |
+|-----------|------------|
+| Activity Logger Types | Extended from 5 → 9 types (`+user, agency, settings, system`), 8 → 10 actions (`+revoked, sent`) |
+| Password Policy Fix | `min(6)` → `min(8)` in `changePasswordSchema` + `reset-password` route |
+| 5 New Zod Schemas | `note.ts`, `waiting-list.ts`, `scheduled-report.ts`, `academy-review.ts`, `notification.ts` (extended) |
+
+### Batch 2: Zod Validation Wiring (16 routes) ✅
+| Route Group | Routes Wired | Schema Source |
+|-------------|-------------|---------------|
+| Users | POST, PUT | `createUserSchema`, `updateUserSchema` |
+| Payments | POST | `createPaymentSchema` |
+| Notes | POST | `createNoteSchema` (new) |
+| Waiting List | POST | `createWaitingListSchema` (new) |
+| Scheduled Reports | POST, PATCH | `createScheduledReportSchema` (new) |
+| Academy Reviews | POST | `createReviewSchema` (new) |
+| Email Templates | POST, PATCH | Already wired (verified) |
+| Change Password | POST | Already wired (verified) |
+| Pilgrim Portal | 4 routes | Inline Zod (testimonial, gallery, referral, roommate) |
+
+### Batch 3: Rate Limiting (7 auth routes) ✅
+| Route | Limit | Window |
+|-------|-------|--------|
+| `auth/register` | 3/min | 60s |
+| `auth/forgot-password` | 3/min | 60s |
+| `auth/reset-password` | 5/min | 60s |
+| `auth/totp-verify` | 5/min | 60s |
+| `command-center/auth/login` | 5/min | 60s |
+| `pilgrim-portal/login` | 5/min | 60s |
+| `settings/security/change-password` | 3/min | 60s |
+
+### Batch 4: Error Handling + Activity Logging ✅
+| Perubahan | Count | Routes |
+|-----------|-------|--------|
+| try/catch added | 9 route files | Academy (courses, lessons, progress), email-templates, waiting-list, invoice |
+| logActivity added | 13 mutations | Users CRUD, agency PUT, notes POST, email-templates, scheduled-reports, blockchain revoke, send-scheduled, waiting-list |
+
+### Batch 5: Cleanup + Tests ✅
+| Perubahan | Keterangan |
+|-----------|------------|
+| Removed deps | `class-variance-authority`, `@tanstack/react-table`, `dotenv` (all unused) |
+| Normalized imports | `zod/v4` → `zod` in 2 files (command-center, gamification) |
+| New test files | 6 files: `api/auth`, `api/users`, `api/pilgrims-extended`, `api/academy`, `api/settings`, `validations/new-schemas` |
+| Updated test | `security.test.ts` — updated for min(8) password policy |
+| **Total tests** | **415 tests across 34 files, all passing** (was 330/28) |
+
+**Files changed:** 48 | **Insertions:** 1,859 | **Deletions:** 345
+**Build:** 0 TypeScript errors | **Tests:** 415/415 passing
+
+---
+
+## L. API ENDPOINTS (~133 Total)  ← UPDATED
 
 ```
 Auth:            9 endpoints (login, register, verify, password, totp-verify, me, etc)                   ← UPDATED
@@ -558,7 +614,7 @@ src/
 │   ├── services/         → 14 service files (+totp, invoice, notification, academy-certificate) ← UPDATED
 │   ├── hooks/            → 4 hooks
 │   ├── contexts/         → 2 (pilgrim-context, branding-context)
-│   ├── validations/      → 10 schemas (+task, email-template)                       ← UPDATED
+│   ├── validations/      → 14 schemas (+note, waiting-list, scheduled-report, academy-review) ← UPDATED
 │   ├── utils/            → 1 (prayer-times)                                         ← NEW
 │   ├── rate-limiter.ts   → In-memory sliding window rate limiter                    ← NEW
 │   ├── auth-command-center.ts → CC JWT auth (sign, verify, cookie)
@@ -568,15 +624,16 @@ src/
 ├── types/                → 5 type definition files
 ├── prisma/
 │   └── seed-academy.ts   → Academy seed script (12 courses + 36 lessons)            ← NEW
-├── tests/                → 28 unit test files (330 tests)                           ← UPDATED
+├── tests/                → 34 unit test files (415 tests)                           ← UPDATED
 └── e2e/                  → 5 Playwright spec files (auth, dashboard, pilgrims, CC, navigation)
 ```
 
 ---
 
-## N. GIT LOG (Session 3-10)
+## O. GIT LOG (Session 3-11)
 
 ```
+eb03772 fix: Session 11 — Codebase hardening & quality improvements
 637c69d feat: Session 10 — Mega Feature Session (37 features)
 e6e94a9 docs: update DEVELOPMENT-PLAN-v3.md with Session 9 progress
 c4ff048 docs: update BLUEPRINT-TRACKING.md with Session 9 progress
@@ -604,7 +661,7 @@ a8ebe52 feat: Phase 2C — Gezma Pilgrim MVP (6 pages + layout + mock data)
 
 ---
 
-## O. NEXT STEPS
+## P. NEXT STEPS
 
 1. **Phase 3: Real API** — Connect real API keys (Nusuk, Payment Gateway, WhatsApp, UmrahCash)
 2. **Mobile Native** — Flutter app (di luar scope web — separate project)
