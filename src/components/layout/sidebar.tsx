@@ -25,6 +25,7 @@ import {
   Globe,
   Clock,
   Trophy,
+  Shield,
 } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n';
 import { useTheme } from '@/lib/theme';
@@ -47,6 +48,7 @@ const menuItems: MenuItem[] = [
   { label: 'Laporan', href: '/reports', icon: BarChart3 },
   { label: 'Aktivitas', href: '/activities', icon: Clock },
   { label: 'Gamifikasi', href: '/gamification', icon: Trophy },
+  { label: 'Blockchain', href: '/blockchain', icon: Shield },
   { label: 'Agensi', href: '/agency', icon: Building2 },
 ];
 

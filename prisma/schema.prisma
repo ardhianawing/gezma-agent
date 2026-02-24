@@ -64,6 +64,7 @@ model Agency {
   doaPrayers      DoaPrayer[]
   leaderboard     AgencyLeaderboard[]
   pointEvents     PointEvent[]
+  certificates    BlockchainCertificate[]
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -110,6 +111,7 @@ model User {
   notificationPrefs NotificationPreference?
   pointEvents     PointEvent[]
   badges          UserBadge[]
+  courseProgress   AcademyCourseProgress[]
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -173,6 +175,7 @@ model Pilgrim {
   payments          PaymentRecord[]
   manasikProgress   PilgrimManasikProgress[]
   doaFavorites      PilgrimDoaFavorite[]
+  certificates      BlockchainCertificate[]
 
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
@@ -474,4 +477,84 @@ model SystemAdmin {
   updatedAt DateTime @updatedAt
 
   @@map("system_admins")
+}
+
+// === BLOCKCHAIN CERTIFICATES ===
+
+model BlockchainCertificate {
+  id                String    @id @default(uuid())
+  certificateNumber String    @unique
+  txHash            String    // simulated 0x... hash
+  blockNumber       Int       // simulated block number
+  metadata          Json?
+  status            String    @default("pending") // pending, verified, revoked
+
+  pilgrimId         String
+  pilgrim           Pilgrim   @relation(fields: [pilgrimId], references: [id], onDelete: Cascade)
+  agencyId          String
+  agency            Agency    @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+
+  issuedAt          DateTime  @default(now())
+  verifiedAt        DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@map("blockchain_certificates")
+}
+
+// === ACADEMY LMS ===
+
+model AcademyCourse {
+  id             String    @id @default(uuid())
+  title          String
+  description    String
+  category       String    // operasional, manasik, bisnis, tutorial
+  level          String    // pemula, menengah, lanjutan
+  thumbnailUrl   String?
+  duration       String    // e.g. "6 jam"
+  instructorName String
+  totalLessons   Int       @default(0)
+  isPublished    Boolean   @default(true)
+  order          Int       @default(0)
+
+  lessons        AcademyLesson[]
+  progress       AcademyCourseProgress[]
+
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@map("academy_courses")
+}
+
+model AcademyLesson {
+  id        String  @id @default(uuid())
+  courseId   String
+  course     AcademyCourse @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  title      String
+  content    String  // markdown/text
+  videoUrl   String?
+  order      Int     @default(0)
+  duration   String? // e.g. "30 menit"
+
+  createdAt  DateTime @default(now())
+
+  @@map("academy_lessons")
+}
+
+model AcademyCourseProgress {
+  id               String    @id @default(uuid())
+  userId           String
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courseId          String
+  course           AcademyCourse @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  completedLessons Int       @default(0)
+  completedLessonIds String[] @default([])
+  totalLessons     Int       @default(0)
+  status           String    @default("not_started") // not_started, in_progress, completed
+
+  startedAt        DateTime?
+  completedAt      DateTime?
+
+  @@unique([userId, courseId])
+  @@map("academy_course_progress")
 }

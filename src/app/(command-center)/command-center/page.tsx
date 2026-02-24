@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Building2, Users, Plane, DollarSign, ChevronRight } from 'lucide-react';
+import { Building2, Users, Plane, DollarSign, ChevronRight, AlertTriangle } from 'lucide-react';
 
 const cc = {
   primary: '#2563EB',
@@ -22,6 +22,14 @@ interface Stats {
   recentAgencies: { id: string; name: string; ppiuStatus: string; createdAt: string; _count: { pilgrims: number } }[];
 }
 
+interface PPIUAlert {
+  id: string;
+  name: string;
+  ppiuNumber: string | null;
+  ppiuExpiryDate: string;
+  daysRemaining: number;
+}
+
 const statusColors: Record<string, { bg: string; text: string }> = {
   pending: { bg: '#FEF3C7', text: '#D97706' },
   active: { bg: '#DCFCE7', text: '#15803D' },
@@ -33,6 +41,7 @@ const statusColors: Record<string, { bg: string; text: string }> = {
 export default function CCDashboardPage() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [alerts, setAlerts] = useState<PPIUAlert[]>([]);
 
   useEffect(() => {
     fetch('/api/command-center/stats')
@@ -40,6 +49,11 @@ export default function CCDashboardPage() {
       .then(setStats)
       .catch(console.error)
       .finally(() => setLoading(false));
+
+    fetch('/api/command-center/alerts')
+      .then(r => r.json())
+      .then(data => setAlerts(data.data || []))
+      .catch(console.error);
   }, []);
 
   const statCards = [
@@ -101,6 +115,93 @@ export default function CCDashboardPage() {
           );
         })}
       </div>
+
+      {/* PPIU Expiry Alerts */}
+      {alerts.length > 0 && (
+        <div
+          style={{
+            borderRadius: '12px',
+            border: `1px solid ${alerts.some(a => a.daysRemaining < 0) ? '#FECACA' : '#FED7AA'}`,
+            backgroundColor: alerts.some(a => a.daysRemaining < 0) ? '#FEF2F2' : '#FFFBEB',
+            overflow: 'hidden',
+          }}
+        >
+          <div
+            style={{
+              padding: '16px 20px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              borderBottom: `1px solid ${alerts.some(a => a.daysRemaining < 0) ? '#FECACA' : '#FED7AA'}`,
+            }}
+          >
+            <AlertTriangle
+              style={{
+                width: '22px',
+                height: '22px',
+                color: alerts.some(a => a.daysRemaining < 0) ? '#DC2626' : '#EA580C',
+                flexShrink: 0,
+              }}
+            />
+            <div>
+              <p style={{ fontSize: '15px', fontWeight: '600', color: '#0F172A', margin: 0 }}>
+                {alerts.length} agensi dengan PPIU akan/sudah kedaluwarsa
+              </p>
+              <p style={{ fontSize: '13px', color: '#64748B', margin: '2px 0 0 0' }}>
+                Agensi dengan izin PPIU yang mendekati atau melewati masa berlaku.
+              </p>
+            </div>
+          </div>
+          <div style={{ padding: '12px 20px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {alerts.map(alert => {
+              const isExpired = alert.daysRemaining < 0;
+              return (
+                <Link key={alert.id} href={`/command-center/agencies/${alert.id}`} style={{ textDecoration: 'none' }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '12px',
+                      padding: '12px 14px',
+                      borderRadius: '8px',
+                      backgroundColor: isExpired ? '#FEE2E2' : '#FFF7ED',
+                      border: `1px solid ${isExpired ? '#FECACA' : '#FDBA74'}`,
+                    }}
+                  >
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p style={{ fontSize: '14px', fontWeight: '600', color: '#0F172A', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {alert.name}
+                      </p>
+                      <p style={{ fontSize: '12px', color: '#64748B', margin: '2px 0 0 0' }}>
+                        PPIU: {alert.ppiuNumber || '-'}
+                      </p>
+                    </div>
+                    <span
+                      style={{
+                        fontSize: '12px',
+                        fontWeight: '600',
+                        padding: '4px 10px',
+                        borderRadius: '6px',
+                        backgroundColor: isExpired ? '#DC2626' : '#EA580C',
+                        color: '#FFFFFF',
+                        whiteSpace: 'nowrap',
+                        flexShrink: 0,
+                      }}
+                    >
+                      {isExpired
+                        ? `Expired ${Math.abs(alert.daysRemaining)} hari lalu`
+                        : alert.daysRemaining === 0
+                          ? 'Kedaluwarsa hari ini'
+                          : `${alert.daysRemaining} hari lagi`
+                      }
+                    </span>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Recent Agencies */}
       <div style={{ backgroundColor: cc.cardBg, borderRadius: '12px', border: `1px solid ${cc.border}`, overflow: 'hidden' }}>

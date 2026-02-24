@@ -1,40 +1,109 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { Search, BookOpen, Award, GraduationCap, Clock, Users } from 'lucide-react';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
 import {
-  courses,
   categories,
   levels,
-  academyStats,
   type CourseCategory,
   type CourseLevel,
-  type Course,
 } from '@/data/mock-academy';
+
+interface CourseProgress {
+  completedLessons: number;
+  completedLessonIds: string[];
+  totalLessons: number;
+  status: string;
+  percent: number;
+}
+
+interface CourseData {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  level: string;
+  thumbnailUrl: string | null;
+  duration: string;
+  instructorName: string;
+  totalLessons: number;
+  lessonCount: number;
+  progress: CourseProgress | null;
+}
+
+interface ProgressItem {
+  courseId: string;
+  status: string;
+  completedAt: string | null;
+}
 
 export default function AcademyPage() {
   const { c } = useTheme();
-  const { isMobile, isTablet, isDesktop } = useResponsive();
+  const { isMobile, isTablet } = useResponsive();
+  const router = useRouter();
 
   const [activeCategory, setActiveCategory] = useState<CourseCategory>('all');
   const [activeLevel, setActiveLevel] = useState<CourseLevel>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
 
-  const filteredCourses = useMemo(() => {
-    return courses.filter((course) => {
-      const matchCategory = activeCategory === 'all' || course.category === activeCategory;
-      const matchLevel = activeLevel === 'all' || course.level === activeLevel;
-      const matchSearch =
-        searchQuery === '' ||
-        course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        course.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        course.tags.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase()));
-      return matchCategory && matchLevel && matchSearch;
-    });
+  const [coursesData, setCoursesData] = useState<CourseData[]>([]);
+  const [totalCourses, setTotalCourses] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [progressList, setProgressList] = useState<ProgressItem[]>([]);
+
+  const fetchCourses = useCallback(async () => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams();
+      if (activeCategory !== 'all') params.set('category', activeCategory);
+      if (activeLevel !== 'all') params.set('level', activeLevel);
+      if (searchQuery) params.set('search', searchQuery);
+      params.set('limit', '100');
+
+      const res = await fetch(`/api/academy/courses?${params.toString()}`);
+      if (res.ok) {
+        const data = await res.json();
+        setCoursesData(data.courses || []);
+        setTotalCourses(data.total || 0);
+      }
+    } catch (err) {
+      console.error('Failed to fetch courses:', err);
+    } finally {
+      setLoading(false);
+    }
   }, [activeCategory, activeLevel, searchQuery]);
+
+  const fetchProgress = useCallback(async () => {
+    try {
+      const res = await fetch('/api/academy/progress');
+      if (res.ok) {
+        const data = await res.json();
+        setProgressList(data.progress || []);
+      }
+    } catch (err) {
+      console.error('Failed to fetch progress:', err);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchCourses();
+  }, [fetchCourses]);
+
+  useEffect(() => {
+    fetchProgress();
+  }, [fetchProgress]);
+
+  const enrolledCount = useMemo(() => {
+    return progressList.filter((p) => p.status === 'in_progress' || p.status === 'completed').length;
+  }, [progressList]);
+
+  const completedCount = useMemo(() => {
+    return progressList.filter((p) => p.status === 'completed').length;
+  }, [progressList]);
 
   const getCategoryColor = (category: string) => {
     const cat = categories.find((ct) => ct.key === category);
@@ -56,17 +125,22 @@ export default function AcademyPage() {
     return stars;
   };
 
-  const getCtaLabel = (progress: number | null) => {
-    if (progress === null) return 'Daftar';
-    if (progress > 0) return 'Lanjutkan';
+  const getCtaLabel = (progress: CourseProgress | null) => {
+    if (!progress) return 'Daftar';
+    if (progress.percent > 0 && progress.status !== 'completed') return 'Lanjutkan';
+    if (progress.status === 'completed') return 'Lihat Ulang';
     return 'Mulai Belajar';
   };
 
+  const handleCourseClick = (courseId: string) => {
+    router.push(`/academy/${courseId}`);
+  };
+
   const statItems = [
-    { label: 'Total Kursus', value: academyStats.totalCourses, icon: BookOpen, color: c.primary },
-    { label: 'Terdaftar', value: academyStats.enrolled, icon: Users, color: c.info },
-    { label: 'Lulus', value: academyStats.completed, icon: GraduationCap, color: c.success },
-    { label: 'Sertifikat', value: academyStats.certificates, icon: Award, color: c.warning },
+    { label: 'Total Kursus', value: totalCourses, icon: BookOpen, color: c.primary },
+    { label: 'Terdaftar', value: enrolledCount, icon: Users, color: c.info },
+    { label: 'Lulus', value: completedCount, icon: GraduationCap, color: c.success },
+    { label: 'Sertifikat', value: completedCount, icon: Award, color: c.warning },
   ];
 
   return (
@@ -225,8 +299,20 @@ export default function AcademyPage() {
         </div>
       </div>
 
-      {/* Course Grid */}
-      {filteredCourses.length === 0 ? (
+      {/* Loading */}
+      {loading ? (
+        <div
+          style={{
+            textAlign: 'center',
+            padding: '60px 20px',
+            backgroundColor: c.cardBg,
+            borderRadius: '16px',
+            border: '1px solid ' + c.borderLight,
+          }}
+        >
+          <div style={{ fontSize: '14px', color: c.textMuted }}>Memuat kursus...</div>
+        </div>
+      ) : coursesData.length === 0 ? (
         <div
           style={{
             textAlign: 'center',
@@ -252,14 +338,16 @@ export default function AcademyPage() {
             gap: '20px',
           }}
         >
-          {filteredCourses.map((course) => {
+          {coursesData.map((course) => {
             const isHovered = hoveredCard === course.id;
             const categoryColor = getCategoryColor(course.category);
             const levelMeta = getLevelMeta(course.level);
+            const progressPercent = course.progress?.percent ?? null;
 
             return (
               <div
                 key={course.id}
+                onClick={() => handleCourseClick(course.id)}
                 onMouseEnter={() => setHoveredCard(course.id)}
                 onMouseLeave={() => setHoveredCard(null)}
                 style={{
@@ -283,7 +371,9 @@ export default function AcademyPage() {
                     justifyContent: 'center',
                   }}
                 >
-                  <span style={{ fontSize: '48px' }}>{course.emoji}</span>
+                  <span style={{ fontSize: '48px' }}>
+                    {categories.find((ct) => ct.key === course.category)?.emoji || '📚'}
+                  </span>
                 </div>
 
                 {/* Content */}
@@ -301,53 +391,8 @@ export default function AcademyPage() {
                         color: levelMeta?.color || '#6B7280',
                       }}
                     >
-                      {levelMeta?.label}
+                      {levelMeta?.label || course.level}
                     </span>
-                    {course.isFree && (
-                      <span
-                        style={{
-                          display: 'inline-block',
-                          padding: '3px 10px',
-                          borderRadius: '12px',
-                          fontSize: '11px',
-                          fontWeight: 600,
-                          backgroundColor: '#05966915',
-                          color: '#059669',
-                        }}
-                      >
-                        Gratis
-                      </span>
-                    )}
-                    {course.isNew && (
-                      <span
-                        style={{
-                          display: 'inline-block',
-                          padding: '3px 10px',
-                          borderRadius: '12px',
-                          fontSize: '11px',
-                          fontWeight: 600,
-                          backgroundColor: '#2563EB15',
-                          color: '#2563EB',
-                        }}
-                      >
-                        Baru
-                      </span>
-                    )}
-                    {course.isPopular && (
-                      <span
-                        style={{
-                          display: 'inline-block',
-                          padding: '3px 10px',
-                          borderRadius: '12px',
-                          fontSize: '11px',
-                          fontWeight: 600,
-                          backgroundColor: '#D9770615',
-                          color: '#D97706',
-                        }}
-                      >
-                        Populer
-                      </span>
-                    )}
                   </div>
 
                   {/* Title & Description */}
@@ -379,15 +424,13 @@ export default function AcademyPage() {
 
                   {/* Instructor */}
                   <div style={{ fontSize: '12px', color: c.textSecondary, marginBottom: '10px' }}>
-                    <span style={{ fontWeight: 600 }}>{course.instructor}</span>
-                    <span style={{ color: c.textMuted }}> · {course.instructorRole}</span>
+                    <span style={{ fontWeight: 600 }}>{course.instructorName}</span>
                   </div>
 
-                  {/* Rating */}
+                  {/* Rating placeholder */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
-                    <div style={{ display: 'flex', gap: '1px' }}>{renderStars(course.rating)}</div>
-                    <span style={{ fontSize: '13px', fontWeight: 600, color: c.textPrimary }}>{course.rating}</span>
-                    <span style={{ fontSize: '12px', color: c.textMuted }}>({course.reviewCount})</span>
+                    <div style={{ display: 'flex', gap: '1px' }}>{renderStars(4.5)}</div>
+                    <span style={{ fontSize: '13px', fontWeight: 600, color: c.textPrimary }}>4.5</span>
                   </div>
 
                   {/* Lesson & Duration */}
@@ -403,7 +446,7 @@ export default function AcademyPage() {
                   >
                     <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                       <BookOpen size={13} />
-                      {course.lessonCount} pelajaran
+                      {course.totalLessons} pelajaran
                     </span>
                     <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                       <Clock size={13} />
@@ -412,7 +455,7 @@ export default function AcademyPage() {
                   </div>
 
                   {/* Progress Bar */}
-                  {course.progress !== null && (
+                  {progressPercent !== null && (
                     <div style={{ marginBottom: '12px' }}>
                       <div
                         style={{
@@ -424,7 +467,7 @@ export default function AcademyPage() {
                         }}
                       >
                         <span>Progress</span>
-                        <span style={{ fontWeight: 600, color: c.success }}>{course.progress}%</span>
+                        <span style={{ fontWeight: 600, color: c.success }}>{progressPercent}%</span>
                       </div>
                       <div
                         style={{
@@ -437,7 +480,7 @@ export default function AcademyPage() {
                         <div
                           style={{
                             height: '100%',
-                            width: course.progress + '%',
+                            width: progressPercent + '%',
                             backgroundColor: '#059669',
                             borderRadius: '3px',
                             transition: 'width 0.3s ease',
@@ -449,13 +492,17 @@ export default function AcademyPage() {
 
                   {/* CTA Button */}
                   <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleCourseClick(course.id);
+                    }}
                     style={{
                       width: '100%',
                       padding: '10px',
                       borderRadius: '10px',
-                      border: course.progress !== null ? 'none' : '1px solid ' + c.primary,
-                      backgroundColor: course.progress !== null ? c.primary : 'transparent',
-                      color: course.progress !== null ? '#fff' : c.primary,
+                      border: course.progress ? 'none' : '1px solid ' + c.primary,
+                      backgroundColor: course.progress ? c.primary : 'transparent',
+                      color: course.progress ? '#fff' : c.primary,
                       fontSize: '14px',
                       fontWeight: 600,
                       cursor: 'pointer',
