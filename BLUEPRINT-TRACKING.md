@@ -1,6 +1,6 @@
 # 🕋 GEZMA — Blueprint Tracking Document
 
-> **Last Synced:** 2026-02-24 (Session 8)
+> **Last Synced:** 2026-02-24 (Session 9)
 > **Repository:** github.com/ardhianawing/gezma-agent
 > **Blueprint Sources:**
 > 1. Cetak Biru Strategis v1 (Generasi Emas Z & Milenial)
@@ -14,9 +14,9 @@
 | Komponen | Blueprint | Implemented | Completion |
 |----------|-----------|-------------|------------|
 | **Gezma Agent** (Core B2B) | ✓ | ✅ | **99%** |
-| **Gezma Pilgrim** (B2C App) | ✓ | ✅ MVP | **85%** |
+| **Gezma Pilgrim** (B2C App) | ✓ | ✅ MVP + Gamification | **90%** |
 | **Gezma Academy** (LMS) | ✓ | ✅ Done | **70%** |
-| **Gezma Command Center** | ✓ | ✅ Done | **85%** |
+| **Gezma Command Center** | ✓ | ✅ Done + Analytics | **90%** |
 | **Platform Pages** | ✓ | ✅ Mock UI | 60% |
 | **Nusuk Integration** | ✓ Critical | ⏸️ Mock Service | 10% |
 | **Fintech Integration** | ✓ | ⏸️ Mock Service | 10% |
@@ -40,13 +40,13 @@
 │  ┌─────────────────┐  ┌─────────────────┐                      │
 │  │  GEZMA AGENT    │  │  GEZMA PILGRIM  │                      │
 │  │  (B2B Travel)   │  │  (B2C Jemaah)   │                      │
-│  │  ✅ 98% Done    │  │  ✅ MVP 85%     │                      │
+│  │  ✅ 99% Done    │  │  ✅ MVP 90%     │                      │
 │  └─────────────────┘  └─────────────────┘                      │
 │                                                                 │
 │  ┌─────────────────┐  ┌─────────────────┐                      │
 │  │ GEZMA COMMAND   │  │ GEZMA ACADEMY   │                      │
 │  │ CENTER (Admin)  │  │     (LMS)       │                      │
-│  │  ✅ 85% Done    │  │  ✅ 70% Done    │                      │
+│  │  ✅ 90% Done    │  │  ✅ 70% Done    │                      │
 │  └─────────────────┘  └─────────────────┘                      │
 │                                                                 │
 │  ┌───────────────────────────────────────────────────────────┐ │
@@ -137,6 +137,7 @@
 | ↳ User Management | `/settings/users` | ✅ Real | CRUD |
 | ↳ **Roles & Permissions** | | ✅ Done | 25 perms, role matrix, per-user overrides |
 | ↳ **Notification Preferences** | `/settings/notifications` | ✅ Done | 5 categories × 3 channels |
+| ↳ **Security Settings** | `/settings/security` | ✅ NEW | Change password + login history (IP, user agent) |
 
 ### Authentication (Blueprint Section: Security)
 | Fitur | Status | Notes |
@@ -172,28 +173,33 @@
 - Cetak Biru v1, BAB 3.3: Gezma Pilgrim (Apps Jemaah Milenial)
 - Cetak Biru v2, BAB 3.3: Modul Gezma Pilgrim
 
-### Status: ✅ MVP Done (85%)
+### Status: ✅ MVP Done + Gamification (90%)
 
 | Fitur (Blueprint) | Status | Priority |
 |-------------------|--------|----------|
 | **Login (Booking Code)** | ✅ Done | HIGH |
 | **Dashboard Jemaah** | ✅ Done | HIGH |
-| ↳ "Lihat Detail" link ke payment history | ✅ NEW | |
+| ↳ "Lihat Detail" link ke payment history | ✅ Done | |
+| ↳ **Gamification Widget** | ✅ NEW | Level/Points/Badge card, links to achievements |
 | **Detail Perjalanan** | ✅ Done | HIGH |
 | **Profile & Dokumen** | ✅ Done | HIGH |
-| **Document Upload** | ✅ NEW | HIGH |
-| ↳ Upload per doc type (JPG/PNG/WebP/PDF) | ✅ NEW | |
-| ↳ 5MB limit, status badge, progress bar | ✅ NEW | |
-| **Payment History** | ✅ NEW | HIGH |
-| ↳ Full timeline, progress bar, summary | ✅ NEW | |
+| **Document Upload** | ✅ Done | HIGH |
+| ↳ Upload per doc type (JPG/PNG/WebP/PDF) | ✅ Done | |
+| ↳ 5MB limit, status badge, progress bar | ✅ Done | |
+| **Payment History** | ✅ Done | HIGH |
+| ↳ Full timeline, progress bar, summary | ✅ Done | |
 | **Manasik Digital** | ✅ Basic | HIGH |
 | ↳ Panduan Ibadah Video | 🔲 | |
 | ↳ Manasik AR (Augmented Reality) | 🔲 | |
 | ↳ "Doa Sesuai Lokasi" (GPS) | 🔲 | |
-| **Gamifikasi** (Blueprint v1 Exclusive) | 🔲 | MEDIUM |
-| ↳ Sistem Poin & Badge | 🔲 | |
-| ↳ Leaderboard | 🔲 | |
-| ↳ Reward (diskon, sedekah digital) | 🔲 | |
+| **Gamifikasi** (Blueprint v1 Exclusive) | ✅ Done | MEDIUM |
+| ↳ Sistem Poin (6 rules) | ✅ NEW | complete_lesson, complete_course, daily_login, etc |
+| ↳ Badge System (6 badges) | ✅ NEW | Pelajar Rajin, Hafiz Doa, Siap Berangkat, etc |
+| ↳ Achievements Page | ✅ NEW | `/pilgrim/achievements` — stats, badges, history |
+| ↳ Level System (50pts/level) | ✅ NEW | Progress bar to next level |
+| ↳ Endpoint Hooks | ✅ NEW | Points on doa fav, manasik, doc upload |
+| ↳ Reward (diskon, sedekah digital) | 🔲 | Needs fintech integration |
+| **Error Boundary** | ✅ NEW | Graceful error handling, "Coba Lagi" button |
 | **Safety Features** | 🔲 | HIGH |
 | ↳ Tombol SOS Darurat | 🔲 | |
 | ↳ Live Tracking Grup | 🔲 | |
@@ -207,15 +213,16 @@
 | ↳ Roommate matching | 🔲 | |
 | ↳ Sharing economy | 🔲 | |
 
-### Pilgrim Portal Navigation (8 pages)
+### Pilgrim Portal Navigation (9 pages)
 | Nav Item | Route | Status |
 |----------|-------|--------|
 | Beranda | `/pilgrim` | ✅ |
 | Perjalanan | `/pilgrim/trip` | ✅ |
 | Manasik | `/pilgrim/manasik` | ✅ |
 | Doa | `/pilgrim/doa` | ✅ |
-| Dokumen | `/pilgrim/documents` | ✅ NEW |
-| Payments | `/pilgrim/payments` | ✅ NEW |
+| Pencapaian | `/pilgrim/achievements` | ✅ NEW |
+| Dokumen | `/pilgrim/documents` | ✅ |
+| Payments | `/pilgrim/payments` | ✅ |
 | Profil | `/pilgrim/profile` | ✅ |
 | Login | `/pilgrim/login` | ✅ |
 
@@ -255,7 +262,7 @@
 ### Referensi Blueprint:
 - Cetak Biru v2, BAB 3.4: Gezma Command Center
 
-### Status: ✅ 85% — Polished (Session 8)
+### Status: ✅ 90% — Analytics Added (Session 9)
 
 | Fitur (Blueprint) | Status | Notes |
 |-------------------|--------|-------|
@@ -264,12 +271,16 @@
 | **Agency List** | ✅ Done | Search, status filter, pagination |
 | **Agency Detail** | ✅ Done | Info, users, stats, approve/suspend |
 | **Audit Log API** | ✅ Done | Cross-agency activity logs, filterable |
-| **Audit Log UI Page** | ✅ NEW | Filter bar, paginated table, CC blue theme |
+| **Audit Log UI Page** | ✅ Done | Filter bar, paginated table, CC blue theme |
 | **Blue Theme Layout** | ✅ Done | Independent layout, dark sidebar, #2563EB primary |
-| **Responsive Layout** | ✅ NEW | Mobile hamburger menu, overlay sidebar, sticky header |
-| **PPIU Expiry Alerts** | ✅ NEW | API + dashboard banner (orange/red), days remaining |
-| **Big Data Analytics** | 🔲 | |
-| ↳ Tren Jemaah Nasional | 🔲 | |
+| **Responsive Layout** | ✅ Done | Mobile hamburger menu, overlay sidebar, sticky header |
+| **PPIU Expiry Alerts** | ✅ Done | API + dashboard banner (orange/red), days remaining |
+| **Error Boundary** | ✅ NEW | Graceful error handling, "Muat Ulang" button |
+| **Big Data Analytics** | ✅ NEW | Period filter (7d/30d/90d/1y), 4 Recharts |
+| ↳ Tren Jemaah (Line Chart) | ✅ NEW | Daily pilgrim registrations over period |
+| ↳ Top 10 Agensi (Bar Chart) | ✅ NEW | Horizontal bar by pilgrim count |
+| ↳ Status Perjalanan (Pie Chart) | ✅ NEW | Trip status distribution |
+| ↳ Revenue Bulanan (Area Chart) | ✅ NEW | Monthly revenue estimate |
 | ↳ Preferensi Hotel | 🔲 | |
 | ↳ Pola Belanja | 🔲 | |
 | **Sistem Verifikasi & Audit** | ✅ Mostly | Agency status + PPIU monitoring + alerts |
@@ -365,17 +376,24 @@
 ### Referensi Blueprint:
 - Cetak Biru v1 (Exclusive): Semua fitur gamifikasi dan lifestyle
 
-### Status: ⚠️ Partial — Gamifikasi Done (Session 7)
+### Status: ✅ Mostly Done — Agent + Pilgrim Gamification (Session 7+9)
 
 | Fitur | Blueprint v1 Section | Status | Notes |
 |-------|---------------------|--------|-------|
-| **Gamifikasi** | BAB 3.1 | ✅ Done | Agent-level gamification |
+| **Gamifikasi Agent** | BAB 3.1 | ✅ Done | Agent-level gamification |
 | ↳ Sistem Poin | | ✅ Done | 8 action rules, auto-award via activity logger |
 | ↳ Badge System | | ✅ Done | 11 badges, auto-check thresholds |
 | ↳ Leaderboard | | ✅ Done | Top 10 agencies per month |
 | ↳ Level System | | ✅ Done | Every 100 points = 1 level |
 | ↳ Gamification Page | | ✅ Done | Stats, badges, leaderboard, history |
 | ↳ Dashboard Widget | | ✅ Done | Points/Level card + mini top 5 |
+| **Gamifikasi Pilgrim** | BAB 3.3 | ✅ NEW | Pilgrim-level gamification (Session 9) |
+| ↳ Sistem Poin (6 rules) | | ✅ NEW | lesson, course, login, profile, document, doa |
+| ↳ Badge System (6 badges) | | ✅ NEW | Langkah Pertama, Pelajar Rajin, Hafiz Doa, etc |
+| ↳ Achievements Page | | ✅ NEW | `/pilgrim/achievements` — stats, grid, history |
+| ↳ Level System (50pts/lvl) | | ✅ NEW | Progress bar to next level |
+| ↳ Dashboard Widget | | ✅ NEW | Level/Points/Badge on pilgrim home |
+| ↳ Endpoint Hooks | | ✅ NEW | Auto-award on doa fav, manasik, doc upload |
 | ↳ Reward (diskon, sedekah) | | 🔲 | Needs fintech integration |
 | **Paket Modular** | BAB 3.2 | 🔲 | |
 | ↳ Umrah Backpacker | | 🔲 | Semi-DIY |
@@ -409,7 +427,7 @@
 |-----------|---------------|--------|-------|
 | **Backend** | Golang | Next.js API Routes | ⚠️ Different |
 | **Mobile** | Flutter | PWA (Web) | ⚠️ Different approach |
-| **Database** | PostgreSQL + MongoDB | PostgreSQL + Prisma 7 (21 models) | ✅ Partial |
+| **Database** | PostgreSQL + MongoDB | PostgreSQL + Prisma 7 (24 models) | ✅ Partial |
 | **API Gateway** | Kong/Apigee | - | ❌ Not implemented |
 | **Blockchain** | Hyperledger Fabric | Mock Simulation | ⚠️ Simulated |
 | **Cloud** | GCP Jakarta | Docker + Nginx + Traefik | ⚠️ Self-hosted |
@@ -479,9 +497,9 @@
 3. **WhatsApp Notifications** — Mock service ready, perlu API key
 
 ### Medium Priority
-4. **CC Big Data Analytics** — Tren jemaah, preferensi, pola belanja
+4. ~~**CC Big Data Analytics**~~ — ✅ Done (Session 9) — 4 charts + period filter
 5. **Academy Video Content** — Real video lessons, quiz/assessment
-6. **Pilgrim Portal Gamification** — Points/badges for jemaah
+6. ~~**Pilgrim Portal Gamification**~~ — ✅ Done (Session 9) — 6 rules, 6 badges, achievements page
 
 ### Low Priority (Nice to Have)
 7. Mobile native app (Flutter)
@@ -501,17 +519,17 @@
 ### Implementation Files
 - `CHECKPOINT.md` — Development checkpoint (in repo)
 - `DEVELOPMENT-PLAN-v3.md` — Phase 2 & 3 execution plan
-- `prisma/schema.prisma` — Database models (21 models)
-- `src/app/api/` — ~98 API endpoints
-- `src/app/(dashboard)/` — 27 dashboard pages
+- `prisma/schema.prisma` — Database models (24 models)
+- `src/app/api/` — ~107 API endpoints
+- `src/app/(dashboard)/` — 28 dashboard pages
 - `src/app/(command-center)/` — 6 command center pages
-- `src/app/(pilgrim)/` — 8 pilgrim portal pages
-- `__tests__/` — 17 test files (235 unit tests)
+- `src/app/(pilgrim)/` — 9 pilgrim portal pages
+- `__tests__/` — 20 test files (274 unit tests)
 - `e2e/` — 5 Playwright spec files
 
 ---
 
 *Document Version: 2.0*
 *Created: 2026-02-23*
-*Updated: 2026-02-24 (Session 8 — Phase 4B: Blockchain + CC Polish + Academy LMS + Tests)*
+*Updated: 2026-02-24 (Session 9 — Error Boundaries + Security + Pilgrim Gamification + CC Analytics)*
 *Next Review: After real API integration or production hardening*
