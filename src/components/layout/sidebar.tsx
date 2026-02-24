@@ -26,6 +26,8 @@ import {
   Clock,
   Trophy,
   Shield,
+  CheckSquare,
+  Bell,
 } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n';
 import { useTheme } from '@/lib/theme';
@@ -44,6 +46,8 @@ const menuItems: MenuItem[] = [
   { label: 'Jamaah', href: '/pilgrims', icon: Users },
   { label: 'Paket', href: '/packages', icon: Package },
   { label: 'Perjalanan', href: '/trips', icon: Plane },
+  { label: 'Tugas', href: '/tasks', icon: CheckSquare },
+  { label: 'Notifikasi', href: '/notifications', icon: Bell },
   { label: 'Dokumen', href: '/documents', icon: FileText },
   { label: 'Laporan', href: '/reports', icon: BarChart3 },
   { label: 'Aktivitas', href: '/activities', icon: Clock },
@@ -157,6 +161,7 @@ export function Sidebar({ isOpen, onClose, isOverlay = false }: SidebarProps) {
 
       {/* Sidebar */}
       <aside
+        data-tour="sidebar"
         style={{
           width: '260px',
           height: '100vh',

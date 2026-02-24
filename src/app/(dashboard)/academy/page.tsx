@@ -54,6 +54,7 @@ export default function AcademyPage() {
   const [totalCourses, setTotalCourses] = useState(0);
   const [loading, setLoading] = useState(true);
   const [progressList, setProgressList] = useState<ProgressItem[]>([]);
+  const [courseRatings, setCourseRatings] = useState<Record<string, { avg: number; count: number }>>({});
 
   const fetchCourses = useCallback(async () => {
     setLoading(true);
@@ -96,6 +97,27 @@ export default function AcademyPage() {
   useEffect(() => {
     fetchProgress();
   }, [fetchProgress]);
+
+  // Fetch ratings for all loaded courses
+  useEffect(() => {
+    if (coursesData.length === 0) return;
+    const fetchRatings = async () => {
+      const ratings: Record<string, { avg: number; count: number }> = {};
+      await Promise.all(
+        coursesData.map(async (course) => {
+          try {
+            const res = await fetch(`/api/academy/${course.id}/reviews`);
+            if (res.ok) {
+              const data = await res.json();
+              ratings[course.id] = { avg: data.avgRating || 0, count: data.totalReviews || 0 };
+            }
+          } catch { /* ignore */ }
+        })
+      );
+      setCourseRatings(ratings);
+    };
+    fetchRatings();
+  }, [coursesData]);
 
   const enrolledCount = useMemo(() => {
     return progressList.filter((p) => p.status === 'in_progress' || p.status === 'completed').length;
@@ -427,11 +449,23 @@ export default function AcademyPage() {
                     <span style={{ fontWeight: 600 }}>{course.instructorName}</span>
                   </div>
 
-                  {/* Rating placeholder */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
-                    <div style={{ display: 'flex', gap: '1px' }}>{renderStars(4.5)}</div>
-                    <span style={{ fontSize: '13px', fontWeight: 600, color: c.textPrimary }}>4.5</span>
-                  </div>
+                  {/* Rating */}
+                  {(() => {
+                    const rating = courseRatings[course.id];
+                    const displayRating = rating?.avg || 0;
+                    const displayCount = rating?.count || 0;
+                    return (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
+                        <div style={{ display: 'flex', gap: '1px' }}>{renderStars(displayRating)}</div>
+                        <span style={{ fontSize: '13px', fontWeight: 600, color: c.textPrimary }}>
+                          {displayRating > 0 ? displayRating : '-'}
+                        </span>
+                        {displayCount > 0 && (
+                          <span style={{ fontSize: '11px', color: c.textMuted }}>({displayCount})</span>
+                        )}
+                      </div>
+                    );
+                  })()}
 
                   {/* Lesson & Duration */}
                   <div

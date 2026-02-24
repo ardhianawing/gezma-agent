@@ -3,11 +3,12 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { Edit, Plus, Trash2, Plane, User, CreditCard, ClipboardCheck, FileText, DollarSign, StickyNote, History, QrCode, Download, Link2 } from 'lucide-react';
+import { Edit, Plus, Trash2, Plane, User, CreditCard, ClipboardCheck, FileText, DollarSign, StickyNote, History, QrCode, Download, Link2, FileDown, MessageSquare, Send } from 'lucide-react';
 import { StatusBadge, SectionCard, BackButton, DetailSkeleton, EmptyState, ConfirmDialog } from '@/components/shared';
 import { DocumentUpload } from '@/components/pilgrims/document-upload';
 import { StatusTimeline } from '@/components/pilgrims/status-timeline';
 import { useFormStyles } from '@/lib/hooks/use-form-styles';
+import { useAuth } from '@/lib/auth';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { useResponsive } from '@/lib/hooks/use-responsive';
 import type { Pilgrim } from '@/types/pilgrim';
@@ -19,6 +20,7 @@ export default function PilgrimDetailPage() {
   const id = params.id as string;
   const { inputStyle, selectStyle, labelStyle, c } = useFormStyles();
   const { isMobile } = useResponsive();
+  const { user: authUser } = useAuth();
 
   const [pilgrim, setPilgrim] = useState<Pilgrim | null>(null);
   const [loading, setLoading] = useState(true);
@@ -41,10 +43,18 @@ export default function PilgrimDetailPage() {
   // Delete payment confirm
   const [deletePayment, setDeletePayment] = useState<{ id: string; amount: number } | null>(null);
 
+  // Invoice download
+  const [downloadingInvoice, setDownloadingInvoice] = useState(false);
+
   // QR Code
   const [qrData, setQrData] = useState<{ qrDataUrl: string; verifyUrl: string } | null>(null);
   const [loadingQr, setLoadingQr] = useState(false);
   const [copyFeedback, setCopyFeedback] = useState(false);
+
+  // Internal notes
+  const [internalNotes, setInternalNotes] = useState<Array<{ id: string; content: string; authorId: string; authorName: string; createdAt: string }>>([]);
+  const [noteContent, setNoteContent] = useState('');
+  const [savingNote, setSavingNote] = useState(false);
 
   // Trip assignment
   const [trips, setTrips] = useState<{ id: string; name: string; status: string; departureDate: string | null }[]>([]);
@@ -105,6 +115,60 @@ export default function PilgrimDetailPage() {
       .then((json) => setStatusHistory(json.data || []))
       .catch(() => {});
   }, [id]);
+
+  // Fetch internal notes
+  useEffect(() => {
+    fetch(`/api/pilgrims/${id}/notes`)
+      .then((res) => res.json())
+      .then((json) => setInternalNotes(json.data || []))
+      .catch(() => {});
+  }, [id]);
+
+  async function handleNoteSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!noteContent.trim()) return;
+    setSavingNote(true);
+    try {
+      const res = await fetch(`/api/pilgrims/${id}/notes`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: noteContent.trim() }),
+      });
+      if (res.ok) {
+        const newNote = await res.json();
+        setInternalNotes((prev) => [newNote, ...prev]);
+        setNoteContent('');
+      }
+    } catch {
+      // silently fail
+    } finally {
+      setSavingNote(false);
+    }
+  }
+
+  async function handleNoteDelete(noteId: string) {
+    try {
+      const res = await fetch(`/api/pilgrims/${id}/notes/${noteId}`, { method: 'DELETE' });
+      if (res.ok) {
+        setInternalNotes((prev) => prev.filter((n) => n.id !== noteId));
+      }
+    } catch {
+      // silently fail
+    }
+  }
+
+  function noteTimeAgo(timestamp: string): string {
+    const now = new Date();
+    const then = new Date(timestamp);
+    const diffMs = now.getTime() - then.getTime();
+    const diffMin = Math.floor(diffMs / 60000);
+    if (diffMin < 1) return 'baru saja';
+    if (diffMin < 60) return `${diffMin}m lalu`;
+    const diffHrs = Math.floor(diffMin / 60);
+    if (diffHrs < 24) return `${diffHrs}j lalu`;
+    const diffDays = Math.floor(diffHrs / 24);
+    return `${diffDays}h lalu`;
+  }
 
   async function handlePaymentSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -183,6 +247,26 @@ export default function PilgrimDetailPage() {
       // silently fail
     } finally {
       setDeletePayment(null);
+    }
+  }
+
+  async function handleDownloadInvoice() {
+    if (downloadingInvoice) return;
+    setDownloadingInvoice(true);
+    try {
+      const res = await fetch(`/api/pilgrims/${id}/invoice`);
+      if (!res.ok) return;
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `kwitansi-${pilgrim?.name || 'jemaah'}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      // silently fail
+    } finally {
+      setDownloadingInvoice(false);
     }
   }
 
@@ -458,32 +542,160 @@ export default function PilgrimDetailPage() {
           </div>
         )}
 
+        {/* Internal Notes */}
+        <div style={{ gridColumn: isMobile ? undefined : '1 / -1' }}>
+          <SectionCard title="Catatan Internal" icon={<MessageSquare style={{ width: '18px', height: '18px', color: c.textMuted }} />}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {/* New note form */}
+              <form onSubmit={handleNoteSubmit} style={{ display: 'flex', gap: '8px', alignItems: isMobile ? 'stretch' : 'flex-end', flexDirection: isMobile ? 'column' : 'row' }}>
+                <textarea
+                  value={noteContent}
+                  onChange={(e) => setNoteContent(e.target.value)}
+                  placeholder="Tulis catatan internal..."
+                  rows={2}
+                  style={{
+                    flex: 1,
+                    padding: '12px',
+                    borderRadius: '10px',
+                    border: `1px solid ${c.border}`,
+                    backgroundColor: c.inputBg || c.cardBg,
+                    color: c.textPrimary,
+                    fontSize: '14px',
+                    resize: 'vertical',
+                    outline: 'none',
+                    fontFamily: 'inherit',
+                    minHeight: '60px',
+                  }}
+                />
+                <button
+                  type="submit"
+                  disabled={savingNote || !noteContent.trim()}
+                  style={{
+                    padding: '12px 20px',
+                    borderRadius: '10px',
+                    border: 'none',
+                    backgroundColor: savingNote || !noteContent.trim() ? c.textMuted : c.primary,
+                    color: 'white',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    cursor: savingNote || !noteContent.trim() ? 'not-allowed' : 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    justifyContent: 'center',
+                    whiteSpace: 'nowrap',
+                    alignSelf: isMobile ? 'stretch' : 'flex-end',
+                    height: isMobile ? 'auto' : '44px',
+                  }}
+                >
+                  <Send style={{ width: '14px', height: '14px' }} />
+                  {savingNote ? 'Mengirim...' : 'Kirim'}
+                </button>
+              </form>
+
+              {/* Notes list */}
+              {internalNotes.length === 0 ? (
+                <p style={{ fontSize: '14px', color: c.textMuted, textAlign: 'center', padding: '16px 0', margin: 0 }}>
+                  Belum ada catatan internal
+                </p>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  {internalNotes.map((note) => (
+                    <div
+                      key={note.id}
+                      style={{
+                        padding: '12px 16px',
+                        borderRadius: '10px',
+                        border: `1px solid ${c.border}`,
+                        backgroundColor: c.cardBg,
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <div style={{
+                            width: '24px', height: '24px', borderRadius: '50%',
+                            backgroundColor: c.primary, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            color: 'white', fontSize: '10px', fontWeight: '600', flexShrink: 0,
+                          }}>
+                            {note.authorName.split(' ').map((n) => n[0]).join('').slice(0, 2)}
+                          </div>
+                          <span style={{ fontSize: '13px', fontWeight: '600', color: c.textPrimary }}>{note.authorName}</span>
+                          <span style={{ fontSize: '11px', color: c.textMuted }}>{noteTimeAgo(note.createdAt)}</span>
+                        </div>
+                        {authUser && (authUser.id === note.authorId || authUser.role === 'owner') && (
+                          <button
+                            onClick={() => handleNoteDelete(note.id)}
+                            title="Hapus catatan"
+                            style={{
+                              padding: '4px', borderRadius: '6px', border: 'none',
+                              backgroundColor: 'transparent', color: c.textMuted, cursor: 'pointer', display: 'flex',
+                            }}
+                          >
+                            <Trash2 style={{ width: '14px', height: '14px' }} />
+                          </button>
+                        )}
+                      </div>
+                      <p style={{ fontSize: '14px', color: c.textPrimary, margin: 0, whiteSpace: 'pre-wrap', lineHeight: '1.5' }}>
+                        {note.content}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </SectionCard>
+        </div>
+
         {/* Payment History */}
         <div style={{ gridColumn: isMobile ? undefined : '1 / -1' }}>
           <SectionCard
             title="Payment History"
             icon={<DollarSign style={{ width: '18px', height: '18px', color: c.textMuted }} />}
             headerRight={
-              <button
-                type="button"
-                onClick={() => setShowPayment(true)}
-                style={{
-                  padding: '8px 16px',
-                  fontSize: '13px',
-                  fontWeight: '600',
-                  color: 'white',
-                  backgroundColor: c.primary,
-                  border: 'none',
-                  borderRadius: '10px',
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                }}
-              >
-                <Plus style={{ width: '14px', height: '14px' }} />
-                Tambah Pembayaran
-              </button>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <button
+                  type="button"
+                  onClick={handleDownloadInvoice}
+                  disabled={downloadingInvoice}
+                  style={{
+                    padding: '8px 16px',
+                    fontSize: '13px',
+                    fontWeight: '500',
+                    color: c.textSecondary,
+                    backgroundColor: c.cardBg,
+                    border: `1px solid ${c.border}`,
+                    borderRadius: '10px',
+                    cursor: downloadingInvoice ? 'not-allowed' : 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    opacity: downloadingInvoice ? 0.6 : 1,
+                  }}
+                >
+                  <FileDown style={{ width: '14px', height: '14px' }} />
+                  {downloadingInvoice ? 'Mengunduh...' : 'Unduh Kwitansi'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowPayment(true)}
+                  style={{
+                    padding: '8px 16px',
+                    fontSize: '13px',
+                    fontWeight: '600',
+                    color: 'white',
+                    backgroundColor: c.primary,
+                    border: 'none',
+                    borderRadius: '10px',
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                  }}
+                >
+                  <Plus style={{ width: '14px', height: '14px' }} />
+                  Tambah Pembayaran
+                </button>
+              </div>
             }
           >
             {pilgrim.payments && pilgrim.payments.length > 0 ? (

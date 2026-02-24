@@ -16,8 +16,11 @@ import {
   QrCode,
   CheckCircle2,
   Edit2,
-  Copy
+  Copy,
+  ExternalLink,
+  Download
 } from 'lucide-react';
+import Link from 'next/link';
 
 interface AgencyData {
   id: string;
@@ -39,6 +42,7 @@ interface AgencyData {
   postalCode: string | null;
   verificationCode: string;
   isVerified: boolean;
+  slug: string | null;
 }
 
 interface EditForm {
@@ -140,26 +144,81 @@ export default function AgencyPage() {
         title={t.agency.title}
         description={t.agency.description}
         actions={
-          <button
-            onClick={openEdit}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px',
-              backgroundColor: c.primary,
-              color: 'white',
-              padding: '10px 16px',
-              borderRadius: '8px',
-              border: 'none',
-              fontWeight: '500',
-              cursor: 'pointer',
-              width: isMobile ? '100%' : 'auto',
-            }}
-          >
-            <Edit2 style={{ width: '20px', height: '20px' }} />
-            <span>{t.agency.editProfile}</span>
-          </button>
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+            <button
+              onClick={async () => {
+                try {
+                  const res = await fetch('/api/agency/export');
+                  if (!res.ok) return;
+                  const blob = await res.blob();
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = `gezma-export-${new Date().toISOString().split('T')[0]}.json`;
+                  a.click();
+                  URL.revokeObjectURL(url);
+                } catch { /* ignore */ }
+              }}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                backgroundColor: c.cardBg,
+                color: c.textSecondary,
+                padding: '10px 16px',
+                borderRadius: '8px',
+                border: `1px solid ${c.border}`,
+                fontWeight: '500',
+                cursor: 'pointer',
+              }}
+            >
+              <Download style={{ width: '18px', height: '18px' }} />
+              <span>Export Data</span>
+            </button>
+            {agency.slug && (
+              <Link
+                href={`/verify/agency/${agency.slug}`}
+                target="_blank"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  backgroundColor: c.cardBg,
+                  color: c.textSecondary,
+                  padding: '10px 16px',
+                  borderRadius: '8px',
+                  border: `1px solid ${c.border}`,
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  textDecoration: 'none',
+                }}
+              >
+                <ExternalLink style={{ width: '18px', height: '18px' }} />
+                <span>Lihat Profil Publik</span>
+              </Link>
+            )}
+            <button
+              onClick={openEdit}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                backgroundColor: c.primary,
+                color: 'white',
+                padding: '10px 16px',
+                borderRadius: '8px',
+                border: 'none',
+                fontWeight: '500',
+                cursor: 'pointer',
+              }}
+            >
+              <Edit2 style={{ width: '20px', height: '20px' }} />
+              <span>{t.agency.editProfile}</span>
+            </button>
+          </div>
         }
       />
 
@@ -397,6 +456,77 @@ export default function AgencyPage() {
           <MapPin style={{ width: '16px', height: '16px', flexShrink: 0 }} />
           <span style={{ wordBreak: 'break-word' }}>{agency.address}, {agency.city}, {agency.province}</span>
         </div>
+      </div>
+
+      {/* Public Profile Link */}
+      <div
+        style={{
+          backgroundColor: c.cardBg,
+          borderRadius: '12px',
+          border: `1px solid ${c.border}`,
+          padding: isMobile ? '16px' : '20px',
+          display: 'flex',
+          alignItems: isMobile ? 'flex-start' : 'center',
+          justifyContent: 'space-between',
+          gap: '12px',
+          flexDirection: isMobile ? 'column' : 'row',
+        }}
+      >
+        <div>
+          <h3 style={{ fontSize: '14px', fontWeight: 600, color: c.textPrimary, margin: '0 0 4px 0' }}>
+            Profil Publik
+          </h3>
+          <p style={{ fontSize: '13px', color: c.textMuted, margin: 0 }}>
+            {agency.slug
+              ? `Halaman publik Anda tersedia di /agency/${agency.slug}`
+              : 'Atur slug agency untuk mengaktifkan halaman profil publik'
+            }
+          </p>
+        </div>
+        {agency.slug ? (
+          <Link
+            href={`/agency/${agency.slug}`}
+            target="_blank"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '8px 16px',
+              fontSize: '13px',
+              fontWeight: 500,
+              color: 'white',
+              backgroundColor: c.primary,
+              borderRadius: '8px',
+              textDecoration: 'none',
+              whiteSpace: 'nowrap',
+              flexShrink: 0,
+            }}
+          >
+            <ExternalLink style={{ width: '14px', height: '14px' }} />
+            Lihat Profil Publik
+          </Link>
+        ) : (
+          <Link
+            href="/settings"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '8px 16px',
+              fontSize: '13px',
+              fontWeight: 500,
+              color: c.textSecondary,
+              backgroundColor: 'transparent',
+              border: `1px solid ${c.border}`,
+              borderRadius: '8px',
+              textDecoration: 'none',
+              whiteSpace: 'nowrap',
+              flexShrink: 0,
+            }}
+          >
+            Atur Slug
+          </Link>
+        )}
       </div>
 
       {/* 3-Column Grid */}

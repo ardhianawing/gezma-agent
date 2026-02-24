@@ -52,6 +52,8 @@ export default function TripDetailPage() {
   const { data } = usePilgrim();
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
   const [now, setNow] = useState(() => new Date());
+  const [shareLoading, setShareLoading] = useState(false);
+  const [shareMessage, setShareMessage] = useState('');
 
   useEffect(() => {
     const interval = setInterval(() => setNow(new Date()), 60000);
@@ -78,6 +80,24 @@ export default function TripDetailPage() {
     const diff = Math.ceil((depDay.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
     return { type: 'upcoming' as const, days: diff };
   }, [trip, now]);
+
+  const handleShareItinerary = async () => {
+    setShareLoading(true);
+    setShareMessage('');
+    try {
+      const res = await fetch('/api/pilgrim-portal/share-itinerary', { method: 'POST' });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || 'Gagal membuat link');
+      await navigator.clipboard.writeText(json.shareUrl);
+      setShareMessage('Link berhasil disalin!');
+      setTimeout(() => setShareMessage(''), 3000);
+    } catch (err) {
+      setShareMessage(err instanceof Error ? err.message : 'Gagal membagikan');
+      setTimeout(() => setShareMessage(''), 3000);
+    } finally {
+      setShareLoading(false);
+    }
+  };
 
   if (!data) {
     return (
@@ -248,6 +268,41 @@ export default function TripDetailPage() {
           </>
         )}
       </div>
+
+      {/* Share Itinerary Button */}
+      <button
+        onClick={handleShareItinerary}
+        disabled={shareLoading}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '8px',
+          width: '100%',
+          padding: '12px',
+          fontSize: '14px',
+          fontWeight: 600,
+          color: GREEN,
+          backgroundColor: GREEN_LIGHT,
+          border: '1px solid ' + GREEN,
+          borderRadius: '10px',
+          cursor: shareLoading ? 'not-allowed' : 'pointer',
+          opacity: shareLoading ? 0.7 : 1,
+        }}
+      >
+        {shareLoading ? 'Membuat link...' : '\u{1F517} Bagikan Itinerary'}
+      </button>
+      {shareMessage && (
+        <p style={{
+          fontSize: '13px',
+          fontWeight: 500,
+          color: shareMessage.includes('berhasil') ? GREEN : '#DC2626',
+          textAlign: 'center',
+          margin: '4px 0 0 0',
+        }}>
+          {shareMessage}
+        </p>
+      )}
 
       {/* 3. Flight Info Card */}
       <div

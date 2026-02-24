@@ -53,6 +53,8 @@ export async function GET(req: NextRequest) {
         position: user.position,
         avatarUrl: user.avatarUrl,
         permissions: user.permissions || null,
+        onboardingCompleted: user.onboardingCompleted,
+        totpEnabled: user.totpEnabled,
         agency: {
           id: user.agency.id,
           name: user.agency.name,

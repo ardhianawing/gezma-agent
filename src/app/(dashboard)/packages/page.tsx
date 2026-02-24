@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { Plus, Star, Plane, Clock, ArrowRight } from 'lucide-react';
+import { Plus, Star, Plane, Clock, ArrowRight, Blocks } from 'lucide-react';
 import { PageHeader } from '@/components/layout/page-header';
 import { formatCurrency } from '@/lib/utils';
 import { useTheme } from '@/lib/theme';
@@ -55,28 +55,52 @@ export default function PackagesPage() {
         description={t.packages.description}
         actions={
           can(PERMISSIONS.PACKAGES_CREATE) ? (
-          <Link href="/packages/new" style={{ width: isMobile ? '100%' : 'auto', display: 'block' }}>
-            <button
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px',
-                backgroundColor: c.primary,
-                color: 'white',
-                padding: '10px 16px',
-                borderRadius: '8px',
-                border: 'none',
-                fontWeight: '500',
-                cursor: 'pointer',
-                transition: 'background-color 0.2s',
-                width: isMobile ? '100%' : 'auto',
-              }}
-            >
-              <Plus style={{ width: '20px', height: '20px' }} />
-              <span>{t.packages.createPackage}</span>
-            </button>
-          </Link>
+          <div style={{ display: 'flex', gap: '8px', flexDirection: isMobile ? 'column' : 'row', width: isMobile ? '100%' : 'auto' }}>
+            <Link href="/packages/builder" style={{ width: isMobile ? '100%' : 'auto', display: 'block' }}>
+              <button
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  backgroundColor: c.cardBg,
+                  color: c.primary,
+                  padding: '10px 16px',
+                  borderRadius: '8px',
+                  border: `1px solid ${c.primary}`,
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  transition: 'background-color 0.2s',
+                  width: isMobile ? '100%' : 'auto',
+                }}
+              >
+                <Blocks style={{ width: '20px', height: '20px' }} />
+                <span>Builder Paket Modular</span>
+              </button>
+            </Link>
+            <Link href="/packages/new" style={{ width: isMobile ? '100%' : 'auto', display: 'block' }}>
+              <button
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  backgroundColor: c.primary,
+                  color: 'white',
+                  padding: '10px 16px',
+                  borderRadius: '8px',
+                  border: 'none',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  transition: 'background-color 0.2s',
+                  width: isMobile ? '100%' : 'auto',
+                }}
+              >
+                <Plus style={{ width: '20px', height: '20px' }} />
+                <span>{t.packages.createPackage}</span>
+              </button>
+            </Link>
+          </div>
           ) : undefined
         }
       />

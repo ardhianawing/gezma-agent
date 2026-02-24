@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Building2, Users, Plane, DollarSign, ChevronRight, AlertTriangle, BarChart3 } from 'lucide-react';
+import { Building2, Users, Plane, DollarSign, ChevronRight, AlertTriangle, BarChart3, ShieldOff } from 'lucide-react';
 import {
   LineChart, Line, BarChart, Bar, PieChart, Pie, AreaChart, Area,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, Legend,
@@ -60,6 +60,9 @@ export default function CCDashboardPage() {
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [analyticsPeriod, setAnalyticsPeriod] = useState('30d');
   const [analyticsLoading, setAnalyticsLoading] = useState(false);
+  const [suspendLoading, setSuspendLoading] = useState(false);
+  const [suspendResult, setSuspendResult] = useState<{ count: number; names: string[] } | null>(null);
+  const [showSuspendConfirm, setShowSuspendConfirm] = useState(false);
 
   useEffect(() => {
     fetch('/api/command-center/stats')
@@ -141,6 +144,112 @@ export default function CCDashboardPage() {
             </div>
           );
         })}
+      </div>
+
+      {/* Auto-Suspend PPIU Expired */}
+      <div
+        style={{
+          backgroundColor: cc.cardBg,
+          borderRadius: '12px',
+          border: `1px solid ${cc.border}`,
+          padding: '16px 20px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '12px',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <ShieldOff style={{ width: '22px', height: '22px', color: '#DC2626', flexShrink: 0 }} />
+          <div>
+            <p style={{ fontSize: '14px', fontWeight: '600', color: cc.textPrimary, margin: 0 }}>
+              Auto-Suspend PPIU Expired
+            </p>
+            <p style={{ fontSize: '12px', color: cc.textMuted, margin: '2px 0 0 0' }}>
+              Otomatis ubah status agensi yang PPIU-nya sudah kedaluwarsa menjadi &quot;expired&quot;.
+            </p>
+          </div>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          {suspendResult && (
+            <span style={{ fontSize: '13px', color: suspendResult.count > 0 ? '#DC2626' : '#15803D', fontWeight: '500' }}>
+              {suspendResult.count > 0
+                ? `${suspendResult.count} agensi di-suspend: ${suspendResult.names.join(', ')}`
+                : 'Tidak ada agensi yang perlu di-suspend.'
+              }
+            </span>
+          )}
+          {!showSuspendConfirm ? (
+            <button
+              onClick={() => setShowSuspendConfirm(true)}
+              disabled={suspendLoading}
+              style={{
+                padding: '8px 16px',
+                fontSize: '13px',
+                fontWeight: '600',
+                backgroundColor: '#DC2626',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                cursor: suspendLoading ? 'not-allowed' : 'pointer',
+                opacity: suspendLoading ? 0.6 : 1,
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {suspendLoading ? 'Memproses...' : 'Jalankan'}
+            </button>
+          ) : (
+            <div style={{ display: 'flex', gap: '6px' }}>
+              <button
+                onClick={async () => {
+                  setSuspendLoading(true);
+                  setSuspendResult(null);
+                  setShowSuspendConfirm(false);
+                  try {
+                    const res = await fetch('/api/command-center/auto-suspend', { method: 'POST' });
+                    const data = await res.json();
+                    setSuspendResult({
+                      count: data.count || 0,
+                      names: (data.affected || []).map((a: { name: string }) => a.name),
+                    });
+                  } catch {
+                    setSuspendResult({ count: -1, names: ['Error saat eksekusi'] });
+                  } finally {
+                    setSuspendLoading(false);
+                  }
+                }}
+                style={{
+                  padding: '8px 16px',
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  backgroundColor: '#DC2626',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                }}
+              >
+                Ya, Jalankan
+              </button>
+              <button
+                onClick={() => setShowSuspendConfirm(false)}
+                style={{
+                  padding: '8px 16px',
+                  fontSize: '13px',
+                  fontWeight: '500',
+                  backgroundColor: cc.cardBg,
+                  color: cc.textSecondary,
+                  border: `1px solid ${cc.border}`,
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                }}
+              >
+                Batal
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* PPIU Expiry Alerts */}

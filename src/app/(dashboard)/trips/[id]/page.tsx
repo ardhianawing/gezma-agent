@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef, use } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, CheckCircle2, Printer, Plane, ClipboardCheck, Users, Plus, Search, X, Trash2 } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, Printer, Plane, ClipboardCheck, Users, Plus, Search, X, Trash2, Clock, Phone, Mail } from 'lucide-react';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
 import { StatusBadge } from '@/components/shared/status-badge';
@@ -93,6 +93,19 @@ export default function TripDetailPage({ params }: { params: Promise<{ id: strin
   const [roomNumberDraft, setRoomNumberDraft] = useState('');
   const [roomTypeDraft, setRoomTypeDraft] = useState('');
 
+  // Waiting list state
+  const [waitingList, setWaitingList] = useState<Array<{
+    id: string;
+    pilgrimName: string;
+    phone: string;
+    email?: string | null;
+    notes?: string | null;
+    createdAt: string;
+  }>>([]);
+  const [wlForm, setWlForm] = useState({ pilgrimName: '', phone: '', email: '', notes: '' });
+  const [savingWl, setSavingWl] = useState(false);
+  const [deletingWlId, setDeletingWlId] = useState<string | null>(null);
+
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const fetchTrip = useCallback(() => {
@@ -109,6 +122,56 @@ export default function TripDetailPage({ params }: { params: Promise<{ id: strin
   useEffect(() => {
     fetchTrip();
   }, [fetchTrip]);
+
+  // Fetch waiting list
+  useEffect(() => {
+    if (!id) return;
+    fetch(`/api/trips/${id}/waiting-list`)
+      .then((res) => res.json())
+      .then((json) => setWaitingList(json.data || []))
+      .catch(() => {});
+  }, [id]);
+
+  async function handleAddWaitingList(e: React.FormEvent) {
+    e.preventDefault();
+    if (!wlForm.pilgrimName.trim() || !wlForm.phone.trim()) return;
+    setSavingWl(true);
+    try {
+      const res = await fetch(`/api/trips/${id}/waiting-list`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          pilgrimName: wlForm.pilgrimName.trim(),
+          phone: wlForm.phone.trim(),
+          email: wlForm.email.trim() || undefined,
+          notes: wlForm.notes.trim() || undefined,
+        }),
+      });
+      if (res.ok) {
+        const entry = await res.json();
+        setWaitingList((prev) => [...prev, entry]);
+        setWlForm({ pilgrimName: '', phone: '', email: '', notes: '' });
+      }
+    } catch {
+      // silently fail
+    } finally {
+      setSavingWl(false);
+    }
+  }
+
+  async function handleDeleteWaitingList(entryId: string) {
+    setDeletingWlId(entryId);
+    try {
+      const res = await fetch(`/api/trips/${id}/waiting-list/${entryId}`, { method: 'DELETE' });
+      if (res.ok) {
+        setWaitingList((prev) => prev.filter((e) => e.id !== entryId));
+      }
+    } catch {
+      // silently fail
+    } finally {
+      setDeletingWlId(null);
+    }
+  }
 
   // Search available pilgrims when modal opens or query changes
   useEffect(() => {
@@ -701,6 +764,229 @@ export default function TripDetailPage({ params }: { params: Promise<{ id: strin
           )}
         </div>
       </div>
+
+      {/* Waiting List Section - shown when at or over capacity */}
+      {trip.capacity > 0 && trip.registeredCount >= trip.capacity && (
+        <div
+          style={{
+            backgroundColor: c.cardBg,
+            borderRadius: '16px',
+            border: `1px solid ${c.border}`,
+            overflow: 'hidden',
+          }}
+        >
+          <div
+            style={{
+              padding: isMobile ? '16px 20px' : '20px 28px',
+              borderBottom: `1px solid ${c.border}`,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+            }}
+          >
+            <Clock style={{ width: '18px', height: '18px', color: '#F59E0B' }} />
+            <h3 style={{ fontSize: '16px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>
+              Daftar Tunggu
+            </h3>
+            <span
+              style={{
+                marginLeft: '8px',
+                padding: '2px 10px',
+                borderRadius: '20px',
+                fontSize: '12px',
+                fontWeight: '600',
+                backgroundColor: '#FEF3C7',
+                color: '#92400E',
+              }}
+            >
+              {waitingList.length} orang
+            </span>
+          </div>
+
+          <div style={{ padding: isMobile ? '20px' : '28px' }}>
+            {/* Add form */}
+            <form onSubmit={handleAddWaitingList} style={{ marginBottom: '20px' }}>
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
+                  gap: '12px',
+                  marginBottom: '12px',
+                }}
+              >
+                <input
+                  type="text"
+                  value={wlForm.pilgrimName}
+                  onChange={(e) => setWlForm((f) => ({ ...f, pilgrimName: e.target.value }))}
+                  placeholder="Nama lengkap *"
+                  required
+                  style={{
+                    padding: '10px 14px',
+                    fontSize: '14px',
+                    color: c.textPrimary,
+                    backgroundColor: c.pageBg,
+                    border: `1px solid ${c.border}`,
+                    borderRadius: '10px',
+                    outline: 'none',
+                  }}
+                />
+                <input
+                  type="tel"
+                  value={wlForm.phone}
+                  onChange={(e) => setWlForm((f) => ({ ...f, phone: e.target.value }))}
+                  placeholder="No. telepon *"
+                  required
+                  style={{
+                    padding: '10px 14px',
+                    fontSize: '14px',
+                    color: c.textPrimary,
+                    backgroundColor: c.pageBg,
+                    border: `1px solid ${c.border}`,
+                    borderRadius: '10px',
+                    outline: 'none',
+                  }}
+                />
+                <input
+                  type="email"
+                  value={wlForm.email}
+                  onChange={(e) => setWlForm((f) => ({ ...f, email: e.target.value }))}
+                  placeholder="Email (opsional)"
+                  style={{
+                    padding: '10px 14px',
+                    fontSize: '14px',
+                    color: c.textPrimary,
+                    backgroundColor: c.pageBg,
+                    border: `1px solid ${c.border}`,
+                    borderRadius: '10px',
+                    outline: 'none',
+                  }}
+                />
+                <input
+                  type="text"
+                  value={wlForm.notes}
+                  onChange={(e) => setWlForm((f) => ({ ...f, notes: e.target.value }))}
+                  placeholder="Catatan (opsional)"
+                  style={{
+                    padding: '10px 14px',
+                    fontSize: '14px',
+                    color: c.textPrimary,
+                    backgroundColor: c.pageBg,
+                    border: `1px solid ${c.border}`,
+                    borderRadius: '10px',
+                    outline: 'none',
+                  }}
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={savingWl}
+                style={{
+                  padding: '10px 20px',
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  color: 'white',
+                  backgroundColor: savingWl ? c.textMuted : '#F59E0B',
+                  border: 'none',
+                  borderRadius: '10px',
+                  cursor: savingWl ? 'not-allowed' : 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                }}
+              >
+                <Plus style={{ width: '14px', height: '14px' }} />
+                {savingWl ? 'Menambahkan...' : 'Tambah ke Daftar Tunggu'}
+              </button>
+            </form>
+
+            {/* Waiting list entries */}
+            {waitingList.length === 0 ? (
+              <p style={{ textAlign: 'center', fontSize: '14px', color: c.textMuted, padding: '16px 0' }}>
+                Belum ada yang masuk daftar tunggu.
+              </p>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                {waitingList.map((entry, idx) => (
+                  <div
+                    key={entry.id}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      padding: '14px 16px',
+                      borderRadius: '10px',
+                      border: `1px solid ${c.border}`,
+                      gap: '12px',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1, minWidth: 0 }}>
+                      <span
+                        style={{
+                          width: '28px',
+                          height: '28px',
+                          borderRadius: '50%',
+                          backgroundColor: '#FEF3C7',
+                          color: '#92400E',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '12px',
+                          fontWeight: '600',
+                          flexShrink: 0,
+                        }}
+                      >
+                        {idx + 1}
+                      </span>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <p style={{ fontSize: '14px', fontWeight: '500', color: c.textPrimary, margin: 0 }}>
+                          {entry.pilgrimName}
+                        </p>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '4px', flexWrap: 'wrap' }}>
+                          <span style={{ fontSize: '12px', color: c.textMuted, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                            <Phone style={{ width: '12px', height: '12px' }} />
+                            {entry.phone}
+                          </span>
+                          {entry.email && (
+                            <span style={{ fontSize: '12px', color: c.textMuted, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                              <Mail style={{ width: '12px', height: '12px' }} />
+                              {entry.email}
+                            </span>
+                          )}
+                          {entry.notes && (
+                            <span style={{ fontSize: '12px', color: c.textMuted, fontStyle: 'italic' }}>
+                              {entry.notes}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => handleDeleteWaitingList(entry.id)}
+                      disabled={deletingWlId === entry.id}
+                      style={{
+                        padding: '6px',
+                        backgroundColor: 'transparent',
+                        border: 'none',
+                        borderRadius: '6px',
+                        cursor: deletingWlId === entry.id ? 'not-allowed' : 'pointer',
+                        color: '#EF4444',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        opacity: deletingWlId === entry.id ? 0.5 : 1,
+                        flexShrink: 0,
+                      }}
+                      title="Hapus dari daftar tunggu"
+                    >
+                      <Trash2 style={{ width: '16px', height: '16px' }} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Add Pilgrim Modal */}
       {showAddModal && (

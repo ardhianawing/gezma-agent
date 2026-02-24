@@ -5,11 +5,11 @@ import { PageHeader } from '@/components/layout/page-header';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
 import { formatCurrency } from '@/lib/utils';
-import { DollarSign, TrendingUp, Users, AlertCircle, Download } from 'lucide-react';
+import { DollarSign, TrendingUp, Users, AlertCircle, Download, ArrowUpRight, ArrowDownRight, GitCompareArrows } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
 
 // ========== TYPES ==========
-interface FinancialReport {
+interface FinancialReportData {
   totalRevenue: number;
   totalOutstanding: number;
   totalPilgrims: number;
@@ -18,6 +18,10 @@ interface FinancialReport {
   typeBreakdown: Record<string, number>;
   tripRevenue: { name: string; revenue: number; outstanding: number; pilgrimCount: number }[];
   monthlyRevenue: { month: string; amount: number }[];
+}
+
+interface FinancialReport extends FinancialReportData {
+  comparison?: FinancialReportData;
 }
 
 interface DemographicsReport {
@@ -64,6 +68,28 @@ function formatMonth(ym: string) {
   return `${months[parseInt(m) - 1]} ${y}`;
 }
 
+function DeltaIndicator({ current, previous, isCurrency }: { current: number; previous: number; isCurrency?: boolean }) {
+  if (previous === 0) return null;
+  const diff = current - previous;
+  const pct = Math.round((diff / previous) * 100);
+  const isPositive = diff >= 0;
+  const Icon = isPositive ? ArrowUpRight : ArrowDownRight;
+  const color = isPositive ? '#10B981' : '#EF4444';
+  const bg = isPositive ? '#ECFDF5' : '#FEF2F2';
+
+  return (
+    <span style={{
+      display: 'inline-flex', alignItems: 'center', gap: '2px',
+      padding: '2px 8px', borderRadius: '6px', fontSize: '11px',
+      fontWeight: 600, backgroundColor: bg, color,
+    }}>
+      <Icon style={{ width: '12px', height: '12px' }} />
+      {isPositive ? '+' : ''}{pct}%
+      {isCurrency && <span style={{ fontWeight: 400, marginLeft: '2px' }}>({formatCurrency(Math.abs(diff))})</span>}
+    </span>
+  );
+}
+
 export default function ReportsPage() {
   const { c } = useTheme();
   const { isMobile } = useResponsive();
@@ -76,6 +102,11 @@ export default function ReportsPage() {
   const [aging, setAging] = useState<AgingReport | null>(null);
   const [conversion, setConversion] = useState<ConversionReport | null>(null);
 
+  // Comparison state
+  const [compareEnabled, setCompareEnabled] = useState(false);
+  const [compareFrom, setCompareFrom] = useState('');
+  const [compareTo, setCompareTo] = useState('');
+
   useEffect(() => {
     setLoading(true);
     const endpoints: Record<string, string> = {
@@ -86,7 +117,12 @@ export default function ReportsPage() {
       funnel: '/api/reports/conversion',
     };
 
-    fetch(endpoints[activeTab])
+    let url = endpoints[activeTab];
+    if (activeTab === 'keuangan' && compareEnabled && compareFrom && compareTo) {
+      url += `?compareFrom=${compareFrom}&compareTo=${compareTo}`;
+    }
+
+    fetch(url)
       .then(res => res.json())
       .then(data => {
         if (activeTab === 'keuangan') setFinancial(data);
@@ -97,7 +133,7 @@ export default function ReportsPage() {
       })
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, [activeTab]);
+  }, [activeTab, compareEnabled, compareFrom, compareTo]);
 
   const handleExportCSV = async () => {
     try {
@@ -164,6 +200,61 @@ export default function ReportsPage() {
         ))}
       </div>
 
+      {/* Period Comparison Controls */}
+      {activeTab === 'keuangan' && (
+        <div style={{
+          backgroundColor: c.cardBg, borderRadius: '12px',
+          border: `1px solid ${c.border}`, padding: isMobile ? '12px' : '16px',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+            <button
+              onClick={() => setCompareEnabled(!compareEnabled)}
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: '6px',
+                padding: '8px 14px', borderRadius: '8px',
+                border: compareEnabled ? `2px solid ${c.primary}` : `1px solid ${c.border}`,
+                backgroundColor: compareEnabled ? c.primaryLight : 'transparent',
+                color: compareEnabled ? c.primary : c.textSecondary,
+                fontSize: '13px', fontWeight: 500, cursor: 'pointer',
+              }}
+            >
+              <GitCompareArrows style={{ width: '14px', height: '14px' }} />
+              Bandingkan Periode
+            </button>
+            {compareEnabled && (
+              <>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <label style={{ fontSize: '12px', color: c.textMuted }}>Dari:</label>
+                  <input
+                    type="date"
+                    value={compareFrom}
+                    onChange={e => setCompareFrom(e.target.value)}
+                    style={{
+                      padding: '6px 10px', fontSize: '13px', borderRadius: '6px',
+                      border: `1px solid ${c.border}`, backgroundColor: c.inputBg,
+                      color: c.textPrimary, outline: 'none',
+                    }}
+                  />
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <label style={{ fontSize: '12px', color: c.textMuted }}>Sampai:</label>
+                  <input
+                    type="date"
+                    value={compareTo}
+                    onChange={e => setCompareTo(e.target.value)}
+                    style={{
+                      padding: '6px 10px', fontSize: '13px', borderRadius: '6px',
+                      border: `1px solid ${c.border}`, backgroundColor: c.inputBg,
+                      color: c.textPrimary, outline: 'none',
+                    }}
+                  />
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
       {loading ? (
         <div style={{ padding: '40px', textAlign: 'center', color: c.textMuted }}>Memuat data...</div>
       ) : (
@@ -191,12 +282,15 @@ export default function ReportsPage() {
 // ========== TAB COMPONENTS ==========
 
 function FinancialTab({ data, c, isMobile }: { data: FinancialReport; c: ReturnType<typeof useTheme>['c']; isMobile: boolean }) {
+  const comp = data.comparison;
   const collectionRate = data.totalPilgrims > 0 ? Math.round((data.paidPilgrims / data.totalPilgrims) * 100) : 0;
+  const compCollectionRate = comp && comp.totalPilgrims > 0 ? Math.round((comp.paidPilgrims / comp.totalPilgrims) * 100) : 0;
+
   const stats = [
-    { label: 'Total Pemasukan', value: formatCurrency(data.totalRevenue), icon: DollarSign, color: c.success, bg: c.successLight },
-    { label: 'Outstanding', value: formatCurrency(data.totalOutstanding), icon: AlertCircle, color: c.error, bg: c.errorLight },
-    { label: 'Jemaah Lunas', value: `${data.paidPilgrims}/${data.totalPilgrims}`, icon: Users, color: c.info, bg: c.infoLight },
-    { label: 'Collection Rate', value: `${collectionRate}%`, icon: TrendingUp, color: '#7C3AED', bg: '#F3E8FF' },
+    { label: 'Total Pemasukan', value: formatCurrency(data.totalRevenue), icon: DollarSign, color: c.success, bg: c.successLight, current: data.totalRevenue, compare: comp?.totalRevenue, isCurrency: true },
+    { label: 'Outstanding', value: formatCurrency(data.totalOutstanding), icon: AlertCircle, color: c.error, bg: c.errorLight, current: data.totalOutstanding, compare: comp?.totalOutstanding, isCurrency: true },
+    { label: 'Jemaah Lunas', value: `${data.paidPilgrims}/${data.totalPilgrims}`, icon: Users, color: c.info, bg: c.infoLight, current: data.paidPilgrims, compare: comp?.paidPilgrims, isCurrency: false },
+    { label: 'Collection Rate', value: `${collectionRate}%`, icon: TrendingUp, color: '#7C3AED', bg: '#F3E8FF', current: collectionRate, compare: compCollectionRate || undefined, isCurrency: false },
   ];
 
   const maxMonthly = Math.max(...data.monthlyRevenue.map(m => m.amount), 1);
@@ -215,10 +309,42 @@ function FinancialTab({ data, c, isMobile }: { data: FinancialReport; c: ReturnT
               </div>
               <p style={{ fontSize: isMobile ? '18px' : '22px', fontWeight: 700, color: c.textPrimary, margin: 0 }}>{s.value}</p>
               <p style={{ fontSize: '12px', color: c.textMuted, margin: '4px 0 0 0' }}>{s.label}</p>
+              {comp && s.compare !== undefined && (
+                <div style={{ marginTop: '6px' }}>
+                  <DeltaIndicator current={s.current} previous={s.compare} isCurrency={s.isCurrency} />
+                </div>
+              )}
             </div>
           );
         })}
       </div>
+
+      {/* Comparison summary card */}
+      {comp && (
+        <div style={{
+          backgroundColor: c.cardBg, borderRadius: '12px',
+          border: `1px solid ${c.border}`, padding: isMobile ? '16px' : '20px',
+        }}>
+          <h3 style={{ fontSize: '14px', fontWeight: 600, color: c.textPrimary, margin: '0 0 12px 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <GitCompareArrows style={{ width: '16px', height: '16px', color: c.primary }} />
+            Ringkasan Perbandingan Periode
+          </h3>
+          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: '16px' }}>
+            <div>
+              <p style={{ fontSize: '12px', color: c.textMuted, margin: '0 0 4px 0' }}>Pemasukan Periode Perbandingan</p>
+              <p style={{ fontSize: '18px', fontWeight: 700, color: c.textPrimary, margin: 0 }}>{formatCurrency(comp.totalRevenue)}</p>
+            </div>
+            <div>
+              <p style={{ fontSize: '12px', color: c.textMuted, margin: '0 0 4px 0' }}>Jemaah Lunas Periode Perbandingan</p>
+              <p style={{ fontSize: '18px', fontWeight: 700, color: c.textPrimary, margin: 0 }}>{comp.paidPilgrims}/{comp.totalPilgrims}</p>
+            </div>
+            <div>
+              <p style={{ fontSize: '12px', color: c.textMuted, margin: '0 0 4px 0' }}>Outstanding Periode Perbandingan</p>
+              <p style={{ fontSize: '18px', fontWeight: 700, color: c.error, margin: 0 }}>{formatCurrency(comp.totalOutstanding)}</p>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '2fr 1fr', gap: '16px' }}>
         <div style={{ backgroundColor: c.cardBg, borderRadius: '12px', border: `1px solid ${c.border}`, overflow: 'hidden' }}>

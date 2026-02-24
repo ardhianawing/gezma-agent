@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Bell, Search, Menu, ChevronDown, LogOut, Building2, Settings, User } from 'lucide-react';
 import { LanguageToggle } from '@/components/shared/language-toggle';
 import { ThemeToggle } from '@/components/shared/theme-toggle';
+import { CommandPalette } from '@/components/shared/command-palette';
 import { useLanguage } from '@/lib/i18n';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
@@ -52,6 +53,7 @@ export function Header({ onMenuClick, showMenuButton = false }: HeaderProps) {
   const { user, logout } = useAuth();
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
+  const [showCommandPalette, setShowCommandPalette] = useState(false);
 
   // Notification dropdown
   const [showNotifs, setShowNotifs] = useState(false);
@@ -101,6 +103,18 @@ export function Header({ onMenuClick, showMenuButton = false }: HeaderProps) {
       .catch(() => {});
   }, []);
 
+  // Global Ctrl+K shortcut for command palette
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setShowCommandPalette((prev) => !prev);
+      }
+    };
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, []);
+
   function handleSearch(e: React.FormEvent) {
     e.preventDefault();
     const q = searchQuery.trim();
@@ -124,6 +138,7 @@ export function Header({ onMenuClick, showMenuButton = false }: HeaderProps) {
   }
 
   return (
+    <>
     <header
       style={{
         position: 'sticky',
@@ -168,47 +183,51 @@ export function Header({ onMenuClick, showMenuButton = false }: HeaderProps) {
             </button>
           )}
 
-          {/* Search - hide on mobile */}
+          {/* Search - opens command palette */}
           {!isMobile && (
-            <form onSubmit={handleSearch} style={{ position: 'relative', width: '100%', maxWidth: '400px' }}>
-              <Search
-                style={{
-                  position: 'absolute',
-                  left: '16px',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  width: '20px',
-                  height: '20px',
-                  color: c.textLight,
-                  pointerEvents: 'none',
-                }}
-              />
-              <input
-                type="search"
-                placeholder={t.header.searchPlaceholder}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                style={{
-                  width: '100%',
-                  height: '48px',
-                  paddingLeft: '48px',
-                  paddingRight: '16px',
-                  borderRadius: '12px',
-                  border: `1px solid ${c.border}`,
-                  backgroundColor: c.inputBg,
-                  fontSize: '14px',
-                  color: c.textPrimary,
-                  outline: 'none',
-                  transition: 'all 0.2s ease',
-                }}
-              />
-            </form>
+            <button
+              data-tour="search"
+              onClick={() => setShowCommandPalette(true)}
+              style={{
+                position: 'relative',
+                width: '100%',
+                maxWidth: '400px',
+                height: '48px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                paddingLeft: '16px',
+                paddingRight: '16px',
+                borderRadius: '12px',
+                border: `1px solid ${c.border}`,
+                backgroundColor: c.inputBg,
+                fontSize: '14px',
+                color: c.textLight,
+                cursor: 'pointer',
+                textAlign: 'left',
+                fontFamily: 'inherit',
+              }}
+            >
+              <Search style={{ width: '20px', height: '20px', color: c.textLight, flexShrink: 0 }} />
+              <span style={{ flex: 1 }}>{t.header.searchPlaceholder}</span>
+              <kbd style={{
+                padding: '2px 8px',
+                fontSize: '11px',
+                color: c.textMuted,
+                backgroundColor: c.pageBg,
+                borderRadius: '6px',
+                border: `1px solid ${c.border}`,
+                fontFamily: 'inherit',
+              }}>
+                Ctrl+K
+              </kbd>
+            </button>
           )}
 
           {/* Mobile search icon */}
           {isMobile && (
             <button
-              onClick={() => router.push('/pilgrims')}
+              onClick={() => setShowCommandPalette(true)}
               style={{
                 padding: '10px',
                 borderRadius: '12px',
@@ -234,7 +253,7 @@ export function Header({ onMenuClick, showMenuButton = false }: HeaderProps) {
           {!isMobile && <LanguageToggle />}
 
           {/* Notifications */}
-          <div ref={notifRef} style={{ position: 'relative' }}>
+          <div ref={notifRef} data-tour="notifications" style={{ position: 'relative' }}>
             <button
               onClick={handleBellClick}
               style={{
@@ -513,5 +532,9 @@ export function Header({ onMenuClick, showMenuButton = false }: HeaderProps) {
         </div>
       </div>
     </header>
+
+    {/* Command Palette */}
+    <CommandPalette open={showCommandPalette} onClose={() => setShowCommandPalette(false)} />
+    </>
   );
 }

@@ -22,6 +22,8 @@ import {
   Lock,
   Eye,
   EyeOff,
+  CalendarClock,
+  FileText,
 } from 'lucide-react';
 
 interface AgencyInfo {
@@ -135,6 +137,22 @@ export default function SettingsPage() {
       color: '#059669',
       bgColor: '#ECFDF5',
       href: '/settings/integrations',
+    },
+    {
+      icon: CalendarClock,
+      title: 'Laporan Terjadwal',
+      description: 'Kirim laporan otomatis ke email secara berkala',
+      color: '#0EA5E9',
+      bgColor: '#E0F2FE',
+      href: '/settings/scheduled-reports',
+    },
+    {
+      icon: FileText,
+      title: 'Template Email',
+      description: 'Kelola template email notifikasi',
+      color: '#D946EF',
+      bgColor: '#FAE8FF',
+      href: '/settings/email-templates',
     },
     {
       icon: Globe,

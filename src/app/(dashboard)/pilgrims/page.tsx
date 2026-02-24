@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { Eye, Edit2, Trash2, Download, Upload, Users, ChevronDown, X, CheckSquare, Loader2 } from 'lucide-react';
+import { Eye, Edit2, Trash2, Download, Upload, Users, ChevronDown, X, CheckSquare, Loader2, List, LayoutGrid } from 'lucide-react';
 import { DataTable, Column, SearchInput, FilterSelect, StatusBadge, ConfirmDialog } from '@/components/shared';
 import { ImportModal } from '@/components/pilgrims/import-modal';
 import { useLanguage } from '@/lib/i18n';
@@ -76,6 +76,12 @@ function PilgrimsPageContent() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkLoading, setBulkLoading] = useState(false);
   const [bulkMessage, setBulkMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  // View mode
+  const [viewMode, setViewMode] = useState<'list' | 'kanban'>('list');
+
+  // Kanban drag state
+  const [draggedPilgrim, setDraggedPilgrim] = useState<string | null>(null);
 
   // Import modal
   const [showImportModal, setShowImportModal] = useState(false);
@@ -270,6 +276,32 @@ function PilgrimsPageContent() {
       URL.revokeObjectURL(url);
     } catch {
       // silently fail
+    }
+  };
+
+  // Kanban: handle drop to change status
+  const handleKanbanDrop = async (newStatus: string) => {
+    if (!draggedPilgrim) return;
+    const pilgrim = pilgrims.find((p) => p.id === draggedPilgrim);
+    if (!pilgrim || pilgrim.status === newStatus) {
+      setDraggedPilgrim(null);
+      return;
+    }
+    try {
+      const res = await fetch(`/api/pilgrims/${draggedPilgrim}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      if (res.ok) {
+        setPilgrims((prev) =>
+          prev.map((p) => (p.id === draggedPilgrim ? { ...p, status: newStatus as PilgrimStatus } : p))
+        );
+      }
+    } catch {
+      // silently fail
+    } finally {
+      setDraggedPilgrim(null);
     }
   };
 
@@ -518,7 +550,7 @@ function PilgrimsPageContent() {
       </div>
 
       {/* Search & Filter */}
-      <div style={{ display: 'flex', gap: '12px', flexDirection: isMobile ? 'column' : 'row' }}>
+      <div style={{ display: 'flex', gap: '12px', flexDirection: isMobile ? 'column' : 'row', alignItems: isMobile ? 'stretch' : 'center' }}>
         <SearchInput
           value={search}
           onChange={setSearch}
@@ -530,6 +562,43 @@ function PilgrimsPageContent() {
           options={STATUS_OPTIONS}
           placeholder="Semua Status"
         />
+        {/* View mode toggle */}
+        <div style={{ display: 'flex', gap: '4px', backgroundColor: c.cardBg, border: `1px solid ${c.border}`, borderRadius: '8px', padding: '4px', flexShrink: 0 }}>
+          <button
+            onClick={() => setViewMode('list')}
+            title="List View"
+            style={{
+              padding: '8px',
+              borderRadius: '6px',
+              border: 'none',
+              backgroundColor: viewMode === 'list' ? c.primary : 'transparent',
+              color: viewMode === 'list' ? 'white' : c.textMuted,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <List style={{ width: '18px', height: '18px' }} />
+          </button>
+          <button
+            onClick={() => setViewMode('kanban')}
+            title="Kanban View"
+            style={{
+              padding: '8px',
+              borderRadius: '6px',
+              border: 'none',
+              backgroundColor: viewMode === 'kanban' ? c.primary : 'transparent',
+              color: viewMode === 'kanban' ? 'white' : c.textMuted,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <LayoutGrid style={{ width: '18px', height: '18px' }} />
+          </button>
+        </div>
       </div>
 
       {/* Bulk success/error message */}
@@ -557,8 +626,114 @@ function PilgrimsPageContent() {
         </div>
       )}
 
+      {/* Kanban View */}
+      {viewMode === 'kanban' && (
+        <div style={{ overflowX: 'auto', paddingBottom: '16px' }}>
+          <div style={{ display: 'flex', gap: '12px', minWidth: 'max-content' }}>
+            {STATUS_OPTIONS.map((statusOpt) => {
+              const columnPilgrims = pilgrims.filter((p) => p.status === statusOpt.value);
+              const statusColors: Record<string, string> = {
+                lead: '#6B7280',
+                dp: '#F59E0B',
+                lunas: '#10B981',
+                dokumen: '#3B82F6',
+                visa: '#8B5CF6',
+                ready: '#06B6D4',
+                departed: '#EC4899',
+                completed: '#22C55E',
+              };
+              const dotColor = statusColors[statusOpt.value] || c.textMuted;
+
+              return (
+                <div
+                  key={statusOpt.value}
+                  onDragOver={(e) => { e.preventDefault(); e.currentTarget.style.backgroundColor = c.primaryLight || '#EFF6FF'; }}
+                  onDragLeave={(e) => { e.currentTarget.style.backgroundColor = c.pageBg; }}
+                  onDrop={(e) => { e.preventDefault(); e.currentTarget.style.backgroundColor = c.pageBg; handleKanbanDrop(statusOpt.value); }}
+                  style={{
+                    minWidth: '220px',
+                    width: '220px',
+                    backgroundColor: c.pageBg,
+                    borderRadius: '12px',
+                    border: `1px solid ${c.border}`,
+                    padding: '12px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '8px',
+                    transition: 'background-color 0.15s',
+                  }}
+                >
+                  {/* Column header */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                    <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: dotColor, flexShrink: 0 }} />
+                    <span style={{ fontSize: '13px', fontWeight: '600', color: c.textPrimary }}>{statusOpt.label}</span>
+                    <span style={{
+                      marginLeft: 'auto',
+                      fontSize: '11px',
+                      fontWeight: '600',
+                      color: c.textMuted,
+                      backgroundColor: c.cardBg,
+                      padding: '2px 8px',
+                      borderRadius: '10px',
+                    }}>
+                      {columnPilgrims.length}
+                    </span>
+                  </div>
+
+                  {/* Pilgrim cards */}
+                  {loading ? (
+                    <div style={{ padding: '16px', textAlign: 'center', fontSize: '12px', color: c.textMuted }}>...</div>
+                  ) : columnPilgrims.length === 0 ? (
+                    <div style={{ padding: '24px 8px', textAlign: 'center', fontSize: '12px', color: c.textMuted, border: `2px dashed ${c.border}`, borderRadius: '8px' }}>
+                      Kosong
+                    </div>
+                  ) : (
+                    columnPilgrims.map((pilgrim) => (
+                      <div
+                        key={pilgrim.id}
+                        draggable
+                        onDragStart={() => setDraggedPilgrim(pilgrim.id)}
+                        onDragEnd={() => setDraggedPilgrim(null)}
+                        onClick={() => window.location.href = `/pilgrims/${pilgrim.id}`}
+                        style={{
+                          backgroundColor: c.cardBg,
+                          borderRadius: '10px',
+                          border: `1px solid ${draggedPilgrim === pilgrim.id ? c.primary : c.border}`,
+                          padding: '12px',
+                          cursor: 'grab',
+                          opacity: draggedPilgrim === pilgrim.id ? 0.5 : 1,
+                          transition: 'border-color 0.15s, opacity 0.15s',
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                          <div style={{
+                            width: '28px', height: '28px', borderRadius: '50%',
+                            backgroundColor: c.primary, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            color: 'white', fontSize: '11px', fontWeight: '600', flexShrink: 0,
+                          }}>
+                            {pilgrim.name.split(' ').map((n) => n[0]).join('').slice(0, 2)}
+                          </div>
+                          <div style={{ minWidth: 0 }}>
+                            <div style={{ fontSize: '13px', fontWeight: '500', color: c.textPrimary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              {pilgrim.name}
+                            </div>
+                          </div>
+                        </div>
+                        <div style={{ fontSize: '11px', color: c.textMuted, fontFamily: 'monospace' }}>
+                          {pilgrim.nik.length > 12 ? pilgrim.nik.slice(0, 12) + '...' : pilgrim.nik}
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Table */}
-      <DataTable
+      {viewMode === 'list' && <DataTable
         columns={columns}
         data={pilgrims}
         loading={loading}
@@ -607,7 +782,7 @@ function PilgrimsPageContent() {
             ? { backgroundColor: c.primaryLight || '#EFF6FF' }
             : undefined
         }
-      />
+      />}
 
       {/* Floating Bulk Action Bar */}
       {selectedIds.size > 0 && (

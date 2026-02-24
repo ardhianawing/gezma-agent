@@ -16,6 +16,7 @@ interface User {
   role: string;
   position: string | null;
   avatarUrl: string | null;
+  onboardingCompleted: boolean;
   agency: Agency;
 }
 

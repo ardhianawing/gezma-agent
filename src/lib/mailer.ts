@@ -1,4 +1,5 @@
 import nodemailer from 'nodemailer';
+import { prisma } from '@/lib/prisma';
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST || 'smtp.gmail.com',
@@ -58,5 +59,98 @@ export async function sendVerificationEmail(to: string, code: string) {
         <p style="color: #999; font-size: 12px;">${APP_NAME}</p>
       </div>
     `,
+  });
+}
+
+// Default templates used as fallback when no custom template exists
+const DEFAULT_TEMPLATES: Record<string, { subject: string; bodyHtml: string }> = {
+  welcome: {
+    subject: 'Selamat Datang, {{name}}!',
+    bodyHtml: `<div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+      <h2>Assalamualaikum {{name}},</h2>
+      <p>Selamat datang di {{agency}}. Kami senang Anda bergabung untuk perjalanan umrah bersama kami.</p>
+      <p>Tim kami akan menghubungi Anda untuk informasi lebih lanjut.</p>
+      <p>Jazakallahu khairan,<br/>{{agency}}</p>
+    </div>`,
+  },
+  payment_reminder: {
+    subject: 'Pengingat Pembayaran - {{agency}}',
+    bodyHtml: `<div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+      <h2>Assalamualaikum {{name}},</h2>
+      <p>Ini adalah pengingat bahwa Anda memiliki pembayaran yang belum diselesaikan.</p>
+      <p>Mohon segera lakukan pembayaran sebelum tanggal {{date}}.</p>
+      <p>Jazakallahu khairan,<br/>{{agency}}</p>
+    </div>`,
+  },
+  departure_reminder: {
+    subject: 'Pengingat Keberangkatan - {{date}}',
+    bodyHtml: `<div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+      <h2>Assalamualaikum {{name}},</h2>
+      <p>Keberangkatan umrah Anda dijadwalkan pada tanggal {{date}}.</p>
+      <p>Pastikan semua dokumen Anda sudah lengkap dan siap.</p>
+      <p>Jazakallahu khairan,<br/>{{agency}}</p>
+    </div>`,
+  },
+};
+
+function interpolateVars(text: string, vars: Record<string, string>): string {
+  let result = text;
+  for (const [key, value] of Object.entries(vars)) {
+    result = result.replace(new RegExp(`\\{\\{${key}\\}\\}`, 'g'), value);
+  }
+  return result;
+}
+
+export async function sendTemplatedEmail(
+  agencyId: string,
+  event: string,
+  to: string,
+  vars: Record<string, string>
+) {
+  // Lookup custom template from database
+  let subject: string;
+  let bodyHtml: string;
+
+  try {
+    const template = await prisma.emailTemplate.findUnique({
+      where: {
+        event_agencyId: {
+          event,
+          agencyId,
+        },
+      },
+    });
+
+    if (template && template.isActive) {
+      subject = template.subject;
+      bodyHtml = template.bodyHtml;
+    } else {
+      // Fallback to default template
+      const defaultTemplate = DEFAULT_TEMPLATES[event];
+      if (!defaultTemplate) {
+        throw new Error(`No default template for event: ${event}`);
+      }
+      subject = defaultTemplate.subject;
+      bodyHtml = defaultTemplate.bodyHtml;
+    }
+  } catch {
+    // If DB lookup fails, use default
+    const defaultTemplate = DEFAULT_TEMPLATES[event];
+    if (!defaultTemplate) {
+      throw new Error(`No template found for event: ${event}`);
+    }
+    subject = defaultTemplate.subject;
+    bodyHtml = defaultTemplate.bodyHtml;
+  }
+
+  // Interpolate variables
+  const finalSubject = interpolateVars(subject, vars);
+  const finalBody = interpolateVars(bodyHtml, vars);
+
+  await transporter.sendMail({
+    from: `"${APP_NAME}" <${FROM}>`,
+    to,
+    subject: finalSubject,
+    html: finalBody,
   });
 }

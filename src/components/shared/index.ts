@@ -18,3 +18,4 @@ export {
   DetailSkeleton,
   FormSkeleton,
 } from './loading-skeleton';
+export { CommandPalette } from './command-palette';

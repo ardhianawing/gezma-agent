@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect, useCallback } from 'react';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
 import { usePilgrim } from '@/lib/contexts/pilgrim-context';
@@ -8,6 +9,7 @@ import { useRouter } from 'next/navigation';
 const GREEN = '#059669';
 const GREEN_LIGHT = '#ECFDF5';
 const GREEN_DARK = '#047857';
+const STAR_YELLOW = '#F59E0B';
 
 function formatDate(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString('id-ID', {
@@ -34,6 +36,97 @@ export default function ProfilePage() {
   const { isMobile } = useResponsive();
   const { data, logout } = usePilgrim();
   const router = useRouter();
+
+  // Referral state
+  const [referralCode, setReferralCode] = useState<string | null>(null);
+  const [referralStats, setReferralStats] = useState({ totalReferrals: 0, completedReferrals: 0 });
+  const [referralLoading, setReferralLoading] = useState(false);
+  const [referralCopied, setReferralCopied] = useState(false);
+
+  // Testimonial state
+  const [canReview, setCanReview] = useState(false);
+  const [existingTestimonial, setExistingTestimonial] = useState<{ rating: number; comment: string; createdAt: string } | null>(null);
+  const [reviewRating, setReviewRating] = useState(0);
+  const [reviewComment, setReviewComment] = useState('');
+  const [reviewSubmitting, setReviewSubmitting] = useState(false);
+  const [reviewError, setReviewError] = useState('');
+  const [reviewSuccess, setReviewSuccess] = useState(false);
+
+  const fetchReferral = useCallback(() => {
+    fetch('/api/pilgrim-portal/referral')
+      .then(res => res.json())
+      .then(d => {
+        setReferralCode(d.referralCode || null);
+        setReferralStats({
+          totalReferrals: d.totalReferrals ?? 0,
+          completedReferrals: d.completedReferrals ?? 0,
+        });
+      })
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    fetchReferral();
+    // Fetch testimonial data
+    fetch('/api/pilgrim-portal/testimonial')
+      .then(res => res.json())
+      .then(d => {
+        setCanReview(d.canReview || false);
+        if (d.testimonial) setExistingTestimonial(d.testimonial);
+      })
+      .catch(() => {});
+  }, [fetchReferral]);
+
+  async function handleGenerateReferral() {
+    setReferralLoading(true);
+    try {
+      const res = await fetch('/api/pilgrim-portal/referral', { method: 'POST' });
+      const d = await res.json();
+      if (d.referralCode) {
+        setReferralCode(d.referralCode);
+        fetchReferral();
+      }
+    } catch { /* silently fail */ } finally {
+      setReferralLoading(false);
+    }
+  }
+
+  function handleCopyReferral() {
+    if (!referralCode) return;
+    navigator.clipboard.writeText(referralCode).then(() => {
+      setReferralCopied(true);
+      setTimeout(() => setReferralCopied(false), 2000);
+    }).catch(() => {});
+  }
+
+  async function handleSubmitReview() {
+    if (reviewRating < 1 || reviewRating > 5) {
+      setReviewError('Pilih rating 1-5');
+      return;
+    }
+    if (!reviewComment.trim()) {
+      setReviewError('Tulis komentar Anda');
+      return;
+    }
+    setReviewSubmitting(true);
+    setReviewError('');
+    try {
+      const res = await fetch('/api/pilgrim-portal/testimonial', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ rating: reviewRating, comment: reviewComment.trim() }),
+      });
+      const d = await res.json();
+      if (!res.ok) throw new Error(d.error || 'Gagal mengirim ulasan');
+      setExistingTestimonial(d.testimonial);
+      setCanReview(false);
+      setReviewSuccess(true);
+    } catch (err) {
+      setReviewError(err instanceof Error ? err.message : 'Gagal mengirim ulasan');
+    } finally {
+      setReviewSubmitting(false);
+    }
+  }
 
   if (!data) return null;
 
@@ -379,6 +472,253 @@ export default function ProfilePage() {
           </a>
         </div>
       </div>
+
+      {/* Ajak Teman (Referral) */}
+      <div style={cardStyle}>
+        <h2 style={sectionTitleStyle}>🤝 Ajak Teman</h2>
+        <p style={{ fontSize: '12px', color: c.textMuted, margin: '0 0 14px 0', lineHeight: 1.5 }}>
+          Bagikan kode referral Anda dan dapatkan bonus poin ketika teman mendaftar!
+        </p>
+
+        {referralCode ? (
+          <>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              padding: '12px 14px',
+              backgroundColor: GREEN_LIGHT,
+              borderRadius: '10px',
+              marginBottom: '12px',
+            }}>
+              <code style={{
+                flex: 1,
+                fontSize: '18px',
+                fontWeight: 700,
+                color: GREEN_DARK,
+                fontFamily: 'monospace',
+                letterSpacing: '1px',
+              }}>
+                {referralCode}
+              </code>
+              <button
+                onClick={handleCopyReferral}
+                style={{
+                  padding: '6px 14px',
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  color: 'white',
+                  backgroundColor: referralCopied ? '#16A34A' : GREEN,
+                  border: 'none',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {referralCopied ? 'Tersalin!' : 'Salin'}
+              </button>
+            </div>
+
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: '10px',
+            }}>
+              <div style={{
+                padding: '12px',
+                backgroundColor: c.pageBg,
+                borderRadius: '10px',
+                textAlign: 'center',
+                border: '1px solid ' + c.borderLight,
+              }}>
+                <p style={{ fontSize: '20px', fontWeight: 700, color: GREEN, margin: '0 0 2px 0' }}>
+                  {referralStats.totalReferrals}
+                </p>
+                <p style={{ fontSize: '11px', color: c.textMuted, margin: 0 }}>Total Referral</p>
+              </div>
+              <div style={{
+                padding: '12px',
+                backgroundColor: c.pageBg,
+                borderRadius: '10px',
+                textAlign: 'center',
+                border: '1px solid ' + c.borderLight,
+              }}>
+                <p style={{ fontSize: '20px', fontWeight: 700, color: GREEN, margin: '0 0 2px 0' }}>
+                  {referralStats.completedReferrals}
+                </p>
+                <p style={{ fontSize: '11px', color: c.textMuted, margin: 0 }}>Berhasil</p>
+              </div>
+            </div>
+          </>
+        ) : (
+          <button
+            onClick={handleGenerateReferral}
+            disabled={referralLoading}
+            style={{
+              width: '100%',
+              padding: '12px',
+              fontSize: '14px',
+              fontWeight: 600,
+              color: 'white',
+              backgroundColor: GREEN,
+              border: 'none',
+              borderRadius: '10px',
+              cursor: referralLoading ? 'not-allowed' : 'pointer',
+              opacity: referralLoading ? 0.6 : 1,
+            }}
+          >
+            {referralLoading ? 'Membuat...' : 'Buat Kode Referral'}
+          </button>
+        )}
+      </div>
+
+      {/* Beri Ulasan */}
+      {(canReview || existingTestimonial) && (
+        <div style={cardStyle}>
+          <h2 style={sectionTitleStyle}>{'\u{2B50}'} Beri Ulasan</h2>
+
+          {existingTestimonial ? (
+            <div>
+              {reviewSuccess && (
+                <p style={{
+                  fontSize: '13px',
+                  color: GREEN,
+                  fontWeight: 600,
+                  margin: '0 0 12px 0',
+                }}>
+                  Terima kasih atas ulasan Anda!
+                </p>
+              )}
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                marginBottom: '8px',
+              }}>
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <span
+                    key={star}
+                    style={{
+                      fontSize: '22px',
+                      color: star <= existingTestimonial.rating ? STAR_YELLOW : '#D1D5DB',
+                    }}
+                  >
+                    {'\u{2B50}'}
+                  </span>
+                ))}
+                <span style={{
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  color: c.textPrimary,
+                  marginLeft: '6px',
+                }}>
+                  {existingTestimonial.rating}/5
+                </span>
+              </div>
+              <p style={{
+                fontSize: '14px',
+                color: c.textPrimary,
+                margin: '0 0 8px 0',
+                lineHeight: 1.5,
+                fontStyle: 'italic',
+              }}>
+                &ldquo;{existingTestimonial.comment}&rdquo;
+              </p>
+              {existingTestimonial.createdAt && (
+                <p style={{ fontSize: '11px', color: c.textLight, margin: 0 }}>
+                  Dikirim {new Date(existingTestimonial.createdAt).toLocaleDateString('id-ID', {
+                    day: 'numeric', month: 'long', year: 'numeric',
+                  })}
+                </p>
+              )}
+            </div>
+          ) : canReview ? (
+            <div>
+              <p style={{
+                fontSize: '13px',
+                color: c.textMuted,
+                margin: '0 0 14px 0',
+                lineHeight: 1.5,
+              }}>
+                Perjalanan Anda telah selesai. Bagikan pengalaman Anda!
+              </p>
+
+              {/* Star rating */}
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                marginBottom: '12px',
+              }}>
+                <span style={{ fontSize: '13px', color: c.textMuted, marginRight: '4px' }}>Rating:</span>
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    onClick={() => setReviewRating(star)}
+                    style={{
+                      fontSize: '28px',
+                      color: star <= reviewRating ? STAR_YELLOW : '#D1D5DB',
+                      backgroundColor: 'transparent',
+                      border: 'none',
+                      cursor: 'pointer',
+                      padding: '0 2px',
+                      lineHeight: 1,
+                    }}
+                  >
+                    {'\u{2B50}'}
+                  </button>
+                ))}
+              </div>
+
+              {/* Comment */}
+              <textarea
+                placeholder="Tulis ulasan Anda..."
+                value={reviewComment}
+                onChange={(e) => setReviewComment(e.target.value)}
+                rows={4}
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  fontSize: '14px',
+                  border: '1px solid ' + c.border,
+                  borderRadius: '10px',
+                  backgroundColor: c.pageBg,
+                  color: c.textPrimary,
+                  outline: 'none',
+                  resize: 'vertical',
+                  boxSizing: 'border-box',
+                  marginBottom: '10px',
+                }}
+              />
+
+              {reviewError && (
+                <p style={{ fontSize: '12px', color: '#DC2626', margin: '0 0 8px 0' }}>
+                  {reviewError}
+                </p>
+              )}
+
+              <button
+                onClick={handleSubmitReview}
+                disabled={reviewSubmitting}
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  color: '#FFFFFF',
+                  backgroundColor: GREEN,
+                  border: 'none',
+                  borderRadius: '10px',
+                  cursor: reviewSubmitting ? 'not-allowed' : 'pointer',
+                  opacity: reviewSubmitting ? 0.7 : 1,
+                }}
+              >
+                {reviewSubmitting ? 'Mengirim...' : 'Kirim Ulasan'}
+              </button>
+            </div>
+          ) : null}
+        </div>
+      )}
 
       {/* Logout button */}
       <button

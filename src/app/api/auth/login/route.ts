@@ -2,11 +2,22 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
+import { rateLimit } from '@/lib/rate-limiter';
 
 const JWT_SECRET = process.env.JWT_SECRET!;
 
 export async function POST(req: NextRequest) {
   try {
+    // Rate limiting: 5 attempts per 60 seconds
+    const { allowed } = rateLimit(req, { limit: 5, window: 60 });
+    if (!allowed) {
+      return NextResponse.json(
+        { error: 'Terlalu banyak percobaan login. Silakan coba lagi nanti.' },
+        { status: 429 }
+      );
+    }
+
     const body = await req.json();
     const { email, password } = body;
 
@@ -55,6 +66,24 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // If TOTP is enabled, return tempToken for 2FA verification
+    if (user.totpEnabled) {
+      const tempToken = jwt.sign(
+        {
+          userId: user.id,
+          email: user.email,
+          type: 'totp_pending',
+        },
+        JWT_SECRET,
+        { expiresIn: 15 * 60 } // 15 minutes
+      );
+
+      return NextResponse.json({
+        requiresTOTP: true,
+        tempToken,
+      });
+    }
+
     // Generate JWT token
     const token = jwt.sign(
       {
@@ -66,6 +95,9 @@ export async function POST(req: NextRequest) {
       JWT_SECRET,
       { expiresIn: 60 * 60 * 24 * 7 } // 7 days in seconds
     );
+
+    // Generate session token
+    const sessionToken = crypto.randomUUID();
 
     // Update last login + record login history
     const ipAddress = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || req.headers.get('x-real-ip') || null;
@@ -81,6 +113,7 @@ export async function POST(req: NextRequest) {
           userId: user.id,
           ipAddress,
           userAgent,
+          sessionToken,
         },
       }),
     ]);

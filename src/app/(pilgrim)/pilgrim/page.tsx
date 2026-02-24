@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
 import { usePilgrim } from '@/lib/contexts/pilgrim-context';
+import { PrayerTimesWidget } from '@/components/pilgrim/prayer-times-widget';
 
 const PILGRIM_GREEN = '#059669';
 const PILGRIM_GREEN_LIGHT = '#ECFDF5';
@@ -357,6 +358,9 @@ export default function PilgrimDashboardPage() {
           })}
         </div>
       </div>
+
+      {/* Prayer Times Widget */}
+      <PrayerTimesWidget />
 
       {/* Agency contact card */}
       <div style={cardStyle}>

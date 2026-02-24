@@ -7,6 +7,7 @@ import {
   LayoutDashboard,
   Building2,
   ScrollText,
+  ShieldCheck,
   LogOut,
   ChevronRight,
   Shield,
@@ -69,6 +70,7 @@ interface MenuItem {
 const menuItems: MenuItem[] = [
   { label: 'Dashboard', href: '/command-center', icon: LayoutDashboard },
   { label: 'Agencies', href: '/command-center/agencies', icon: Building2 },
+  { label: 'Kepatuhan', href: '/command-center/compliance', icon: ShieldCheck },
   { label: 'Audit Log', href: '/command-center/audit-log', icon: ScrollText },
 ];
 
