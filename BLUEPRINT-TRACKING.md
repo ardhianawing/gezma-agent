@@ -1,7 +1,7 @@
 # 🕋 GEZMA — Blueprint Tracking Document
 
-> **Last Synced:** 2026-02-24
-> **Repository:** github.com/ardhianawing/gezma-agent  
+> **Last Synced:** 2026-02-24 (Session 6)
+> **Repository:** github.com/ardhianawing/gezma-agent
 > **Blueprint Sources:**
 > 1. Cetak Biru Strategis v1 (Generasi Emas Z & Milenial)
 > 2. Cetak Biru Strategis v2 (Koperasi Platform Digital)
@@ -14,7 +14,7 @@
 | Komponen | Blueprint | Implemented | Completion |
 |----------|-----------|-------------|------------|
 | **Gezma Agent** (Core B2B) | ✓ | ✅ | **95%** |
-| **Gezma Pilgrim** (B2C App) | ✓ | ✅ MVP | **80%** |
+| **Gezma Pilgrim** (B2C App) | ✓ | ✅ MVP | **85%** |
 | **Gezma Academy** (LMS) | ✓ | ⏸️ Mock UI | 15% |
 | **Gezma Command Center** | ✓ | 🔲 | 0% |
 | **Platform Pages** | ✓ | ✅ Mock UI | 60% |
@@ -38,7 +38,7 @@
 │  ┌─────────────────┐  ┌─────────────────┐                      │
 │  │  GEZMA AGENT    │  │  GEZMA PILGRIM  │                      │
 │  │  (B2B Travel)   │  │  (B2C Jemaah)   │                      │
-│  │  ✅ 95% Done    │  │  ✅ MVP 80%     │                      │
+│  │  ✅ 95% Done    │  │  ✅ MVP 85%     │                      │
 │  └─────────────────┘  └─────────────────┘                      │
 │                                                                 │
 │  ┌─────────────────┐  ┌─────────────────┐                      │
@@ -66,12 +66,15 @@
 
 | Fitur (Blueprint) | Route | Status | Notes |
 |-------------------|-------|--------|-------|
-| **Dashboard Overview** | `/dashboard` | ✅ Done | Stats, alerts, activity |
+| **Dashboard Overview** | `/dashboard` | ✅ Done | Stats, alerts, activity, charts |
 | ↳ Stats Summary | | ✅ Real | Total jemaah, trips, revenue |
 | ↳ Action Center / Alerts | | ✅ Real | Operational alerts |
 | ↳ Upcoming Trips | | ✅ Real | |
 | ↳ Recent Activities | | ✅ Real | Activity log dari DB |
 | ↳ Quick Actions | | ✅ Real | |
+| ↳ **Revenue Trend Chart** | | ✅ NEW | LineChart 12 bulan (Recharts) |
+| ↳ **Pilgrim Status Distribution** | | ✅ NEW | PieChart per status |
+| ↳ **Trip Capacity Chart** | | ✅ NEW | BarChart capacity vs registered |
 | **Pilgrims CRM** | `/pilgrims` | ✅ Done | Full CRUD |
 | ↳ List + Search + Filter + Pagination | | ✅ Real | |
 | ↳ Add Pilgrim | `/pilgrims/new` | ✅ Real | |
@@ -83,7 +86,7 @@
 | ↳ Checklist per Pilgrim | | ✅ Real | 9 items |
 | ↳ Payment Records (CRUD) | | ✅ Real | DP, cicilan, lunas, refund |
 | ↳ Trip Assignment | | ✅ Real | |
-| ↳ Export CSV | | ✅ Real | |
+| ↳ **Export CSV (server-side)** | | ✅ UPGRADED | UTF-8 BOM, server-side API |
 | ↳ **Import CSV** | | ✅ Done | 3-step modal, template download |
 | ↳ **Bulk Actions** | | ✅ Done | Status, trip assign, delete |
 | ↳ **Status Timeline Visual** | | ✅ Done | Horizontal progress + vertical |
@@ -95,6 +98,7 @@
 | ↳ HPP Calculator (9 komponen) | | ✅ Real | |
 | ↳ Margin & Published Price | | ✅ Real | Auto-calculate |
 | ↳ Itinerary Builder | | ✅ Real | Day-by-day |
+| ↳ **Itinerary Display** | | ✅ NEW | Vertical timeline, city badges |
 | ↳ Category (5 types) | | ✅ Real | Regular/Plus/VIP/Ramadhan/Budget |
 | ↳ **Package Duplicate** | | ✅ Done | Clone + "(Copy)" suffix |
 | ↳ **Brochure Generator PDF** | | ✅ Done | jsPDF, A4, full branding |
@@ -110,19 +114,19 @@
 | ↳ **Rooming List Management** | | ✅ Done | Inline room editing |
 | ↳ **Manifest CRUD (add/remove)** | | ✅ Done | Modal add, remove |
 | **Documents** | `/documents` | ✅ Basic | Agency documents |
+| **Activity Log** | `/activities` | ✅ NEW | Full page, filter, search, pagination |
 | **Agency Profile** | `/agency` | ✅ Done | |
 | ↳ Company Info | | ✅ Real | |
 | ↳ **Bank Accounts** | | ⚠️ Partial | UI ada, data basic |
 | ↳ **Branding Settings** | | ❌ Belum | White-label |
 | ↳ **QR Verification Page** | `/verify/pilgrim/[code]` | ✅ Done | QR generate + public verify |
-| **Reports** | `/reports` | ✅ Done | |
-| ↳ Total Revenue | | ✅ Real | |
-| ↳ Outstanding Balance | | ✅ Real | |
-| ↳ Collection Rate | | ✅ Real | |
-| ↳ Breakdown by Method | | ✅ Real | Transfer/Cash/Card |
-| ↳ Breakdown by Type | | ✅ Real | DP/Cicilan/Lunas/Refund |
-| ↳ Revenue per Trip | | ✅ Real | |
-| ↳ Monthly Trend | | ✅ Real | |
+| **Reports** | `/reports` | ✅ UPGRADED | 5-tab layout |
+| ↳ Tab Keuangan: Revenue, Outstanding, Collection Rate, Breakdown | | ✅ Real | |
+| ↳ **Tab Demografi: Gender, Usia, Provinsi** | | ✅ NEW | PieChart + BarChart |
+| ↳ **Tab Dokumen: Completion rate per type** | | ✅ NEW | Stacked progress bars |
+| ↳ **Tab Aging: Piutang 0-30/31-60/61-90/90+ hari** | | ✅ NEW | BarChart + top debtors |
+| ↳ **Tab Funnel: Konversi lead → completed** | | ✅ NEW | Funnel bars + percentage |
+| ↳ **Export CSV per tab** | | ✅ NEW | Server-side UTF-8 BOM |
 | **Settings** | `/settings` | ✅ Done | |
 | ↳ Theme Toggle | | ✅ Real | Light/Dark |
 | ↳ Language | | ✅ Real | ID/EN |
@@ -165,14 +169,20 @@
 - Cetak Biru v1, BAB 3.3: Gezma Pilgrim (Apps Jemaah Milenial)
 - Cetak Biru v2, BAB 3.3: Modul Gezma Pilgrim
 
-### Status: ✅ MVP Done (80%)
+### Status: ✅ MVP Done (85%)
 
 | Fitur (Blueprint) | Status | Priority |
 |-------------------|--------|----------|
 | **Login (Booking Code)** | ✅ Done | HIGH |
 | **Dashboard Jemaah** | ✅ Done | HIGH |
+| ↳ "Lihat Detail" link ke payment history | ✅ NEW | |
 | **Detail Perjalanan** | ✅ Done | HIGH |
 | **Profile & Dokumen** | ✅ Done | HIGH |
+| **Document Upload** | ✅ NEW | HIGH |
+| ↳ Upload per doc type (JPG/PNG/WebP/PDF) | ✅ NEW | |
+| ↳ 5MB limit, status badge, progress bar | ✅ NEW | |
+| **Payment History** | ✅ NEW | HIGH |
+| ↳ Full timeline, progress bar, summary | ✅ NEW | |
 | **Manasik Digital** | ✅ Basic | HIGH |
 | ↳ Panduan Ibadah Video | 🔲 | |
 | ↳ Manasik AR (Augmented Reality) | 🔲 | |
@@ -194,6 +204,18 @@
 | ↳ Roommate matching | 🔲 | |
 | ↳ Sharing economy | 🔲 | |
 
+### Pilgrim Portal Navigation (8 pages)
+| Nav Item | Route | Status |
+|----------|-------|--------|
+| Beranda | `/pilgrim` | ✅ |
+| Perjalanan | `/pilgrim/trip` | ✅ |
+| Manasik | `/pilgrim/manasik` | ✅ |
+| Doa | `/pilgrim/doa` | ✅ |
+| Dokumen | `/pilgrim/documents` | ✅ NEW |
+| Payments | `/pilgrim/payments` | ✅ NEW |
+| Profil | `/pilgrim/profile` | ✅ |
+| Login | `/pilgrim/login` | ✅ |
+
 ---
 
 ## 3️⃣ GEZMA ACADEMY (LMS)
@@ -202,11 +224,11 @@
 - Cetak Biru v1, BAB 3.4: Gezma Academy
 - Cetak Biru v2, BAB 3: Platform LMS
 
-### Status: ⏸️ 5% — Placeholder Only
+### Status: ⏸️ 15% — Mock UI Only
 
 | Fitur (Blueprint) | Route | Status | Notes |
 |-------------------|-------|--------|-------|
-| Academy Page | `/academy` | ⏸️ Coming Soon | Placeholder |
+| Academy Page | `/academy` | ✅ Mock UI | 12 kursus mock data |
 | **Kursus Operasional** | | 🔲 | |
 | ↳ SOP Handling Jemaah | | 🔲 | |
 | ↳ Manajemen Manifest | | 🔲 | |
@@ -295,27 +317,27 @@
 - Cetak Biru v2, BAB 4: Solusi Strategis dan Integrasi Ekosistem
 - Cetak Biru v2, BAB 1.2: Era Nusuk dan Mandat Integrasi 2025
 
-### Status: 🔲 0% — Belum Dimulai
+### Status: ⏸️ Mock Services Ready — Perlu API Keys
 
-| Integrasi | Blueprint Ref | Status | Priority | Deadline |
-|-----------|---------------|--------|----------|----------|
-| **Nusuk API** | BAB 1.2, 4 | 🔲 Belum | 🔴 CRITICAL | Juni 2025 |
-| ↳ Hotel Booking | | 🔲 | | |
-| ↳ Visa Processing | | 🔲 | | |
-| ↳ Status Tracking | | 🔲 | | |
+| Integrasi | Blueprint Ref | Status | Priority | Notes |
+|-----------|---------------|--------|----------|-------|
+| **Nusuk API** | BAB 1.2, 4 | ⏸️ Mock Service | 🔴 CRITICAL | Service + 3 API + UI ready |
+| ↳ Hotel Booking | | ⏸️ Mock | | |
+| ↳ Visa Processing | | ⏸️ Mock | | |
+| ↳ Status Tracking | | ⏸️ Mock | | |
 | **Siskopatuh Kemenag** | BAB 5.2 | 🔲 Belum | 🔴 CRITICAL | |
 | ↳ Pelaporan PPIU | | 🔲 | | |
 | ↳ Verifikasi Izin | | 🔲 | | |
-| **Payment Gateway** | BAB 4.1 | 🔲 Belum | 🔴 HIGH | |
-| ↳ Midtrans/Xendit | | 🔲 | | |
-| ↳ Virtual Account | | 🔲 | | |
-| **UmrahCash** | BAB 4.1 | 🔲 Belum | 🟡 HIGH | |
-| ↳ Cross-border IDR → SAR | | 🔲 | | |
-| ↳ Fixed Rate Lock | | 🔲 | | |
-| ↳ Split Payment | | 🔲 | | |
-| **WhatsApp API** | | 🔲 Belum | 🟡 HIGH | |
-| ↳ Notifikasi Jemaah | | 🔲 | | |
-| ↳ Broadcast | | 🔲 | | |
+| **Payment Gateway** | BAB 4.1 | ⏸️ Mock Service | 🔴 HIGH | Service + 4 API + UI ready |
+| ↳ Midtrans/Xendit | | ⏸️ Mock | | |
+| ↳ Virtual Account | | ⏸️ Mock | | |
+| **UmrahCash** | BAB 4.1 | ⏸️ Mock Service | 🟡 HIGH | Service + 3 API + UI ready |
+| ↳ Cross-border IDR → SAR | | ⏸️ Mock | | |
+| ↳ Fixed Rate Lock | | ⏸️ Mock | | |
+| ↳ Split Payment | | ⏸️ Mock | | |
+| **WhatsApp API** | | ⏸️ Mock Service | 🟡 HIGH | Service + 5 API + UI ready |
+| ↳ Notifikasi Jemaah | | ⏸️ Mock | | |
+| ↳ Broadcast | | ⏸️ Mock | | |
 | **Blockchain** | BAB 4.2 | 🔲 Belum | 🟢 MEDIUM | |
 | ↳ Sertifikat Digital | | 🔲 | | |
 | ↳ Verifikasi Dokumen | | 🔲 | | |
@@ -376,16 +398,18 @@
 |-----------|---------------|--------|-------|
 | **Backend** | Golang | Next.js API Routes | ⚠️ Different |
 | **Mobile** | Flutter | PWA (Web) | ⚠️ Different approach |
-| **Database** | PostgreSQL + MongoDB | PostgreSQL + Prisma | ✅ Partial |
+| **Database** | PostgreSQL + MongoDB | PostgreSQL + Prisma 7 | ✅ Partial |
 | **API Gateway** | Kong/Apigee | - | ❌ Not implemented |
 | **Blockchain** | Hyperledger Fabric | - | ❌ Not implemented |
-| **Cloud** | GCP Jakarta | - | ⚠️ TBD |
-| **Frontend** | - | Next.js 16 + Tailwind | ✅ |
-| **Auth** | - | JWT Cookies | ✅ |
+| **Cloud** | GCP Jakarta | Docker + Nginx + Traefik | ⚠️ Self-hosted |
+| **Frontend** | - | Next.js 16 + Inline Styles | ✅ |
+| **Auth** | - | JWT Cookies (agent + pilgrim) | ✅ |
 | **Email** | - | Nodemailer SMTP | ✅ |
 | **AI** | - | Gemini 2.0 Flash | ✅ Bonus |
 | **Validation** | - | Zod v4 | ✅ |
 | **Charts** | - | Recharts | ✅ |
+| **PDF** | - | jsPDF + jspdf-autotable | ✅ |
+| **QR** | - | qrcode | ✅ |
 
 ---
 
@@ -418,12 +442,12 @@
 | ↳ MVP Gezma Agent | | ✅ Done | |
 | ↳ Integrasi Siskopatuh | | 🔲 Belum | |
 | ↳ 100 Early Adopters | | ⚠️ External | |
-| **Phase 2: Konektivitas** | Bulan 7-12 | 🔄 In Progress | 10% |
+| **Phase 2: Konektivitas** | Bulan 7-12 | 🔄 In Progress | 15% |
 | ↳ B2B Marketplace | | ⏸️ Placeholder | |
-| ↳ Nusuk Integration | | 🔲 Belum | CRITICAL |
-| ↳ Payment Gateway | | 🔲 Belum | |
-| ↳ UmrahCash | | 🔲 Belum | |
-| ↳ Gezma Pilgrim Beta | | 🔲 Belum | |
+| ↳ Nusuk Integration | | ⏸️ Mock Service | CRITICAL |
+| ↳ Payment Gateway | | ⏸️ Mock Service | |
+| ↳ UmrahCash | | ⏸️ Mock Service | |
+| ↳ Gezma Pilgrim Beta | | ✅ MVP Done | |
 | **Phase 3: Ekosistem** | Tahun 2 | 🔲 Not Started | 0% |
 | ↳ Full Nusuk API | | 🔲 | |
 | ↳ Blockchain Verification | | 🔲 | |
@@ -436,20 +460,19 @@
 
 ### High Priority (Harus Segera)
 1. **Nusuk API Integration** — Mock service ready, perlu real API key
-2. ~~**Platform Pages**~~ — ✅ Done (6 pages with mock data)
-3. ~~**Rooming List Management**~~ — ✅ Done
-4. ~~**Manifest CRUD**~~ — ✅ Done
+2. **Payment Gateway Integration** — Mock service ready, perlu API key
+3. **WhatsApp Notifications** — Mock service ready, perlu API key
 
-### Medium Priority (Setelah High Selesai)
-5. ~~Import CSV Jemaah~~ — ✅ Done
-6. ~~Brochure PDF Generator~~ — ✅ Done
-7. **Payment Gateway Integration** — Mock service ready
-8. **WhatsApp Notifications** — Mock service ready
+### Medium Priority
+4. **Gezma Command Center** — Admin asosiasi dashboard (0%)
+5. **Gezma Academy** — Full LMS (currently mock UI)
+6. **Unit & E2E Testing** — Playwright, Jest
 
 ### Low Priority (Nice to Have)
-9. Gamifikasi features
-10. Blockchain verification
-11. Mobile native app (Flutter)
+7. Gamifikasi features
+8. Blockchain verification
+9. Mobile native app (Flutter)
+10. White-label branding
 
 ---
 
@@ -462,11 +485,15 @@
 
 ### Implementation Files
 - `CHECKPOINT.md` — Development checkpoint (in repo)
-- `prisma/schema.prisma` — Database models (8 models)
-- `src/app/api/` — 28 API endpoints
+- `DEVELOPMENT-PLAN-v3.md` — Phase 2 & 3 execution plan
+- `prisma/schema.prisma` — Database models (13 models)
+- `src/app/api/` — 72 API endpoints
+- `src/app/(dashboard)/` — 23 dashboard pages
+- `src/app/(pilgrim)/` — 8 pilgrim portal pages
 
 ---
 
-*Document Version: 1.0*  
-*Created: 2026-02-23*  
-*Next Review: After Phase 2 completion*
+*Document Version: 2.0*
+*Created: 2026-02-23*
+*Updated: 2026-02-24 (Session 6 — 7 internal features)*
+*Next Review: After Phase 3 integration with real API keys*
