@@ -12,6 +12,7 @@ interface AgencyVerification {
   ppiuNumber: string | null;
   ppiuExpiryDate: string | null;
   isVerified: boolean;
+  ppiuStatus: string | null;
   phone: string;
   email: string;
   city: string | null;
@@ -102,9 +103,9 @@ export default function VerifyPage() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
             <div style={{
               width: '64px', height: '64px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
-              backgroundColor: agency.isVerified ? c.successLight : c.errorLight,
+              backgroundColor: agency.isVerified && agency.ppiuStatus === 'active' ? c.successLight : c.errorLight,
             }}>
-              {agency.isVerified ? (
+              {agency.isVerified && agency.ppiuStatus === 'active' ? (
                 <CheckCircle2 style={{ width: '32px', height: '32px', color: c.success }} />
               ) : (
                 <XCircle style={{ width: '32px', height: '32px', color: c.error }} />
@@ -112,10 +113,10 @@ export default function VerifyPage() {
             </div>
             <div>
               <h2 style={{ fontSize: '18px', fontWeight: '700', color: c.textPrimary, margin: 0 }}>
-                {agency.isVerified ? 'Verified Agency' : 'Not Verified'}
+                {agency.isVerified && agency.ppiuStatus === 'active' ? 'Verified Agency' : 'Not Verified'}
               </h2>
               <p style={{ fontSize: '14px', color: c.textMuted, margin: '4px 0 0 0' }}>
-                {agency.isVerified
+                {agency.isVerified && agency.ppiuStatus === 'active'
                   ? 'This travel agency is officially registered and verified'
                   : 'This agency could not be verified'}
               </p>
@@ -172,7 +173,9 @@ function InfoRow({ icon: Icon, label, value, c }: { icon: React.ComponentType<Re
 }
 
 function formatDate(dateString: string): string {
-  return new Date(dateString).toLocaleDateString('id-ID', {
+  const d = new Date(dateString);
+  if (isNaN(d.getTime())) return dateString;
+  return d.toLocaleDateString('id-ID', {
     day: 'numeric',
     month: 'long',
     year: 'numeric',

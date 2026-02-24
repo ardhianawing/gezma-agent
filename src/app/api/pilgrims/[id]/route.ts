@@ -38,6 +38,9 @@ export async function PUT(req: NextRequest, { params }: Context) {
   const auth = getAuthPayload(req);
   if (!auth) return unauthorizedResponse();
 
+  const denied = await checkPermission(auth, PERMISSIONS.PILGRIMS_EDIT);
+  if (denied) return denied;
+
   const { id } = await params;
 
   try {

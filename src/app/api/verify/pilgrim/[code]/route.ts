@@ -11,14 +11,11 @@ export async function GET(
     const pilgrim = await prisma.pilgrim.findUnique({
       where: { verificationCode: code },
       select: {
-        id: true,
         name: true,
         nik: true,
         gender: true,
         birthPlace: true,
         birthDate: true,
-        phone: true,
-        email: true,
         status: true,
         bookingCode: true,
         roomType: true,
@@ -28,6 +25,7 @@ export async function GET(
             legalName: true,
             ppiuNumber: true,
             isVerified: true,
+            ppiuStatus: true,
           },
         },
       },
@@ -38,7 +36,7 @@ export async function GET(
     }
 
     // Mask NIK for privacy (show first 6 and last 4)
-    const maskedNik = pilgrim.nik.length > 10
+    const maskedNik = pilgrim.nik.length >= 10
       ? pilgrim.nik.slice(0, 6) + '****' + pilgrim.nik.slice(-4)
       : pilgrim.nik;
 

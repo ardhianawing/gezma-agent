@@ -1,12 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
+import { checkPermission } from '@/lib/auth-permissions';
+import { PERMISSIONS } from '@/lib/permissions';
 
 type Context = { params: Promise<{ id: string }> };
 
 export async function PATCH(req: NextRequest, { params }: Context) {
   const auth = getAuthPayload(req);
   if (!auth) return unauthorizedResponse();
+
+  const denied = await checkPermission(auth, PERMISSIONS.TRIPS_EDIT);
+  if (denied) return denied;
 
   const { id } = await params;
 

@@ -9,6 +9,7 @@ import { ImportModal } from '@/components/pilgrims/import-modal';
 import { useLanguage } from '@/lib/i18n';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
+import { usePermission, PERMISSIONS } from '@/lib/hooks/use-permissions';
 import type { PilgrimStatus } from '@/types';
 
 interface PilgrimRow {
@@ -59,6 +60,7 @@ function PilgrimsPageContent() {
   const { t } = useLanguage();
   const { c } = useTheme();
   const { isMobile } = useResponsive();
+  const { can } = usePermission();
   const searchParams = useSearchParams();
 
   const [pilgrims, setPilgrims] = useState<PilgrimRow[]>([]);
@@ -410,11 +412,14 @@ function PilgrimsPageContent() {
               <Eye style={{ width: '18px', height: '18px' }} />
             </button>
           </Link>
+          {can(PERMISSIONS.PILGRIMS_EDIT) && (
           <Link href={`/pilgrims/${row.id}/edit`}>
             <button title={t.common.edit} style={actionBtnStyle}>
               <Edit2 style={{ width: '18px', height: '18px' }} />
             </button>
           </Link>
+          )}
+          {can(PERMISSIONS.PILGRIMS_DELETE) && (
           <button
             title={t.common.delete}
             onClick={(e) => { e.stopPropagation(); setDeleteTarget({ id: row.id, name: row.name }); }}
@@ -422,6 +427,7 @@ function PilgrimsPageContent() {
           >
             <Trash2 style={{ width: '18px', height: '18px' }} />
           </button>
+          )}
         </div>
       ),
     },
@@ -506,6 +512,7 @@ function PilgrimsPageContent() {
             <Download style={{ width: '16px', height: '16px' }} />
             Export CSV
           </button>
+          {can(PERMISSIONS.PILGRIMS_CREATE) && (
           <Link href="/pilgrims/new" style={{ textDecoration: 'none' }}>
             <button
               style={{
@@ -530,6 +537,7 @@ function PilgrimsPageContent() {
               {t.pilgrims.addPilgrim}
             </button>
           </Link>
+          )}
         </div>
       </div>
 

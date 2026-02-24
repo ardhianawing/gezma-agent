@@ -33,7 +33,7 @@ export async function GET(req: NextRequest, { params }: Context) {
     }
 
     // Build verification URL
-    const baseUrl = req.nextUrl.origin;
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || req.nextUrl.origin;
     const verifyUrl = `${baseUrl}/verify/pilgrim/${code}`;
 
     // Generate QR as data URL

@@ -117,6 +117,9 @@ export default function NotificationPreferencesPage() {
                   padding: '16px 20px',
                   borderBottom: idx < NOTIFICATION_CATEGORIES.length - 1 ? `1px solid ${c.borderLight}` : 'none',
                   alignItems: 'center',
+                  pointerEvents: saving ? 'none' : 'auto',
+                  opacity: saving ? 0.6 : 1,
+                  transition: 'opacity 0.2s',
                 }}
               >
                 <div>

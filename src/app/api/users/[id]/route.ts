@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 import { checkPermission } from '@/lib/auth-permissions';
-import { PERMISSIONS } from '@/lib/permissions';
+import { PERMISSIONS, VALID_ROLES } from '@/lib/permissions';
 
 type Context = { params: Promise<{ id: string }> };
 
@@ -43,6 +43,9 @@ export async function PUT(req: NextRequest, { params }: Context) {
   const auth = getAuthPayload(req);
   if (!auth) return unauthorizedResponse();
 
+  const denied = await checkPermission(auth, PERMISSIONS.USERS_EDIT);
+  if (denied) return denied;
+
   const { id } = await params;
 
   try {
@@ -57,6 +60,16 @@ export async function PUT(req: NextRequest, { params }: Context) {
     }
 
     const { name, role, position, phone, isActive } = body;
+
+    // Validate role if provided
+    if (role !== undefined) {
+      if (!VALID_ROLES.includes(role)) {
+        return NextResponse.json({ error: 'Role tidak valid' }, { status: 400 });
+      }
+      if (role === 'owner' && auth.role !== 'owner') {
+        return NextResponse.json({ error: 'Hanya owner yang bisa mengatur role owner' }, { status: 403 });
+      }
+    }
 
     const updateData: Record<string, unknown> = {};
     if (name !== undefined) updateData.name = name;

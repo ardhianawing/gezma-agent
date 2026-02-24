@@ -10,6 +10,7 @@ import { formatShortDate } from '@/lib/utils';
 import { useTheme } from '@/lib/theme';
 import { useLanguage } from '@/lib/i18n';
 import { useResponsive } from '@/lib/hooks/use-responsive';
+import { usePermission, PERMISSIONS } from '@/lib/hooks/use-permissions';
 
 interface TripData {
   id: string;
@@ -30,6 +31,7 @@ export default function TripsPage() {
   const { c } = useTheme();
   const { t } = useLanguage();
   const { isMobile, isTablet } = useResponsive();
+  const { can } = usePermission();
   const [trips, setTrips] = useState<TripData[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -50,6 +52,7 @@ export default function TripsPage() {
         title={t.trips.title}
         description={t.trips.description}
         actions={
+          can(PERMISSIONS.TRIPS_CREATE) ? (
           <Link href="/trips/new" style={{ width: isMobile ? '100%' : 'auto', display: 'block' }}>
             <button
               style={{
@@ -72,6 +75,7 @@ export default function TripsPage() {
               <span>{t.trips.createTrip}</span>
             </button>
           </Link>
+          ) : undefined
         }
       />
 

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
+import { checkPermission } from '@/lib/auth-permissions';
+import { PERMISSIONS, VALID_ROLES } from '@/lib/permissions';
 import bcrypt from 'bcryptjs';
 
 export async function GET(req: NextRequest) {
@@ -35,9 +37,21 @@ export async function POST(req: NextRequest) {
   const auth = getAuthPayload(req);
   if (!auth) return unauthorizedResponse();
 
+  const denied = await checkPermission(auth, PERMISSIONS.USERS_CREATE);
+  if (denied) return denied;
+
   try {
     const body = await req.json();
     const { name, email, password, role, position, phone } = body;
+
+    // Validate role
+    if (role && !VALID_ROLES.includes(role)) {
+      return NextResponse.json({ error: 'Role tidak valid' }, { status: 400 });
+    }
+    // Non-owner cannot create owner accounts
+    if (role === 'owner' && auth.role !== 'owner') {
+      return NextResponse.json({ error: 'Hanya owner yang bisa membuat akun owner' }, { status: 403 });
+    }
 
     if (!name || !email || !password) {
       return NextResponse.json(

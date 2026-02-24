@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
+import { checkPermission } from '@/lib/auth-permissions';
+import { PERMISSIONS } from '@/lib/permissions';
 import { tripFormSchema } from '@/lib/validations/trip';
 import { logActivity } from '@/lib/activity-logger';
 
@@ -40,6 +42,9 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const auth = getAuthPayload(req);
   if (!auth) return unauthorizedResponse();
+
+  const denied = await checkPermission(auth, PERMISSIONS.TRIPS_CREATE);
+  if (denied) return denied;
 
   try {
     const body = await req.json();

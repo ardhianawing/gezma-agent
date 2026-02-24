@@ -44,6 +44,7 @@ export default function PilgrimDetailPage() {
   // QR Code
   const [qrData, setQrData] = useState<{ qrDataUrl: string; verifyUrl: string } | null>(null);
   const [loadingQr, setLoadingQr] = useState(false);
+  const [copyFeedback, setCopyFeedback] = useState(false);
 
   // Trip assignment
   const [trips, setTrips] = useState<{ id: string; name: string; status: string; departureDate: string | null }[]>([]);
@@ -211,7 +212,10 @@ export default function PilgrimDetailPage() {
 
   function handleCopyLink() {
     if (!qrData) return;
-    navigator.clipboard.writeText(qrData.verifyUrl).catch(() => {});
+    navigator.clipboard.writeText(qrData.verifyUrl).then(() => {
+      setCopyFeedback(true);
+      setTimeout(() => setCopyFeedback(false), 2000);
+    }).catch(() => {});
   }
 
   if (loading) return <DetailSkeleton />;
@@ -430,7 +434,7 @@ export default function PilgrimDetailPage() {
                     }}
                   >
                     <Link2 style={{ width: '14px', height: '14px' }} />
-                    Copy Link
+                    {copyFeedback ? 'Tersalin!' : 'Copy Link'}
                   </button>
                 </div>
               </>

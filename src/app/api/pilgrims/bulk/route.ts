@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
+import { checkPermission } from '@/lib/auth-permissions';
+import { PERMISSIONS } from '@/lib/permissions';
 import { logActivity } from '@/lib/activity-logger';
 
 const VALID_STATUSES = ['lead', 'dp', 'lunas', 'dokumen', 'visa', 'ready', 'departed', 'completed'];
@@ -17,6 +19,14 @@ export async function POST(req: NextRequest) {
       status?: string;
       tripId?: string;
     };
+
+    // Permission check based on action
+    const permMap = { update_status: PERMISSIONS.PILGRIMS_EDIT, assign_trip: PERMISSIONS.PILGRIMS_EDIT, delete: PERMISSIONS.PILGRIMS_DELETE };
+    const perm = permMap[action];
+    if (perm) {
+      const denied = await checkPermission(auth, perm);
+      if (denied) return denied;
+    }
 
     // Validate input
     if (!action || !Array.isArray(pilgrimIds) || pilgrimIds.length === 0) {

@@ -38,6 +38,8 @@ export const PERMISSIONS = {
 
 export type Permission = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];
 
+export const VALID_ROLES = ['owner', 'admin', 'staff', 'marketing'] as const;
+
 // Default role → permissions matrix
 export const ROLE_PERMISSIONS: Record<string, Permission[]> = {
   owner: Object.values(PERMISSIONS), // all permissions
@@ -55,9 +57,13 @@ export const ROLE_PERMISSIONS: Record<string, Permission[]> = {
     PERMISSIONS.TRIPS_EDIT,
     PERMISSIONS.TRIPS_DELETE,
     PERMISSIONS.USERS_VIEW,
+    PERMISSIONS.USERS_CREATE,
+    PERMISSIONS.USERS_EDIT,
+    PERMISSIONS.USERS_DELETE,
     PERMISSIONS.PAYMENTS_CREATE,
     PERMISSIONS.PAYMENTS_DELETE,
     PERMISSIONS.SETTINGS_VIEW,
+    PERMISSIONS.SETTINGS_EDIT,
     PERMISSIONS.REPORTS_VIEW,
   ],
   staff: [

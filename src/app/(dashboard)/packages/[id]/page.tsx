@@ -40,9 +40,14 @@ export default function PackageDetailPage() {
     if (!pkg || !confirm(`Hapus paket "${pkg.name}"?`)) return;
     try {
       const res = await fetch(`/api/packages/${id}`, { method: 'DELETE' });
-      if (res.ok) router.push('/packages');
-    } catch (err) {
-      console.error('Failed to delete package:', err);
+      if (res.ok) {
+        router.push('/packages');
+      } else {
+        const data = await res.json().catch(() => ({}));
+        alert(data.error || 'Gagal menghapus paket');
+      }
+    } catch {
+      alert('Terjadi kesalahan jaringan');
     }
   };
 
@@ -54,9 +59,12 @@ export default function PackageDetailPage() {
       if (res.ok) {
         const newPkg = await res.json();
         router.push(`/packages/${newPkg.id}`);
+      } else {
+        const data = await res.json().catch(() => ({}));
+        alert(data.error || 'Gagal menduplikasi paket');
       }
-    } catch (err) {
-      console.error('Failed to duplicate package:', err);
+    } catch {
+      alert('Terjadi kesalahan jaringan');
     } finally {
       setDuplicating(false);
     }
@@ -73,11 +81,16 @@ export default function PackageDetailPage() {
         const a = document.createElement('a');
         a.href = url;
         a.download = `brosur-${pkg.slug || pkg.name}.pdf`;
+        document.body.appendChild(a);
         a.click();
-        URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 100);
+      } else {
+        const data = await res.json().catch(() => ({}));
+        alert(data.error || 'Gagal membuat brosur');
       }
-    } catch (err) {
-      console.error('Failed to generate brochure:', err);
+    } catch {
+      alert('Terjadi kesalahan jaringan');
     } finally {
       setGeneratingPdf(false);
     }

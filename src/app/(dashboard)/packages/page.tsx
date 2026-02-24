@@ -8,12 +8,14 @@ import { formatCurrency } from '@/lib/utils';
 import { useTheme } from '@/lib/theme';
 import { useLanguage } from '@/lib/i18n';
 import { useResponsive } from '@/lib/hooks/use-responsive';
+import { usePermission, PERMISSIONS } from '@/lib/hooks/use-permissions';
 import type { Package } from '@/types/package';
 
 export default function PackagesPage() {
   const { c } = useTheme();
   const { t } = useLanguage();
   const { isMobile } = useResponsive();
+  const { can } = usePermission();
 
   const [packages, setPackages] = useState<Package[]>([]);
   const [loading, setLoading] = useState(true);
@@ -52,6 +54,7 @@ export default function PackagesPage() {
         title={t.packages.title}
         description={t.packages.description}
         actions={
+          can(PERMISSIONS.PACKAGES_CREATE) ? (
           <Link href="/packages/new" style={{ width: isMobile ? '100%' : 'auto', display: 'block' }}>
             <button
               style={{
@@ -74,6 +77,7 @@ export default function PackagesPage() {
               <span>{t.packages.createPackage}</span>
             </button>
           </Link>
+          ) : undefined
         }
       />
 

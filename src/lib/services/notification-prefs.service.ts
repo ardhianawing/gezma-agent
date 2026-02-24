@@ -33,21 +33,23 @@ export function getDefaultPreferences(): NotificationPreferences {
   return prefs;
 }
 
-// Merge saved prefs with defaults (fill in any missing keys)
+// Merge saved prefs with defaults (fill in any missing keys) — immutable
 export function mergeWithDefaults(saved: NotificationPreferences | null): NotificationPreferences {
   const defaults = getDefaultPreferences();
-  if (!saved) return defaults;
+  if (!saved || typeof saved !== 'object' || Array.isArray(saved)) return defaults;
 
+  const result: NotificationPreferences = {};
   for (const cat of NOTIFICATION_CATEGORIES) {
-    if (!saved[cat.key]) {
-      saved[cat.key] = defaults[cat.key];
+    if (!saved[cat.key] || typeof saved[cat.key] !== 'object') {
+      result[cat.key] = { ...defaults[cat.key] };
     } else {
+      result[cat.key] = {};
       for (const ch of NOTIFICATION_CHANNELS) {
-        if (typeof saved[cat.key][ch.key] !== 'boolean') {
-          saved[cat.key][ch.key] = defaults[cat.key][ch.key];
-        }
+        result[cat.key][ch.key] = typeof saved[cat.key][ch.key] === 'boolean'
+          ? saved[cat.key][ch.key]
+          : defaults[cat.key][ch.key];
       }
     }
   }
-  return saved;
+  return result;
 }

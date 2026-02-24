@@ -12,6 +12,7 @@ function slugify(text: string): string {
     .replace(/[^a-z0-9\s-]/g, '')
     .replace(/\s+/g, '-')
     .replace(/-+/g, '-')
+    .replace(/^-+|-+$/g, '')
     .trim();
 }
 
@@ -49,6 +50,9 @@ export async function GET(req: NextRequest, { params }: Context) {
 export async function PUT(req: NextRequest, { params }: Context) {
   const auth = getAuthPayload(req);
   if (!auth) return unauthorizedResponse();
+
+  const denied = await checkPermission(auth, PERMISSIONS.PACKAGES_EDIT);
+  if (denied) return denied;
 
   const { id } = await params;
 

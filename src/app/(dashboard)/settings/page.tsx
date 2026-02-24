@@ -16,8 +16,6 @@ import {
   Users,
   Plug,
   ChevronRight,
-  Mail,
-  Smartphone,
   Moon,
   Sun,
   Check,
@@ -34,8 +32,6 @@ export default function SettingsPage() {
   const { theme, setTheme, c } = useTheme();
   const { t } = useLanguage();
   const { isMobile, isTablet } = useResponsive();
-  const [emailAlerts, setEmailAlerts] = useState(true);
-  const [pushNotifs, setPushNotifs] = useState(false);
   const [agency, setAgency] = useState<AgencyInfo | null>(null);
 
   // Password change
@@ -114,7 +110,7 @@ export default function SettingsPage() {
       description: t.settings.securityDesc,
       color: c.success,
       bgColor: c.successLight,
-      href: '#security',
+      href: null as string | null,
     },
     {
       icon: CreditCard,
@@ -331,99 +327,6 @@ export default function SettingsPage() {
                   </div>
                 )}
               </button>
-            </div>
-          </div>
-
-          {/* Notification Preferences */}
-          <div
-            style={{
-              backgroundColor: c.cardBg,
-              borderRadius: '12px',
-              border: `1px solid ${c.border}`,
-              overflow: 'hidden',
-              transition: 'all 0.3s ease',
-            }}
-          >
-            <div style={{ padding: isMobile ? '16px' : '20px', borderBottom: `1px solid ${c.borderLight}` }}>
-              <h3 style={{ fontSize: '14px', fontWeight: '600', color: c.textPrimary, margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Bell style={{ width: '16px', height: '16px', color: c.textMuted }} />
-                {t.settings.quickNotifications}
-              </h3>
-            </div>
-            <div style={{ padding: isMobile ? '16px' : '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              {/* Email Alerts */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <Mail style={{ width: '20px', height: '20px', color: c.textMuted }} />
-                  <span style={{ fontSize: '14px', color: c.textPrimary }}>{t.settings.emailAlerts}</span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setEmailAlerts(!emailAlerts)}
-                  style={{
-                    width: '44px',
-                    height: '24px',
-                    backgroundColor: emailAlerts ? c.primary : c.border,
-                    borderRadius: '12px',
-                    position: 'relative',
-                    cursor: 'pointer',
-                    border: 'none',
-                    padding: 0,
-                    transition: 'background-color 0.2s',
-                  }}
-                >
-                  <div
-                    style={{
-                      position: 'absolute',
-                      top: '2px',
-                      left: emailAlerts ? '22px' : '2px',
-                      width: '20px',
-                      height: '20px',
-                      backgroundColor: 'white',
-                      borderRadius: '50%',
-                      transition: 'left 0.2s',
-                      border: emailAlerts ? 'none' : `1px solid ${c.border}`,
-                    }}
-                  />
-                </button>
-              </div>
-
-              {/* Push Notifications */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <Smartphone style={{ width: '20px', height: '20px', color: c.textMuted }} />
-                  <span style={{ fontSize: '14px', color: c.textPrimary }}>{t.settings.pushNotifications}</span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setPushNotifs(!pushNotifs)}
-                  style={{
-                    width: '44px',
-                    height: '24px',
-                    backgroundColor: pushNotifs ? c.primary : c.border,
-                    borderRadius: '12px',
-                    position: 'relative',
-                    cursor: 'pointer',
-                    border: 'none',
-                    padding: 0,
-                    transition: 'background-color 0.2s',
-                  }}
-                >
-                  <div
-                    style={{
-                      position: 'absolute',
-                      top: '2px',
-                      left: pushNotifs ? '22px' : '2px',
-                      width: '20px',
-                      height: '20px',
-                      backgroundColor: 'white',
-                      borderRadius: '50%',
-                      transition: 'left 0.2s',
-                      border: pushNotifs ? 'none' : `1px solid ${c.border}`,
-                    }}
-                  />
-                </button>
-              </div>
             </div>
           </div>
 

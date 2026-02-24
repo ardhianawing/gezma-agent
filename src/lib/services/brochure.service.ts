@@ -32,7 +32,7 @@ interface BrochurePackage {
   description: string;
   duration: number;
   airline: string;
-  itinerary: ItineraryDay[];
+  itinerary: unknown[];
   publishedPrice: number;
   isPromo: boolean;
   promoPrice: number | null;
@@ -56,7 +56,8 @@ function formatCurrency(amount: number): string {
 }
 
 function stars(count: number): string {
-  return '\u2605'.repeat(count) + '\u2606'.repeat(5 - count);
+  const clamped = Math.max(0, Math.min(5, count || 0));
+  return '\u2605'.repeat(clamped) + '\u2606'.repeat(5 - clamped);
 }
 
 export function generateBrochurePdf(pkg: BrochurePackage, agency: BrochureAgency): Buffer {
@@ -99,13 +100,13 @@ export function generateBrochurePdf(pkg: BrochurePackage, agency: BrochureAgency
   doc.setFontSize(11);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(100, 100, 100);
-  doc.text(`${pkg.category.toUpperCase()} | ${pkg.duration} Hari | ${pkg.airline}`, margin, y);
+  doc.text(`${(pkg.category || '').toUpperCase()} | ${pkg.duration} Hari | ${pkg.airline || '-'}`, margin, y);
   y += 10;
 
   // --- Description ---
   doc.setTextColor(50, 50, 50);
   doc.setFontSize(10);
-  const descLines = doc.splitTextToSize(pkg.description, contentWidth);
+  const descLines = doc.splitTextToSize(pkg.description || '', contentWidth);
   doc.text(descLines, margin, y);
   y += descLines.length * 5 + 6;
 
@@ -142,8 +143,8 @@ export function generateBrochurePdf(pkg: BrochurePackage, agency: BrochureAgency
     margin: { left: margin, right: margin },
     head: [['Kota', 'Hotel', 'Rating', 'Jarak ke Masjid']],
     body: [
-      ['Makkah', pkg.makkahHotel, stars(pkg.makkahHotelRating), pkg.makkahHotelDistance],
-      ['Madinah', pkg.madinahHotel, stars(pkg.madinahHotelRating), pkg.madinahHotelDistance],
+      ['Makkah', pkg.makkahHotel || '-', stars(pkg.makkahHotelRating), pkg.makkahHotelDistance || '-'],
+      ['Madinah', pkg.madinahHotel || '-', stars(pkg.madinahHotelRating), pkg.madinahHotelDistance || '-'],
     ],
     theme: 'striped',
     headStyles: { fillColor: [200, 30, 30], fontSize: 9 },
@@ -169,10 +170,10 @@ export function generateBrochurePdf(pkg: BrochurePackage, agency: BrochureAgency
     y += 7;
 
     const itineraryRows = itinerary.map((day) => {
-      const activitiesText = day.activities
+      const activitiesText = (day.activities || [])
         .map((a) => `${a.time} - ${a.title}`)
         .join('\n');
-      return [`Hari ${day.day}`, day.title, day.city, activitiesText];
+      return [`Hari ${day.day}`, day.title || '', day.city || '', activitiesText];
     });
 
     autoTable(doc, {
@@ -215,20 +216,22 @@ export function generateBrochurePdf(pkg: BrochurePackage, agency: BrochureAgency
   doc.setFontSize(9);
   doc.setFont('helvetica', 'normal');
 
-  const maxRows = Math.max(pkg.inclusions.length, pkg.exclusions.length);
+  const inclusions = pkg.inclusions || [];
+  const exclusions = pkg.exclusions || [];
+  const maxRows = Math.max(inclusions.length, exclusions.length);
   for (let i = 0; i < maxRows; i++) {
     if (y > 275) {
       doc.addPage();
       y = margin;
     }
 
-    if (i < pkg.inclusions.length) {
+    if (i < inclusions.length) {
       doc.setTextColor(50, 50, 50);
-      doc.text(`\u2713 ${pkg.inclusions[i]}`, margin, y);
+      doc.text(`\u2713 ${inclusions[i]}`, margin, y);
     }
-    if (i < pkg.exclusions.length) {
+    if (i < exclusions.length) {
       doc.setTextColor(150, 50, 50);
-      doc.text(`\u2717 ${pkg.exclusions[i]}`, margin + halfWidth + 6, y);
+      doc.text(`\u2717 ${exclusions[i]}`, margin + halfWidth + 6, y);
     }
     y += 5;
   }

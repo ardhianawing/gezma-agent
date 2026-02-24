@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { hasPermission, ROLE_PERMISSIONS, type Permission } from '@/lib/permissions';
+import { hasPermission, PERMISSIONS, ROLE_PERMISSIONS, type Permission } from '@/lib/permissions';
 
 interface UserInfo {
   role: string;
@@ -38,7 +38,7 @@ export function usePermission() {
   }, []);
 
   function can(permission: Permission): boolean {
-    if (!user) return true; // loading state — show everything, gated server-side
+    if (!user) return false; // loading state — hide until permissions are loaded
     return hasPermission(user.role, permission, user.permissions);
   }
 
@@ -49,4 +49,4 @@ export function usePermission() {
   return { can, canAny, role: user?.role || null };
 }
 
-export { ROLE_PERMISSIONS, type Permission };
+export { PERMISSIONS, ROLE_PERMISSIONS, type Permission };

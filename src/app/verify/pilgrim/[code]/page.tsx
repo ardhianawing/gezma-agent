@@ -19,6 +19,7 @@ interface PilgrimVerification {
     legalName: string;
     ppiuNumber: string | null;
     isVerified: boolean;
+    ppiuStatus: string | null;
   };
 }
 
@@ -173,7 +174,7 @@ export default function PilgrimVerifyPage() {
               PPIU: {pilgrim.agency.ppiuNumber}
             </p>
           )}
-          {pilgrim.agency.isVerified && (
+          {pilgrim.agency.isVerified && pilgrim.agency.ppiuStatus === 'active' && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', paddingLeft: '32px' }}>
               <CheckCircle2 style={{ width: '14px', height: '14px', color: c.success }} />
               <span style={{ fontSize: '12px', color: c.success, fontWeight: '500' }}>Agency Terverifikasi</span>
@@ -206,13 +207,11 @@ function InfoRow({ icon: Icon, label, value, c }: { icon: React.ComponentType<Re
 }
 
 function formatDate(dateString: string): string {
-  try {
-    return new Date(dateString).toLocaleDateString('id-ID', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
-    });
-  } catch {
-    return dateString;
-  }
+  const d = new Date(dateString);
+  if (isNaN(d.getTime())) return dateString;
+  return d.toLocaleDateString('id-ID', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
 }

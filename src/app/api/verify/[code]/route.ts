@@ -17,6 +17,7 @@ export async function GET(
         ppiuNumber: true,
         ppiuExpiryDate: true,
         isVerified: true,
+        ppiuStatus: true,
         phone: true,
         email: true,
         city: true,

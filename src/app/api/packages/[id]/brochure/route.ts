@@ -46,7 +46,7 @@ export async function POST(req: NextRequest, { params }: Context) {
         description: pkg.description,
         duration: pkg.duration,
         airline: pkg.airline,
-        itinerary: pkg.itinerary as never,
+        itinerary: Array.isArray(pkg.itinerary) ? pkg.itinerary as unknown[] : [],
         publishedPrice: pkg.publishedPrice,
         isPromo: pkg.isPromo,
         promoPrice: pkg.promoPrice,
@@ -66,7 +66,7 @@ export async function POST(req: NextRequest, { params }: Context) {
       status: 200,
       headers: {
         'Content-Type': 'application/pdf',
-        'Content-Disposition': `attachment; filename="brosur-${pkg.slug}.pdf"`,
+        'Content-Disposition': `attachment; filename="brosur-${pkg.slug || pkg.id}.pdf"`,
       },
     });
   } catch (error) {
