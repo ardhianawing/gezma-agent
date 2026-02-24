@@ -1,6 +1,6 @@
 # 🕋 GEZMA — Blueprint Tracking Document
 
-> **Last Synced:** 2026-02-23  
+> **Last Synced:** 2026-02-24
 > **Repository:** github.com/ardhianawing/gezma-agent  
 > **Blueprint Sources:**
 > 1. Cetak Biru Strategis v1 (Generasi Emas Z & Milenial)
@@ -13,13 +13,13 @@
 
 | Komponen | Blueprint | Implemented | Completion |
 |----------|-----------|-------------|------------|
-| **Gezma Agent** (Core B2B) | ✓ | ✅ | **90%** |
-| **Gezma Pilgrim** (B2C App) | ✓ | 🔲 | 0% |
-| **Gezma Academy** (LMS) | ✓ | ⏸️ Placeholder | 5% |
+| **Gezma Agent** (Core B2B) | ✓ | ✅ | **95%** |
+| **Gezma Pilgrim** (B2C App) | ✓ | ✅ MVP | **80%** |
+| **Gezma Academy** (LMS) | ✓ | ⏸️ Mock UI | 15% |
 | **Gezma Command Center** | ✓ | 🔲 | 0% |
-| **Platform Pages** | ✓ | ⏸️ Placeholder | 5% |
-| **Nusuk Integration** | ✓ Critical | 🔲 | 0% |
-| **Fintech Integration** | ✓ | 🔲 | 0% |
+| **Platform Pages** | ✓ | ✅ Mock UI | 60% |
+| **Nusuk Integration** | ✓ Critical | ⏸️ Mock Service | 10% |
+| **Fintech Integration** | ✓ | ⏸️ Mock Service | 10% |
 | **Blockchain Verification** | ✓ | 🔲 | 0% |
 
 ---
@@ -38,7 +38,7 @@
 │  ┌─────────────────┐  ┌─────────────────┐                      │
 │  │  GEZMA AGENT    │  │  GEZMA PILGRIM  │                      │
 │  │  (B2B Travel)   │  │  (B2C Jemaah)   │                      │
-│  │  ✅ 90% Done    │  │  🔲 0% Done     │                      │
+│  │  ✅ 95% Done    │  │  ✅ MVP 80%     │                      │
 │  └─────────────────┘  └─────────────────┘                      │
 │                                                                 │
 │  ┌─────────────────┐  ┌─────────────────┐                      │
@@ -62,7 +62,7 @@
 - Cetak Biru v2, BAB 3.2: Modul Gezma Agent
 - Frontend Plan v2.0, Section 5.1: Module Structure
 
-### Status: ✅ 90% Complete
+### Status: ✅ 95% Complete
 
 | Fitur (Blueprint) | Route | Status | Notes |
 |-------------------|-------|--------|-------|
@@ -84,9 +84,9 @@
 | ↳ Payment Records (CRUD) | | ✅ Real | DP, cicilan, lunas, refund |
 | ↳ Trip Assignment | | ✅ Real | |
 | ↳ Export CSV | | ✅ Real | |
-| ↳ **Import CSV** | | ❌ Belum | Blueprint: Section 5 |
-| ↳ **Bulk Actions** | | ❌ Belum | Blueprint: Section 5 |
-| ↳ **Status Timeline Visual** | | ❌ Belum | Blueprint: Section 5.2 |
+| ↳ **Import CSV** | | ✅ Done | 3-step modal, template download |
+| ↳ **Bulk Actions** | | ✅ Done | Status, trip assign, delete |
+| ↳ **Status Timeline Visual** | | ✅ Done | Horizontal progress + vertical |
 | **Packages** | `/packages` | ✅ Done | Full CRUD |
 | ↳ List + Search + Filter | | ✅ Real | |
 | ↳ Create Package | `/packages/new` | ✅ Real | |
@@ -96,8 +96,8 @@
 | ↳ Margin & Published Price | | ✅ Real | Auto-calculate |
 | ↳ Itinerary Builder | | ✅ Real | Day-by-day |
 | ↳ Category (5 types) | | ✅ Real | Regular/Plus/VIP/Ramadhan/Budget |
-| ↳ **Package Duplicate** | | ❌ Belum | |
-| ↳ **Brochure Generator PDF** | | ❌ Belum | Blueprint: Section 5.1 |
+| ↳ **Package Duplicate** | | ✅ Done | Clone + "(Copy)" suffix |
+| ↳ **Brochure Generator PDF** | | ✅ Done | jsPDF, A4, full branding |
 | **Trips** | `/trips` | ✅ Done | Full CRUD |
 | ↳ List + Search + Filter | | ✅ Real | |
 | ↳ Create Trip | `/trips/new` | ✅ Real | |
@@ -107,14 +107,14 @@
 | ↳ Operational Checklist | | ✅ Real | |
 | ↳ Print Manifest | | ✅ Real | |
 | ↳ Capacity Tracking | | ✅ Real | |
-| ↳ **Rooming List Management** | | ❌ Belum | Blueprint: HIGH priority |
-| ↳ **Manifest CRUD (add/remove)** | | ❌ Belum | Blueprint: HIGH priority |
+| ↳ **Rooming List Management** | | ✅ Done | Inline room editing |
+| ↳ **Manifest CRUD (add/remove)** | | ✅ Done | Modal add, remove |
 | **Documents** | `/documents` | ✅ Basic | Agency documents |
 | **Agency Profile** | `/agency` | ✅ Done | |
 | ↳ Company Info | | ✅ Real | |
 | ↳ **Bank Accounts** | | ⚠️ Partial | UI ada, data basic |
 | ↳ **Branding Settings** | | ❌ Belum | White-label |
-| ↳ **QR Verification Page** | `/verify/[code]` | ⏸️ Placeholder | |
+| ↳ **QR Verification Page** | `/verify/pilgrim/[code]` | ✅ Done | QR generate + public verify |
 | **Reports** | `/reports` | ✅ Done | |
 | ↳ Total Revenue | | ✅ Real | |
 | ↳ Outstanding Balance | | ✅ Real | |
@@ -128,8 +128,8 @@
 | ↳ Language | | ✅ Real | ID/EN |
 | ↳ Change Password | | ✅ Real | |
 | ↳ User Management | `/settings/users` | ✅ Real | CRUD |
-| ↳ **Roles & Permissions** | | ⚠️ Basic | 4 roles, no granular perms |
-| ↳ **Notification Preferences** | | ❌ Belum | |
+| ↳ **Roles & Permissions** | | ✅ Done | 25 perms, role matrix, per-user overrides |
+| ↳ **Notification Preferences** | `/settings/notifications` | ✅ Done | 5 categories × 3 channels |
 
 ### Authentication (Blueprint Section: Security)
 | Fitur | Status | Notes |
@@ -165,11 +165,15 @@
 - Cetak Biru v1, BAB 3.3: Gezma Pilgrim (Apps Jemaah Milenial)
 - Cetak Biru v2, BAB 3.3: Modul Gezma Pilgrim
 
-### Status: 🔲 0% — Belum Dimulai
+### Status: ✅ MVP Done (80%)
 
 | Fitur (Blueprint) | Status | Priority |
 |-------------------|--------|----------|
-| **Manasik Digital** | 🔲 | HIGH |
+| **Login (Booking Code)** | ✅ Done | HIGH |
+| **Dashboard Jemaah** | ✅ Done | HIGH |
+| **Detail Perjalanan** | ✅ Done | HIGH |
+| **Profile & Dokumen** | ✅ Done | HIGH |
+| **Manasik Digital** | ✅ Basic | HIGH |
 | ↳ Panduan Ibadah Video | 🔲 | |
 | ↳ Manasik AR (Augmented Reality) | 🔲 | |
 | ↳ "Doa Sesuai Lokasi" (GPS) | 🔲 | |
@@ -251,32 +255,32 @@
 ### Referensi Blueprint:
 - Semua dokumen cetak biru
 
-### Status: ⏸️ 5% — Placeholder Only
+### Status: ✅ 60% — Mock UI Done
 
 | Page | Route | Status | Mock Data | UI Design |
 |------|-------|--------|-----------|-----------|
-| **Marketplace** | `/marketplace` | ⏸️ Coming Soon | 📝 Ready | 📝 Prompt ready |
+| **Marketplace** | `/marketplace` | ✅ Mock UI | ✅ 30 items | ✅ Done |
 | ↳ Hotel (Makkah/Madinah) | | 🔲 | ✅ 12 items | |
 | ↳ Visa | | 🔲 | ✅ 3 items | |
 | ↳ Bus & Handling | | 🔲 | ✅ 3 items | |
 | ↳ Asuransi | | 🔲 | ✅ 3 items | |
 | ↳ Mutawwif | | 🔲 | ✅ 3 items | |
 | ↳ Tiket Pesawat | | 🔲 | ✅ 5 items | |
-| **Forum** | `/forum` | ⏸️ Coming Soon | 📝 Ready | 📝 Prompt ready |
+| **Forum** | `/forum` | ✅ Mock UI | ✅ 12 threads | ✅ Done |
 | ↳ Kategori (7 types) | | 🔲 | ✅ 7 cats | |
 | ↳ Threads | | 🔲 | ✅ 12 threads | |
 | ↳ Kaskus-style Table | | 🔲 | | |
-| **Berita** | `/news` | ⏸️ Coming Soon | 📝 Ready | 📝 Prompt ready |
+| **Berita** | `/news` | ✅ Mock UI | ✅ 10 artikel | ✅ Done |
 | ↳ Regulasi | | 🔲 | ✅ | |
 | ↳ Pengumuman | | 🔲 | ✅ | |
 | ↳ Event | | 🔲 | ✅ | |
 | ↳ Tips | | 🔲 | ✅ | |
 | ↳ Peringatan | | 🔲 | ✅ | |
-| **Trade Centre** | `/trade` | ⏸️ Coming Soon | 📝 Ready | 📝 Prompt ready |
+| **Trade Centre** | `/trade` | ✅ Mock UI | ✅ 20 items | ✅ Done |
 | ↳ Katalog Produk Ekspor | | 🔲 | ✅ 20 items | |
 | ↳ Pengajuan Produk | | 🔲 | | |
 | ↳ Proses Kurasi | | 🔲 | | |
-| **Layanan** | `/services` | ⏸️ Coming Soon | 📝 Ready | 📝 Prompt ready |
+| **Layanan** | `/services` | ✅ Mock UI | ✅ 6 services | ✅ Done |
 | ↳ Konsultasi Legal | | 🔲 | | |
 | ↳ Partner Visa | | 🔲 | | |
 | ↳ Download Dokumen | | 🔲 | | |
@@ -409,7 +413,7 @@
 
 | Phase | Blueprint Timeline | Actual Status | Completion |
 |-------|-------------------|---------------|------------|
-| **Phase 1: Fondasi** | Bulan 1-6 | ✅ Done | 90% |
+| **Phase 1: Fondasi** | Bulan 1-6 | ✅ Done | 95% |
 | ↳ Badan Hukum | | ⚠️ External | |
 | ↳ MVP Gezma Agent | | ✅ Done | |
 | ↳ Integrasi Siskopatuh | | 🔲 Belum | |
@@ -431,16 +435,16 @@
 ## 📋 IMMEDIATE ACTION ITEMS
 
 ### High Priority (Harus Segera)
-1. **Nusuk API Integration** — Deadline Juni 2025, belum dimulai
-2. **Platform Pages** — Prompt sudah ready, tinggal eksekusi
-3. **Rooming List Management** — Core feature yang missing
-4. **Manifest CRUD** — Add/remove pilgrim dari trip
+1. **Nusuk API Integration** — Mock service ready, perlu real API key
+2. ~~**Platform Pages**~~ — ✅ Done (6 pages with mock data)
+3. ~~**Rooming List Management**~~ — ✅ Done
+4. ~~**Manifest CRUD**~~ — ✅ Done
 
 ### Medium Priority (Setelah High Selesai)
-5. Import CSV Jemaah
-6. Brochure PDF Generator
-7. Payment Gateway Integration
-8. WhatsApp Notifications
+5. ~~Import CSV Jemaah~~ — ✅ Done
+6. ~~Brochure PDF Generator~~ — ✅ Done
+7. **Payment Gateway Integration** — Mock service ready
+8. **WhatsApp Notifications** — Mock service ready
 
 ### Low Priority (Nice to Have)
 9. Gamifikasi features

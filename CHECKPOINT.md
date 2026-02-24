@@ -1,6 +1,6 @@
 # GEZMA Agent — Development Checkpoint
 
-> **Last Updated:** 2026-02-23 (Session 3)
+> **Last Updated:** 2026-02-24 (Session 4)
 > **Blueprint Reference:** `GEZMA-AGENT-PLAN-v2.md`, `DEVELOPMENT-PLAN-v3.md`
 
 ---
@@ -11,7 +11,7 @@
 |----------|--------|------------|
 | **Phase 1: Core Agent Dashboard** | ✅ 100% Done | Semua modul + API |
 | **Phase 2A: Platform Pages** | ✅ Done | 6 halaman dengan mock data |
-| **Phase 2B: Agent Backlog** | ✅ Done | Manifest CRUD, Timeline, Bulk, Import CSV |
+| **Phase 2B: Agent Backlog** | ✅ 100% Done | Manifest, Timeline, Bulk, Import CSV + 5 low-priority backlog |
 | **Phase 2C: Gezma Pilgrim MVP** | ✅ Done | 6 halaman + layout + real DB |
 | **Phase 3: Integrasi** | ✅ Prep Done | 4 service layers + 15 API endpoints + 7 UI pages (mock) |
 | **PWA** | ✅ Done | Service Worker, Install Prompt, Offline |
@@ -116,14 +116,14 @@ Semua 6 halaman sudah dibangun dengan mock data (bukan Coming Soon lagi):
 | Bulk Actions | ✅ | POST `/pilgrims/bulk` | Checkboxes, floating bar, dropdowns |
 | Import CSV | ✅ | POST `/pilgrims/import` | 3-step modal, template download |
 
-### Belum Dikerjakan (LOW priority)
-| Fitur | Status | Prioritas |
-|-------|--------|-----------|
-| Brochure Generator (PDF) | ❌ | LOW |
-| Package Duplicate | ❌ | LOW |
-| QR Verification Page | ❌ | LOW |
-| Granular Roles & Permissions | ❌ | LOW |
-| Notification Preferences | ❌ | LOW |
+### Low Priority Backlog — ✅ All Done (Session 4)
+| Fitur | Status | Keterangan |
+|-------|--------|------------|
+| Brochure Generator (PDF) | ✅ Done | jsPDF + jspdf-autotable, download dari detail paket |
+| Package Duplicate | ✅ Done | Clone paket dengan "(Copy)" suffix, isActive=false |
+| QR Verification Page | ✅ Done | Generate QR per jemaah, public verify page |
+| Granular Roles & Permissions | ✅ Done | 25 permissions, role matrix, per-user overrides, API guards |
+| Notification Preferences | ✅ Done | 5 kategori × 3 channel, toggle grid UI |
 
 ---
 
@@ -173,17 +173,19 @@ Semua menggunakan mock data, siap connect real API ketika key tersedia:
 
 ---
 
-## F. API ENDPOINTS (55 Total)
+## F. API ENDPOINTS (60 Total)
 
 ```
 Auth:          7 endpoints (login, register, verify, password, etc)
-Pilgrims:     13 endpoints (CRUD + documents + payments + status + history + bulk + import)
-Packages:      5 endpoints (full CRUD)
+Pilgrims:     14 endpoints (CRUD + documents + payments + status + history + bulk + import + QR)
+Packages:      7 endpoints (CRUD + duplicate + brochure)
 Trips:         7 endpoints (CRUD + checklist + manifest + manifest/remove)
 Dashboard:     3 endpoints (stats, alerts, activities)
 Reports:       1 endpoint  (financial)
+Settings:      1 endpoint  (notification preferences GET/PUT)
 Integrations: 15 endpoints (nusuk: 3, payment: 4, whatsapp: 5, umrahcash: 3)
 Pilgrim Portal: 7 endpoints (login, me, logout, manasik, manasik/progress, doa, doa/favorites)
+Verify:        1 endpoint  (public pilgrim QR verification)
 Other:         3 endpoints (agency, users, chat AI)
 ```
 
@@ -239,9 +241,10 @@ src/
 
 ---
 
-## H. GIT LOG (Session 3)
+## H. GIT LOG (Session 3-4)
 
 ```
+72ff2f9 feat: implement 5 low-priority backlog features (brochure, duplicate, QR, permissions, notifications)
 0ff9765 feat: connect Manasik & Doa to real database
 67343b3 docs: update CHECKPOINT.md with Pilgrim Portal DB integration
 5fec158 feat: connect Pilgrim Portal to real database via Prisma
@@ -259,4 +262,4 @@ a8ebe52 feat: Phase 2C — Gezma Pilgrim MVP (6 pages + layout + mock data)
 1. **Pilgrim Portal Enhancements** — Document upload dari portal, payment status realtime
 2. **Phase 3: Integrasi** — Nusuk API, Payment Gateway, WhatsApp API (connect real keys)
 3. **Phase 4: Advanced** — Gamifikasi, Blockchain, Command Center, Mobile Native
-4. **Low Priority Backlog** — Brochure Generator, Package Duplicate, QR Verification, Granular Roles
+4. ~~**Low Priority Backlog**~~ — ✅ All Done (Session 4)
