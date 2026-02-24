@@ -1,6 +1,6 @@
 # 🕋 GEZMA — Blueprint Tracking Document
 
-> **Last Synced:** 2026-02-24 (Session 7)
+> **Last Synced:** 2026-02-24 (Session 8)
 > **Repository:** github.com/ardhianawing/gezma-agent
 > **Blueprint Sources:**
 > 1. Cetak Biru Strategis v1 (Generasi Emas Z & Milenial)
@@ -13,14 +13,14 @@
 
 | Komponen | Blueprint | Implemented | Completion |
 |----------|-----------|-------------|------------|
-| **Gezma Agent** (Core B2B) | ✓ | ✅ | **98%** |
+| **Gezma Agent** (Core B2B) | ✓ | ✅ | **99%** |
 | **Gezma Pilgrim** (B2C App) | ✓ | ✅ MVP | **85%** |
-| **Gezma Academy** (LMS) | ✓ | ⏸️ Mock UI | 15% |
-| **Gezma Command Center** | ✓ | ✅ Done | **70%** |
+| **Gezma Academy** (LMS) | ✓ | ✅ Done | **70%** |
+| **Gezma Command Center** | ✓ | ✅ Done | **85%** |
 | **Platform Pages** | ✓ | ✅ Mock UI | 60% |
 | **Nusuk Integration** | ✓ Critical | ⏸️ Mock Service | 10% |
 | **Fintech Integration** | ✓ | ⏸️ Mock Service | 10% |
-| **Blockchain Verification** | ✓ | 🔲 | 0% |
+| **Blockchain Verification** | ✓ | ✅ Mock Done | **80%** |
 | **Gamifikasi** | ✓ | ✅ Done | **90%** |
 | **White-label Branding** | ✓ | ✅ Done | **80%** |
 
@@ -46,7 +46,7 @@
 │  ┌─────────────────┐  ┌─────────────────┐                      │
 │  │ GEZMA COMMAND   │  │ GEZMA ACADEMY   │                      │
 │  │ CENTER (Admin)  │  │     (LMS)       │                      │
-│  │  ✅ 70% Done    │  │  ⏸️ Placeholder │                      │
+│  │  ✅ 85% Done    │  │  ✅ 70% Done    │                      │
 │  └─────────────────┘  └─────────────────┘                      │
 │                                                                 │
 │  ┌───────────────────────────────────────────────────────────┐ │
@@ -116,7 +116,8 @@
 | ↳ **Rooming List Management** | | ✅ Done | Inline room editing |
 | ↳ **Manifest CRUD (add/remove)** | | ✅ Done | Modal add, remove |
 | **Documents** | `/documents` | ✅ Basic | Agency documents |
-| **Activity Log** | `/activities` | ✅ NEW | Full page, filter, search, pagination |
+| **Activity Log** | `/activities` | ✅ Done | Full page, filter, search, pagination |
+| **Blockchain Certificates** | `/blockchain` | ✅ NEW | Issue/verify/revoke, public verify page |
 | **Agency Profile** | `/agency` | ✅ Done | |
 | ↳ Company Info | | ✅ Real | |
 | ↳ **Bank Accounts** | | ⚠️ Partial | UI ada, data basic |
@@ -226,30 +227,26 @@
 - Cetak Biru v1, BAB 3.4: Gezma Academy
 - Cetak Biru v2, BAB 3: Platform LMS
 
-### Status: ⏸️ 15% — Mock UI Only
+### Status: ✅ 70% — Full LMS with DB (Session 8)
 
 | Fitur (Blueprint) | Route | Status | Notes |
 |-------------------|-------|--------|-------|
-| Academy Page | `/academy` | ✅ Mock UI | 12 kursus mock data |
-| **Kursus Operasional** | | 🔲 | |
-| ↳ SOP Handling Jemaah | | 🔲 | |
-| ↳ Manajemen Manifest | | 🔲 | |
-| ↳ Emergency Handling | | 🔲 | |
-| **Kursus Manasik & Ibadah** | | 🔲 | |
-| ↳ Bimbingan Umrah Lengkap | | 🔲 | |
-| ↳ Fiqih Umrah 4 Madzhab | | 🔲 | |
-| ↳ Sejarah Makkah-Madinah | | 🔲 | |
-| **Kursus Bisnis** | | 🔲 | |
-| ↳ Kalkulasi HPP | | 🔲 | |
-| ↳ Digital Marketing | | 🔲 | |
-| ↳ Legalitas PPIU | | 🔲 | |
-| **Tutorial GEZMA** | | 🔲 | |
-| ↳ Panduan Pemula | | 🔲 | |
-| ↳ Fitur Advanced | | 🔲 | |
+| Academy Page | `/academy` | ✅ Real DB | 12 kursus from DB, API-driven, progress tracking |
+| Course Detail + Lessons | `/academy/[id]` | ✅ Done | Lesson viewer, markdown content, progress bar |
+| Course Progress Tracking | | ✅ Done | Per-user, per-lesson completion, auto-complete |
+| Academy API (5 endpoints) | `/api/academy/*` | ✅ Done | Courses, detail, lessons, progress CRUD |
+| DB Models (3 new) | | ✅ Done | AcademyCourse, AcademyLesson, AcademyCourseProgress |
+| Seed Data | | ✅ Done | 12 courses + 36 lessons seeded |
+| **Kursus Operasional** | | ✅ Seeded | 3 courses (Dasar Manajemen, Visa, Handling) |
+| **Kursus Manasik & Ibadah** | | ✅ Seeded | 3 courses (Manasik, Doa, Fiqih) |
+| **Kursus Bisnis** | | ✅ Seeded | 3 courses (Marketing, Keuangan, Pricing) |
+| **Tutorial GEZMA** | | ✅ Seeded | 3 courses (Jamaah, Laporan, Keuangan) |
 | **Sertifikasi Mutawwif** | | 🔲 | |
 | ↳ Public Speaking | | 🔲 | |
 | ↳ Content Creation | | 🔲 | |
 | ↳ Fikih Kontemporer | | 🔲 | |
+| **Video Lessons** | | 🔲 | videoUrl field ready, needs content |
+| **Quiz & Assessment** | | 🔲 | |
 
 ---
 
@@ -258,24 +255,27 @@
 ### Referensi Blueprint:
 - Cetak Biru v2, BAB 3.4: Gezma Command Center
 
-### Status: ✅ 70% — Core Done (Session 7)
+### Status: ✅ 85% — Polished (Session 8)
 
 | Fitur (Blueprint) | Status | Notes |
 |-------------------|--------|-------|
 | **Admin Auth (SystemAdmin)** | ✅ Done | Independent JWT (cc_token), login/me/logout |
-| **Dashboard Global** | ✅ Done | Total agencies, pilgrims, trips, revenue, recent agencies |
+| **Dashboard Global** | ✅ Done | Stats + recent agencies + PPIU expiry alerts |
 | **Agency List** | ✅ Done | Search, status filter, pagination |
 | **Agency Detail** | ✅ Done | Info, users, stats, approve/suspend |
 | **Audit Log API** | ✅ Done | Cross-agency activity logs, filterable |
+| **Audit Log UI Page** | ✅ NEW | Filter bar, paginated table, CC blue theme |
 | **Blue Theme Layout** | ✅ Done | Independent layout, dark sidebar, #2563EB primary |
+| **Responsive Layout** | ✅ NEW | Mobile hamburger menu, overlay sidebar, sticky header |
+| **PPIU Expiry Alerts** | ✅ NEW | API + dashboard banner (orange/red), days remaining |
 | **Big Data Analytics** | 🔲 | |
 | ↳ Tren Jemaah Nasional | 🔲 | |
 | ↳ Preferensi Hotel | 🔲 | |
 | ↳ Pola Belanja | 🔲 | |
-| **Sistem Verifikasi & Audit** | ⚠️ Partial | Agency status management done |
-| ↳ Monitor Izin PPIU Anggota | ✅ Done | Status filter (pending/active/expiring/expired/suspended) |
+| **Sistem Verifikasi & Audit** | ✅ Mostly | Agency status + PPIU monitoring + alerts |
+| ↳ Monitor Izin PPIU Anggota | ✅ Done | Status filter + expiry alerts |
 | ↳ Auto-block Expired License | 🔲 | |
-| ↳ Notifikasi Expiry | 🔲 | |
+| ↳ Notifikasi Expiry | ✅ Done | Dashboard alert banner |
 | **Compliance Dashboard** | 🔲 | |
 
 ---
@@ -346,10 +346,10 @@
 | **WhatsApp API** | | ⏸️ Mock Service | 🟡 HIGH | Service + 5 API + UI ready |
 | ↳ Notifikasi Jemaah | | ⏸️ Mock | | |
 | ↳ Broadcast | | ⏸️ Mock | | |
-| **Blockchain** | BAB 4.2 | 🔲 Belum | 🟢 MEDIUM | |
-| ↳ Sertifikat Digital | | 🔲 | | |
-| ↳ Verifikasi Dokumen | | 🔲 | | |
-| ↳ Smart Contract Escrow | | 🔲 | | |
+| **Blockchain** | BAB 4.2 | ✅ Mock Done | 🟢 MEDIUM | Service + 5 API + UI |
+| ↳ Sertifikat Digital | | ✅ Done | | Issue/verify/revoke certificates |
+| ↳ Verifikasi Dokumen | | ✅ Done | | Public verify page |
+| ↳ Smart Contract Escrow | | 🔲 | | Needs real blockchain |
 | **Asuransi H2H** | BAB 4.4 | 🔲 Belum | 🟢 MEDIUM | |
 | ↳ Zurich Syariah | | 🔲 | | |
 | ↳ Mega Insurance | | 🔲 | | |
@@ -409,9 +409,9 @@
 |-----------|---------------|--------|-------|
 | **Backend** | Golang | Next.js API Routes | ⚠️ Different |
 | **Mobile** | Flutter | PWA (Web) | ⚠️ Different approach |
-| **Database** | PostgreSQL + MongoDB | PostgreSQL + Prisma 7 (17 models) | ✅ Partial |
+| **Database** | PostgreSQL + MongoDB | PostgreSQL + Prisma 7 (21 models) | ✅ Partial |
 | **API Gateway** | Kong/Apigee | - | ❌ Not implemented |
-| **Blockchain** | Hyperledger Fabric | - | ❌ Not implemented |
+| **Blockchain** | Hyperledger Fabric | Mock Simulation | ⚠️ Simulated |
 | **Cloud** | GCP Jakarta | Docker + Nginx + Traefik | ⚠️ Self-hosted |
 | **Frontend** | - | Next.js 16 + Inline Styles | ✅ |
 | **Auth** | - | JWT Cookies (agent + pilgrim) | ✅ |
@@ -463,9 +463,9 @@
 | ↳ Payment Gateway | | ⏸️ Mock Service | |
 | ↳ UmrahCash | | ⏸️ Mock Service | |
 | ↳ Gezma Pilgrim Beta | | ✅ MVP Done | |
-| **Phase 3: Ekosistem** | Tahun 2 | 🔲 Not Started | 0% |
+| **Phase 3: Ekosistem** | Tahun 2 | 🔄 Partial | 15% |
 | ↳ Full Nusuk API | | 🔲 | |
-| ↳ Blockchain Verification | | 🔲 | |
+| ↳ Blockchain Verification | | ✅ Mock Done | |
 | ↳ Lifestyle Commerce | | 🔲 | |
 | ↳ Asuransi H2H | | 🔲 | |
 
@@ -479,15 +479,15 @@
 3. **WhatsApp Notifications** — Mock service ready, perlu API key
 
 ### Medium Priority
-4. **Gezma Academy** — Full LMS (currently mock UI)
-5. **Unit & E2E Testing** — Add tests for Phase 4 features, Playwright
-6. **Command Center Polish** — Audit Log UI page, responsive mobile, analytics
+4. **CC Big Data Analytics** — Tren jemaah, preferensi, pola belanja
+5. **Academy Video Content** — Real video lessons, quiz/assessment
+6. **Pilgrim Portal Gamification** — Points/badges for jemaah
 
 ### Low Priority (Nice to Have)
-7. Blockchain verification (mock)
-8. Mobile native app (Flutter)
-9. Custom domain per tenant (white-label)
-10. Gamifikasi rewards (diskon, sedekah — needs fintech)
+7. Mobile native app (Flutter)
+8. Custom domain per tenant (white-label)
+9. Gamifikasi rewards (diskon, sedekah — needs fintech)
+10. Sertifikasi Mutawwif courses
 
 ---
 
@@ -501,15 +501,17 @@
 ### Implementation Files
 - `CHECKPOINT.md` — Development checkpoint (in repo)
 - `DEVELOPMENT-PLAN-v3.md` — Phase 2 & 3 execution plan
-- `prisma/schema.prisma` — Database models (17 models)
-- `src/app/api/` — 83 API endpoints
-- `src/app/(dashboard)/` — 25 dashboard pages
-- `src/app/(command-center)/` — 5 command center pages
+- `prisma/schema.prisma` — Database models (21 models)
+- `src/app/api/` — ~98 API endpoints
+- `src/app/(dashboard)/` — 27 dashboard pages
+- `src/app/(command-center)/` — 6 command center pages
 - `src/app/(pilgrim)/` — 8 pilgrim portal pages
+- `__tests__/` — 17 test files (235 unit tests)
+- `e2e/` — 5 Playwright spec files
 
 ---
 
 *Document Version: 2.0*
 *Created: 2026-02-23*
-*Updated: 2026-02-24 (Session 7 — Phase 4: Gamifikasi + Command Center + White-label)*
-*Next Review: After Phase 3 real API integration or Phase 4 completion*
+*Updated: 2026-02-24 (Session 8 — Phase 4B: Blockchain + CC Polish + Academy LMS + Tests)*
+*Next Review: After real API integration or production hardening*

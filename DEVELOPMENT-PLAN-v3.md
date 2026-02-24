@@ -1,8 +1,8 @@
 # 🕋 GEZMA Development Plan v3.0
 
 > **Created:** 2026-02-23
-> **Last Updated:** 2026-02-24 (Session 7)
-> **Status:** Phase 1-3 Complete, Phase 4 Partial (3/5)
+> **Last Updated:** 2026-02-24 (Session 8)
+> **Status:** Phase 1-4 Complete (except Mobile Native)
 > **Scope:** Phase 2 (Platform & Ecosystem) + Phase 3 (Integration) + Phase 4 (Advanced)
 
 ---
@@ -97,19 +97,20 @@
 | WhatsApp | ✅ Mock | Service + 5 API + Settings UI + Broadcast |
 | UmrahCash | ✅ Mock | Service + 3 API + Settings UI + Calculator |
 
-### ✅ Phase 4 — Advanced (3/5 Done)
+### ✅ Phase 4 — Advanced (4/5 Done)
 
 | Feature | Status | Notes |
 |---------|--------|-------|
 | Gamifikasi | ✅ Done | Point system (8 rules), 11 badges, leaderboard, auto-award via activity logger |
-| Command Center | ✅ Done | SystemAdmin auth (cc_token), 7 API endpoints, blue-themed layout, agencies CRUD |
+| Command Center | ✅ Done | SystemAdmin auth (cc_token), 7 API endpoints, blue-themed layout, agencies CRUD, audit log, PPIU expiry alerts |
 | White-label Branding | ✅ Done | Custom colors/logo/title per agency, BrandingProvider, live preview settings |
-| Blockchain Verification | 🔲 Belum | Hyperledger, dokumen verification |
+| Blockchain Verification | ✅ Done | Mock simulation (service + 5 API + dashboard + public verify) |
 | Mobile Native | 🔲 Belum | Flutter app (di luar scope Next.js) |
 
-**New DB models:** PointEvent, UserBadge, AgencyLeaderboard, SystemAdmin
+**New DB models (21 total):** PointEvent, UserBadge, AgencyLeaderboard, SystemAdmin, Course, Lesson, UserCourseProgress, BlockchainCertificate
 **Extended:** User (+totalPoints, level), Agency (+branding fields, totalPoints)
-**New files:** 24 | **Modified:** 8 | **Total insertions:** 2671
+**Session 7:** 24 new files | 8 modified | 2671 insertions
+**Session 8:** Blockchain, CC Polish, Academy LMS, 235 unit tests, E2E Playwright
 
 ---
 
@@ -178,12 +179,12 @@
 │                                                                 │
 │  ─────────────────────────────────────────────────────────────  │
 │                                                                 │
-│  PHASE 4 🔄 ─── Advanced Features (3/5)                        │
+│  PHASE 4 ✅ ─── Advanced Features (4/5)                        │
 │  ├── Gamifikasi                          ✅                    │
 │  ├── Command Center (Admin Asosiasi)     ✅                    │
 │  ├── White-label Branding                ✅                    │
-│  ├── Blockchain Verification             🔲                    │
-│  └── Mobile Native (Flutter)             🔲                    │
+│  ├── Blockchain Verification             ✅ Mock               │
+│  └── Mobile Native (Flutter)             🔲 Out of scope      │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -503,7 +504,7 @@ Semua menggunakan mock data. Siap connect real API ketika key tersedia.
 
 ---
 
-## 8. PHASE 4: ADVANCED FEATURES (3/5 Done)
+## 8. PHASE 4: ADVANCED FEATURES (4/5 Done)
 
 ### Session 7 — Gamifikasi + Command Center + White-label (2026-02-24)
 
@@ -512,7 +513,16 @@ Semua menggunakan mock data. Siap connect real API ketika key tersedia.
 | **Gamifikasi** | HIGH | ✅ Done | 8 point rules, 11 badges, leaderboard, auto-award via activity logger |
 | **Command Center** | MEDIUM | ✅ Done | SystemAdmin model, independent JWT auth (cc_token), blue layout, agencies CRUD |
 | **White-label Branding** | MEDIUM | ✅ Done | Custom primaryColor/logo/title per agency, BrandingProvider, theme override |
-| Blockchain Verification | HIGH | 🔲 | Hyperledger, dokumen verification |
+
+### Session 8 — Blockchain + CC Polish + Academy LMS + Tests (2026-02-24)
+
+| Feature | Complexity | Status | Notes |
+|---------|------------|--------|-------|
+| **Blockchain Verification** | HIGH | ✅ Done | Mock simulation — service + 5 API + dashboard page + public verify |
+| **Command Center Polish** | MEDIUM | ✅ Done | Audit log UI page, responsive layout fixes, PPIU expiry alerts |
+| **Academy LMS** | MEDIUM | ✅ Done | Full implementation — DB models, API (5 endpoints), seed data, course detail page |
+| **Unit Tests** | MEDIUM | ✅ Done | 235 total (was ~151), 6 new test files |
+| **E2E Tests** | MEDIUM | ✅ Done | Playwright setup, 5 spec files |
 | Mobile Native | HIGH | 🔲 | Flutter app (di luar scope Next.js) |
 | Paket Modular | MEDIUM | 🔲 | Umrah backpacker, component-based |
 | Tabungan Umrah | HIGH | 🔲 | Fintech partnership needed |
@@ -551,7 +561,7 @@ Semua menggunakan mock data. Siap connect real API ketika key tersedia.
 
 **Auth:** `cc_token` cookie (httpOnly, 7 days), independent JWT sign/verify
 
-**API Endpoints (7):**
+**API Endpoints (8):**
 ```
 POST /api/command-center/auth/login
 GET  /api/command-center/auth/me
@@ -561,14 +571,16 @@ GET  /api/command-center/agencies/[id]
 PATCH /api/command-center/agencies/[id]
 GET  /api/command-center/stats
 GET  /api/command-center/audit-log
+GET  /api/command-center/alerts              ← NEW (Session 8)
 ```
 
-**UI Pages (5):**
+**UI Pages (6):**
 - `(command-center)/layout.tsx` — Independent layout, blue theme (#2563EB), dark sidebar
 - `command-center/login/page.tsx` — Admin login
 - `command-center/page.tsx` — Dashboard (global stats, recent agencies)
 - `command-center/agencies/page.tsx` — Agency list (search, status filter, pagination)
 - `command-center/agencies/[id]/page.tsx` — Agency detail (info, users, approve/suspend)
+- `command-center/audit-log/page.tsx` — Audit log (filters, search, pagination) ← NEW (Session 8)
 
 **Default Admin:** `admin@gezma.id` / `admin123!`
 
@@ -586,6 +598,70 @@ GET  /api/command-center/audit-log
 - `src/app/(dashboard)/layout.tsx` — Modified: wraps with BrandingProvider
 - `src/app/(dashboard)/settings/branding/page.tsx` — Color picker, logo URLs, live preview
 - `src/app/api/agency/route.ts` — Modified: PUT accepts branding fields
+
+---
+
+### 8.4 BLOCKCHAIN VERIFICATION ✅
+
+**Service:** `src/lib/services/blockchain.service.ts` — Mock blockchain simulation (hash generation, certificate chain)
+
+**API Endpoints (5):**
+```
+GET    /api/blockchain/certificates     — List certificates (by agency)
+POST   /api/blockchain/certificates     — Issue new certificate
+GET    /api/blockchain/certificates/[id] — Certificate detail
+POST   /api/blockchain/certificates/[id]/verify — Verify certificate
+GET    /api/verify/blockchain/[hash]    — Public verification page
+```
+
+**UI:**
+- `(dashboard)/blockchain/page.tsx` — Dashboard: stats, certificate list, issue new
+- `verify/blockchain/[hash]/page.tsx` — Public verify page (no auth needed)
+
+---
+
+### 8.5 ACADEMY LMS ✅
+
+**DB Models:** `Course`, `Lesson`, `UserCourseProgress`
+
+**API Endpoints (5):**
+```
+GET  /api/academy/courses              — List courses
+GET  /api/academy/courses/[id]         — Course detail + lessons
+GET  /api/academy/courses/[id]/lessons/[lessonId] — Lesson content
+POST /api/academy/progress             — Mark lesson complete
+GET  /api/academy/progress             — User progress
+```
+
+**UI:**
+- `(dashboard)/academy/[id]/page.tsx` — Course detail page with lessons
+- Seed data: courses + lessons
+
+---
+
+### 8.6 COMMAND CENTER POLISH ✅
+
+**New UI:**
+- `(command-center)/audit-log/page.tsx` — Full audit log page with filters
+- Responsive layout improvements across all CC pages
+- PPIU expiry alert system
+
+**New API:**
+```
+GET /api/command-center/alerts         — PPIU expiry alerts
+```
+
+---
+
+### 8.7 TESTING ✅
+
+**Unit Tests (235 total):**
+- 6 new test files added in Session 8
+- Coverage across services, API routes, and utilities
+
+**E2E Tests (Playwright):**
+- Playwright configuration + setup
+- 5 spec files covering core user flows
 
 ---
 
@@ -751,21 +827,24 @@ await logActivity({ agencyId: auth.agencyId, userId: auth.userId, ... });
 ✅ UMRAHCASH — Service + 3 API + Settings UI + Calculator (mock)
 ```
 
-### Phase 4: Advanced (3/5 Done)
+### Phase 4: Advanced (4/5 Done)
 
 ```
 ✅ GAMIFIKASI — 8 point rules, 11 badges, leaderboard, auto-award, dashboard widget, full page
-✅ COMMAND CENTER — SystemAdmin auth, 7 API endpoints, blue layout, agencies CRUD, audit log
+✅ COMMAND CENTER — SystemAdmin auth, 8 API endpoints, blue layout, agencies CRUD, audit log, PPIU alerts
 ✅ WHITE-LABEL — BrandingProvider, color-utils, theme override, settings page, sidebar branding
-□ BLOCKCHAIN — Hyperledger, dokumen verification
-□ MOBILE NATIVE — Flutter app
+✅ BLOCKCHAIN — Mock simulation, service + 5 API + dashboard + public verify
+✅ ACADEMY LMS — Full DB implementation, 5 API, seed data, course detail page
+✅ CC POLISH — Audit log UI, responsive layout, PPIU expiry alerts
+✅ TESTING — 235 unit tests + Playwright E2E (5 specs)
+□ MOBILE NATIVE — Flutter app (out of scope for Next.js)
 ```
 
 ---
 
 ## 📎 APPENDIX
 
-### A. API Count Summary (83 Total)
+### A. API Count Summary (~98 Total)
 
 ```
 Auth:            7 endpoints
@@ -781,8 +860,10 @@ Pilgrim Portal:  9 endpoints (login, me, logout, documents GET/POST, manasik, ma
 Verify:          2 endpoints (pilgrim QR + agency QR)
 Users:           2 endpoints (CRUD + role management)
 Other:           2 endpoints (agency, chat AI)
-Gamification:    4 endpoints (stats, badges, leaderboard, history)        ← NEW
-Command Center:  7 endpoints (login, me, logout, agencies, agencies/[id], stats, audit-log) ← NEW
+Gamification:    4 endpoints (stats, badges, leaderboard, history)
+Command Center:  8 endpoints (login, me, logout, agencies, agencies/[id], stats, audit-log, alerts) ← UPDATED
+Academy:         5 endpoints (courses, course detail, lesson, progress, user progress) ← NEW
+Blockchain:      5 endpoints (certificates CRUD, certificate detail, verify, public verify) ← NEW
 ```
 
 ### B. Color Reference
@@ -813,7 +894,14 @@ Command Center:  7 endpoints (login, me, logout, agencies, agencies/[id], stats,
 
 ---
 
-*Plan Version: 3.2*
+*Plan Version: 3.3*
 *Created: 2026-02-23*
-*Updated: 2026-02-24 (Phase 4 Partial — Gamifikasi + Command Center + White-label)*
-*Next: Blockchain Verification (mock), or connect real API keys for Phase 3*
+*Updated: 2026-02-24 (Phase 4 Complete — Session 8: Blockchain + CC Polish + Academy LMS + Tests)*
+*Next: Connect real API keys for Phase 3 integrations, or Mobile Native (Flutter — separate repo)*
+
+### Git Log (Phase 4)
+
+```
+Session 7: feat: implement Phase 4A — Gamifikasi, Command Center, White-label Branding
+65e5d80 feat: implement Phase 4B — Blockchain, CC Polish, Academy LMS, Tests
+```

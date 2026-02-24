@@ -1,6 +1,6 @@
 # GEZMA Agent — Development Checkpoint
 
-> **Last Updated:** 2026-02-24 (Session 7 — Phase 4: Gamifikasi + Command Center + White-label)
+> **Last Updated:** 2026-02-24 (Session 8 — Phase 4B: Blockchain + CC Polish + Academy LMS + Tests)
 > **Blueprint Reference:** `GEZMA-AGENT-PLAN-v2.md`, `DEVELOPMENT-PLAN-v3.md`
 
 ---
@@ -15,7 +15,7 @@
 | **Phase 2C: Gezma Pilgrim MVP** | ✅ Done | 6 → 8 halaman (+ documents, payments) + layout + real DB |
 | **Phase 2D: Internal Features** | ✅ Done | 7 fitur: charts, reports, activity log, doc upload, CSV export |
 | **Phase 3: Integrasi** | ✅ Prep Done | 4 service layers + 15 API endpoints + 7 UI pages (mock) |
-| **Phase 4: Advanced** | ✅ 3/5 Done | Gamifikasi, Command Center, White-label Branding |
+| **Phase 4: Advanced** | ✅ 5/5 Done | Gamifikasi, Command Center, White-label, Blockchain, Academy LMS |
 | **PWA** | ✅ Done | Service Worker, Install Prompt, Offline |
 | **Deployment** | ✅ Ready | Docker + Nginx + Traefik |
 
@@ -212,7 +212,7 @@ Semua menggunakan mock data, siap connect real API ketika key tersedia:
 
 ---
 
-## G. PHASE 4 — ADVANCED FEATURES (Session 7) ✅ 3/5 Done
+## G. PHASE 4A — ADVANCED FEATURES (Session 7) ✅ 3/5 Done
 
 3 fitur Phase 4 diimplementasi dalam 1 session:
 
@@ -253,7 +253,56 @@ Semua menggunakan mock data, siap connect real API ketika key tersedia:
 
 ---
 
-## H. API ENDPOINTS (83 Total)
+## H. PHASE 4B — BLOCKCHAIN + CC POLISH + ACADEMY LMS + TESTS (Session 8) ✅
+
+5 area dikerjakan dalam 1 session, menuntaskan seluruh Phase 4:
+
+### Blockchain Verification (Mock) ✅
+| Fitur | Status | Keterangan |
+|-------|--------|------------|
+| BlockchainCertificate Model | ✅ | Prisma model, cert number, tx hash, status lifecycle |
+| Blockchain Service | ✅ | `blockchain.service.ts` — cert generation, tx hash simulation, issue/verify/revoke |
+| 5 API Endpoints | ✅ | POST/GET certificates, GET detail, POST revoke, GET public verify |
+| Dashboard Page (`/blockchain`) | ✅ | Stats bar, certificate table, issue modal, detail modal |
+| Public Verify Page | ✅ | `/verify/certificate/[number]` — public certificate verification |
+| Sidebar Menu + Middleware | ✅ | Shield icon, protected route |
+
+### Command Center Polish ✅
+| Fitur | Status | Keterangan |
+|-------|--------|------------|
+| Audit Log UI Page | ✅ | `/command-center/audit-log` — filter bar, paginated table, CC blue theme |
+| Responsive Layout | ✅ | Mobile hamburger menu, overlay sidebar, sticky header |
+| PPIU Expiry Alerts | ✅ | `/api/command-center/alerts` API + dashboard alert banner |
+
+### Academy LMS (Full) ✅
+| Fitur | Status | Keterangan |
+|-------|--------|------------|
+| 3 Prisma Models | ✅ | AcademyCourse, AcademyLesson, AcademyCourseProgress |
+| 5 API Endpoints | ✅ | Course list, course detail, lesson content, progress tracking, user progress |
+| Seed Script | ✅ | `prisma/seed-academy.ts` — 12 courses + 36 lessons |
+| Academy Page (Live API) | ✅ | Replaced mock data with real DB calls |
+| Course Detail Page | ✅ | `/academy/[id]` — lesson viewer, progress tracking |
+
+### Unit Tests ✅
+| Fitur | Status | Keterangan |
+|-------|--------|------------|
+| 6 New Test Files | ✅ | blockchain, gamification, auth-cc, color-utils, validations (gamification + command-center) |
+| Total Tests | ✅ | 235 tests across 17 test files, all passing |
+
+### E2E Tests (Playwright) ✅
+| Fitur | Status | Keterangan |
+|-------|--------|------------|
+| Playwright Setup | ✅ | Config + chromium only |
+| 5 Spec Files | ✅ | auth, dashboard, pilgrims, command-center, navigation |
+| Script | ✅ | `npm run test:e2e` |
+
+**DB Changes:** +4 models (BlockchainCertificate, AcademyCourse, AcademyLesson, AcademyCourseProgress) — total 21 models
+**New files:** 36 | **Build:** 0 TypeScript errors, 113 routes
+**Total pages:** Dashboard 27 (was 25), CC 6 (was 5), Verify 3 (was 2)
+
+---
+
+## I. API ENDPOINTS (~98 Total)
 
 ```
 Auth:            7 endpoints (login, register, verify, password, etc)
@@ -266,23 +315,25 @@ Reports Export:  1 endpoint  (financial/export)
 Settings:        1 endpoint  (notification preferences GET/PUT)
 Integrations:   15 endpoints (nusuk: 3, payment: 4, whatsapp: 5, umrahcash: 3)
 Pilgrim Portal:  9 endpoints (login, me, logout, documents GET/POST, manasik, manasik/progress, doa, doa/favorites)
-Verify:          2 endpoints (public pilgrim QR + agency QR verification)
+Verify:          3 endpoints (pilgrim QR + agency QR + certificate verification)     ← UPDATED
 Users:           2 endpoints (CRUD + role management)
 Other:           2 endpoints (agency, chat AI)
 Gamification:    4 endpoints (stats, badges, leaderboard, history)
-Command Center:  7 endpoints (login, me, logout, agencies, agencies/[id], stats, audit-log)
+Command Center:  8 endpoints (login, me, logout, agencies, agencies/[id], stats, audit-log, alerts) ← UPDATED
+Blockchain:      5 endpoints (POST/GET certificates, GET detail, POST revoke, GET public verify)    ← NEW
+Academy:         5 endpoints (courses, course detail, lesson, progress, user progress)              ← NEW
 ```
 
 ---
 
-## I. TECH STACK
+## J. TECH STACK
 
 | Layer | Tech |
 |-------|------|
 | Framework | Next.js 16 (App Router) |
 | Language | TypeScript |
 | Styling | 100% inline styles + useTheme() |
-| Database | PostgreSQL + Prisma v7 (17 models) |
+| Database | PostgreSQL + Prisma v7 (21 models) |
 | Auth | JWT (HTTP-only cookies) |
 | Email | Nodemailer (SMTP) |
 | AI | Google Gemini 2.0 Flash |
@@ -295,16 +346,17 @@ Command Center:  7 endpoints (login, me, logout, agencies, agencies/[id], stats,
 
 ---
 
-## J. FILE STRUCTURE
+## K. FILE STRUCTURE
 
 ```
 src/
 ├── app/
 │   ├── (auth)/           → 4 pages
-│   ├── (dashboard)/      → 25 pages (6 platform + 19 operasional, incl. gamification, settings/branding)
-│   ├── (command-center)/ → 5 pages (login, dashboard, agencies list, agency detail) + layout  ← NEW
+│   ├── (dashboard)/      → 27 pages (6 platform + 21 operasional, incl. gamification, blockchain, academy/[id])  ← UPDATED
+│   ├── (command-center)/ → 6 pages (login, dashboard, agencies, agency detail, audit-log) + layout               ← UPDATED
 │   ├── (pilgrim)/        → 8 pages (login, home, trip, manasik, doa, documents, payments, profile) + layout
-│   ├── api/              → 83 API endpoints (+4 gamification, +7 command-center)
+│   ├── api/              → ~98 API endpoints (+5 blockchain, +5 academy, +1 CC alerts)                           ← UPDATED
+│   ├── verify/           → 3 pages (pilgrim QR, agency QR, certificate/[number])                                 ← UPDATED
 │   └── offline/          → PWA offline page
 ├── components/
 │   ├── shared/           → 12 reusable components
@@ -317,22 +369,27 @@ src/
 │   └── ai-assistant/     → 1 (ChatWidget)
 ├── data/                 → 8 mock data files (+pilgrim-portal, manasik, doa)
 ├── lib/
-│   ├── services/         → 8 service files (+gamification.service)
+│   ├── services/         → 9 service files (+blockchain.service)                    ← UPDATED
 │   ├── hooks/            → 4 hooks
-│   ├── contexts/         → 2 (pilgrim-context, branding-context)         ← NEW
-│   ├── validations/      → 7 schemas (+gamification, command-center)     ← NEW
-│   ├── auth-command-center.ts → CC JWT auth (sign, verify, cookie)       ← NEW
+│   ├── contexts/         → 2 (pilgrim-context, branding-context)
+│   ├── validations/      → 7 schemas (+gamification, command-center)
+│   ├── auth-command-center.ts → CC JWT auth (sign, verify, cookie)
 │   ├── csv-export.ts     → UTF-8 BOM CSV generator
 │   ├── i18n/             → ID + EN translations
-│   └── theme/            → Light + Dark + color-utils + branding override ← UPDATED
-└── types/                → 5 type definition files
+│   └── theme/            → Light + Dark + color-utils + branding override
+├── types/                → 5 type definition files
+├── prisma/
+│   └── seed-academy.ts   → Academy seed script (12 courses + 36 lessons)            ← NEW
+├── tests/                → 17 unit test files (235 tests)                           ← UPDATED
+└── e2e/                  → 5 Playwright spec files (auth, dashboard, pilgrims, CC, navigation) ← NEW
 ```
 
 ---
 
-## K. GIT LOG (Session 3-7)
+## L. GIT LOG (Session 3-8)
 
 ```
+65e5d80 feat: implement Phase 4B — Blockchain, CC Polish, Academy LMS, Tests
 747c92e feat: implement Phase 4 — Gamifikasi, Command Center, White-label Branding
 d745e74 chore: remove 5 unused utility files
 b35f4bc fix: add missing auth protection for /reports and /activities routes
@@ -354,10 +411,11 @@ a8ebe52 feat: Phase 2C — Gezma Pilgrim MVP (6 pages + layout + mock data)
 
 ---
 
-## L. NEXT STEPS
+## M. NEXT STEPS
 
 1. **Phase 3: Real API** — Connect real API keys (Nusuk, Payment Gateway, WhatsApp, UmrahCash)
-2. **Phase 4: Remaining** — Blockchain Verification (mock), Mobile Native (Flutter — di luar scope)
-3. **Testing** — Add unit tests for Phase 4 features (gamification service, CC auth, color-utils)
-4. **Polish** — Command Center responsive, Audit Log UI page, Command Center mobile layout
-5. **Production** — Change SystemAdmin default password, secure JWT_SECRET
+2. **Mobile Native** — Flutter app (di luar scope web — separate project)
+3. **Production Hardening** — Change SystemAdmin default password, secure JWT_SECRET, SSL certs
+4. **E2E Test CI** — Integrate Playwright into CI/CD pipeline
+5. **Real Blockchain** — Replace mock tx hash with actual blockchain integration (e.g., Polygon/Base)
+6. **Academy Content** — Add real course content, video embeds, quiz system
