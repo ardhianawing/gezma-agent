@@ -1,6 +1,6 @@
 # GEZMA Agent — Development Checkpoint
 
-> **Last Updated:** 2026-02-24 (Session 8 — Phase 4B: Blockchain + CC Polish + Academy LMS + Tests)
+> **Last Updated:** 2026-02-24 (Session 9 — Error Boundaries + Security + Pilgrim Gamification + CC Analytics)
 > **Blueprint Reference:** `GEZMA-AGENT-PLAN-v2.md`, `DEVELOPMENT-PLAN-v3.md`
 
 ---
@@ -16,6 +16,7 @@
 | **Phase 2D: Internal Features** | ✅ Done | 7 fitur: charts, reports, activity log, doc upload, CSV export |
 | **Phase 3: Integrasi** | ✅ Prep Done | 4 service layers + 15 API endpoints + 7 UI pages (mock) |
 | **Phase 4: Advanced** | ✅ 5/5 Done | Gamifikasi, Command Center, White-label, Blockchain, Academy LMS |
+| **Session 9: Polish** | ✅ Done | Error Boundaries, Security Settings, Pilgrim Gamification, CC Analytics |
 | **PWA** | ✅ Done | Service Worker, Install Prompt, Offline |
 | **Deployment** | ✅ Ready | Docker + Nginx + Traefik |
 
@@ -296,13 +297,70 @@ Semua menggunakan mock data, siap connect real API ketika key tersedia:
 | 5 Spec Files | ✅ | auth, dashboard, pilgrims, command-center, navigation |
 | Script | ✅ | `npm run test:e2e` |
 
-**DB Changes:** +4 models (BlockchainCertificate, AcademyCourse, AcademyLesson, AcademyCourseProgress) — total 21 models
+**DB Changes:** +4 models (BlockchainCertificate, AcademyCourse, AcademyLesson, AcademyCourseProgress)
 **New files:** 36 | **Build:** 0 TypeScript errors, 113 routes
 **Total pages:** Dashboard 27 (was 25), CC 6 (was 5), Verify 3 (was 2)
 
 ---
 
-## I. API ENDPOINTS (~98 Total)
+## I. SESSION 9 — ERROR BOUNDARIES + SECURITY + PILGRIM GAMIFICATION + CC ANALYTICS ✅
+
+6 fitur dikerjakan dalam 1 session:
+
+### Error Boundaries ✅
+| Fitur | Status | Keterangan |
+|-------|--------|------------|
+| PilgrimErrorBoundary | ✅ | Green theme, "Coba Lagi" reset button, bahasa Indonesia |
+| CCErrorBoundary | ✅ | Blue theme, "Muat Ulang" reset button |
+| Layout Integration | ✅ | Wraps children in both pilgrim + CC layouts |
+
+### Settings Security ✅
+| Fitur | Status | Keterangan |
+|-------|--------|------------|
+| Login History Recording | ✅ | IP + user agent captured on every login |
+| LoginHistory Model | ✅ | Prisma model with userId, ipAddress, userAgent, loginAt, logoutAt |
+| Change Password API | ✅ | `POST /api/settings/security/change-password` — Zod validated |
+| Login History API | ✅ | `GET /api/settings/security/login-history` — paginated |
+| Security Settings Page | ✅ | `/settings/security` — password form, login history table, tips |
+| Settings Navigation | ✅ | "Keamanan" section now links to security page |
+
+### Pilgrim Gamification ✅
+| Fitur | Status | Keterangan |
+|-------|--------|------------|
+| PilgrimPointEvent Model | ✅ | pilgrimId, action, points, description, metadata |
+| PilgrimBadge Model | ✅ | pilgrimId, badgeKey, badgeName, badgeDescription, badgeIcon |
+| Gamification Service | ✅ | 6 point rules, 6 badge definitions, level system (50pts/level) |
+| 3 API Endpoints | ✅ | stats, history (paginated), badges (earned + locked) |
+| Endpoint Hooks | ✅ | Points on: doa favorite, manasik complete, document upload |
+| Achievements Page | ✅ | `/pilgrim/achievements` — stats bar, badge grid, point history |
+| Dashboard Widget | ✅ | Level/Points/Badge card on pilgrim home, links to achievements |
+| Navigation | ✅ | "Pencapaian" (Trophy) added to pilgrim bottom nav |
+
+### Command Center Analytics ✅
+| Fitur | Status | Keterangan |
+|-------|--------|------------|
+| Analytics API | ✅ | `GET /api/command-center/analytics?period=30d` — 5 data sets |
+| Pilgrim Growth Chart | ✅ | LineChart — daily registrations over period |
+| Top Agencies Chart | ✅ | Horizontal BarChart — top 10 by pilgrim count |
+| Trip Status Chart | ✅ | PieChart — distribution by status |
+| Revenue Chart | ✅ | AreaChart — monthly revenue estimate |
+| Period Filter | ✅ | 7d, 30d, 90d, 1y toggle buttons |
+
+### Unit Tests ✅
+| Fitur | Status | Keterangan |
+|-------|--------|------------|
+| pilgrim-gamification.test.ts | ✅ | 23 tests — point rules, badge definitions, level calculation |
+| login-history.test.ts | ✅ | 5 tests — record structure, IP validation, date handling |
+| security.test.ts | ✅ | 11 tests — changePassword schema, loginHistoryQuery schema |
+| **Total** | ✅ | **274 tests across 20 test files, all passing** |
+
+**DB Changes:** +3 models (PilgrimPointEvent, PilgrimBadge, LoginHistory) — total 24 models
+**New files:** 15 | **Modified:** 10 | **Total insertions:** 2020
+**Build:** 0 TypeScript errors, 121 routes
+
+---
+
+## J. API ENDPOINTS (~107 Total)  ← UPDATED
 
 ```
 Auth:            7 endpoints (login, register, verify, password, etc)
@@ -312,16 +370,16 @@ Trips:           7 endpoints (CRUD + checklist + manifest + manifest/remove)
 Dashboard:       4 endpoints (stats, alerts, activities, charts)
 Reports:         5 endpoints (financial, demographics, documents, payment-aging, conversion)
 Reports Export:  1 endpoint  (financial/export)
-Settings:        1 endpoint  (notification preferences GET/PUT)
+Settings:        3 endpoints (notifications GET/PUT, security/change-password, security/login-history)  ← UPDATED
 Integrations:   15 endpoints (nusuk: 3, payment: 4, whatsapp: 5, umrahcash: 3)
-Pilgrim Portal:  9 endpoints (login, me, logout, documents GET/POST, manasik, manasik/progress, doa, doa/favorites)
-Verify:          3 endpoints (pilgrim QR + agency QR + certificate verification)     ← UPDATED
+Pilgrim Portal: 12 endpoints (login, me, logout, documents, manasik, doa, gamification ×3)             ← UPDATED
+Verify:          3 endpoints (pilgrim QR + agency QR + certificate verification)
 Users:           2 endpoints (CRUD + role management)
 Other:           2 endpoints (agency, chat AI)
 Gamification:    4 endpoints (stats, badges, leaderboard, history)
-Command Center:  8 endpoints (login, me, logout, agencies, agencies/[id], stats, audit-log, alerts) ← UPDATED
-Blockchain:      5 endpoints (POST/GET certificates, GET detail, POST revoke, GET public verify)    ← NEW
-Academy:         5 endpoints (courses, course detail, lesson, progress, user progress)              ← NEW
+Command Center:  9 endpoints (login, me, logout, agencies, agencies/[id], stats, audit-log, alerts, analytics) ← UPDATED
+Blockchain:      5 endpoints (POST/GET certificates, GET detail, POST revoke, GET public verify)
+Academy:         5 endpoints (courses, course detail, lesson, progress, user progress)
 ```
 
 ---
@@ -333,7 +391,7 @@ Academy:         5 endpoints (courses, course detail, lesson, progress, user pro
 | Framework | Next.js 16 (App Router) |
 | Language | TypeScript |
 | Styling | 100% inline styles + useTheme() |
-| Database | PostgreSQL + Prisma v7 (21 models) |
+| Database | PostgreSQL + Prisma v7 (24 models) |
 | Auth | JWT (HTTP-only cookies) |
 | Email | Nodemailer (SMTP) |
 | AI | Google Gemini 2.0 Flash |
@@ -352,10 +410,10 @@ Academy:         5 endpoints (courses, course detail, lesson, progress, user pro
 src/
 ├── app/
 │   ├── (auth)/           → 4 pages
-│   ├── (dashboard)/      → 27 pages (6 platform + 21 operasional, incl. gamification, blockchain, academy/[id])  ← UPDATED
-│   ├── (command-center)/ → 6 pages (login, dashboard, agencies, agency detail, audit-log) + layout               ← UPDATED
-│   ├── (pilgrim)/        → 8 pages (login, home, trip, manasik, doa, documents, payments, profile) + layout
-│   ├── api/              → ~98 API endpoints (+5 blockchain, +5 academy, +1 CC alerts)                           ← UPDATED
+│   ├── (dashboard)/      → 28 pages (+settings/security)                                                        ← UPDATED
+│   ├── (command-center)/ → 6 pages (login, dashboard+analytics, agencies, agency detail, audit-log) + layout
+│   ├── (pilgrim)/        → 9 pages (+achievements) + layout with error boundary                                  ← UPDATED
+│   ├── api/              → ~107 API endpoints (+3 pilgrim gamification, +2 security, +1 CC analytics)            ← UPDATED
 │   ├── verify/           → 3 pages (pilgrim QR, agency QR, certificate/[number])                                 ← UPDATED
 │   └── offline/          → PWA offline page
 ├── components/
@@ -366,13 +424,15 @@ src/
 │   ├── trips/            → 1 (trip-form)
 │   ├── dashboard/        → 5 (action-center, quick-actions, revenue-chart, pilgrim-status-chart, trip-capacity-chart)
 │   ├── pwa/              → 4 (sw-register, offline, install, update)
-│   └── ai-assistant/     → 1 (ChatWidget)
+│   ├── ai-assistant/     → 1 (ChatWidget)
+│   ├── pilgrim-error-boundary.tsx → Pilgrim portal error boundary                   ← NEW
+│   └── cc-error-boundary.tsx      → Command Center error boundary                   ← NEW
 ├── data/                 → 8 mock data files (+pilgrim-portal, manasik, doa)
 ├── lib/
-│   ├── services/         → 9 service files (+blockchain.service)                    ← UPDATED
+│   ├── services/         → 10 service files (+pilgrim-gamification.service)          ← UPDATED
 │   ├── hooks/            → 4 hooks
 │   ├── contexts/         → 2 (pilgrim-context, branding-context)
-│   ├── validations/      → 7 schemas (+gamification, command-center)
+│   ├── validations/      → 8 schemas (+security)                                    ← UPDATED
 │   ├── auth-command-center.ts → CC JWT auth (sign, verify, cookie)
 │   ├── csv-export.ts     → UTF-8 BOM CSV generator
 │   ├── i18n/             → ID + EN translations
@@ -380,15 +440,16 @@ src/
 ├── types/                → 5 type definition files
 ├── prisma/
 │   └── seed-academy.ts   → Academy seed script (12 courses + 36 lessons)            ← NEW
-├── tests/                → 17 unit test files (235 tests)                           ← UPDATED
-└── e2e/                  → 5 Playwright spec files (auth, dashboard, pilgrims, CC, navigation) ← NEW
+├── tests/                → 20 unit test files (274 tests)                           ← UPDATED
+└── e2e/                  → 5 Playwright spec files (auth, dashboard, pilgrims, CC, navigation)
 ```
 
 ---
 
-## L. GIT LOG (Session 3-8)
+## L. GIT LOG (Session 3-9)
 
 ```
+3a77b1a feat: Session 9 — Error Boundaries, Security, Pilgrim Gamification, CC Analytics
 65e5d80 feat: implement Phase 4B — Blockchain, CC Polish, Academy LMS, Tests
 747c92e feat: implement Phase 4 — Gamifikasi, Command Center, White-label Branding
 d745e74 chore: remove 5 unused utility files
@@ -419,3 +480,5 @@ a8ebe52 feat: Phase 2C — Gezma Pilgrim MVP (6 pages + layout + mock data)
 4. **E2E Test CI** — Integrate Playwright into CI/CD pipeline
 5. **Real Blockchain** — Replace mock tx hash with actual blockchain integration (e.g., Polygon/Base)
 6. **Academy Content** — Add real course content, video embeds, quiz system
+7. **Pilgrim Profile Update API** — Hook gamification points on profile update
+8. **Daily Login Points** — Award daily_login points on pilgrim portal login
