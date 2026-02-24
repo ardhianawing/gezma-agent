@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPilgrimPayload } from '@/lib/auth-pilgrim';
 import { prisma } from '@/lib/prisma';
+import { awardPilgrimPoints } from '@/lib/services/pilgrim-gamification.service';
 
 export async function POST(req: NextRequest) {
   try {
@@ -29,6 +30,9 @@ export async function POST(req: NextRequest) {
         },
         update: {},
       });
+
+      // Award points for favoriting doa
+      awardPilgrimPoints(payload.pilgrimId, 'favorite_doa', 'Menambahkan doa ke favorit').catch(() => {});
     } else {
       await prisma.pilgrimDoaFavorite.deleteMany({
         where: {

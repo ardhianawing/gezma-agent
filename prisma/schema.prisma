@@ -112,6 +112,7 @@ model User {
   pointEvents     PointEvent[]
   badges          UserBadge[]
   courseProgress   AcademyCourseProgress[]
+  loginHistory    LoginHistory[]
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -176,6 +177,8 @@ model Pilgrim {
   manasikProgress   PilgrimManasikProgress[]
   doaFavorites      PilgrimDoaFavorite[]
   certificates      BlockchainCertificate[]
+  pointEvents       PilgrimPointEvent[]
+  badges            PilgrimBadge[]
 
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
@@ -557,4 +560,49 @@ model AcademyCourseProgress {
 
   @@unique([userId, courseId])
   @@map("academy_course_progress")
+}
+
+// === PILGRIM GAMIFICATION ===
+
+model PilgrimPointEvent {
+  id          String   @id @default(uuid())
+  pilgrimId   String
+  pilgrim     Pilgrim  @relation(fields: [pilgrimId], references: [id], onDelete: Cascade)
+  action      String   // complete_lesson, complete_course, daily_login, update_profile, upload_document, favorite_doa
+  points      Int
+  description String
+  metadata    Json?
+
+  createdAt   DateTime @default(now())
+
+  @@map("pilgrim_point_events")
+}
+
+model PilgrimBadge {
+  id               String   @id @default(uuid())
+  pilgrimId        String
+  pilgrim          Pilgrim  @relation(fields: [pilgrimId], references: [id], onDelete: Cascade)
+  badgeKey         String
+  badgeName        String
+  badgeDescription String
+  badgeIcon        String
+
+  earnedAt         DateTime @default(now())
+
+  @@unique([pilgrimId, badgeKey])
+  @@map("pilgrim_badges")
+}
+
+// === LOGIN HISTORY ===
+
+model LoginHistory {
+  id         String    @id @default(uuid())
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ipAddress  String?
+  userAgent  String?
+  loginAt    DateTime  @default(now())
+  logoutAt   DateTime?
+
+  @@map("login_history")
 }

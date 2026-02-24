@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPilgrimPayload } from '@/lib/auth-pilgrim';
 import { prisma } from '@/lib/prisma';
+import { awardPilgrimPoints } from '@/lib/services/pilgrim-gamification.service';
 
 export async function POST(req: NextRequest) {
   try {
@@ -29,6 +30,9 @@ export async function POST(req: NextRequest) {
         },
         update: {},
       });
+
+      // Award points for completing lesson
+      awardPilgrimPoints(payload.pilgrimId, 'complete_lesson', 'Menyelesaikan pelajaran manasik').catch(() => {});
     } else {
       await prisma.pilgrimManasikProgress.deleteMany({
         where: {

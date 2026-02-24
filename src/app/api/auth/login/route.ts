@@ -67,11 +67,23 @@ export async function POST(req: NextRequest) {
       { expiresIn: 60 * 60 * 24 * 7 } // 7 days in seconds
     );
 
-    // Update last login
-    await prisma.user.update({
-      where: { id: user.id },
-      data: { lastLoginAt: new Date() },
-    });
+    // Update last login + record login history
+    const ipAddress = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || req.headers.get('x-real-ip') || null;
+    const userAgent = req.headers.get('user-agent') || null;
+
+    await Promise.all([
+      prisma.user.update({
+        where: { id: user.id },
+        data: { lastLoginAt: new Date() },
+      }),
+      prisma.loginHistory.create({
+        data: {
+          userId: user.id,
+          ipAddress,
+          userAgent,
+        },
+      }),
+    ]);
 
     // Set token in cookie
     const response = NextResponse.json({

@@ -2,7 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Building2, Users, Plane, DollarSign, ChevronRight, AlertTriangle } from 'lucide-react';
+import { Building2, Users, Plane, DollarSign, ChevronRight, AlertTriangle, BarChart3 } from 'lucide-react';
+import {
+  LineChart, Line, BarChart, Bar, PieChart, Pie, AreaChart, Area,
+  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, Legend,
+} from 'recharts';
 
 const cc = {
   primary: '#2563EB',
@@ -30,6 +34,17 @@ interface PPIUAlert {
   daysRemaining: number;
 }
 
+interface AnalyticsData {
+  pilgrimGrowth: { date: string; count: number }[];
+  agencyPerformance: { id: string; name: string; pilgrimCount: number }[];
+  tripStats: { status: string; count: number }[];
+  revenueEstimate: { month: string; amount: number }[];
+  categoryBreakdown: { category: string; count: number }[];
+}
+
+const CHART_COLORS = ['#2563EB', '#10B981', '#F59E0B', '#8B5CF6', '#EF4444', '#06B6D4', '#EC4899'];
+const PIE_COLORS = ['#2563EB', '#10B981', '#F59E0B', '#8B5CF6', '#EF4444'];
+
 const statusColors: Record<string, { bg: string; text: string }> = {
   pending: { bg: '#FEF3C7', text: '#D97706' },
   active: { bg: '#DCFCE7', text: '#15803D' },
@@ -42,6 +57,9 @@ export default function CCDashboardPage() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
   const [alerts, setAlerts] = useState<PPIUAlert[]>([]);
+  const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
+  const [analyticsPeriod, setAnalyticsPeriod] = useState('30d');
+  const [analyticsLoading, setAnalyticsLoading] = useState(false);
 
   useEffect(() => {
     fetch('/api/command-center/stats')
@@ -55,6 +73,15 @@ export default function CCDashboardPage() {
       .then(data => setAlerts(data.data || []))
       .catch(console.error);
   }, []);
+
+  useEffect(() => {
+    setAnalyticsLoading(true);
+    fetch(`/api/command-center/analytics?period=${analyticsPeriod}`)
+      .then(r => r.json())
+      .then(setAnalytics)
+      .catch(console.error)
+      .finally(() => setAnalyticsLoading(false));
+  }, [analyticsPeriod]);
 
   const statCards = [
     { label: 'Total Agencies', value: stats?.totalAgencies ?? 0, icon: Building2, color: '#2563EB' },
@@ -257,6 +284,171 @@ export default function CCDashboardPage() {
             </div>
           )}
         </div>
+      </div>
+
+      {/* Analytics Section */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <BarChart3 style={{ width: '22px', height: '22px', color: cc.primary }} />
+            <h2 style={{ fontSize: '20px', fontWeight: '600', color: cc.textPrimary, margin: 0 }}>
+              Big Data Analytics
+            </h2>
+          </div>
+          <div style={{ display: 'flex', gap: '6px' }}>
+            {(['7d', '30d', '90d', '1y'] as const).map(p => (
+              <button
+                key={p}
+                onClick={() => setAnalyticsPeriod(p)}
+                style={{
+                  padding: '6px 14px',
+                  borderRadius: '8px',
+                  border: `1px solid ${analyticsPeriod === p ? cc.primary : cc.border}`,
+                  backgroundColor: analyticsPeriod === p ? '#EFF6FF' : cc.cardBg,
+                  color: analyticsPeriod === p ? cc.primary : cc.textMuted,
+                  fontSize: '13px',
+                  fontWeight: analyticsPeriod === p ? 600 : 400,
+                  cursor: 'pointer',
+                }}
+              >
+                {p}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {analyticsLoading ? (
+          <p style={{ textAlign: 'center', color: cc.textMuted, fontSize: '14px', padding: '40px 0' }}>
+            Memuat analytics...
+          </p>
+        ) : analytics && (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
+            {/* Pilgrim Growth - Line Chart */}
+            <div style={{
+              backgroundColor: cc.cardBg,
+              borderRadius: '12px',
+              border: `1px solid ${cc.border}`,
+              padding: '20px',
+            }}>
+              <h3 style={{ fontSize: '15px', fontWeight: '600', color: cc.textPrimary, margin: '0 0 16px 0' }}>
+                Pertumbuhan Jemaah
+              </h3>
+              <div style={{ width: '100%', height: 250 }}>
+                <ResponsiveContainer>
+                  <LineChart data={analytics.pilgrimGrowth}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
+                    <XAxis
+                      dataKey="date"
+                      tick={{ fontSize: 11, fill: '#64748B' }}
+                      tickFormatter={(v: string) => v.slice(5)}
+                    />
+                    <YAxis tick={{ fontSize: 11, fill: '#64748B' }} />
+                    <Tooltip
+                      contentStyle={{ borderRadius: '8px', fontSize: '13px' }}
+                      labelFormatter={(v) => `Tanggal: ${v}`}
+                    />
+                    <Line type="monotone" dataKey="count" stroke="#2563EB" strokeWidth={2} dot={false} name="Jemaah Baru" />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            {/* Top Agencies - Bar Chart */}
+            <div style={{
+              backgroundColor: cc.cardBg,
+              borderRadius: '12px',
+              border: `1px solid ${cc.border}`,
+              padding: '20px',
+            }}>
+              <h3 style={{ fontSize: '15px', fontWeight: '600', color: cc.textPrimary, margin: '0 0 16px 0' }}>
+                Top 10 Agensi
+              </h3>
+              <div style={{ width: '100%', height: 250 }}>
+                <ResponsiveContainer>
+                  <BarChart data={analytics.agencyPerformance} layout="vertical">
+                    <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
+                    <XAxis type="number" tick={{ fontSize: 11, fill: '#64748B' }} />
+                    <YAxis
+                      type="category"
+                      dataKey="name"
+                      tick={{ fontSize: 11, fill: '#64748B' }}
+                      width={100}
+                    />
+                    <Tooltip contentStyle={{ borderRadius: '8px', fontSize: '13px' }} />
+                    <Bar dataKey="pilgrimCount" name="Jemaah" radius={[0, 4, 4, 0]}>
+                      {analytics.agencyPerformance.map((_, i) => (
+                        <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            {/* Trip Status - Pie Chart */}
+            <div style={{
+              backgroundColor: cc.cardBg,
+              borderRadius: '12px',
+              border: `1px solid ${cc.border}`,
+              padding: '20px',
+            }}>
+              <h3 style={{ fontSize: '15px', fontWeight: '600', color: cc.textPrimary, margin: '0 0 16px 0' }}>
+                Status Perjalanan
+              </h3>
+              <div style={{ width: '100%', height: 250 }}>
+                <ResponsiveContainer>
+                  <PieChart>
+                    <Pie
+                      data={analytics.tripStats}
+                      dataKey="count"
+                      nameKey="status"
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={90}
+                      label={(props) => `${props.name} (${props.value})`}
+                      labelLine={false}
+                    >
+                      {analytics.tripStats.map((_, i) => (
+                        <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip contentStyle={{ borderRadius: '8px', fontSize: '13px' }} />
+                    <Legend wrapperStyle={{ fontSize: '12px' }} />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            {/* Revenue - Area Chart */}
+            <div style={{
+              backgroundColor: cc.cardBg,
+              borderRadius: '12px',
+              border: `1px solid ${cc.border}`,
+              padding: '20px',
+            }}>
+              <h3 style={{ fontSize: '15px', fontWeight: '600', color: cc.textPrimary, margin: '0 0 16px 0' }}>
+                Estimasi Revenue Bulanan
+              </h3>
+              <div style={{ width: '100%', height: 250 }}>
+                <ResponsiveContainer>
+                  <AreaChart data={analytics.revenueEstimate}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
+                    <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#64748B' }} />
+                    <YAxis
+                      tick={{ fontSize: 11, fill: '#64748B' }}
+                      tickFormatter={(v: number) => `${(v / 1_000_000).toFixed(0)}M`}
+                    />
+                    <Tooltip
+                      contentStyle={{ borderRadius: '8px', fontSize: '13px' }}
+                      formatter={(value) => [`Rp ${(Number(value) / 1_000_000).toFixed(1)}M`, 'Revenue']}
+                    />
+                    <Area type="monotone" dataKey="amount" stroke="#8B5CF6" fill="#8B5CF620" strokeWidth={2} name="Revenue" />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

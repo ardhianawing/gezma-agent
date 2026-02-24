@@ -5,6 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
 import { PilgrimProvider, usePilgrim } from '@/lib/contexts/pilgrim-context';
+import { PilgrimErrorBoundary } from '@/components/pilgrim-error-boundary';
 
 const PILGRIM_GREEN = '#059669';
 const PILGRIM_GREEN_HOVER = '#047857';
@@ -15,6 +16,7 @@ const NAV_ITEMS = [
   { label: 'Perjalanan', emoji: '\u{2708}\u{FE0F}', href: '/pilgrim/trip' },
   { label: 'Manasik', emoji: '\u{1F4D6}', href: '/pilgrim/manasik' },
   { label: 'Doa', emoji: '\u{1F932}', href: '/pilgrim/doa' },
+  { label: 'Pencapaian', emoji: '\u{1F3C6}', href: '/pilgrim/achievements' },
   { label: 'Dokumen', emoji: '\u{1F4CB}', href: '/pilgrim/documents' },
   { label: 'Profil', emoji: '\u{1F464}', href: '/pilgrim/profile' },
 ];
@@ -184,7 +186,9 @@ function PilgrimLayoutInner({ children }: { children: React.ReactNode }) {
         margin: '0 auto',
         boxSizing: 'border-box',
       }}>
-        {children}
+        <PilgrimErrorBoundary>
+          {children}
+        </PilgrimErrorBoundary>
       </main>
 
       {/* Mobile bottom nav */}

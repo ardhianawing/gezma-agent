@@ -3,6 +3,7 @@ import { getPilgrimPayload } from '@/lib/auth-pilgrim';
 import { prisma } from '@/lib/prisma';
 import { writeFile, mkdir } from 'fs/promises';
 import path from 'path';
+import { awardPilgrimPoints } from '@/lib/services/pilgrim-gamification.service';
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
 const MAX_SIZE = 5 * 1024 * 1024; // 5MB
@@ -74,6 +75,9 @@ export async function POST(req: NextRequest) {
         },
       });
     }
+
+    // Award points for uploading document
+    awardPilgrimPoints(payload.pilgrimId, 'upload_document', `Mengunggah dokumen ${docType}`).catch(() => {});
 
     return NextResponse.json({ success: true, fileUrl, fileName: file.name });
   } catch (error) {

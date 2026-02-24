@@ -15,6 +15,7 @@ import {
   LucideIcon,
 } from 'lucide-react';
 import { useResponsive } from '@/lib/hooks/use-responsive';
+import { CCErrorBoundary } from '@/components/cc-error-boundary';
 
 // Blue theme for Command Center
 const cc = {
@@ -327,7 +328,9 @@ export default function CommandCenterLayout({ children }: { children: React.Reac
           )}
 
           <main style={{ padding: isMobileOrTablet ? '20px 16px' : '32px' }}>
-            {children}
+            <CCErrorBoundary>
+              {children}
+            </CCErrorBoundary>
           </main>
         </div>
       </div>

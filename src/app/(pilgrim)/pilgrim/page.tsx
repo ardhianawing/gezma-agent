@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
 import { usePilgrim } from '@/lib/contexts/pilgrim-context';
@@ -39,10 +40,25 @@ function getDocStatusColor(status: string, c: ReturnType<typeof useTheme>['c']):
   }
 }
 
+interface GamificationStats {
+  totalPoints: number;
+  level: number;
+  badgeCount: number;
+  recentPoints: { id: string; description: string; points: number }[];
+}
+
 export default function PilgrimDashboardPage() {
   const { c } = useTheme();
   const { isMobile } = useResponsive();
   const { data } = usePilgrim();
+  const [gamification, setGamification] = useState<GamificationStats | null>(null);
+
+  useEffect(() => {
+    fetch('/api/pilgrim-portal/gamification/stats')
+      .then(r => r.json())
+      .then(setGamification)
+      .catch(() => {});
+  }, []);
 
   if (!data) return null;
 
@@ -413,6 +429,40 @@ export default function PilgrimDashboardPage() {
           </a>
         </div>
       </div>
+
+      {/* Gamification Widget */}
+      {gamification && (
+        <a href="/pilgrim/achievements" style={{ textDecoration: 'none', display: 'block' }}>
+          <div style={{
+            ...cardStyle,
+            background: `linear-gradient(135deg, ${PILGRIM_GREEN}, #047857)`,
+            border: 'none',
+            color: '#FFFFFF',
+            cursor: 'pointer',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
+              <h2 style={{ fontSize: '15px', fontWeight: 600, color: '#FFFFFF', margin: 0 }}>
+                {'\u{1F3C6}'} Pencapaian Anda
+              </h2>
+              <span style={{ fontSize: '12px', opacity: 0.85 }}>Lihat semua &rarr;</span>
+            </div>
+            <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
+              <div style={{ textAlign: 'center' }}>
+                <p style={{ fontSize: '24px', fontWeight: 700, margin: 0 }}>Lv.{gamification.level}</p>
+                <p style={{ fontSize: '11px', opacity: 0.8, margin: '2px 0 0 0' }}>Level</p>
+              </div>
+              <div style={{ textAlign: 'center' }}>
+                <p style={{ fontSize: '24px', fontWeight: 700, margin: 0 }}>{gamification.totalPoints}</p>
+                <p style={{ fontSize: '11px', opacity: 0.8, margin: '2px 0 0 0' }}>Poin</p>
+              </div>
+              <div style={{ textAlign: 'center' }}>
+                <p style={{ fontSize: '24px', fontWeight: 700, margin: 0 }}>{gamification.badgeCount}</p>
+                <p style={{ fontSize: '11px', opacity: 0.8, margin: '2px 0 0 0' }}>Badge</p>
+              </div>
+            </div>
+          </div>
+        </a>
+      )}
 
       {/* Muthawwif card */}
       <div style={cardStyle}>

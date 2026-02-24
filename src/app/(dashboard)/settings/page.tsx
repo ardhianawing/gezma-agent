@@ -110,7 +110,7 @@ export default function SettingsPage() {
       description: t.settings.securityDesc,
       color: c.success,
       bgColor: c.successLight,
-      href: null as string | null,
+      href: '/settings/security',
     },
     {
       icon: CreditCard,
