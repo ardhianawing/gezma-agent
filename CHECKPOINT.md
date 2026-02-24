@@ -1,6 +1,6 @@
 # GEZMA Agent — Development Checkpoint
 
-> **Last Updated:** 2026-02-24 (Session 5 — Review & Fix)
+> **Last Updated:** 2026-02-24 (Session 6 — 7 Internal Features)
 > **Blueprint Reference:** `GEZMA-AGENT-PLAN-v2.md`, `DEVELOPMENT-PLAN-v3.md`
 
 ---
@@ -12,7 +12,8 @@
 | **Phase 1: Core Agent Dashboard** | ✅ 100% Done | Semua modul + API |
 | **Phase 2A: Platform Pages** | ✅ Done | 6 halaman dengan mock data |
 | **Phase 2B: Agent Backlog** | ✅ 100% Done | Manifest, Timeline, Bulk, Import CSV + 5 low-priority backlog + 28 bug fixes |
-| **Phase 2C: Gezma Pilgrim MVP** | ✅ Done | 6 halaman + layout + real DB |
+| **Phase 2C: Gezma Pilgrim MVP** | ✅ Done | 6 → 8 halaman (+ documents, payments) + layout + real DB |
+| **Phase 2D: Internal Features** | ✅ Done | 7 fitur: charts, reports, activity log, doc upload, CSV export |
 | **Phase 3: Integrasi** | ✅ Prep Done | 4 service layers + 15 API endpoints + 7 UI pages (mock) |
 | **PWA** | ✅ Done | Service Worker, Install Prompt, Offline |
 | **Deployment** | ✅ Ready | Docker + Nginx + Traefik |
@@ -38,13 +39,13 @@
 | CRUD + Search + Filter + Pagination | ✅ |
 | Upload/Hapus Dokumen (KTP, Paspor, dll) | ✅ |
 | Status Lifecycle (8 status + badge warna) | ✅ |
-| Status Timeline Visual | ✅ NEW |
+| Status Timeline Visual | ✅ |
 | Checklist per Jemaah (9 item) | ✅ |
 | Payment Records (DP, Cicilan, Lunas, Refund) | ✅ |
 | Trip Assignment | ✅ |
-| Export CSV | ✅ |
-| Import CSV (upload, preview, mapping, validate) | ✅ NEW |
-| Bulk Actions (status, trip assign, delete) | ✅ NEW |
+| Export CSV (server-side, UTF-8 BOM) | ✅ UPGRADED |
+| Import CSV (upload, preview, mapping, validate) | ✅ |
+| Bulk Actions (status, trip assign, delete) | ✅ |
 
 ### 3. Packages (Paket Umrah)
 | Fitur | Status |
@@ -53,15 +54,16 @@
 | HPP Calculator (9 komponen biaya) | ✅ |
 | Margin & Published Price (auto-calculate) | ✅ |
 | Itinerary Builder (day-by-day) | ✅ |
+| **Itinerary Display (timeline, city badge)** | ✅ NEW |
 | Kategori (Regular/Plus/VIP/Ramadhan/Budget) | ✅ |
 
 ### 4. Trips (Keberangkatan)
 | Fitur | Status |
 |-------|--------|
 | CRUD + Search + Filter | ✅ |
-| Manifest CRUD (add/remove pilgrim) | ✅ NEW |
-| Room Assignment (inline editing) | ✅ NEW |
-| Capacity Progress Bar | ✅ NEW |
+| Manifest CRUD (add/remove pilgrim) | ✅ |
+| Room Assignment (inline editing) | ✅ |
+| Capacity Progress Bar | ✅ |
 | Operational Checklist (8 item) | ✅ |
 | Print Manifest | ✅ |
 
@@ -69,25 +71,39 @@
 | Fitur | Status |
 |-------|--------|
 | Stats Summary, Activity Log, Alerts, Quick Actions, Upcoming Trips | ✅ |
+| **Revenue Trend Chart (LineChart, 12 bulan)** | ✅ NEW |
+| **Pilgrim Status Distribution (PieChart)** | ✅ NEW |
+| **Trip Capacity Chart (BarChart)** | ✅ NEW |
 
-### 6. Financial Reports
+### 6. Reports (5 Tab)
 | Fitur | Status |
 |-------|--------|
-| Revenue, Outstanding, Collection Rate, Breakdown, Trend | ✅ |
+| **Tab Keuangan:** Revenue, Outstanding, Collection Rate, Breakdown, Trend | ✅ |
+| **Tab Demografi:** Gender pie chart, age bar chart, top 10 provinsi | ✅ NEW |
+| **Tab Dokumen:** Per-type completion rate, stacked progress bar | ✅ NEW |
+| **Tab Aging:** Aging buckets (0-30, 31-60, 61-90, 90+), top 10 debtors | ✅ NEW |
+| **Tab Funnel:** Conversion funnel (lead → completed), percentage bars | ✅ NEW |
+| **Export CSV** per tab (server-side) | ✅ NEW |
 
-### 7. Settings
+### 7. Activity Log
+| Fitur | Status |
+|-------|--------|
+| Dashboard widget (6 item terbaru) | ✅ |
+| **Full page (`/activities`) — filter, search, pagination** | ✅ NEW |
+
+### 8. Settings
 | Fitur | Status |
 |-------|--------|
 | Theme (Light/Dark), Language (ID/EN), Password, Users, Agency Profile | ✅ |
 | Notification Preferences (5 kategori × 3 channel) | ✅ |
 | Granular Permissions (25 permissions, role matrix, UI gates) | ✅ |
 
-### 8. AI Assistant
+### 9. AI Assistant
 | Fitur | Status |
 |-------|--------|
 | Chat Widget + Gemini 2.0 Flash | ✅ |
 
-### 9. PWA
+### 10. PWA
 | Fitur | Status |
 |-------|--------|
 | Manifest, Service Worker, Offline, Install Prompt, Update Prompt | ✅ |
@@ -148,25 +164,41 @@ App terpisah untuk jemaah (route group `(pilgrim)`) dengan layout mobile-first, 
 
 | Fitur | Status | Keterangan |
 |-------|--------|------------|
-| Layout + Navigation | ✅ | Bottom nav (mobile) + top nav (desktop), green accent (#059669) |
-| Pilgrim Context | ✅ | Login state via httpOnly cookie (JWT), auto-restore session via `/me` API |
+| Layout + Navigation | ✅ | Bottom nav 6 item (+ Dokumen) + top nav (desktop), green accent (#059669) |
+| Pilgrim Context | ✅ | Login state via httpOnly cookie (JWT), auto-restore session, `refreshData()` callback |
 | Login dengan booking code | ✅ | Real DB auth via API, JWT token (30-day), error handling |
-| **Pilgrim Auth (JWT)** | ✅ NEW | `auth-pilgrim.ts` — sign/verify pilgrim_token cookie, separate from agent auth |
-| **Pilgrim Portal API** | ✅ NEW | 3 endpoints: login, me, logout (`/api/pilgrim-portal/*`) |
-| **Data Transformer** | ✅ NEW | `pilgrim-portal.service.ts` — DB rows → PilgrimPortalData shape |
-| **DB Migration** | ✅ NEW | `bookingCode` field + unique constraint `[agencyId, bookingCode]` |
-| Dashboard jemaah | ✅ | Welcome, status progress (8 step), quick info, payment summary, docs, agency contact |
+| **Pilgrim Auth (JWT)** | ✅ | `auth-pilgrim.ts` — sign/verify pilgrim_token cookie |
+| **Pilgrim Portal API** | ✅ | 5 endpoints: login, me, logout, documents (GET/POST) |
+| **Data Transformer** | ✅ | `pilgrim-portal.service.ts` — DB rows → PilgrimPortalData (incl. fileUrl/fileName) |
+| Dashboard jemaah | ✅ | Welcome, status progress (8 step), quick info, payment summary + "Lihat Detail" link, docs, agency contact |
 | Detail perjalanan | ✅ | Countdown timer, flight info, hotels, muthawwif, room assignment, itinerary timeline |
 | Manasik digital | ✅ | 8 materi dari DB per-agency, progress tracking persisten via API |
 | Panduan doa | ✅ | 16 doa dari DB per-agency, favorit persisten via API |
-| **Manasik & Doa DB** | ✅ NEW | 4 tabel: manasik_lessons, doa_prayers, pilgrim_manasik_progress, pilgrim_doa_favorites |
-| **Manasik & Doa API** | ✅ NEW | 4 endpoints: GET manasik, POST progress, GET doa, POST favorites |
-| **Seed Script** | ✅ NEW | `prisma/seed-manasik-doa.ts` — seed default content per-agency |
+| **Document Upload** | ✅ NEW | Upload per doc type (JPG/PNG/WebP/PDF, 5MB), status badge, progress bar |
+| **Payment History** | ✅ NEW | Full timeline, progress bar, summary cards (total/paid/remaining) |
 | Profile & dokumen | ✅ | Data pribadi, kontak, kamar, dokumen checklist, travel agent info, logout |
 
 ---
 
-## E. PHASE 3 — INTEGRASI (Preparation Done)
+## E. PHASE 2D — INTERNAL FEATURES (Session 6) ✅ NEW
+
+7 fitur high-impact tanpa API key external:
+
+| Fitur | Files Created | Files Modified | Keterangan |
+|-------|--------------|----------------|------------|
+| **Itinerary Display** | 0 | 1 | Vertical timeline di package detail, city badges (Makkah/Madinah/Jeddah) |
+| **Document Upload** | 2 | 4 | Pilgrim upload FormData, local filesystem, upsert PilgrimDocument |
+| **Payment History** | 1 | 1 | Pilgrim full payment page, timeline, progress bar |
+| **Dashboard Charts** | 4 | 1 | 3 Recharts (LineChart, PieChart, BarChart) + API endpoint |
+| **Activity Log Page** | 1 | 2 | Full page with type filter, search, pagination, sidebar menu |
+| **Advanced Reports** | 4 | 1 | 5-tab reports: Keuangan, Demografi, Dokumen, Aging, Funnel |
+| **CSV Export** | 3 | 1 | Server-side UTF-8 BOM, pilgrims + payments endpoints |
+
+**Total:** 15 new files, 11 modified files, 1926 insertions
+
+---
+
+## F. PHASE 3 — INTEGRASI (Preparation Done)
 
 Semua menggunakan mock data, siap connect real API ketika key tersedia:
 
@@ -177,37 +209,29 @@ Semua menggunakan mock data, siap connect real API ketika key tersedia:
 | **WhatsApp** | whatsapp.service.ts | 5 (config, test, send, broadcast, templates) | Settings + trip broadcast | ✅ Mock |
 | **UmrahCash** | umrahcash.service.ts | 3 (config, rate, transfer) | Settings + calculator | ✅ Mock |
 
-**Halaman Baru:**
-- `/settings/integrations` — Hub semua integrasi
-- `/settings/integrations/nusuk` — Config Nusuk API
-- `/settings/integrations/payment` — Config Payment Gateway (Midtrans/Xendit/Duitku)
-- `/settings/integrations/whatsapp` — Config WhatsApp + template editor
-- `/settings/integrations/umrahcash` — Exchange rate calculator + transfer
-- `/pilgrims/[id]/invoice` — Buat & kelola invoice pembayaran
-- `/trips/[id]/broadcast` — Broadcast WhatsApp ke jemaah
-
 ---
 
-## F. API ENDPOINTS (60 Total)
+## G. API ENDPOINTS (72 Total)
 
 ```
-Auth:          7 endpoints (login, register, verify, password, etc)
-Pilgrims:     14 endpoints (CRUD + documents + payments + status + history + bulk + import + QR)
-Packages:      7 endpoints (CRUD + duplicate + brochure)
-Trips:         7 endpoints (CRUD + checklist + manifest + manifest/remove)
-Dashboard:     3 endpoints (stats, alerts, activities)
-Reports:       1 endpoint  (financial)
-Settings:      1 endpoint  (notification preferences GET/PUT)
-Integrations: 15 endpoints (nusuk: 3, payment: 4, whatsapp: 5, umrahcash: 3)
-Pilgrim Portal: 7 endpoints (login, me, logout, manasik, manasik/progress, doa, doa/favorites)
-Verify:        2 endpoints (public pilgrim QR + agency QR verification)
-Users:         2 endpoints (CRUD + role management)
-Other:         2 endpoints (agency, chat AI)
+Auth:           7 endpoints (login, register, verify, password, etc)
+Pilgrims:      15 endpoints (CRUD + documents + payments + status + history + bulk + import + QR + export)
+Packages:       7 endpoints (CRUD + duplicate + brochure)
+Trips:          7 endpoints (CRUD + checklist + manifest + manifest/remove)
+Dashboard:      4 endpoints (stats, alerts, activities, charts)
+Reports:        5 endpoints (financial, demographics, documents, payment-aging, conversion)
+Reports Export:  1 endpoint  (financial/export)
+Settings:       1 endpoint  (notification preferences GET/PUT)
+Integrations:  15 endpoints (nusuk: 3, payment: 4, whatsapp: 5, umrahcash: 3)
+Pilgrim Portal: 9 endpoints (login, me, logout, documents GET/POST, manasik, manasik/progress, doa, doa/favorites)
+Verify:         2 endpoints (public pilgrim QR + agency QR verification)
+Users:          2 endpoints (CRUD + role management)
+Other:          2 endpoints (agency, chat AI)
 ```
 
 ---
 
-## F. TECH STACK
+## H. TECH STACK
 
 | Layer | Tech |
 |-------|------|
@@ -221,19 +245,21 @@ Other:         2 endpoints (agency, chat AI)
 | Validation | Zod v4 |
 | Charts | Recharts |
 | Icons | Lucide React |
+| PDF | jsPDF + jspdf-autotable |
+| QR | qrcode |
 | Deployment | Docker + Nginx + Traefik |
 
 ---
 
-## G. FILE STRUCTURE
+## I. FILE STRUCTURE
 
 ```
 src/
 ├── app/
 │   ├── (auth)/          → 4 pages
-│   ├── (dashboard)/     → 22 pages (6 platform + 16 operasional)
-│   ├── (pilgrim)/       → 6 pages (login, home, trip, manasik, doa, profile) + layout
-│   ├── api/             → 40 API endpoints (incl. pilgrim-portal: 7)
+│   ├── (dashboard)/     → 23 pages (6 platform + 17 operasional, incl. /activities)
+│   ├── (pilgrim)/       → 8 pages (login, home, trip, manasik, doa, documents, payments, profile) + layout
+│   ├── api/             → 72 API endpoints
 │   └── offline/         → PWA offline page
 ├── components/
 │   ├── shared/          → 12 reusable components
@@ -241,7 +267,7 @@ src/
 │   ├── packages/        → 3 (form, itinerary, pricing)
 │   ├── pilgrims/        → 3 (document-upload, status-timeline, import-modal)
 │   ├── trips/           → 1 (trip-form)
-│   ├── dashboard/       → 2 (action-center, quick-actions)
+│   ├── dashboard/       → 5 (action-center, quick-actions, revenue-chart, pilgrim-status-chart, trip-capacity-chart)
 │   ├── pwa/             → 4 (sw-register, offline, install, update)
 │   └── ai-assistant/    → 1 (ChatWidget)
 ├── data/                → 8 mock data files (+pilgrim-portal, manasik, doa)
@@ -250,6 +276,7 @@ src/
 │   ├── hooks/           → 4 hooks
 │   ├── contexts/        → 1 (pilgrim-context)
 │   ├── validations/     → 5 schemas
+│   ├── csv-export.ts    → UTF-8 BOM CSV generator
 │   ├── i18n/            → ID + EN translations
 │   └── theme/           → Light + Dark color system
 └── types/               → 5 type definition files
@@ -257,9 +284,11 @@ src/
 
 ---
 
-## H. GIT LOG (Session 3-5)
+## J. GIT LOG (Session 3-6)
 
 ```
+973b771 feat: implement 7 internal features — charts, reports, activity log, document upload, CSV export
+081a204 docs: update CHECKPOINT.md with Session 5 review & 28 bug fixes
 b4c5033 fix: resolve 28 review issues across 5 backlog features
 2af763f docs: update tracking documents — mark 5 low-priority backlog features as done
 72ff2f9 feat: implement 5 low-priority backlog features (brochure, duplicate, QR, permissions, notifications)
@@ -275,9 +304,9 @@ a8ebe52 feat: Phase 2C — Gezma Pilgrim MVP (6 pages + layout + mock data)
 
 ---
 
-## I. NEXT STEPS
+## K. NEXT STEPS
 
-1. **Pilgrim Portal Enhancements** — Document upload dari portal, payment status realtime
-2. **Phase 3: Integrasi** — Nusuk API, Payment Gateway, WhatsApp API (connect real keys)
-3. **Phase 4: Advanced** — Gamifikasi, Blockchain, Command Center, Mobile Native
-4. ~~**Low Priority Backlog**~~ — ✅ All Done (Session 4)
+1. **Phase 3: Integrasi** — Connect real API keys (Nusuk, Payment Gateway, WhatsApp, UmrahCash)
+2. **Phase 4: Advanced** — Gamifikasi, Blockchain, Command Center, Mobile Native
+3. **GEZMA Command Center** — Admin Asosiasi dashboard (0%)
+4. **Testing** — Unit tests, E2E tests with Playwright
