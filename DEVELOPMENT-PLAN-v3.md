@@ -1,8 +1,8 @@
 # 🕋 GEZMA Development Plan v3.0
 
 > **Created:** 2026-02-23
-> **Last Updated:** 2026-02-24 (Session 9)
-> **Status:** Phase 1-4 Complete (except Mobile Native)
+> **Last Updated:** 2026-02-25 (Session 10 — Mega Feature Session: 37 Features)
+> **Status:** Phase 1-4 Complete + Session 10 (37 features, 39 models, 330 tests)
 > **Scope:** Phase 2 (Platform & Ecosystem) + Phase 3 (Integration) + Phase 4 (Advanced)
 
 ---
@@ -29,12 +29,12 @@
 | Modul | Completion | Notes |
 |-------|------------|-------|
 | **Auth System** | 100% | Login, Register, Email Verify, Forgot Password, Change Password |
-| **Dashboard** | 100% | Stats, Alerts, Activity Log, Charts (Revenue, Status, Capacity) |
-| **Pilgrims CRM** | 100% | CRUD, Documents, Payments, Status, Timeline, Bulk Actions, Import CSV, Export CSV, QR Verification |
-| **Packages** | 100% | CRUD, HPP Calculator, Itinerary Builder, Itinerary Display, Duplicate, Brochure PDF |
-| **Trips** | 100% | CRUD, Manifest CRUD, Room Assignment, Checklist, Print Manifest |
-| **Reports** | 100% | 5-tab: Keuangan, Demografi, Dokumen, Aging, Funnel + CSV Export |
-| **Settings** | 100% | Theme, Language, Users, Agency Profile, Notification Prefs, Granular Permissions (25 perms) |
+| **Dashboard** | 100% | Stats, Alerts, Activity Log, Charts, Customizable Layout, Onboarding Tour |
+| **Pilgrims CRM** | 100% | CRUD, Documents, Payments, Status, Timeline, Bulk, Import/Export CSV, QR, Kanban, Notes, Invoice PDF |
+| **Packages** | 100% | CRUD, HPP Calculator, Itinerary Builder, Display, Duplicate, Brochure PDF, Package Builder Wizard |
+| **Trips** | 100% | CRUD, Manifest CRUD, Room Assignment, Checklist, Print, Calendar View, Waiting List |
+| **Reports** | 100% | 5-tab + CSV Export + Comparison Analytics + Scheduled Reports |
+| **Settings** | 100% | Theme, Language, Users, Agency, Notifications, Permissions, Security/2FA, Email Templates, Scheduled Reports |
 | **AI Assistant** | 100% | Gemini 2.0 Flash integration |
 | **PWA** | 100% | Installable, Offline, Service Worker, Update Prompt |
 | **Activity Log** | 100% | Dashboard widget + Full page with filter, search, pagination |
@@ -102,16 +102,16 @@
 | Feature | Status | Notes |
 |---------|--------|-------|
 | Gamifikasi | ✅ Done | Point system (8 rules), 11 badges, leaderboard, auto-award via activity logger |
-| Command Center | ✅ Done | SystemAdmin auth (cc_token), 7 API endpoints, blue-themed layout, agencies CRUD, audit log, PPIU expiry alerts |
+| Command Center | ✅ Done | SystemAdmin auth, agencies CRUD, audit log, PPIU alerts, analytics, compliance, auto-suspend |
 | White-label Branding | ✅ Done | Custom colors/logo/title per agency, BrandingProvider, live preview settings |
 | Blockchain Verification | ✅ Done | Mock simulation (service + 5 API + dashboard + public verify) |
 | Mobile Native | 🔲 Belum | Flutter app (di luar scope Next.js) |
 
-**New DB models (24 total):** PointEvent, UserBadge, AgencyLeaderboard, SystemAdmin, Course, Lesson, UserCourseProgress, BlockchainCertificate, PilgrimPointEvent, PilgrimBadge, LoginHistory
-**Extended:** User (+totalPoints, level, loginHistory[]), Agency (+branding fields, totalPoints), Pilgrim (+pointEvents[], badges[])
+**DB models (39 total):** 24 from Phase 1-4 + 15 new from Session 10
 **Session 7:** 24 new files | 8 modified | 2671 insertions
 **Session 8:** Blockchain, CC Polish, Academy LMS, 235 unit tests, E2E Playwright
 **Session 9:** Error Boundaries, Security Settings, Pilgrim Gamification, CC Analytics, 274 unit tests
+**Session 10:** 37 features, 15 new models, ~74 new files, ~21 modified, 15,223 insertions, 330 unit tests
 
 ---
 
@@ -190,6 +190,22 @@
 │  ├── Pilgrim Gamification                ✅                    │
 │  ├── CC Big Data Analytics               ✅                    │
 │  └── Mobile Native (Flutter)             🔲 Out of scope      │
+│                                                                 │
+│  ─────────────────────────────────────────────────────────────  │
+│                                                                 │
+│  SESSION 10 ✅ ─── Mega Feature Session (37 Features)          │
+│  ├── Security: Rate Limiting, 2FA/TOTP, Sessions     ✅       │
+│  ├── Productivity: Search, Kanban, Calendar, Tasks    ✅       │
+│  ├── Agent: Invoice, Email Templates, Waiting List    ✅       │
+│  ├── Pilgrim: Packing, Prayer, Currency, Emergency    ✅       │
+│  ├── Pilgrim: Gallery, Testimonial, Referral, Room    ✅       │
+│  ├── Platform: Notifications, Onboarding, Agency      ✅       │
+│  ├── Reports: Scheduled, Export, Comparison           ✅       │
+│  ├── Academy: Quiz, Certificates, Reviews             ✅       │
+│  ├── CC: Compliance, Auto-suspend                     ✅       │
+│  ├── Detail: News, Forum, Marketplace, Help/FAQ       ✅       │
+│  ├── Other: Roommate Matching, Package Builder        ✅       │
+│  └── Tests: 56 new → 330 total (28 files)            ✅       │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -627,19 +643,26 @@ GET    /api/verify/blockchain/[hash]    — Public verification page
 
 ### 8.5 ACADEMY LMS ✅
 
-**DB Models:** `Course`, `Lesson`, `UserCourseProgress`
+**DB Models:** `AcademyCourse`, `AcademyLesson`, `AcademyCourseProgress`, `AcademyQuiz`, `AcademyQuizQuestion`, `AcademyQuizAttempt`, `AcademyCourseReview`
 
-**API Endpoints (5):**
+**API Endpoints (10):**
 ```
 GET  /api/academy/courses              — List courses
 GET  /api/academy/courses/[id]         — Course detail + lessons
 GET  /api/academy/courses/[id]/lessons/[lessonId] — Lesson content
 POST /api/academy/progress             — Mark lesson complete
 GET  /api/academy/progress             — User progress
+GET  /api/academy/[courseId]/quiz       — Quiz + questions (S10)
+POST /api/academy/[courseId]/quiz/attempt — Submit quiz attempt (S10)
+GET  /api/academy/[courseId]/certificate — Download certificate PDF (S10)
+GET  /api/academy/[courseId]/reviews    — Course reviews + avg rating (S10)
+POST /api/academy/[courseId]/reviews    — Submit review (S10)
 ```
 
 **UI:**
-- `(dashboard)/academy/[id]/page.tsx` — Course detail page with lessons
+- `(dashboard)/academy/[id]/page.tsx` — Course detail with lessons, reviews, quiz/cert buttons
+- `(dashboard)/academy/[id]/quiz/page.tsx` — Quiz UI, one question at a time, result screen (S10)
+- `(dashboard)/academy/page.tsx` — Avg star rating on course cards (S10)
 - Seed data: courses + lessons
 
 ---
@@ -771,6 +794,121 @@ Returns: pilgrimGrowth, agencyPerformance, tripStats, revenueEstimate, categoryB
 - `__tests__/validations/security.test.ts` — 11 tests (changePasswordSchema, loginHistoryQuerySchema)
 
 **Total: 274 tests in 20 files (was 235 in 17 files)**
+
+---
+
+### Session 10 — Mega Feature Session: 37 Features (2026-02-25)
+
+| Batch | Features | Status |
+|-------|----------|--------|
+| **Prisma Schema** | 15 new models + field additions (24 → 39 models) | ✅ Done |
+| **Batch 1: Security** | Rate Limiting, 2FA/TOTP, Session Management | ✅ Done |
+| **Batch 2: Productivity Core** | Global Search/Cmd Palette, Kanban Pilgrim, Calendar Trips, Notes, Tasks | ✅ Done |
+| **Batch 3: Productivity Ext** | Invoice PDF, Email Templates, Waiting List | ✅ Done |
+| **Batch 4: Pilgrim Portal** | Packing, Prayer Times, Currency, Emergency, Itinerary Sharing, Gallery, Testimonial | ✅ Done |
+| **Batch 5: Platform & Marketing** | Referral, Public Agency Profile, Onboarding Tour, Notification Center | ✅ Done |
+| **Batch 6: Data & Reporting** | Customizable Dashboard, Scheduled Reports, Data Export, Comparison Analytics | ✅ Done |
+| **Batch 7: Academy** | Quiz & Assessment, Certificate Generator, Course Rating & Review | ✅ Done |
+| **Batch 8: Command Center** | Compliance Dashboard, Auto-block Expired PPIU | ✅ Done |
+| **Batch 9: Detail Pages** | News/Forum/Marketplace detail pages, Help/FAQ | ✅ Done |
+| **Batch 10: Other** | Roommate Matching, Package Builder Wizard | ✅ Done |
+| **Batch 11: Navigation** | Sidebar (Tasks, Notifications), Middleware, Pilgrim nav, CC nav | ✅ Done |
+| **Batch 12: Unit Tests** | 8 new test files, 56 new tests → 330 total in 28 files | ✅ Done |
+
+### 8.13 NEW PRISMA MODELS (Session 10) ✅
+
+15 new models added:
+```
+PilgrimNote, AgencyTask, EmailTemplate, WaitingList, PilgrimPhoto,
+PilgrimTestimonial, Referral, Notification, ScheduledReport,
+AcademyQuiz, AcademyQuizQuestion, AcademyQuizAttempt,
+AcademyCourseReview, RoommatePreference
+```
+
+New fields on existing models:
+- User: +totpSecret, +totpEnabled, +onboardingCompleted
+- LoginHistory: +sessionToken, +isActive
+- Agency: +slug @unique
+- Trip: +shareCode @unique
+
+### 8.14 SECURITY & AUTH (Session 10) ✅
+
+**Rate Limiting:** `src/lib/rate-limiter.ts` — In-memory sliding window, per IP+route, configurable limit/window
+
+**2FA/TOTP:** `src/lib/services/totp.service.ts` — otplib + AES-256-GCM encryption
+```
+POST /api/settings/security/totp/setup    — Generate secret + QR
+POST /api/settings/security/totp/verify   — Verify & enable 2FA
+POST /api/settings/security/totp/disable  — Disable 2FA
+POST /api/auth/totp-verify                — Verify TOTP during login
+```
+
+**Session Management:**
+```
+GET    /api/settings/security/sessions    — List active sessions
+DELETE /api/settings/security/sessions    — Revoke session
+```
+
+### 8.15 AGENT PRODUCTIVITY (Session 10) ✅
+
+**Global Search / Command Palette:** `src/components/shared/command-palette.tsx` — Ctrl+K, debounced search, keyboard nav
+**Kanban Board:** Pilgrim page alternate view, 8-column DnD, PATCH status on drop
+**Calendar View:** Trip page alternate view, custom month grid, trip dots
+**Internal Notes:** `POST/GET /api/pilgrims/[id]/notes`, author tracking
+**Task Management:** `src/app/(dashboard)/tasks/page.tsx` — 3-column Kanban, CRUD API
+**Invoice PDF:** `src/lib/services/invoice.service.ts` — jsPDF, "LUNAS" watermark
+**Email Templates:** Per-event templates (welcome/payment_reminder/departure_reminder), variable interpolation
+**Waiting List:** Per-trip when at capacity, add/remove entries
+**Notification Center:** Bell badge, dropdown, full page, mark read, filter
+
+### 8.16 PILGRIM PORTAL ENHANCEMENT (Session 10) ✅
+
+7 new pages + 2 new API groups:
+- `/pilgrim/packing` — 7 category checklist, localStorage, custom items, progress bar
+- `/pilgrim/currency` — IDR ↔ SAR converter, editable rate
+- `/pilgrim/emergency` — KBRI, KJRI, RS, police, ambulance, Kemenag hotline
+- `/pilgrim/gallery` — Photo upload/list/delete with captions
+- `/pilgrim/roommate` — Preference form + matching algorithm
+- Itinerary sharing: `/share/itinerary/[code]` (public)
+- Testimonial: Star rating + comment for completed trips
+- Referral: Generate/share code, bonus points
+
+Prayer Times Widget: `src/lib/utils/prayer-times.ts` — Astronomical calculation, Makkah/Madinah
+
+### 8.17 PLATFORM & MARKETING (Session 10) ✅
+
+- Public Agency Profile: `/agency/[slug]` — packages, testimonials, stats (no auth)
+- Onboarding Tour: `src/components/shared/onboarding-tour.tsx` — step highlight overlay
+- Customizable Dashboard: Widget show/hide, edit mode, localStorage persist
+- Data Export: JSON export of all agency data
+- Comparison Analytics: Period comparison, delta indicators
+- Scheduled Reports: Configure frequency, type, email recipients
+
+### 8.18 PLATFORM DETAIL PAGES (Session 10) ✅
+
+- `/news/[id]` — Full article, related articles
+- `/forum/[id]` — Full thread, mock replies
+- `/marketplace/[id]` — Full item display, related items
+- `/help` — 25 FAQs in 5 categories, searchable, accordion
+
+### 8.19 COMMAND CENTER ENHANCEMENT (Session 10) ✅
+
+**Compliance Dashboard:** `/command-center/compliance` — Weighted score (PPIU 40%, docs 30%, activity 20%, verified 10%), color-coded
+**Auto-suspend:** `POST /api/command-center/auto-suspend` — Find & suspend expired PPIU agencies
+
+### 8.20 SESSION 10 TESTING ✅
+
+**New Test Files (8):**
+- `rate-limiter.test.ts` — 6 tests (sliding window, IP/route isolation)
+- `notification.test.ts` — 5 tests (createNotification structure)
+- `totp.test.ts` — 6 tests (encrypt/decrypt, format, generate, verify)
+- `invoice.test.ts` — 3 tests (PDF generation with mocked jsPDF)
+- `task.test.ts` — 12 tests (Zod schema validation)
+- `email-template.test.ts` — 9 tests (Zod schema validation)
+- `prayer-times.test.ts` — 6 tests (calculation, format, chronology, next prayer)
+- `academy-quiz.test.ts` — 9 tests (scoring, pass/fail, edge cases)
+
+**Total: 330 tests in 28 files (was 274 in 20 files)**
 
 ---
 
@@ -940,17 +1078,17 @@ await logActivity({ agencyId: auth.agencyId, userId: auth.userId, ... });
 
 ```
 ✅ GAMIFIKASI — 8 point rules, 11 badges, leaderboard, auto-award, dashboard widget, full page
-✅ COMMAND CENTER — SystemAdmin auth, 8 API endpoints, blue layout, agencies CRUD, audit log, PPIU alerts
+✅ COMMAND CENTER — SystemAdmin auth, 11 API endpoints, blue layout, agencies CRUD, audit log, PPIU alerts, compliance, auto-suspend
 ✅ WHITE-LABEL — BrandingProvider, color-utils, theme override, settings page, sidebar branding
 ✅ BLOCKCHAIN — Mock simulation, service + 5 API + dashboard + public verify
-✅ ACADEMY LMS — Full DB implementation, 5 API, seed data, course detail page
+✅ ACADEMY LMS — Full DB (7 models), 10 API, seed data, course detail, quiz, certificates, reviews
 ✅ CC POLISH — Audit log UI, responsive layout, PPIU expiry alerts
-✅ TESTING — 235 unit tests + Playwright E2E (5 specs)
+✅ TESTING — 330 unit tests (28 files) + Playwright E2E (5 specs)
 ✅ ERROR BOUNDARIES — Pilgrim (green) + CC (blue) error boundaries in layouts
-✅ SECURITY SETTINGS — LoginHistory model, login recording, change password, security page
+✅ SECURITY SETTINGS — LoginHistory, login recording, change password, 2FA/TOTP, session management, rate limiting
 ✅ PILGRIM GAMIFICATION — 6 point rules, 6 badges, service, 3 API, achievements page, dashboard widget, nav
 ✅ CC ANALYTICS — Analytics API (5 datasets), 4 Recharts, period filter
-✅ SESSION 9 TESTS — 39 new tests → 274 total in 20 files
+✅ SESSION 10 — 37 features: productivity, pilgrim portal, platform, detail pages, notifications, etc.
 □ MOBILE NATIVE — Flutter app (out of scope for Next.js)
 ```
 
@@ -958,25 +1096,29 @@ await logActivity({ agencyId: auth.agencyId, userId: auth.userId, ... });
 
 ## 📎 APPENDIX
 
-### A. API Count Summary (~107 Total)
+### A. API Count Summary (~133 Total)
 
 ```
-Auth:            7 endpoints
-Pilgrims:       15 endpoints (CRUD + docs + payments + status + history + bulk + import + QR + export)
+Auth:            9 endpoints (login, register, verify, password, totp-verify, me, etc)
+Pilgrims:       18 endpoints (CRUD + docs + payments + status + history + bulk + import + QR + export + notes + invoice)
 Packages:        7 endpoints (CRUD + duplicate + brochure)
-Trips:           7 endpoints (CRUD + checklist + manifest + manifest/remove)
+Trips:           9 endpoints (CRUD + checklist + manifest + manifest/remove + waiting-list)
 Dashboard:       4 endpoints (stats, alerts, activities, charts)
-Reports:         5 endpoints (financial, demographics, documents, payment-aging, conversion)
+Reports:         6 endpoints (financial, demographics, documents, payment-aging, conversion, send-scheduled)
 Reports Export:  1 endpoint  (financial/export)
-Settings:        3 endpoints (notification prefs GET/PUT, login-history, change-password)  ← UPDATED
+Settings:       10 endpoints (notifications, security ×5, email-templates ×2, scheduled-reports ×2, onboarding)
 Integrations:   15 endpoints (nusuk: 3, payment: 4, whatsapp: 5, umrahcash: 3)
-Pilgrim Portal: 12 endpoints (login, me, logout, documents GET/POST, manasik, manasik/progress, doa, doa/favorites, gamification stats/history/badges) ← UPDATED
-Verify:          2 endpoints (pilgrim QR + agency QR)
+Pilgrim Portal: 20 endpoints (login, me, logout, docs, manasik, doa, gamification ×3, gallery ×2, testimonial, referral ×2, roommate ×2, share-itinerary)
+Verify:          3 endpoints (pilgrim QR + agency QR + certificate)
 Users:           2 endpoints (CRUD + role management)
-Other:           2 endpoints (agency, chat AI)
+Other:           3 endpoints (agency, agency/export, chat AI)
+Search:          1 endpoint  (global search)
+Notifications:   3 endpoints (list+markAll, markRead+delete)
+Tasks:           2 endpoints (list+create, update+delete)
+Public:          3 endpoints (agency/public/[slug], share/itinerary/[code], agency/[slug])
 Gamification:    4 endpoints (stats, badges, leaderboard, history)
-Command Center:  9 endpoints (login, me, logout, agencies, agencies/[id], stats, audit-log, alerts, analytics) ← UPDATED
-Academy:         5 endpoints (courses, course detail, lesson, progress, user progress)
+Command Center: 11 endpoints (login, me, logout, agencies, agencies/[id], stats, audit-log, alerts, analytics, compliance, auto-suspend)
+Academy:        10 endpoints (courses, detail, lesson, progress, user progress, quiz, attempt, certificate, reviews ×2)
 Blockchain:      5 endpoints (certificates CRUD, certificate detail, verify, public verify)
 ```
 
@@ -1008,15 +1150,16 @@ Blockchain:      5 endpoints (certificates CRUD, certificate detail, verify, pub
 
 ---
 
-*Plan Version: 3.4*
+*Plan Version: 3.5*
 *Created: 2026-02-23*
-*Updated: 2026-02-24 (Session 9: Error Boundaries + Security + Pilgrim Gamification + CC Analytics)*
+*Updated: 2026-02-25 (Session 10: Mega Feature Session — 37 Features)*
 *Next: Connect real API keys for Phase 3 integrations, or Mobile Native (Flutter — separate repo)*
 
-### Git Log (Phase 4)
+### Git Log (Phase 4 + Session 10)
 
 ```
-Session 7: feat: implement Phase 4A — Gamifikasi, Command Center, White-label Branding
-Session 8: feat: implement Phase 4B — Blockchain, CC Polish, Academy LMS, Tests
-Session 9: feat: implement Session 9 — Error Boundaries, Security, Pilgrim Gamification, CC Analytics
+Session 7:  feat: implement Phase 4A — Gamifikasi, Command Center, White-label Branding
+Session 8:  feat: implement Phase 4B — Blockchain, CC Polish, Academy LMS, Tests
+Session 9:  feat: implement Session 9 — Error Boundaries, Security, Pilgrim Gamification, CC Analytics
+Session 10: feat: Session 10 — Mega Feature Session (37 features)
 ```
