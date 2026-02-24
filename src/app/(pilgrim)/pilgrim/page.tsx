@@ -214,7 +214,15 @@ export default function PilgrimDashboardPage() {
 
       {/* Payment summary card */}
       <div style={cardStyle}>
-        <h2 style={sectionTitleStyle}>Ringkasan Pembayaran</h2>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+          <h2 style={{ ...sectionTitleStyle, margin: 0 }}>Ringkasan Pembayaran</h2>
+          <a href="/pilgrim/payments" style={{
+            fontSize: '13px', fontWeight: 600, color: PILGRIM_GREEN,
+            textDecoration: 'none',
+          }}>
+            Lihat Detail &rarr;
+          </a>
+        </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '14px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

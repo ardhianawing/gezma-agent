@@ -60,6 +60,8 @@ export interface PilgrimPortalData {
     label: string;
     status: string;
     required: boolean;
+    fileUrl?: string;
+    fileName?: string;
   }>;
   totalPackagePrice: number;
   totalPaid: number;

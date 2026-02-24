@@ -8,6 +8,9 @@ import { useResponsive } from '@/lib/hooks/use-responsive';
 import { StatCard } from '@/components/shared/stat-card';
 import { ActionCenter } from '@/components/dashboard/action-center';
 import { QuickActions } from '@/components/dashboard/quick-actions';
+import { RevenueChart } from '@/components/dashboard/revenue-chart';
+import { PilgrimStatusChart } from '@/components/dashboard/pilgrim-status-chart';
+import { TripCapacityChart } from '@/components/dashboard/trip-capacity-chart';
 interface Activity {
   id: string;
   type: string;
@@ -15,6 +18,12 @@ interface Activity {
   title: string;
   description: string;
   createdAt: string;
+}
+
+interface ChartsData {
+  revenueTrend: { month: string; amount: number }[];
+  pilgrimStatus: { status: string; count: number }[];
+  tripCapacity: { name: string; capacity: number; registered: number }[];
 }
 
 interface DashboardStats {
@@ -61,6 +70,17 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [activities, setActivities] = useState<Activity[]>([]);
   const [activitiesLoading, setActivitiesLoading] = useState(true);
+  const [charts, setCharts] = useState<ChartsData | null>(null);
+
+  useEffect(() => {
+    async function fetchCharts() {
+      try {
+        const res = await fetch('/api/dashboard/charts');
+        if (res.ok) setCharts(await res.json());
+      } catch { /* silently fail */ }
+    }
+    fetchCharts();
+  }, []);
 
   useEffect(() => {
     async function fetchStats() {
@@ -202,6 +222,23 @@ export default function DashboardPage() {
         <ActionCenter />
         <QuickActions />
       </div>
+
+      {/* CHARTS */}
+      {charts && (
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: isMobile || isTablet ? '1fr' : '1fr 1fr',
+            gap: isMobile ? '12px' : '16px',
+          }}
+        >
+          <div style={{ gridColumn: isMobile || isTablet ? undefined : '1 / -1' }}>
+            <RevenueChart data={charts.revenueTrend} />
+          </div>
+          <PilgrimStatusChart data={charts.pilgrimStatus} />
+          <TripCapacityChart data={charts.tripCapacity} />
+        </div>
+      )}
 
       {/* UPCOMING TRIPS + RECENT ACTIVITY */}
       <div

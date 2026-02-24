@@ -15,6 +15,7 @@ const NAV_ITEMS = [
   { label: 'Perjalanan', emoji: '\u{2708}\u{FE0F}', href: '/pilgrim/trip' },
   { label: 'Manasik', emoji: '\u{1F4D6}', href: '/pilgrim/manasik' },
   { label: 'Doa', emoji: '\u{1F932}', href: '/pilgrim/doa' },
+  { label: 'Dokumen', emoji: '\u{1F4CB}', href: '/pilgrim/documents' },
   { label: 'Profil', emoji: '\u{1F464}', href: '/pilgrim/profile' },
 ];
 

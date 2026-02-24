@@ -23,6 +23,7 @@ import {
   GraduationCap,
   HeadphonesIcon,
   Globe,
+  Clock,
 } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n';
 import { useTheme } from '@/lib/theme';
@@ -42,6 +43,7 @@ const menuItems: MenuItem[] = [
   { label: 'Perjalanan', href: '/trips', icon: Plane },
   { label: 'Dokumen', href: '/documents', icon: FileText },
   { label: 'Laporan', href: '/reports', icon: BarChart3 },
+  { label: 'Aktivitas', href: '/activities', icon: Clock },
   { label: 'Agensi', href: '/agency', icon: Building2 },
 ];
 

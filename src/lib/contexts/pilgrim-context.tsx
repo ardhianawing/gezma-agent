@@ -7,6 +7,7 @@ interface PilgrimContextType {
   data: PilgrimPortalData | null;
   login: (bookingCode: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
+  refreshData: () => void;
   isLoading: boolean;
 }
 
@@ -59,8 +60,20 @@ export function PilgrimProvider({ children }: { children: ReactNode }) {
     fetch('/api/pilgrim-portal/logout', { method: 'POST', credentials: 'same-origin' }).catch(() => {});
   }, []);
 
+  const refreshData = useCallback(() => {
+    fetch('/api/pilgrim-portal/me', { credentials: 'same-origin' })
+      .then(res => {
+        if (res.ok) return res.json();
+        return null;
+      })
+      .then(json => {
+        if (json?.data) setData(json.data);
+      })
+      .catch(() => {});
+  }, []);
+
   return (
-    <PilgrimContext.Provider value={{ data, login, logout, isLoading }}>
+    <PilgrimContext.Provider value={{ data, login, logout, refreshData, isLoading }}>
       {children}
     </PilgrimContext.Provider>
   );

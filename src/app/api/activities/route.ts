@@ -7,13 +7,40 @@ export async function GET(req: NextRequest) {
   if (!auth) return unauthorizedResponse();
 
   try {
-    const data = await prisma.activityLog.findMany({
-      where: { agencyId: auth.agencyId },
-      orderBy: { createdAt: 'desc' },
-      take: 20,
-    });
+    const { searchParams } = new URL(req.url);
+    const page = Math.max(1, parseInt(searchParams.get('page') || '1'));
+    const limit = Math.min(100, Math.max(1, parseInt(searchParams.get('limit') || '20')));
+    const type = searchParams.get('type') || '';
+    const search = searchParams.get('search') || '';
 
-    return NextResponse.json({ data });
+    const where: Record<string, unknown> = { agencyId: auth.agencyId };
+    if (type) where.type = type;
+    if (search) {
+      where.OR = [
+        { title: { contains: search, mode: 'insensitive' } },
+        { description: { contains: search, mode: 'insensitive' } },
+      ];
+    }
+
+    const [data, total] = await Promise.all([
+      prisma.activityLog.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      prisma.activityLog.count({ where }),
+    ]);
+
+    return NextResponse.json({
+      data,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    });
   } catch (error) {
     console.error('GET /api/activities error:', error);
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });

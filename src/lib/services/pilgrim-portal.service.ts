@@ -68,6 +68,8 @@ function transformToPilgrimPortalData(
       label: DOCUMENT_LABELS[type] || type,
       status: doc?.status ?? 'missing',
       required: REQUIRED_DOCS.includes(type),
+      fileUrl: doc?.fileUrl ?? undefined,
+      fileName: doc?.fileName ?? undefined,
     };
   });
 

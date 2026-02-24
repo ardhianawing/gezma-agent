@@ -259,33 +259,9 @@ function PilgrimsPageContent() {
 
   const handleExportCSV = async () => {
     try {
-      const params = new URLSearchParams({ page: '1', limit: '10000' });
-      if (search) params.set('search', search);
-      if (statusFilter) params.set('status', statusFilter);
-      const res = await fetch(`/api/pilgrims?${params}`);
+      const res = await fetch('/api/pilgrims/export');
       if (!res.ok) return;
-      const json = await res.json();
-      const rows = json.data as PilgrimRow[];
-      if (rows.length === 0) return;
-
-      const header = ['Nama', 'NIK', 'Email', 'Telepon', 'Status', 'Dokumen Lengkap'];
-      const csvRows = [
-        header.join(','),
-        ...rows.map((r) => {
-          const docsComplete = r.documents?.filter((d) => d.status !== 'missing').length || 0;
-          const docsTotal = r.documents?.length || 0;
-          return [
-            `"${r.name}"`,
-            `"${r.nik}"`,
-            `"${r.email}"`,
-            `"${r.phone}"`,
-            r.status,
-            `${docsComplete}/${docsTotal}`,
-          ].join(',');
-        }),
-      ];
-
-      const blob = new Blob([csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+      const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;

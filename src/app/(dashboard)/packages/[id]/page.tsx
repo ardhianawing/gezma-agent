@@ -3,11 +3,11 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Edit, Trash2, DollarSign, Building2, FileText, CheckCircle, XCircle, Copy, Download } from 'lucide-react';
+import { ArrowLeft, Edit, Trash2, DollarSign, Building2, FileText, CheckCircle, XCircle, Copy, Download, MapPin, Calendar } from 'lucide-react';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
 import { formatCurrency } from '@/lib/utils';
-import type { Package } from '@/types/package';
+import type { Package, ItineraryDay } from '@/types/package';
 
 export default function PackageDetailPage() {
   const params = useParams();
@@ -300,6 +300,94 @@ export default function PackageDetailPage() {
                 </li>
               ))}
             </ul>
+          </div>
+        </div>
+
+        {/* Itinerary */}
+        <div style={{ ...cardStyle, gridColumn: isMobile ? undefined : '1 / -1' }}>
+          <div style={cardHeaderStyle}>
+            <Calendar style={{ width: '18px', height: '18px', color: c.textMuted }} />
+            <h3 style={{ fontSize: '16px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>Itinerary</h3>
+          </div>
+          <div style={cardBodyStyle}>
+            {(() => {
+              const itinerary: ItineraryDay[] = Array.isArray(pkg.itinerary) ? pkg.itinerary : [];
+              if (itinerary.length === 0) {
+                return (
+                  <p style={{ fontSize: '14px', color: c.textMuted, textAlign: 'center', padding: '24px 0' }}>
+                    Belum ada itinerary untuk paket ini.
+                  </p>
+                );
+              }
+              return (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
+                  {itinerary.map((day, i) => (
+                    <div key={i} style={{ display: 'flex', gap: '16px' }}>
+                      {/* Timeline line + circle */}
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '48px', flexShrink: 0 }}>
+                        <div style={{
+                          width: '36px', height: '36px', borderRadius: '50%',
+                          backgroundColor: c.primary, color: 'white',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          fontSize: '12px', fontWeight: 700, flexShrink: 0,
+                        }}>
+                          H-{day.day}
+                        </div>
+                        {i < itinerary.length - 1 && (
+                          <div style={{ width: '2px', flex: 1, backgroundColor: c.border, minHeight: '20px' }} />
+                        )}
+                      </div>
+                      {/* Content */}
+                      <div style={{ flex: 1, paddingBottom: i < itinerary.length - 1 ? '24px' : '0' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap', marginBottom: '8px' }}>
+                          <h4 style={{ fontSize: '15px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>
+                            {day.title}
+                          </h4>
+                          {day.city && (
+                            <span style={{
+                              display: 'inline-flex', alignItems: 'center', gap: '4px',
+                              fontSize: '11px', fontWeight: 600,
+                              padding: '2px 10px', borderRadius: '20px',
+                              backgroundColor: day.city.toLowerCase().includes('makkah') ? '#FEF3C7' :
+                                day.city.toLowerCase().includes('madinah') ? '#DBEAFE' :
+                                day.city.toLowerCase().includes('jeddah') ? '#F3E8FF' : c.cardBgHover,
+                              color: day.city.toLowerCase().includes('makkah') ? '#D97706' :
+                                day.city.toLowerCase().includes('madinah') ? '#2563EB' :
+                                day.city.toLowerCase().includes('jeddah') ? '#7C3AED' : c.textSecondary,
+                            }}>
+                              <MapPin style={{ width: '10px', height: '10px' }} />
+                              {day.city}
+                            </span>
+                          )}
+                        </div>
+                        {day.description && (
+                          <p style={{ fontSize: '13px', color: c.textMuted, margin: '0 0 8px 0', lineHeight: 1.5 }}>
+                            {day.description}
+                          </p>
+                        )}
+                        {day.activities && day.activities.length > 0 && (
+                          <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                            {day.activities.map((act, j) => {
+                              const actTitle = typeof act === 'string' ? act : act.title;
+                              const actTime = typeof act === 'string' ? null : act.time;
+                              return (
+                                <li key={j} style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '13px', color: c.textSecondary }}>
+                                  <span style={{ color: c.textLight, marginTop: '1px' }}>&bull;</span>
+                                  {actTime && (
+                                    <span style={{ fontWeight: 600, color: c.textMuted, minWidth: '42px', flexShrink: 0 }}>{actTime}</span>
+                                  )}
+                                  {actTitle}
+                                </li>
+                              );
+                            })}
+                          </ul>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              );
+            })()}
           </div>
         </div>
       </div>
