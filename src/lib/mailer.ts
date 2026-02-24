@@ -15,7 +15,7 @@ const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || 'GEZMA Agent';
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
 export async function sendResetPasswordEmail(to: string, code: string) {
-  const resetUrl = `${APP_URL}/verify/${code}?type=reset`;
+  const resetUrl = `${APP_URL}/reset-password?code=${code}`;
 
   await transporter.sendMail({
     from: `"${APP_NAME}" <${FROM}>`,
