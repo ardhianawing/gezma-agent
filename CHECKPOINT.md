@@ -1,6 +1,6 @@
 # GEZMA Agent — Development Checkpoint
 
-> **Last Updated:** 2026-02-24 (Session 9 — Error Boundaries + Security + Pilgrim Gamification + CC Analytics)
+> **Last Updated:** 2026-02-25 (Session 10 — Mega Feature Session: 37 Features)
 > **Blueprint Reference:** `GEZMA-AGENT-PLAN-v2.md`, `DEVELOPMENT-PLAN-v3.md`
 
 ---
@@ -17,6 +17,7 @@
 | **Phase 3: Integrasi** | ✅ Prep Done | 4 service layers + 15 API endpoints + 7 UI pages (mock) |
 | **Phase 4: Advanced** | ✅ 5/5 Done | Gamifikasi, Command Center, White-label, Blockchain, Academy LMS |
 | **Session 9: Polish** | ✅ Done | Error Boundaries, Security Settings, Pilgrim Gamification, CC Analytics |
+| **Session 10: Mega Features** | ✅ Done | 37 features: Security, Productivity, Pilgrim Portal, Platform, Academy, CC |
 | **PWA** | ✅ Done | Service Worker, Install Prompt, Offline |
 | **Deployment** | ✅ Ready | Docker + Nginx + Traefik |
 
@@ -360,38 +361,160 @@ Semua menggunakan mock data, siap connect real API ketika key tersedia:
 
 ---
 
-## J. API ENDPOINTS (~107 Total)  ← UPDATED
+## J. SESSION 10 — MEGA FEATURE SESSION (37 Features) ✅
+
+37 fitur diimplementasi dalam 1 session besar, 12 batch parallel:
+
+### Prisma Schema Update ✅
+| Perubahan | Keterangan |
+|-----------|------------|
+| 15 new models | PilgrimNote, AgencyTask, EmailTemplate, WaitingList, PilgrimPhoto, PilgrimTestimonial, Referral, Notification, ScheduledReport, AcademyQuiz, AcademyQuizQuestion, AcademyQuizAttempt, AcademyCourseReview, RoommatePreference |
+| User fields | +totpSecret, +totpEnabled, +onboardingCompleted |
+| LoginHistory fields | +sessionToken, +isActive |
+| Agency fields | +slug @unique |
+| Trip fields | +shareCode @unique |
+| **Total models** | **39** (was 24) |
+
+### Batch 1: Security & Auth ✅
+| Fitur | Status | Keterangan |
+|-------|--------|------------|
+| API Rate Limiting | ✅ | In-memory sliding window, `rateLimit(req, { limit, window })`, per IP+route |
+| 2FA/TOTP | ✅ | otplib + AES-256-GCM encryption, QR setup, verify, disable, login flow with tempToken |
+| Session Management | ✅ | List active sessions, revoke access, sessionToken tracking |
+
+### Batch 2: Agent Productivity Core ✅
+| Fitur | Status | Keterangan |
+|-------|--------|------------|
+| Global Search / Command Palette | ✅ | Ctrl+K, debounced search across pilgrims/packages/trips, keyboard nav |
+| Kanban Board Pilgrim | ✅ | 8-column status board, HTML5 DnD, PATCH status on drop |
+| Calendar View Trips | ✅ | Custom month grid, trip dots on departure/return dates, day click panel |
+| Internal Notes per Pilgrim | ✅ | CRUD notes with author tracking, timeAgo display |
+| Task Management | ✅ | 3-column Kanban (Todo/In Progress/Done), filter by assignee, create/edit/delete |
+
+### Batch 3: Agent Productivity Extended ✅
+| Fitur | Status | Keterangan |
+|-------|--------|------------|
+| Invoice/Kwitansi PDF | ✅ | jsPDF, agency header, payment table, "LUNAS" watermark, download endpoint |
+| Email Templates | ✅ | CRUD per event (welcome/payment_reminder/departure_reminder), variable interpolation |
+| Waiting List | ✅ | Per-trip waiting list, add/remove entries, shown when trip at capacity |
+
+### Batch 4: Pilgrim Portal Enhancement ✅
+| Fitur | Status | Keterangan |
+|-------|--------|------------|
+| Packing Checklist | ✅ | 7 categories, localStorage persistence, add custom items, progress bar |
+| Prayer Times Widget | ✅ | Astronomical calculation, Makkah/Madinah toggle, highlight next prayer |
+| Currency Converter | ✅ | IDR ↔ SAR, editable rate, localStorage persistence |
+| Emergency Contacts | ✅ | KBRI, KJRI, RS, Ambulans, Polisi, Pemadam, Kemenag — with tel: links |
+| Itinerary Sharing | ✅ | Generate shareCode, public page `/share/itinerary/[code]` (no auth) |
+| Photo Gallery | ✅ | Upload/list/delete photos with captions |
+| Testimonial/Review | ✅ | Star rating + comment, only for completed trips |
+
+### Batch 5: Platform & Marketing ✅
+| Fitur | Status | Keterangan |
+|-------|--------|------------|
+| Referral System | ✅ | Generate code, use code → award points to referrer, stats |
+| Public Agency Profile | ✅ | `/agency/[slug]` — public page with packages, testimonials, stats |
+| Onboarding Tour | ✅ | Step-by-step highlight overlay, "Lanjut"/"Lewati", auto-show for new users |
+| Notification Center | ✅ | Bell + unread badge, dropdown, full page, mark read, filter, CRUD |
+
+### Batch 6: Data & Reporting ✅
+| Fitur | Status | Keterangan |
+|-------|--------|------------|
+| Customizable Dashboard | ✅ | Widget show/hide, edit mode, localStorage persistence, reset to default |
+| Scheduled Reports | ✅ | Configure frequency (weekly/monthly), report type, email recipients |
+| Data Backup/Export | ✅ | Export all agency data as JSON (pilgrims, packages, trips, payments) |
+| Comparison Analytics | ✅ | Period comparison toggle, delta indicators (green/red %) |
+
+### Batch 7: Academy Enhancement ✅
+| Fitur | Status | Keterangan |
+|-------|--------|------------|
+| Quiz & Assessment | ✅ | Per-course quiz with questions, attempt scoring, pass/fail, one-at-a-time UI |
+| Certificate Generator | ✅ | jsPDF decorative certificate, name/course/date/score, download when passed |
+| Course Rating & Review | ✅ | 1-5 star, one per user, avg rating on course cards |
+
+### Batch 8: Command Center Enhancement ✅
+| Fitur | Status | Keterangan |
+|-------|--------|------------|
+| Compliance Dashboard | ✅ | Weighted score (PPIU 40%, docs 30%, activity 20%, verified 10%), color-coded |
+| Auto-block Expired PPIU | ✅ | Find expired agencies, auto-suspend, confirmation dialog |
+
+### Batch 9: Platform Detail Pages ✅
+| Fitur | Status | Keterangan |
+|-------|--------|------------|
+| News Article Detail | ✅ | `/news/[id]` — full content, related articles |
+| Forum Thread Detail | ✅ | `/forum/[id]` — full content, mock replies |
+| Marketplace Item Detail | ✅ | `/marketplace/[id]` — full display, related items |
+| Help/FAQ Page | ✅ | 25 FAQs in 5 categories, searchable, accordion |
+
+### Batch 10: Other Features ✅
+| Fitur | Status | Keterangan |
+|-------|--------|------------|
+| Pilgrim Roommate Matching | ✅ | Preference form (gender, age, smoking, snoring, language), matching algorithm |
+| Package Builder Wizard | ✅ | 4-step wizard (Flight → Hotel Makkah → Hotel Madinah → Visa), running total |
+
+### Navigation & Wiring ✅
+| Perubahan | Keterangan |
+|-----------|------------|
+| Sidebar | +Tugas (CheckSquare), +Notifikasi (Bell) |
+| Middleware | +/tasks, +/notifications to protectedPaths |
+| Pilgrim Layout | +Packing, +Emergency nav items |
+| CC Layout | +Kepatuhan nav item |
+
+### Unit Tests ✅
+| Test File | Tests | Keterangan |
+|-----------|-------|------------|
+| rate-limiter.test.ts | 6 | Sliding window, IP/route isolation, remaining count |
+| notification.test.ts | 5 | createNotification structure validation |
+| totp.test.ts | 6 | Encrypt/decrypt, format validation, generateSecret, verifyToken |
+| invoice.test.ts | 3 | PDF generation with mocked jsPDF, empty payments, remaining balance |
+| task.test.ts | 12 | Zod schema create/update validation |
+| email-template.test.ts | 9 | Zod schema validation |
+| prayer-times.test.ts | 6 | Calculation, format, chronological order, city comparison, next prayer |
+| academy-quiz.test.ts | 9 | Score calculation, pass/fail, edge cases |
+| **Total** | **330 tests across 28 files, all passing** |
+
+**DB Changes:** +15 models (24 → 39 total)
+**New files:** ~74 | **Modified:** ~21 | **Total insertions:** 15,223
+**Build:** 0 TypeScript errors | **Tests:** 330/330 passing
+
+---
+
+## K. API ENDPOINTS (~133 Total)  ← UPDATED
 
 ```
-Auth:            7 endpoints (login, register, verify, password, etc)
-Pilgrims:       15 endpoints (CRUD + documents + payments + status + history + bulk + import + QR + export)
+Auth:            9 endpoints (login, register, verify, password, totp-verify, me, etc)                   ← UPDATED
+Pilgrims:       18 endpoints (CRUD + docs + payments + status + history + bulk + import + QR + export + notes + invoice) ← UPDATED
 Packages:        7 endpoints (CRUD + duplicate + brochure)
-Trips:           7 endpoints (CRUD + checklist + manifest + manifest/remove)
+Trips:           9 endpoints (CRUD + checklist + manifest + manifest/remove + waiting-list)               ← UPDATED
 Dashboard:       4 endpoints (stats, alerts, activities, charts)
-Reports:         5 endpoints (financial, demographics, documents, payment-aging, conversion)
+Reports:         6 endpoints (financial, demographics, documents, payment-aging, conversion, send-scheduled) ← UPDATED
 Reports Export:  1 endpoint  (financial/export)
-Settings:        3 endpoints (notifications GET/PUT, security/change-password, security/login-history)  ← UPDATED
+Settings:       10 endpoints (notifications, security ×5, email-templates ×2, scheduled-reports ×2, onboarding) ← UPDATED
 Integrations:   15 endpoints (nusuk: 3, payment: 4, whatsapp: 5, umrahcash: 3)
-Pilgrim Portal: 12 endpoints (login, me, logout, documents, manasik, doa, gamification ×3)             ← UPDATED
+Pilgrim Portal: 20 endpoints (login, me, logout, docs, manasik, doa, gamification ×3, gallery ×2, testimonial, referral ×2, roommate ×2, share-itinerary) ← UPDATED
 Verify:          3 endpoints (pilgrim QR + agency QR + certificate verification)
 Users:           2 endpoints (CRUD + role management)
-Other:           2 endpoints (agency, chat AI)
+Other:           3 endpoints (agency, agency/export, chat AI)                                             ← UPDATED
+Search:          1 endpoint  (global search across pilgrims/packages/trips)                               ← NEW
+Notifications:   3 endpoints (list+markAllRead, markRead+delete per id)                                  ← NEW
+Tasks:           2 endpoints (list+create, update+delete per id)                                          ← NEW
+Public:          3 endpoints (agency/public/[slug], share/itinerary/[code], agency/[slug] page)           ← NEW
 Gamification:    4 endpoints (stats, badges, leaderboard, history)
-Command Center:  9 endpoints (login, me, logout, agencies, agencies/[id], stats, audit-log, alerts, analytics) ← UPDATED
+Command Center: 11 endpoints (login, me, logout, agencies, agencies/[id], stats, audit-log, alerts, analytics, compliance, auto-suspend) ← UPDATED
 Blockchain:      5 endpoints (POST/GET certificates, GET detail, POST revoke, GET public verify)
-Academy:         5 endpoints (courses, course detail, lesson, progress, user progress)
+Academy:        10 endpoints (courses, course detail, lesson, progress, user progress, quiz, quiz/attempt, certificate, reviews ×2) ← UPDATED
 ```
 
 ---
 
-## J. TECH STACK
+## L. TECH STACK
 
 | Layer | Tech |
 |-------|------|
 | Framework | Next.js 16 (App Router) |
 | Language | TypeScript |
 | Styling | 100% inline styles + useTheme() |
-| Database | PostgreSQL + Prisma v7 (24 models) |
+| Database | PostgreSQL + Prisma v7 (39 models) |
 | Auth | JWT (HTTP-only cookies) |
 | Email | Nodemailer (SMTP) |
 | AI | Google Gemini 2.0 Flash |
@@ -404,21 +527,24 @@ Academy:         5 endpoints (courses, course detail, lesson, progress, user pro
 
 ---
 
-## K. FILE STRUCTURE
+## M. FILE STRUCTURE
 
 ```
 src/
 ├── app/
 │   ├── (auth)/           → 4 pages
-│   ├── (dashboard)/      → 28 pages (+settings/security)                                                        ← UPDATED
-│   ├── (command-center)/ → 6 pages (login, dashboard+analytics, agencies, agency detail, audit-log) + layout
-│   ├── (pilgrim)/        → 9 pages (+achievements) + layout with error boundary                                  ← UPDATED
-│   ├── api/              → ~107 API endpoints (+3 pilgrim gamification, +2 security, +1 CC analytics)            ← UPDATED
-│   ├── verify/           → 3 pages (pilgrim QR, agency QR, certificate/[number])                                 ← UPDATED
+│   ├── (dashboard)/      → 40+ pages (+tasks, notifications, builder, detail pages, quiz, etc)                   ← UPDATED
+│   ├── (command-center)/ → 7 pages (+compliance)                                                                 ← UPDATED
+│   ├── (pilgrim)/        → 14+ pages (+packing, currency, emergency, gallery, roommate)                          ← UPDATED
+│   ├── api/              → ~133 API endpoints (+35 new routes)                                                   ← UPDATED
+│   ├── agency/           → 1 page (public agency profile)                                                        ← NEW
+│   ├── share/            → 1 page (public itinerary sharing)                                                     ← NEW
+│   ├── verify/           → 3 pages (pilgrim QR, agency QR, certificate/[number])
 │   └── offline/          → PWA offline page
 ├── components/
-│   ├── shared/           → 12 reusable components
-│   ├── layout/           → 3 (sidebar, header, page-header)
+│   ├── shared/           → 15 reusable components (+command-palette, onboarding-tour)                            ← UPDATED
+│   ├── layout/           → 4 (sidebar, header, page-header, notification-bell)                                   ← UPDATED
+│   ├── pilgrim/          → 1 (prayer-times-widget)                                                               ← NEW
 │   ├── packages/         → 3 (form, itinerary, pricing)
 │   ├── pilgrims/         → 3 (document-upload, status-timeline, import-modal)
 │   ├── trips/            → 1 (trip-form)
@@ -429,10 +555,12 @@ src/
 │   └── cc-error-boundary.tsx      → Command Center error boundary                   ← NEW
 ├── data/                 → 8 mock data files (+pilgrim-portal, manasik, doa)
 ├── lib/
-│   ├── services/         → 10 service files (+pilgrim-gamification.service)          ← UPDATED
+│   ├── services/         → 14 service files (+totp, invoice, notification, academy-certificate) ← UPDATED
 │   ├── hooks/            → 4 hooks
 │   ├── contexts/         → 2 (pilgrim-context, branding-context)
-│   ├── validations/      → 8 schemas (+security)                                    ← UPDATED
+│   ├── validations/      → 10 schemas (+task, email-template)                       ← UPDATED
+│   ├── utils/            → 1 (prayer-times)                                         ← NEW
+│   ├── rate-limiter.ts   → In-memory sliding window rate limiter                    ← NEW
 │   ├── auth-command-center.ts → CC JWT auth (sign, verify, cookie)
 │   ├── csv-export.ts     → UTF-8 BOM CSV generator
 │   ├── i18n/             → ID + EN translations
@@ -440,15 +568,19 @@ src/
 ├── types/                → 5 type definition files
 ├── prisma/
 │   └── seed-academy.ts   → Academy seed script (12 courses + 36 lessons)            ← NEW
-├── tests/                → 20 unit test files (274 tests)                           ← UPDATED
+├── tests/                → 28 unit test files (330 tests)                           ← UPDATED
 └── e2e/                  → 5 Playwright spec files (auth, dashboard, pilgrims, CC, navigation)
 ```
 
 ---
 
-## L. GIT LOG (Session 3-9)
+## N. GIT LOG (Session 3-10)
 
 ```
+637c69d feat: Session 10 — Mega Feature Session (37 features)
+e6e94a9 docs: update DEVELOPMENT-PLAN-v3.md with Session 9 progress
+c4ff048 docs: update BLUEPRINT-TRACKING.md with Session 9 progress
+2448dbf docs: update CHECKPOINT.md with Session 9 progress
 3a77b1a feat: Session 9 — Error Boundaries, Security, Pilgrim Gamification, CC Analytics
 65e5d80 feat: implement Phase 4B — Blockchain, CC Polish, Academy LMS, Tests
 747c92e feat: implement Phase 4 — Gamifikasi, Command Center, White-label Branding
@@ -472,13 +604,15 @@ a8ebe52 feat: Phase 2C — Gezma Pilgrim MVP (6 pages + layout + mock data)
 
 ---
 
-## M. NEXT STEPS
+## O. NEXT STEPS
 
 1. **Phase 3: Real API** — Connect real API keys (Nusuk, Payment Gateway, WhatsApp, UmrahCash)
 2. **Mobile Native** — Flutter app (di luar scope web — separate project)
-3. **Production Hardening** — Change SystemAdmin default password, secure JWT_SECRET, SSL certs
+3. **Production Hardening** — Change SystemAdmin default password, secure JWT_SECRET, SSL certs, TOTP_ENCRYPTION_KEY
 4. **E2E Test CI** — Integrate Playwright into CI/CD pipeline
 5. **Real Blockchain** — Replace mock tx hash with actual blockchain integration (e.g., Polygon/Base)
-6. **Academy Content** — Add real course content, video embeds, quiz system
+6. **Academy Content** — Add real course content, video embeds, seed quiz data
 7. **Pilgrim Profile Update API** — Hook gamification points on profile update
 8. **Daily Login Points** — Award daily_login points on pilgrim portal login
+9. **Cron Jobs** — Implement scheduled report sending, PPIU expiry auto-check
+10. **File Storage** — Move from local filesystem to S3/MinIO for photo gallery & documents
