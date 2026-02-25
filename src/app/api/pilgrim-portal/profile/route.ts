@@ -36,7 +36,7 @@ export async function PATCH(req: NextRequest) {
     const data: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(result.data)) {
       if (value !== undefined) {
-        data[key] = key === 'emergencyContact' ? value : value;
+        data[key] = value;
       }
     }
 

@@ -5,8 +5,7 @@ import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import { rateLimit } from '@/lib/rate-limiter';
 import { logger } from '@/lib/logger';
-
-const JWT_SECRET = process.env.JWT_SECRET!;
+import { JWT_SECRET } from '@/lib/auth-server';
 
 export async function POST(req: NextRequest) {
   try {

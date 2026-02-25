@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
+import { checkPermission } from '@/lib/auth-permissions';
+import { PERMISSIONS } from '@/lib/permissions';
 import { prisma } from '@/lib/prisma';
 import { emailTemplateSchema } from '@/lib/validations/email-template';
 import { logActivity } from '@/lib/activity-logger';
@@ -8,6 +10,9 @@ import { logger } from '@/lib/logger';
 export async function GET(req: NextRequest) {
   const auth = getAuthPayload(req);
   if (!auth) return unauthorizedResponse();
+
+  const denied = await checkPermission(auth, PERMISSIONS.SETTINGS_VIEW);
+  if (denied) return denied;
 
   try {
     const templates = await prisma.emailTemplate.findMany({

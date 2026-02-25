@@ -103,7 +103,7 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      // Verify trip belongs to agency and check capacity
+      // Verify trip belongs to agency
       const trip = await prisma.trip.findFirst({
         where: { id: tripId, agencyId: auth.agencyId },
       });
@@ -115,21 +115,18 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      // Count how many new pilgrims (not already on this trip)
-      const newPilgrims = pilgrims.filter((p) => p.tripId !== tripId);
-      const currentCount = trip.registeredCount;
-      const wouldBeTotal = currentCount + newPilgrims.length;
+      // Capacity check + assignment inside transaction to prevent race condition
+      const capacityError = await prisma.$transaction(async (tx) => {
+        // Re-fetch trip inside transaction for accurate count
+        const currentTrip = await tx.trip.findUniqueOrThrow({ where: { id: tripId } });
+        const newPilgrims = pilgrims.filter((p) => p.tripId !== tripId);
+        const currentCount = currentTrip.registeredCount;
+        const wouldBeTotal = currentCount + newPilgrims.length;
 
-      if (trip.capacity > 0 && wouldBeTotal > trip.capacity) {
-        return NextResponse.json(
-          {
-            error: `Kapasitas trip tidak cukup. Sisa: ${trip.capacity - currentCount}, dibutuhkan: ${newPilgrims.length}`,
-          },
-          { status: 400 }
-        );
-      }
+        if (currentTrip.capacity > 0 && wouldBeTotal > currentTrip.capacity) {
+          return `Kapasitas trip tidak cukup. Sisa: ${currentTrip.capacity - currentCount}, dibutuhkan: ${newPilgrims.length}`;
+        }
 
-      await prisma.$transaction(async (tx) => {
         // Collect old trip IDs to update their counts
         const oldTripIds = new Set<string>();
 
@@ -158,7 +155,13 @@ export async function POST(req: NextRequest) {
           const count = await tx.pilgrim.count({ where: { tripId: oldId } });
           await tx.trip.update({ where: { id: oldId }, data: { registeredCount: count } });
         }
+
+        return null;
       });
+
+      if (capacityError) {
+        return NextResponse.json({ error: capacityError }, { status: 400 });
+      }
 
       logActivity({
         type: 'pilgrim',

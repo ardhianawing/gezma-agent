@@ -1,7 +1,6 @@
 import { NextRequest } from 'next/server';
 import jwt from 'jsonwebtoken';
-
-const JWT_SECRET = process.env.JWT_SECRET!;
+import { JWT_SECRET } from '@/lib/auth-server';
 
 export interface PilgrimJwtPayload {
   pilgrimId: string;

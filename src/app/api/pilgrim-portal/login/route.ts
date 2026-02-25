@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
       if (!existing) {
         await awardPilgrimPoints(result.pilgrimId, 'daily_login', 'Login harian');
       }
-    })().catch(() => {});
+    })().catch(err => logger.error('Failed to award daily login points', { error: String(err) }));
 
     const response = NextResponse.json({
       message: 'Login berhasil',

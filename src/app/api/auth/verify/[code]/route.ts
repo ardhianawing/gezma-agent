@@ -2,8 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import jwt from 'jsonwebtoken';
 import { logger } from '@/lib/logger';
-
-const JWT_SECRET = process.env.JWT_SECRET!;
+import { JWT_SECRET } from '@/lib/auth-server';
 
 export async function GET(
   req: NextRequest,

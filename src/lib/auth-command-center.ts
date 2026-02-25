@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
-
-const JWT_SECRET = process.env.JWT_SECRET!;
+import { JWT_SECRET } from '@/lib/auth-server';
 const CC_COOKIE = 'cc_token';
 
 export interface CCAuthPayload {

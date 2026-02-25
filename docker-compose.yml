@@ -5,7 +5,7 @@ services:
     environment:
       POSTGRES_DB: gezma_agent
       POSTGRES_USER: gezma_admin
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-gezma_secret_2026}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -20,7 +20,7 @@ services:
     ports:
       - "3001:3000"
     environment:
-      DATABASE_URL: postgresql://gezma_admin:${DB_PASSWORD:-gezma_secret_2026}@db:5432/gezma_agent
+      DATABASE_URL: postgresql://gezma_admin:${DB_PASSWORD:?DB_PASSWORD is required}@db:5432/gezma_agent
       JWT_SECRET: ${JWT_SECRET:-change-me-in-production}
       JWT_EXPIRES_IN: 7d
       NEXT_PUBLIC_APP_URL: ${APP_URL:-http://localhost:3000}

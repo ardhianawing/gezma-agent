@@ -22,6 +22,9 @@ const envSchema = z.object({
   S3_ACCESS_KEY: z.string().optional(),
   S3_SECRET_KEY: z.string().optional(),
 
+  // Security
+  TOTP_ENCRYPTION_KEY: z.string().min(1, 'TOTP_ENCRYPTION_KEY is required for 2FA').optional(),
+
   // Cron
   CRON_ENABLED: z.string().default('true').transform(v => v === 'true'),
 });

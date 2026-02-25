@@ -5,8 +5,7 @@ import crypto from 'crypto';
 import { verifyToken } from '@/lib/services/totp.service';
 import { rateLimit } from '@/lib/rate-limiter';
 import { logger } from '@/lib/logger';
-
-const JWT_SECRET = process.env.JWT_SECRET!;
+import { JWT_SECRET } from '@/lib/auth-server';
 
 interface TotpPendingPayload {
   userId: string;

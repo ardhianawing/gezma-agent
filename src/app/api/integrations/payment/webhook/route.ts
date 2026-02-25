@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
       provider = 'midtrans';
     }
 
-    console.log(`[Payment Webhook] Received from ${provider}:`, JSON.stringify(payload, null, 2));
+    logger.info(`[Payment Webhook] Received from ${provider}`, { provider, payload });
 
     await handleWebhook(provider, payload);
 

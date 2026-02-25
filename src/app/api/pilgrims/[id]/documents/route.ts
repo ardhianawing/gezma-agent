@@ -1,10 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
 import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 import { checkPermission } from '@/lib/auth-permissions';
 import { PERMISSIONS } from '@/lib/permissions';
 import { logActivity } from '@/lib/activity-logger';
 import { logger } from '@/lib/logger';
+
+const documentUploadSchema = z.object({
+  type: z.string().min(1, 'Tipe dokumen wajib diisi'),
+  status: z.enum(['uploaded', 'verified', 'missing']).default('uploaded'),
+  fileName: z.string().nullable().optional(),
+  fileUrl: z.string().nullable().optional(),
+  fileSize: z.number().nullable().optional(),
+  expiryDate: z.string().nullable().optional(),
+});
 
 type Context = { params: Promise<{ id: string }> };
 
@@ -28,19 +38,24 @@ export async function POST(req: NextRequest, { params }: Context) {
     }
 
     const body = await req.json();
-    const { type, status, fileName, fileUrl, expiryDate } = body;
+    const parsed = documentUploadSchema.safeParse(body);
 
-    if (!type) {
-      return NextResponse.json({ error: 'Tipe dokumen wajib diisi' }, { status: 400 });
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Validasi gagal', details: parsed.error.flatten().fieldErrors },
+        { status: 400 }
+      );
     }
+
+    const { type, status, fileName, fileUrl, fileSize, expiryDate } = parsed.data;
 
     const doc = await prisma.pilgrimDocument.create({
       data: {
         type,
-        status: status || 'uploaded',
+        status,
         fileName: fileName || null,
         fileUrl: fileUrl || null,
-        fileSize: body.fileSize || null,
+        fileSize: fileSize || null,
         expiryDate: expiryDate ? new Date(expiryDate) : null,
         uploadedAt: new Date(),
         pilgrimId: id,

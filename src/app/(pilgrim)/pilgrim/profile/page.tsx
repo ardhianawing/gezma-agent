@@ -35,7 +35,7 @@ function getDocStatusInfo(status: string): { bg: string; text: string; label: st
 export default function ProfilePage() {
   const { c } = useTheme();
   const { isMobile } = useResponsive();
-  const { data, logout } = usePilgrim();
+  const { data, logout, refreshData } = usePilgrim();
   const router = useRouter();
   const { addToast } = useToast();
 
@@ -133,8 +133,7 @@ export default function ProfilePage() {
       if (!res.ok) throw new Error(d.error || 'Gagal memperbarui profil');
       addToast({ type: 'success', title: 'Profil berhasil diperbarui' });
       setEditMode(false);
-      // Refresh page to show updated data
-      window.location.reload();
+      refreshData();
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Gagal memperbarui profil';
       addToast({ type: 'error', title: msg });
@@ -565,7 +564,7 @@ export default function ProfilePage() {
         </div>
         <div style={{ display: 'flex', gap: '10px' }}>
           <a
-            href={'https://wa.me/' + agency.whatsapp.replace(/[^0-9]/g, '')}
+            href={'https://wa.me/' + (agency.whatsapp?.replace(/[^0-9]/g, '') || '')}
             target="_blank"
             rel="noopener noreferrer"
             style={{

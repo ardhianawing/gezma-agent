@@ -2,7 +2,13 @@ import { generateSecret as otpGenerateSecret, generateURI, verify as otpVerify }
 import QRCode from 'qrcode';
 import crypto from 'crypto';
 
-const TOTP_ENCRYPTION_KEY = process.env.TOTP_ENCRYPTION_KEY!;
+function getTotpEncryptionKey(): string {
+  const key = process.env.TOTP_ENCRYPTION_KEY;
+  if (!key) {
+    throw new Error('TOTP_ENCRYPTION_KEY environment variable is required');
+  }
+  return key;
+}
 const ALGORITHM = 'aes-256-gcm';
 const IV_LENGTH = 16;
 
@@ -11,7 +17,7 @@ const IV_LENGTH = 16;
  * Returns a string in the format: iv:authTag:encrypted (all hex-encoded).
  */
 export function encryptSecret(secret: string): string {
-  const key = Buffer.from(TOTP_ENCRYPTION_KEY, 'hex');
+  const key = Buffer.from(getTotpEncryptionKey(), 'hex');
   const iv = crypto.randomBytes(IV_LENGTH);
   const cipher = crypto.createCipheriv(ALGORITHM, key, iv);
 
@@ -27,7 +33,7 @@ export function encryptSecret(secret: string): string {
  * Decrypt a TOTP secret encrypted with AES-256-GCM.
  */
 export function decryptSecret(encryptedData: string): string {
-  const key = Buffer.from(TOTP_ENCRYPTION_KEY, 'hex');
+  const key = Buffer.from(getTotpEncryptionKey(), 'hex');
   const [ivHex, authTagHex, encrypted] = encryptedData.split(':');
 
   const iv = Buffer.from(ivHex, 'hex');
