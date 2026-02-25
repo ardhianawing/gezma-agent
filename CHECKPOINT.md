@@ -1,6 +1,6 @@
 # GEZMA Agent — Development Checkpoint
 
-> **Last Updated:** 2026-02-25 (Session 11 — Codebase Hardening & Quality)
+> **Last Updated:** 2026-02-25 (Session 12 — UI/UX Polish)
 > **Blueprint Reference:** `GEZMA-AGENT-PLAN-v2.md`, `DEVELOPMENT-PLAN-v3.md`
 
 ---
@@ -19,6 +19,7 @@
 | **Session 9: Polish** | ✅ Done | Error Boundaries, Security Settings, Pilgrim Gamification, CC Analytics |
 | **Session 10: Mega Features** | ✅ Done | 37 features: Security, Productivity, Pilgrim Portal, Platform, Academy, CC |
 | **Session 11: Hardening** | ✅ Done | Zod validation, rate limiting, try/catch, logActivity, cleanup, 85 new tests |
+| **Session 12: UI/UX Polish** | ✅ Done | Skeleton loaders, toast notifications, ConfirmDialog, button spinners, accessibility, empty states |
 | **PWA** | ✅ Done | Service Worker, Install Prompt, Offline |
 | **Deployment** | ✅ Ready | Docker + Nginx + Traefik |
 
@@ -535,7 +536,84 @@ Comprehensive audit + fix of ~50 quality/security gaps across the codebase:
 
 ---
 
-## L. API ENDPOINTS (~133 Total)  ← UPDATED
+## L. SESSION 12 — UI/UX POLISH ✅
+
+Wire underutilized shared components into pages for consistent, polished UX across the entire app:
+
+### Batch 1: Skeleton Loaders (12 pages) ✅
+| Page | Skeleton Type |
+|------|---------------|
+| Dashboard | TableSkeleton (activities) |
+| Packages List | CardSkeleton grid (4) |
+| Package Detail | DetailSkeleton |
+| Package Edit | FormSkeleton (8 fields) |
+| Trips List | CardSkeleton grid (4) |
+| Academy Courses | CardSkeleton grid (6) |
+| Activities | TableSkeleton (5×3) |
+| Blockchain | StatsSkeleton (3) + TableSkeleton |
+| Settings Security | TableSkeleton (4×2) |
+| CC Agencies | TableSkeleton (5×6) |
+| CC Agency Detail | DetailSkeleton |
+| Pilgrim Roommate | FormSkeleton (6 fields) |
+
+### Batch 2: Toast Notifications (~25 pages) ✅
+| Priority | Pages | Changes |
+|----------|-------|---------|
+| P1: alert() replacement | 5 files | packages/[id] (6 alerts), settings/users (2), academy/[id], scheduled-reports, pilgrim/gallery |
+| P2: Silent catches | 11 files | pilgrims/[id], pilgrims/[id]/edit, pilgrims/new, packages/new, packages/[id]/edit, settings/branding, email-templates, notifications, blockchain, agency, trips/[id] |
+| P3: Pilgrim + Integrations | 8 files | packing, profile, documents, nusuk, whatsapp, payment, umrahcash, notifications |
+
+### Batch 3: ConfirmDialog (7 pages) ✅
+| Page | Action | Previously |
+|------|--------|-----------|
+| packages/[id] | Delete package | `window.confirm()` |
+| settings/users | Delete user | `window.confirm()` |
+| academy/[id] | Delete review | `window.confirm()` |
+| scheduled-reports | Delete report | `window.confirm()` |
+| pilgrim/gallery | Delete photo | `window.confirm()` |
+| tasks | Delete task | No confirmation (added) |
+| trips/[id] | Remove waiting list | Toast feedback added |
+
+### Batch 4: Button Loading Spinners (20 pages) ✅
+| Group | Pages |
+|-------|-------|
+| Settings | page, security, branding, users, email-templates, notifications, scheduled-reports |
+| Main | agency, blockchain (issue+revoke), pilgrims/[id] (payment+note), tasks |
+| Integrations | nusuk, whatsapp, payment, umrahcash |
+| Other | pilgrim/roommate, pilgrim/gallery, academy/[id], academy/[id]/quiz, CC login |
+
+Also centralized `@keyframes spin` in `globals.css` and removed 6 inline `<style>` duplicates.
+
+### Batch 5: Accessibility ✅
+| Enhancement | Files | Details |
+|-------------|-------|---------|
+| ConfirmDialog a11y | 1 component | `role="dialog"`, `aria-modal`, `aria-labelledby`, auto-focus cancel button |
+| Toast a11y | 1 component | `role="alert"`, `aria-live="assertive"`, close button `aria-label` |
+| Icon button aria-labels | 6 pages | pilgrims, users, tasks, blockchain, notifications, trips/[id] |
+| Custom modal role="dialog" | 4 pages | pilgrims, trips/[id], blockchain, users |
+
+### Batch 6: Empty State Consistency (12 pages) ✅
+| Page | Icon | Title |
+|------|------|-------|
+| settings/users | Users | Belum ada user |
+| activities | Activity | Belum ada aktivitas |
+| scheduled-reports | FileText | Belum ada laporan terjadwal |
+| blockchain | Shield | Belum ada sertifikat |
+| gamification | Trophy/Star | Belum ada data leaderboard / riwayat poin |
+| documents | FileText | Belum ada dokumen |
+| trips | MapPin | Belum ada trip |
+| packages | Package | Conditional (filter-aware) |
+| tasks | CheckSquare | Tidak ada task |
+| notifications | Bell | Conditional (tab-aware) |
+| dashboard | Trophy/Calendar/Clock | 3 empty states |
+| reports | BarChart3 | 5 empty states across tabs |
+
+**Files changed:** 44 | **Insertions:** 534 | **Deletions:** 226
+**Build:** 0 TypeScript errors | **Tests:** 415/415 passing
+
+---
+
+## M. API ENDPOINTS (~133 Total)
 
 ```
 Auth:            9 endpoints (login, register, verify, password, totp-verify, me, etc)                   ← UPDATED
@@ -563,7 +641,7 @@ Academy:        10 endpoints (courses, course detail, lesson, progress, user pro
 
 ---
 
-## L. TECH STACK
+## N. TECH STACK
 
 | Layer | Tech |
 |-------|------|
@@ -583,7 +661,7 @@ Academy:        10 endpoints (courses, course detail, lesson, progress, user pro
 
 ---
 
-## M. FILE STRUCTURE
+## O. FILE STRUCTURE
 
 ```
 src/
@@ -630,9 +708,10 @@ src/
 
 ---
 
-## O. GIT LOG (Session 3-11)
+## P. GIT LOG (Session 3-12)
 
 ```
+85b78c0 feat: Session 12 — UI/UX polish across 44 files
 eb03772 fix: Session 11 — Codebase hardening & quality improvements
 637c69d feat: Session 10 — Mega Feature Session (37 features)
 e6e94a9 docs: update DEVELOPMENT-PLAN-v3.md with Session 9 progress
@@ -661,7 +740,7 @@ a8ebe52 feat: Phase 2C — Gezma Pilgrim MVP (6 pages + layout + mock data)
 
 ---
 
-## P. NEXT STEPS
+## Q. NEXT STEPS
 
 1. **Phase 3: Real API** — Connect real API keys (Nusuk, Payment Gateway, WhatsApp, UmrahCash)
 2. **Mobile Native** — Flutter app (di luar scope web — separate project)
