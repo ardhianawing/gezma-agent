@@ -1,8 +1,8 @@
 # 🕋 GEZMA Development Plan v3.0
 
 > **Created:** 2026-02-23
-> **Last Updated:** 2026-02-25 (Session 11 — Codebase Hardening & Quality)
-> **Status:** Phase 1-4 Complete + Session 11 (hardening, 39 models, 415 tests)
+> **Last Updated:** 2026-02-25 (Session 12 — UI/UX Polish)
+> **Status:** Phase 1-4 Complete + Session 12 (UI/UX polish, 39 models, 415 tests)
 > **Scope:** Phase 2 (Platform & Ecosystem) + Phase 3 (Integration) + Phase 4 (Advanced)
 
 ---
@@ -113,6 +113,7 @@
 **Session 9:** Error Boundaries, Security Settings, Pilgrim Gamification, CC Analytics, 274 unit tests
 **Session 10:** 37 features, 15 new models, ~74 new files, ~21 modified, 15,223 insertions, 330 unit tests
 **Session 11:** Codebase hardening — Zod on 16 routes, rate limiting on 7 auth routes, try/catch on 9 routes, logActivity on 13 routes, 5 new schemas, 85 new tests → 415 total (34 files)
+**Session 12:** UI/UX polish — Skeleton loaders (12 pages), toast notifications (~25 pages), ConfirmDialog (7 pages), button spinners (20 pages), accessibility (12 files), empty states (12 pages). 44 files changed, 534 insertions, 226 deletions.
 
 ---
 
@@ -998,6 +999,25 @@ Added `rateLimit(req, { limit, window })` to:
 
 ---
 
+### 8.26 Session 12 — UI/UX Polish (6 Batches)
+
+Wire underutilized shared components into pages across the entire app:
+
+| Batch | Description | Pages | Changes |
+|-------|------------|-------|---------|
+| 4a | Centralize `@keyframes spin` in globals.css | 1 | Remove inline duplicates |
+| 1 | Skeleton loaders (StatsSkeleton, TableSkeleton, CardSkeleton, DetailSkeleton, FormSkeleton) | 12 | Replace "Loading..." text |
+| 2 | Toast notifications (`useToast()` → `addToast()`) replacing `alert()` + silent catches | ~25 | 3 priority tiers |
+| 3 | ConfirmDialog replacing `window.confirm()` + add missing confirmations | 7 | Destructive variant |
+| 4b | Button loading spinners (Loader2 + spin animation) | 20 | Consistent feedback |
+| 5 | Accessibility (aria-labels, role="dialog", aria-modal, auto-focus) | 12 | 2 components + 10 pages |
+| 6 | EmptyState component consistency | 12 | Replace inline "Belum ada..." text |
+
+**Total: 44 files changed, 534 insertions, 226 deletions**
+**Build: 0 TypeScript errors | Tests: 415/415 passing**
+
+---
+
 ## 9. TECHNICAL GUIDELINES
 
 ### 9.1 Styling Rules
@@ -1239,14 +1259,16 @@ Blockchain:      5 endpoints (certificates CRUD, certificate detail, verify, pub
 
 *Plan Version: 3.5*
 *Created: 2026-02-23*
-*Updated: 2026-02-25 (Session 10: Mega Feature Session — 37 Features)*
+*Updated: 2026-02-25 (Session 12: UI/UX Polish)*
 *Next: Connect real API keys for Phase 3 integrations, or Mobile Native (Flutter — separate repo)*
 
-### Git Log (Phase 4 + Session 10)
+### Git Log (Phase 4 + Sessions 10-12)
 
 ```
 Session 7:  feat: implement Phase 4A — Gamifikasi, Command Center, White-label Branding
 Session 8:  feat: implement Phase 4B — Blockchain, CC Polish, Academy LMS, Tests
 Session 9:  feat: implement Session 9 — Error Boundaries, Security, Pilgrim Gamification, CC Analytics
 Session 10: feat: Session 10 — Mega Feature Session (37 features)
+Session 11: fix: Session 11 — Codebase hardening & quality improvements
+Session 12: feat: Session 12 — UI/UX polish across 44 files
 ```
