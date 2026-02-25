@@ -37,6 +37,8 @@ COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 COPY --from=builder /app/node_modules/dotenv ./node_modules/dotenv
+COPY --from=builder /app/node_modules/node-cron ./node_modules/node-cron
+COPY --from=builder /app/node_modules/@aws-sdk ./node_modules/@aws-sdk
 COPY --from=builder /app/src/generated ./src/generated
 
 # Copy start script

@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { signPilgrimToken } from '@/lib/auth-pilgrim';
 import { findPilgrimByBookingCode } from '@/lib/services/pilgrim-portal.service';
 import { rateLimit } from '@/lib/rate-limiter';
+import { prisma } from '@/lib/prisma';
+import { awardPilgrimPoints } from '@/lib/services/pilgrim-gamification.service';
 
 export async function POST(req: NextRequest) {
   try {
@@ -30,6 +32,22 @@ export async function POST(req: NextRequest) {
     }
 
     const token = signPilgrimToken(result.pilgrimId, result.agencyId);
+
+    // Award daily login points (fire-and-forget)
+    (async () => {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const existing = await prisma.pilgrimPointEvent.findFirst({
+        where: {
+          pilgrimId: result.pilgrimId,
+          action: 'daily_login',
+          createdAt: { gte: today },
+        },
+      });
+      if (!existing) {
+        await awardPilgrimPoints(result.pilgrimId, 'daily_login', 'Login harian');
+      }
+    })().catch(() => {});
 
     const response = NextResponse.json({
       message: 'Login berhasil',

@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPilgrimPayload } from '@/lib/auth-pilgrim';
 import { prisma } from '@/lib/prisma';
-import { writeFile, mkdir } from 'fs/promises';
-import path from 'path';
 import { awardPilgrimPoints } from '@/lib/services/pilgrim-gamification.service';
+import { getStorage } from '@/lib/storage';
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
 const MAX_SIZE = 5 * 1024 * 1024; // 5MB
@@ -37,17 +36,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Ukuran file maksimal 5MB' }, { status: 400 });
     }
 
-    // Save file to disk
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'documents', payload.pilgrimId);
-    await mkdir(uploadDir, { recursive: true });
-
+    // Save file via storage abstraction
     const ext = file.name.split('.').pop() || 'bin';
-    const fileName = `${docType}-${Date.now()}.${ext}`;
-    const filePath = path.join(uploadDir, fileName);
+    const storageKey = `documents/${payload.pilgrimId}/${docType}-${Date.now()}.${ext}`;
     const buffer = Buffer.from(await file.arrayBuffer());
-    await writeFile(filePath, buffer);
-
-    const fileUrl = `/uploads/documents/${payload.pilgrimId}/${fileName}`;
+    const fileUrl = await getStorage().upload(storageKey, buffer, file.type);
 
     // Upsert PilgrimDocument
     const existing = await prisma.pilgrimDocument.findFirst({

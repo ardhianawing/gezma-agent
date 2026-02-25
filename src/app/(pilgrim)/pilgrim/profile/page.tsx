@@ -39,6 +39,11 @@ export default function ProfilePage() {
   const router = useRouter();
   const { addToast } = useToast();
 
+  // Profile edit state
+  const [editMode, setEditMode] = useState(false);
+  const [editData, setEditData] = useState({ phone: '', email: '', whatsapp: '', address: '' });
+  const [editSaving, setEditSaving] = useState(false);
+
   // Referral state
   const [referralCode, setReferralCode] = useState<string | null>(null);
   const [referralStats, setReferralStats] = useState({ totalReferrals: 0, completedReferrals: 0 });
@@ -103,6 +108,39 @@ export default function ProfilePage() {
     }).catch(() => {
       addToast({ type: 'error', title: 'Gagal menyalin kode referral' });
     });
+  }
+
+  function handleStartEdit() {
+    if (!data) return;
+    setEditData({
+      phone: data.pilgrim.phone || '',
+      email: data.pilgrim.email || '',
+      whatsapp: '',
+      address: data.pilgrim.address || '',
+    });
+    setEditMode(true);
+  }
+
+  async function handleSaveProfile() {
+    setEditSaving(true);
+    try {
+      const res = await fetch('/api/pilgrim-portal/profile', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(editData),
+      });
+      const d = await res.json();
+      if (!res.ok) throw new Error(d.error || 'Gagal memperbarui profil');
+      addToast({ type: 'success', title: 'Profil berhasil diperbarui' });
+      setEditMode(false);
+      // Refresh page to show updated data
+      window.location.reload();
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Gagal memperbarui profil';
+      addToast({ type: 'error', title: msg });
+    } finally {
+      setEditSaving(false);
+    }
   }
 
   async function handleSubmitReview() {
@@ -273,21 +311,109 @@ export default function ProfilePage() {
 
       {/* Contact info */}
       <div style={cardStyle}>
-        <h2 style={sectionTitleStyle}>📱 Kontak</h2>
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
-          {[
-            { label: 'Telepon', value: pilgrim.phone },
-            { label: 'Email', value: pilgrim.email },
-          ].map((row, i) => (
-            <div key={i} style={{
-              ...infoRowStyle,
-              borderBottom: i === 1 ? 'none' : '1px solid ' + c.borderLight,
-            }}>
-              <span style={labelStyle}>{row.label}</span>
-              <span style={valueStyle}>{row.value}</span>
-            </div>
-          ))}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
+          <h2 style={{ ...sectionTitleStyle, margin: 0 }}>📱 Kontak</h2>
+          {!editMode && (
+            <button
+              onClick={handleStartEdit}
+              style={{
+                padding: '5px 14px',
+                fontSize: '12px',
+                fontWeight: 600,
+                color: GREEN,
+                backgroundColor: GREEN_LIGHT,
+                border: '1px solid ' + GREEN,
+                borderRadius: '8px',
+                cursor: 'pointer',
+              }}
+            >
+              Edit Profil
+            </button>
+          )}
         </div>
+
+        {editMode ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {([
+              { key: 'phone' as const, label: 'Telepon' },
+              { key: 'email' as const, label: 'Email' },
+              { key: 'whatsapp' as const, label: 'WhatsApp' },
+              { key: 'address' as const, label: 'Alamat' },
+            ]).map(field => (
+              <div key={field.key}>
+                <label style={{ fontSize: '12px', color: c.textMuted, marginBottom: '4px', display: 'block' }}>
+                  {field.label}
+                </label>
+                <input
+                  value={editData[field.key]}
+                  onChange={e => setEditData(prev => ({ ...prev, [field.key]: e.target.value }))}
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    fontSize: '14px',
+                    border: '1px solid ' + c.border,
+                    borderRadius: '8px',
+                    backgroundColor: c.pageBg,
+                    color: c.textPrimary,
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                  }}
+                />
+              </div>
+            ))}
+            <div style={{ display: 'flex', gap: '10px', marginTop: '4px' }}>
+              <button
+                onClick={() => setEditMode(false)}
+                style={{
+                  flex: 1,
+                  padding: '10px',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  color: c.textPrimary,
+                  backgroundColor: c.pageBg,
+                  border: '1px solid ' + c.border,
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                }}
+              >
+                Batal
+              </button>
+              <button
+                onClick={handleSaveProfile}
+                disabled={editSaving}
+                style={{
+                  flex: 1,
+                  padding: '10px',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  color: '#FFFFFF',
+                  backgroundColor: GREEN,
+                  border: 'none',
+                  borderRadius: '8px',
+                  cursor: editSaving ? 'not-allowed' : 'pointer',
+                  opacity: editSaving ? 0.7 : 1,
+                }}
+              >
+                {editSaving ? 'Menyimpan...' : 'Simpan'}
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            {[
+              { label: 'Telepon', value: pilgrim.phone },
+              { label: 'Email', value: pilgrim.email },
+            ].map((row, i) => (
+              <div key={i} style={{
+                ...infoRowStyle,
+                borderBottom: i === 1 ? 'none' : '1px solid ' + c.borderLight,
+              }}>
+                <span style={labelStyle}>{row.label}</span>
+                <span style={valueStyle}>{row.value}</span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Room assignment */}

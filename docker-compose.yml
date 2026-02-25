@@ -31,6 +31,8 @@ services:
       SMTP_PASS: ${SMTP_PASS}
       SMTP_FROM: ${SMTP_FROM:-gezmaagent@gmail.com}
       APP_URL: ${APP_URL:-http://localhost:3000}
+      CRON_ENABLED: "true"
+      STORAGE_DRIVER: local
       NODE_ENV: production
     depends_on:
       db:
