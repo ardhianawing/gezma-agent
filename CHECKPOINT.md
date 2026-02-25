@@ -1,6 +1,6 @@
 # GEZMA Agent — Development Checkpoint
 
-> **Last Updated:** 2026-02-25 (Session 12 — UI/UX Polish)
+> **Last Updated:** 2026-02-25 (Session 13 — Production Readiness)
 > **Blueprint Reference:** `GEZMA-AGENT-PLAN-v2.md`, `DEVELOPMENT-PLAN-v3.md`
 
 ---
@@ -20,6 +20,7 @@
 | **Session 10: Mega Features** | ✅ Done | 37 features: Security, Productivity, Pilgrim Portal, Platform, Academy, CC |
 | **Session 11: Hardening** | ✅ Done | Zod validation, rate limiting, try/catch, logActivity, cleanup, 85 new tests |
 | **Session 12: UI/UX Polish** | ✅ Done | Skeleton loaders, toast notifications, ConfirmDialog, button spinners, accessibility, empty states |
+| **Session 13: Production Readiness** | ✅ Done | Env validation, CSP headers, structured logger, storage abstraction, cron jobs, gamification hooks |
 | **PWA** | ✅ Done | Service Worker, Install Prompt, Offline |
 | **Deployment** | ✅ Ready | Docker + Nginx + Traefik |
 
@@ -613,7 +614,52 @@ Also centralized `@keyframes spin` in `globals.css` and removed 6 inline `<style
 
 ---
 
-## M. API ENDPOINTS (~133 Total)
+## M. SESSION 13 — PRODUCTION READINESS ✅
+
+6 production-readiness improvements across 4 batches:
+
+### Batch 1: Foundation ✅
+| Fitur | Status | Keterangan |
+|-------|--------|------------|
+| Environment Validation | ✅ | Zod schema at startup: DATABASE_URL, JWT_SECRET (min 32), STORAGE_DRIVER, CRON_ENABLED |
+| CSP Header | ✅ | Content-Security-Policy + Permissions-Policy in next.config.ts |
+| Structured Logger | ✅ | JSON output in prod, readable in dev, no deps |
+| File Storage Abstraction | ✅ | StorageDriver interface, LocalStorage + S3Storage (MinIO), `getStorage()` singleton |
+| Instrumentation Hook | ✅ | `src/instrumentation.ts` — Next.js server startup, env validation + cron init |
+
+### Batch 2: Gamification Hooks ✅
+| Fitur | Status | Keterangan |
+|-------|--------|------------|
+| Daily Login Points | ✅ | `daily_login` (5 pts) awarded on pilgrim login, deduplicated per day |
+| Profile Update Points | ✅ | `update_profile` (15 pts) on pilgrim profile self-service update |
+| Pilgrim Profile PATCH API | ✅ | `/api/pilgrim-portal/profile` — phone, email, whatsapp, address, etc. |
+| Profile Edit UI | ✅ | "Edit Profil" button + inline edit mode in pilgrim profile page |
+
+### Batch 3: Cron Jobs ✅
+| Job | Schedule | Keterangan |
+|-----|----------|------------|
+| Scheduled Reports | `0 * * * *` | Check active reports, send if due (weekly/monthly), update lastSentAt |
+| PPIU Auto-Suspend | `0 1 * * *` | Find agencies with expired PPIU, auto-update to 'expired' |
+| PPIU Expiry Alerts | `0 8 * * *` | Log warnings for agencies expiring within 30 days |
+
+Also: extracted report-generator.service.ts from send-scheduled route, node-cron + @aws-sdk/client-s3 deps.
+
+### Batch 4: Tests ✅
+| Test File | Tests | Keterangan |
+|-----------|-------|------------|
+| env.test.ts | 6 | Missing vars, short JWT_SECRET, defaults, caching |
+| storage.test.ts | 3 | Upload, getUrl, delete (mocked fs) |
+| cron.test.ts | 4 | Enable/disable, schedule registration, logging |
+| logger.test.ts | 5 | JSON prod, readable dev, levels, debug suppression |
+| **Total** | **433 tests across 38 files, all passing** |
+
+**Files changed:** 20 | **Insertions:** 4,340 | **Deletions:** 1,839
+**Build:** 0 TypeScript errors | **Tests:** 433/433 passing
+**New deps:** node-cron, @aws-sdk/client-s3
+
+---
+
+## N. API ENDPOINTS (~134 Total)
 
 ```
 Auth:            9 endpoints (login, register, verify, password, totp-verify, me, etc)                   ← UPDATED
@@ -625,7 +671,7 @@ Reports:         6 endpoints (financial, demographics, documents, payment-aging,
 Reports Export:  1 endpoint  (financial/export)
 Settings:       10 endpoints (notifications, security ×5, email-templates ×2, scheduled-reports ×2, onboarding) ← UPDATED
 Integrations:   15 endpoints (nusuk: 3, payment: 4, whatsapp: 5, umrahcash: 3)
-Pilgrim Portal: 20 endpoints (login, me, logout, docs, manasik, doa, gamification ×3, gallery ×2, testimonial, referral ×2, roommate ×2, share-itinerary) ← UPDATED
+Pilgrim Portal: 21 endpoints (login, me, logout, docs, profile, manasik, doa, gamification ×3, gallery ×2, testimonial, referral ×2, roommate ×2, share-itinerary) ← UPDATED
 Verify:          3 endpoints (pilgrim QR + agency QR + certificate verification)
 Users:           2 endpoints (CRUD + role management)
 Other:           3 endpoints (agency, agency/export, chat AI)                                             ← UPDATED
@@ -689,11 +735,15 @@ src/
 │   └── cc-error-boundary.tsx      → Command Center error boundary                   ← NEW
 ├── data/                 → 8 mock data files (+pilgrim-portal, manasik, doa)
 ├── lib/
-│   ├── services/         → 14 service files (+totp, invoice, notification, academy-certificate) ← UPDATED
+│   ├── services/         → 15 service files (+totp, invoice, notification, academy-certificate, report-generator) ← UPDATED
 │   ├── hooks/            → 4 hooks
 │   ├── contexts/         → 2 (pilgrim-context, branding-context)
 │   ├── validations/      → 14 schemas (+note, waiting-list, scheduled-report, academy-review) ← UPDATED
 │   ├── utils/            → 1 (prayer-times)                                         ← NEW
+│   ├── env.ts            → Zod env validation at startup                           ← NEW S13
+│   ├── logger.ts         → Structured logger (JSON prod, readable dev)             ← NEW S13
+│   ├── storage.ts        → File storage abstraction (local/S3)                     ← NEW S13
+│   ├── cron.ts           → Cron jobs (reports, PPIU suspend, alerts)               ← NEW S13
 │   ├── rate-limiter.ts   → In-memory sliding window rate limiter                    ← NEW
 │   ├── auth-command-center.ts → CC JWT auth (sign, verify, cookie)
 │   ├── csv-export.ts     → UTF-8 BOM CSV generator
@@ -702,7 +752,7 @@ src/
 ├── types/                → 5 type definition files
 ├── prisma/
 │   └── seed-academy.ts   → Academy seed script (12 courses + 36 lessons)            ← NEW
-├── tests/                → 34 unit test files (415 tests)                           ← UPDATED
+├── tests/                → 38 unit test files (433 tests)                           ← UPDATED S13
 └── e2e/                  → 5 Playwright spec files (auth, dashboard, pilgrims, CC, navigation)
 ```
 
@@ -711,6 +761,7 @@ src/
 ## P. GIT LOG (Session 3-12)
 
 ```
+295e01c feat: Session 13 — Production readiness (env validation, CSP, storage, cron, gamification)
 85b78c0 feat: Session 12 — UI/UX polish across 44 files
 eb03772 fix: Session 11 — Codebase hardening & quality improvements
 637c69d feat: Session 10 — Mega Feature Session (37 features)
@@ -748,7 +799,4 @@ a8ebe52 feat: Phase 2C — Gezma Pilgrim MVP (6 pages + layout + mock data)
 4. **E2E Test CI** — Integrate Playwright into CI/CD pipeline
 5. **Real Blockchain** — Replace mock tx hash with actual blockchain integration (e.g., Polygon/Base)
 6. **Academy Content** — Add real course content, video embeds, seed quiz data
-7. **Pilgrim Profile Update API** — Hook gamification points on profile update
-8. **Daily Login Points** — Award daily_login points on pilgrim portal login
-9. **Cron Jobs** — Implement scheduled report sending, PPIU expiry auto-check
-10. **File Storage** — Move from local filesystem to S3/MinIO for photo gallery & documents
+7. **S3 Storage** — Configure STORAGE_DRIVER=s3 with MinIO/S3 bucket for production file storage
