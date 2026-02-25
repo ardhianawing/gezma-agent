@@ -472,7 +472,7 @@
 |-----------|---------------|--------|-------|
 | **Backend** | Golang | Next.js API Routes | ⚠️ Different |
 | **Mobile** | Flutter | PWA (Web) | ⚠️ Different approach |
-| **Database** | PostgreSQL + MongoDB | PostgreSQL + Prisma 7 (39 models) | ✅ Partial |
+| **Database** | PostgreSQL + MongoDB | PostgreSQL + Prisma 7 (39 models, indexes S14) | ✅ Partial |
 | **API Gateway** | Kong/Apigee | - | ❌ Not implemented |
 | **Blockchain** | Hyperledger Fabric | Mock Simulation | ⚠️ Simulated |
 | **Cloud** | GCP Jakarta | Docker + Nginx + Traefik | ⚠️ Self-hosted |
@@ -553,11 +553,20 @@
 10. Custom domain per tenant (white-label)
 11. Gamifikasi rewards (diskon, sedekah — needs fintech)
 12. Sertifikasi Mutawwif courses
-13. Cron jobs for scheduled reports & PPIU expiry auto-check
-14. File storage migration (local → S3/MinIO)
 
-### ✅ Completed (Session 12)
-15. ~~**UI/UX Polish**~~ — ✅ Done (Session 12) — Skeleton loaders (12 pages), toast notifications (~25 pages), ConfirmDialog (7 pages), button spinners (20 pages), accessibility (12 files), empty states (12 pages). 44 files, 534 insertions.
+### Next: Session 14 — Database & Infrastructure Hardening
+13. **Database Indexes** — Add 17+ `@@index` on foreign keys (agencyId, pilgrimId, userId) — 0 indexes saat ini
+14. **Health Check** — `/api/health` + `/api/health/ready` for Docker/Traefik
+15. **SEO** — `robots.ts` + `sitemap.ts` for public pages
+16. **Image Optimization** — Next.js `images` config (webp/avif, S3 domains)
+17. **Logger Cleanup** — Replace 50+ `console.error` with `logger.error`
+18. **Env Docs** — Expand `.env.example` from 20 → 35+ vars
+
+### ✅ Completed (Session 12-13)
+19. ~~**UI/UX Polish**~~ — ✅ Done (Session 12)
+20. ~~**Cron jobs for scheduled reports & PPIU expiry**~~ — ✅ Done (Session 13)
+21. ~~**File storage abstraction (local → S3/MinIO)**~~ — ✅ Done (Session 13)
+22. ~~**Env validation + CSP + Logger + Gamification hooks**~~ — ✅ Done (Session 13)
 
 ---
 
@@ -572,18 +581,18 @@
 - `CHECKPOINT.md` — Development checkpoint (in repo)
 - `DEVELOPMENT-PLAN-v3.md` — Phase 2 & 3 execution plan
 - `prisma/schema.prisma` — Database models (39 models)
-- `src/app/api/` — ~133 API endpoints
+- `src/app/api/` — ~134 API endpoints
 - `src/app/(dashboard)/` — 40+ dashboard pages
 - `src/app/(command-center)/` — 7 command center pages
 - `src/app/(pilgrim)/` — 14+ pilgrim portal pages
 - `src/app/agency/` — 1 public agency page
 - `src/app/share/` — 1 public itinerary page
-- `__tests__/` — 34 test files (415 unit tests)
+- `__tests__/` — 38 test files (433 unit tests)
 - `e2e/` — 5 Playwright spec files
 
 ---
 
-*Document Version: 2.0*
+*Document Version: 2.1*
 *Created: 2026-02-23*
-*Updated: 2026-02-25 (Session 12 — UI/UX Polish)*
-*Next Review: After real API integration or production hardening*
+*Updated: 2026-02-25 (Session 13 — Production Readiness)*
+*Next: Session 14 (DB indexes + infra) → then real API integration*

@@ -791,7 +791,55 @@ a8ebe52 feat: Phase 2C — Gezma Pilgrim MVP (6 pages + layout + mock data)
 
 ---
 
-## Q. NEXT STEPS
+## Q. SESSION 14 PLAN — Database & Infrastructure Hardening
+
+Audit hasil Session 13 menemukan production gaps kritis yang bisa ditangani tanpa external deps:
+
+### Batch 1: Database Indexes (CRITICAL)
+Prisma schema memiliki **0 `@@index`** — semua query multi-tenant (filter by `agencyId`) melakukan full table scan.
+
+| Model | Index | Alasan |
+|-------|-------|--------|
+| Pilgrim | `@@index([agencyId])` | Multi-tenant query utama, dipakai di 20+ API |
+| User | `@@index([agencyId])` | User listing per agency |
+| ActivityLog | `@@index([agencyId])`, `@@index([userId])` | Logged on every mutation |
+| Trip | `@@index([agencyId])` | Trip listing, calendar, cron reports |
+| Package | `@@index([agencyId])` | Package listing per agency |
+| PaymentRecord | `@@index([pilgrimId])` | Payment history lookup |
+| PilgrimDocument | `@@index([pilgrimId])` | Document listing per pilgrim |
+| Notification | `@@index([userId])`, `@@index([agencyId])` | Notification center queries |
+| LoginHistory | `@@index([userId])` | Security audit |
+| PointEvent | `@@index([userId, agencyId])` | Gamification leaderboard |
+| PilgrimPointEvent | `@@index([pilgrimId])` | Pilgrim gamification |
+| PilgrimManasikProgress | `@@index([pilgrimId])` | Manasik progress |
+| PilgrimDoaFavorite | `@@index([pilgrimId])` | Doa favorites |
+| Agency | `@@index([ppiuStatus, ppiuExpiryDate])` | Cron PPIU auto-suspend |
+| ScheduledReport | `@@index([isActive, agencyId])` | Cron scheduled reports |
+| AgencyTask | `@@index([agencyId])` | Task management |
+| PilgrimBadge | `@@index([pilgrimId])` | Badge lookup |
+
+### Batch 2: Health Check & Monitoring
+- **`/api/health`** — DB ping + uptime + memory, untuk Traefik/Docker healthcheck
+- **`/api/health/ready`** — Readiness probe (DB connected, cron running)
+- Update `docker-compose.yml` healthcheck dari `curl` ke health endpoint
+
+### Batch 3: SEO & Security
+- **`src/app/robots.ts`** — Block `/dashboard/*`, `/api/*`, `/command-center/*`, `/pilgrim/*`
+- **`src/app/sitemap.ts`** — Public pages: `/`, `/agency/[slug]`, `/verify/*`, `/help`
+- **`.env.example`** — Expand dari 20 → 35+ vars with descriptions + required/optional markers
+
+### Batch 4: Image Optimization & Performance
+- **`next.config.ts`** `images` config — formats (webp/avif), domains (S3), device sizes
+- **Console.error cleanup** — Replace 50+ `console.error` in API routes with `logger.error`
+
+### Batch 5: Tests + Verification
+- Unit tests for health endpoint, new index validation
+- `npx tsc --noEmit` + `npm run test` + `npm run build`
+- `prisma db push` to apply indexes
+
+---
+
+## R. FUTURE STEPS (Beyond Session 14)
 
 1. **Phase 3: Real API** — Connect real API keys (Nusuk, Payment Gateway, WhatsApp, UmrahCash)
 2. **Mobile Native** — Flutter app (di luar scope web — separate project)
@@ -800,3 +848,5 @@ a8ebe52 feat: Phase 2C — Gezma Pilgrim MVP (6 pages + layout + mock data)
 5. **Real Blockchain** — Replace mock tx hash with actual blockchain integration (e.g., Polygon/Base)
 6. **Academy Content** — Add real course content, video embeds, seed quiz data
 7. **S3 Storage** — Configure STORAGE_DRIVER=s3 with MinIO/S3 bucket for production file storage
+8. **Error Monitoring** — Sentry integration for real-time error tracking
+9. **API Documentation** — OpenAPI/Swagger auto-generated from Zod schemas
