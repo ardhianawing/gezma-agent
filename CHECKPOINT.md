@@ -1,6 +1,6 @@
 # GEZMA Agent — Development Checkpoint
 
-> **Last Updated:** 2026-02-25 (Session 13 — Production Readiness)
+> **Last Updated:** 2026-02-25 (Session 14 — Database & Infrastructure Hardening)
 > **Blueprint Reference:** `GEZMA-AGENT-PLAN-v2.md`, `DEVELOPMENT-PLAN-v3.md`
 
 ---
@@ -21,6 +21,7 @@
 | **Session 11: Hardening** | ✅ Done | Zod validation, rate limiting, try/catch, logActivity, cleanup, 85 new tests |
 | **Session 12: UI/UX Polish** | ✅ Done | Skeleton loaders, toast notifications, ConfirmDialog, button spinners, accessibility, empty states |
 | **Session 13: Production Readiness** | ✅ Done | Env validation, CSP headers, structured logger, storage abstraction, cron jobs, gamification hooks |
+| **Session 14: DB & Infra Hardening** | ✅ Done | 25+ DB indexes, health endpoints, robots/sitemap, image optimization, logger cleanup 132 files |
 | **PWA** | ✅ Done | Service Worker, Install Prompt, Offline |
 | **Deployment** | ✅ Ready | Docker + Nginx + Traefik |
 
@@ -818,24 +819,23 @@ Prisma schema memiliki **0 `@@index`** — semua query multi-tenant (filter by `
 | AgencyTask | `@@index([agencyId])` | Task management |
 | PilgrimBadge | `@@index([pilgrimId])` | Badge lookup |
 
-### Batch 2: Health Check & Monitoring
+### Batch 2: Health Check & Monitoring ✅
 - **`/api/health`** — DB ping + uptime + memory, untuk Traefik/Docker healthcheck
 - **`/api/health/ready`** — Readiness probe (DB connected, cron running)
 - Update `docker-compose.yml` healthcheck dari `curl` ke health endpoint
 
-### Batch 3: SEO & Security
+### Batch 3: SEO & Security ✅
 - **`src/app/robots.ts`** — Block `/dashboard/*`, `/api/*`, `/command-center/*`, `/pilgrim/*`
 - **`src/app/sitemap.ts`** — Public pages: `/`, `/agency/[slug]`, `/verify/*`, `/help`
 - **`.env.example`** — Expand dari 20 → 35+ vars with descriptions + required/optional markers
 
-### Batch 4: Image Optimization & Performance
+### Batch 4: Image Optimization & Observability ✅
 - **`next.config.ts`** `images` config — formats (webp/avif), domains (S3), device sizes
-- **Console.error cleanup** — Replace 50+ `console.error` in API routes with `logger.error`
+- **Console.error cleanup** — Replaced 180 `console.error` → `logger.error` across 132 API route files
 
-### Batch 5: Tests + Verification
-- Unit tests for health endpoint, new index validation
-- `npx tsc --noEmit` + `npm run test` + `npm run build`
-- `prisma db push` to apply indexes
+### Batch 5: Tests + Verification ✅
+- Unit tests: `health.test.ts` (4 tests), `schema-indexes.test.ts` (14 tests)
+- **451 tests passing** (was 433), 0 TypeScript errors, build succeeds
 
 ---
 
