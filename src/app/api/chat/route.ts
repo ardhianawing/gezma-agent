@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
+import { logger } from '@/lib/logger';
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
@@ -178,7 +179,7 @@ export async function POST(request: NextRequest) {
 
     if (!response.ok) {
       const errorData = await response.json();
-      console.error('Gemini API Error:', errorData);
+      logger.error('Gemini API Error', { error: String(errorData) });
       return NextResponse.json(
         { error: 'Failed to get response from AI', details: errorData },
         { status: response.status }
@@ -192,7 +193,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ message: assistantMessage });
   } catch (error) {
-    console.error('Chat API Error:', error);
+    logger.error('Chat API Error', { error: String(error) });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

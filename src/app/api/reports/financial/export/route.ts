@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 import { generateCSV } from '@/lib/csv-export';
+import { logger } from '@/lib/logger';
 
 export async function GET(req: NextRequest) {
   const auth = getAuthPayload(req);
@@ -38,7 +39,7 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('GET /api/reports/financial/export error:', error);
+    logger.error('GET /api/reports/financial/export error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 import { prisma } from '@/lib/prisma';
+import { logger } from '@/lib/logger';
 
 export async function GET(req: NextRequest) {
   try {
@@ -23,7 +24,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ sessions });
   } catch (error) {
-    console.error('Sessions list error:', error);
+    logger.error('Sessions list error', { error: String(error) });
     return NextResponse.json(
       { error: 'Terjadi kesalahan server.' },
       { status: 500 }
@@ -75,7 +76,7 @@ export async function DELETE(req: NextRequest) {
       message: 'Session berhasil diakhiri.',
     });
   } catch (error) {
-    console.error('Session revoke error:', error);
+    logger.error('Session revoke error', { error: String(error) });
     return NextResponse.json(
       { error: 'Terjadi kesalahan server.' },
       { status: 500 }

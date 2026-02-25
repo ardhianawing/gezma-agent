@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPilgrimPayload } from '@/lib/auth-pilgrim';
 import { getPilgrimStats } from '@/lib/services/pilgrim-gamification.service';
+import { logger } from '@/lib/logger';
 
 export async function GET(req: NextRequest) {
   try {
@@ -12,7 +13,7 @@ export async function GET(req: NextRequest) {
     const stats = await getPilgrimStats(payload.pilgrimId);
     return NextResponse.json(stats);
   } catch (error) {
-    console.error('GET /api/pilgrim-portal/gamification/stats error:', error);
+    logger.error('GET /api/pilgrim-portal/gamification/stats error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }

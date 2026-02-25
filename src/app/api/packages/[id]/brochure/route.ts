@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 import { generateBrochurePdf } from '@/lib/services/brochure.service';
+import { logger } from '@/lib/logger';
 
 type Context = { params: Promise<{ id: string }> };
 
@@ -70,7 +71,7 @@ export async function POST(req: NextRequest, { params }: Context) {
       },
     });
   } catch (error) {
-    console.error('POST /api/packages/[id]/brochure error:', error);
+    logger.error('POST /api/packages/[id]/brochure error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }

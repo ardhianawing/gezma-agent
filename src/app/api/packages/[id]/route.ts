@@ -5,6 +5,7 @@ import { checkPermission } from '@/lib/auth-permissions';
 import { PERMISSIONS } from '@/lib/permissions';
 import { packageFormSchema } from '@/lib/validations/package';
 import { logActivity } from '@/lib/activity-logger';
+import { logger } from '@/lib/logger';
 
 function slugify(text: string): string {
   return text
@@ -42,7 +43,7 @@ export async function GET(req: NextRequest, { params }: Context) {
 
     return NextResponse.json(pkg);
   } catch (error) {
-    console.error('GET /api/packages/[id] error:', error);
+    logger.error('GET /api/packages/[id] error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }
@@ -132,7 +133,7 @@ export async function PUT(req: NextRequest, { params }: Context) {
 
     return NextResponse.json(pkg);
   } catch (error) {
-    console.error('PUT /api/packages/[id] error:', error);
+    logger.error('PUT /api/packages/[id] error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }
@@ -169,7 +170,7 @@ export async function DELETE(req: NextRequest, { params }: Context) {
 
     return NextResponse.json({ message: 'Paket berhasil dihapus' });
   } catch (error) {
-    console.error('DELETE /api/packages/[id] error:', error);
+    logger.error('DELETE /api/packages/[id] error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }

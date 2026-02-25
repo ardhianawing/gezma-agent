@@ -5,6 +5,7 @@ import { checkPermission } from '@/lib/auth-permissions';
 import { PERMISSIONS } from '@/lib/permissions';
 import { tripFormSchema } from '@/lib/validations/trip';
 import { logActivity } from '@/lib/activity-logger';
+import { logger } from '@/lib/logger';
 
 export async function GET(req: NextRequest) {
   const auth = getAuthPayload(req);
@@ -34,7 +35,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ data });
   } catch (error) {
-    console.error('GET /api/trips error:', error);
+    logger.error('GET /api/trips error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }
@@ -101,7 +102,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(trip, { status: 201 });
   } catch (error) {
-    console.error('POST /api/trips error:', error);
+    logger.error('POST /api/trips error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }

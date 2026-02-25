@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getCCAuthPayload, ccUnauthorizedResponse } from '@/lib/auth-command-center';
 import { prisma } from '@/lib/prisma';
+import { logger } from '@/lib/logger';
 
 export async function GET(req: NextRequest) {
   const auth = getCCAuthPayload(req);
@@ -141,7 +142,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ data: filtered, total: filtered.length });
   } catch (error) {
-    console.error('Compliance fetch error:', error);
+    logger.error('Compliance fetch error', { error: String(error) });
     return NextResponse.json({ error: 'Gagal memuat data compliance' }, { status: 500 });
   }
 }

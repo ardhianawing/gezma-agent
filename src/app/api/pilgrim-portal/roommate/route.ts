@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getPilgrimPayload } from '@/lib/auth-pilgrim';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 const roommateSchema = z.object({
   gender: z.string().min(1, 'Gender wajib diisi'),
@@ -26,7 +27,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ data: preference });
   } catch (error) {
-    console.error('Roommate preference fetch error:', error);
+    logger.error('Roommate preference fetch error', { error: String(error) });
     return NextResponse.json({ error: 'Gagal memuat preferensi' }, { status: 500 });
   }
 }
@@ -74,7 +75,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ data: preference, message: 'Preferensi berhasil disimpan' });
   } catch (error) {
-    console.error('Roommate preference save error:', error);
+    logger.error('Roommate preference save error', { error: String(error) });
     return NextResponse.json({ error: 'Gagal menyimpan preferensi' }, { status: 500 });
   }
 }

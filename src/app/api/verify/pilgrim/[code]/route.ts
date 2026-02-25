@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { logger } from '@/lib/logger';
 
 export async function GET(
   _req: NextRequest,
@@ -54,7 +55,7 @@ export async function GET(
       },
     });
   } catch (error) {
-    console.error('GET /api/verify/pilgrim/[code] error:', error);
+    logger.error('GET /api/verify/pilgrim/[code] error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }

@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { sendResetPasswordEmail } from '@/lib/mailer';
 import crypto from 'crypto';
 import { rateLimit } from '@/lib/rate-limiter';
+import { logger } from '@/lib/logger';
 
 export async function POST(req: NextRequest) {
   try {
@@ -40,12 +41,12 @@ export async function POST(req: NextRequest) {
     try {
       await sendResetPasswordEmail(email, code);
     } catch (emailError) {
-      console.error('Failed to send reset email:', emailError);
+      logger.error('Failed to send reset email', { error: String(emailError) });
     }
 
     return NextResponse.json({ message: 'Jika email terdaftar, kode reset telah dikirim.' });
   } catch (error) {
-    console.error('Forgot password error:', error);
+    logger.error('Forgot password error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }

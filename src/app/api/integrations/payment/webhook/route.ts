@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { handleWebhook } from '@/lib/services/payment-gateway.service';
 import type { PaymentProvider } from '@/lib/services/payment-gateway.service';
+import { logger } from '@/lib/logger';
 
 // This endpoint does NOT require authentication.
 // Webhooks come from external payment gateway services (Midtrans, Xendit, Duitku).
@@ -36,7 +37,7 @@ export async function POST(req: NextRequest) {
     // Payment gateways will retry if they don't get 200
     return NextResponse.json({ status: 'ok' });
   } catch (error) {
-    console.error('POST /api/integrations/payment/webhook error:', error);
+    logger.error('POST /api/integrations/payment/webhook error', { error: String(error) });
     // Still return 200 to prevent infinite retries from gateway
     return NextResponse.json({ status: 'error', message: 'Processing failed' }, { status: 200 });
   }

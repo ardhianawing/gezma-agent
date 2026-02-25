@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
+import { logger } from '@/lib/logger';
 
 export async function DELETE(
   req: NextRequest,
@@ -29,7 +30,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('DELETE /api/academy/[courseId]/reviews/[reviewId] error:', error);
+    logger.error('DELETE /api/academy/[courseId]/reviews/[reviewId] error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }

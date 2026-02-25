@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 import { createTaskSchema } from '@/lib/validations/task';
 import { logActivity } from '@/lib/activity-logger';
+import { logger } from '@/lib/logger';
 
 export async function GET(req: NextRequest) {
   const auth = getAuthPayload(req);
@@ -23,7 +24,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ data: tasks });
   } catch (error) {
-    console.error('GET /api/tasks error:', error);
+    logger.error('GET /api/tasks error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }
@@ -71,7 +72,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(task, { status: 201 });
   } catch (error) {
-    console.error('POST /api/tasks error:', error);
+    logger.error('POST /api/tasks error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }

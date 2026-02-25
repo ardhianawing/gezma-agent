@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 import { notificationPreferencesSchema } from '@/lib/validations/notification';
 import { mergeWithDefaults } from '@/lib/services/notification-prefs.service';
+import { logger } from '@/lib/logger';
 
 export async function GET(req: NextRequest) {
   const auth = getAuthPayload(req);
@@ -19,7 +20,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ data: preferences });
   } catch (error) {
-    console.error('GET /api/settings/notifications error:', error);
+    logger.error('GET /api/settings/notifications error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }
@@ -52,7 +53,7 @@ export async function PUT(req: NextRequest) {
 
     return NextResponse.json({ data: preferences });
   } catch (error) {
-    console.error('PUT /api/settings/notifications error:', error);
+    logger.error('PUT /api/settings/notifications error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }

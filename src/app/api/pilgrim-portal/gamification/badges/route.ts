@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getPilgrimPayload } from '@/lib/auth-pilgrim';
 import { prisma } from '@/lib/prisma';
 import { PILGRIM_BADGE_DEFINITIONS } from '@/lib/services/pilgrim-gamification.service';
+import { logger } from '@/lib/logger';
 
 export async function GET(req: NextRequest) {
   try {
@@ -30,7 +31,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ data: allBadges });
   } catch (error) {
-    console.error('GET /api/pilgrim-portal/gamification/badges error:', error);
+    logger.error('GET /api/pilgrim-portal/gamification/badges error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }

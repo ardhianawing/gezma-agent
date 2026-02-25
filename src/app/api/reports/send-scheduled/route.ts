@@ -4,6 +4,7 @@ import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 import { logActivity } from '@/lib/activity-logger';
 import nodemailer from 'nodemailer';
 import { generateFinancialReport, generatePilgrimReport, generateTripReport } from '@/lib/services/report-generator.service';
+import { logger } from '@/lib/logger';
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST || 'smtp.gmail.com',
@@ -102,7 +103,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true, sentTo: report.emailTo });
   } catch (error) {
-    console.error('POST /api/reports/send-scheduled error:', error);
+    logger.error('POST /api/reports/send-scheduled error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }

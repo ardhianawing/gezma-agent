@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 import { changePasswordSchema } from '@/lib/validations/security';
 import { rateLimit } from '@/lib/rate-limiter';
+import { logger } from '@/lib/logger';
 
 export async function POST(req: NextRequest) {
   try {
@@ -47,7 +48,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ message: 'Password berhasil diubah' });
   } catch (error) {
-    console.error('POST /api/settings/security/change-password error:', error);
+    logger.error('POST /api/settings/security/change-password error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }

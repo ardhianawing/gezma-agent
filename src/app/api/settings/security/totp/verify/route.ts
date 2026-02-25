@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 import { prisma } from '@/lib/prisma';
 import { encryptSecret, verifyTokenPlain } from '@/lib/services/totp.service';
+import { logger } from '@/lib/logger';
 
 export async function POST(req: NextRequest) {
   try {
@@ -42,7 +43,7 @@ export async function POST(req: NextRequest) {
       message: 'Two-Factor Authentication berhasil diaktifkan.',
     });
   } catch (error) {
-    console.error('TOTP verify error:', error);
+    logger.error('TOTP verify error', { error: String(error) });
     return NextResponse.json(
       { error: 'Terjadi kesalahan server.' },
       { status: 500 }

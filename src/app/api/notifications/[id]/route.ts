@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 import { prisma } from '@/lib/prisma';
+import { logger } from '@/lib/logger';
 
 // PATCH: mark single notification as read
 export async function PATCH(
@@ -28,7 +29,7 @@ export async function PATCH(
 
     return NextResponse.json(updated);
   } catch (error) {
-    console.error('PATCH /api/notifications/[id] error:', error);
+    logger.error('PATCH /api/notifications/[id] error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }
@@ -56,7 +57,7 @@ export async function DELETE(
 
     return NextResponse.json({ message: 'Notifikasi dihapus' });
   } catch (error) {
-    console.error('DELETE /api/notifications/[id] error:', error);
+    logger.error('DELETE /api/notifications/[id] error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }

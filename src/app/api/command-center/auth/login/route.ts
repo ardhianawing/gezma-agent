@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma';
 import { signCCToken, setCCTokenCookie } from '@/lib/auth-command-center';
 import { ccLoginSchema } from '@/lib/validations/command-center';
 import { rateLimit } from '@/lib/rate-limiter';
+import { logger } from '@/lib/logger';
 
 export async function POST(req: NextRequest) {
   try {
@@ -42,7 +43,7 @@ export async function POST(req: NextRequest) {
 
     return setCCTokenCookie(response, token);
   } catch (error) {
-    console.error('POST /api/command-center/auth/login error:', error);
+    logger.error('POST /api/command-center/auth/login error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }

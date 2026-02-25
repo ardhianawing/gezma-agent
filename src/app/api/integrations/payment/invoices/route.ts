@@ -7,6 +7,7 @@ import {
   getChannelLabel,
 } from '@/lib/services/payment-gateway.service';
 import type { PaymentChannel } from '@/lib/services/payment-gateway.service';
+import { logger } from '@/lib/logger';
 
 const VALID_CHANNELS: PaymentChannel[] = [
   'va_bca', 'va_mandiri', 'va_bni', 'va_bri',
@@ -25,7 +26,7 @@ export async function GET(req: NextRequest) {
     const invoices = await listInvoices(auth.agencyId, { pilgrimId, status });
     return NextResponse.json({ data: invoices });
   } catch (error) {
-    console.error('GET /api/integrations/payment/invoices error:', error);
+    logger.error('GET /api/integrations/payment/invoices error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }
@@ -73,7 +74,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(invoice, { status: 201 });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Terjadi kesalahan server';
-    console.error('POST /api/integrations/payment/invoices error:', error);
+    logger.error('POST /api/integrations/payment/invoices error', { error: String(error) });
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

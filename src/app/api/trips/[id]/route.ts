@@ -5,6 +5,7 @@ import { checkPermission } from '@/lib/auth-permissions';
 import { PERMISSIONS } from '@/lib/permissions';
 import { tripFormSchema } from '@/lib/validations/trip';
 import { logActivity } from '@/lib/activity-logger';
+import { logger } from '@/lib/logger';
 
 type Context = { params: Promise<{ id: string }> };
 
@@ -41,7 +42,7 @@ export async function GET(req: NextRequest, { params }: Context) {
 
     return NextResponse.json({ ...trip, manifest });
   } catch (error) {
-    console.error('GET /api/trips/[id] error:', error);
+    logger.error('GET /api/trips/[id] error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }
@@ -103,7 +104,7 @@ export async function PUT(req: NextRequest, { params }: Context) {
 
     return NextResponse.json(trip);
   } catch (error) {
-    console.error('PUT /api/trips/[id] error:', error);
+    logger.error('PUT /api/trips/[id] error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }
@@ -140,7 +141,7 @@ export async function DELETE(req: NextRequest, { params }: Context) {
 
     return NextResponse.json({ message: 'Trip berhasil dihapus' });
   } catch (error) {
-    console.error('DELETE /api/trips/[id] error:', error);
+    logger.error('DELETE /api/trips/[id] error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }

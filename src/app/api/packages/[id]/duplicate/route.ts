@@ -4,6 +4,7 @@ import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 import { checkPermission } from '@/lib/auth-permissions';
 import { PERMISSIONS } from '@/lib/permissions';
 import { logActivity } from '@/lib/activity-logger';
+import { logger } from '@/lib/logger';
 
 function slugify(text: string): string {
   return text
@@ -88,7 +89,7 @@ export async function POST(req: NextRequest, { params }: Context) {
 
     return NextResponse.json(duplicated, { status: 201 });
   } catch (error) {
-    console.error('POST /api/packages/[id]/duplicate error:', error);
+    logger.error('POST /api/packages/[id]/duplicate error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }

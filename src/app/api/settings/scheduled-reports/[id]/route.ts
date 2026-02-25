@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 import { updateScheduledReportSchema } from '@/lib/validations/scheduled-report';
 import { logActivity } from '@/lib/activity-logger';
+import { logger } from '@/lib/logger';
 
 export async function PATCH(
   req: NextRequest,
@@ -55,7 +56,7 @@ export async function PATCH(
 
     return NextResponse.json(updated);
   } catch (error) {
-    console.error('PATCH /api/settings/scheduled-reports/[id] error:', error);
+    logger.error('PATCH /api/settings/scheduled-reports/[id] error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }
@@ -91,7 +92,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('DELETE /api/settings/scheduled-reports/[id] error:', error);
+    logger.error('DELETE /api/settings/scheduled-reports/[id] error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }

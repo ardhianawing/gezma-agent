@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import { verifyToken } from '@/lib/services/totp.service';
 import { rateLimit } from '@/lib/rate-limiter';
+import { logger } from '@/lib/logger';
 
 const JWT_SECRET = process.env.JWT_SECRET!;
 
@@ -131,7 +132,7 @@ export async function POST(req: NextRequest) {
 
     return response;
   } catch (error) {
-    console.error('TOTP verify error:', error);
+    logger.error('TOTP verify error', { error: String(error) });
     return NextResponse.json(
       { error: 'Terjadi kesalahan server.' },
       { status: 500 }

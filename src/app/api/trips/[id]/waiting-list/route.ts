@@ -3,6 +3,7 @@ import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 import { prisma } from '@/lib/prisma';
 import { createWaitingListSchema } from '@/lib/validations/waiting-list';
 import { logActivity } from '@/lib/activity-logger';
+import { logger } from '@/lib/logger';
 
 export async function GET(
   req: NextRequest,
@@ -21,7 +22,7 @@ export async function GET(
 
     return NextResponse.json({ data: entries });
   } catch (error) {
-    console.error('[WAITING_LIST_GET] error:', error);
+    logger.error('[WAITING_LIST_GET] error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }
@@ -78,7 +79,7 @@ export async function POST(
 
     return NextResponse.json(entry, { status: 201 });
   } catch (error) {
-    console.error('[WAITING_LIST_POST] error:', error);
+    logger.error('[WAITING_LIST_POST] error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }

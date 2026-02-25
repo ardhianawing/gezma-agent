@@ -4,6 +4,7 @@ import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 import { checkPermission } from '@/lib/auth-permissions';
 import { PERMISSIONS } from '@/lib/permissions';
 import { logActivity } from '@/lib/activity-logger';
+import { logger } from '@/lib/logger';
 
 type Context = { params: Promise<{ id: string; paymentId: string }> };
 
@@ -60,7 +61,7 @@ export async function DELETE(req: NextRequest, { params }: Context) {
 
     return NextResponse.json({ message: 'Pembayaran berhasil dihapus' });
   } catch (error) {
-    console.error('DELETE /api/pilgrims/[id]/payments/[paymentId] error:', error);
+    logger.error('DELETE /api/pilgrims/[id]/payments/[paymentId] error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }

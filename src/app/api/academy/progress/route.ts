@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
+import { logger } from '@/lib/logger';
 
 export async function GET(req: NextRequest) {
   const auth = getAuthPayload(req);
@@ -42,7 +43,7 @@ export async function GET(req: NextRequest) {
 
   return NextResponse.json({ progress: data });
   } catch (error) {
-    console.error('[ACADEMY_PROGRESS_GET] error:', error);
+    logger.error('[ACADEMY_PROGRESS_GET] error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }

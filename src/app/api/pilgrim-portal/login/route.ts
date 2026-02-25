@@ -4,6 +4,7 @@ import { findPilgrimByBookingCode } from '@/lib/services/pilgrim-portal.service'
 import { rateLimit } from '@/lib/rate-limiter';
 import { prisma } from '@/lib/prisma';
 import { awardPilgrimPoints } from '@/lib/services/pilgrim-gamification.service';
+import { logger } from '@/lib/logger';
 
 export async function POST(req: NextRequest) {
   try {
@@ -64,7 +65,7 @@ export async function POST(req: NextRequest) {
 
     return response;
   } catch (error) {
-    console.error('Pilgrim login error:', error);
+    logger.error('Pilgrim login error', { error: String(error) });
     return NextResponse.json(
       { error: 'Terjadi kesalahan server. Silakan coba lagi.' },
       { status: 500 }

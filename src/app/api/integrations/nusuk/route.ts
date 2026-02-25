@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 import { getNusukConfig, updateNusukConfig } from '@/lib/services/nusuk.service';
+import { logger } from '@/lib/logger';
 
 export async function GET(req: NextRequest) {
   const auth = getAuthPayload(req);
@@ -10,7 +11,7 @@ export async function GET(req: NextRequest) {
     const config = await getNusukConfig(auth.agencyId);
     return NextResponse.json({ data: config });
   } catch (error) {
-    console.error('GET /api/integrations/nusuk error:', error);
+    logger.error('GET /api/integrations/nusuk error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }
@@ -43,7 +44,7 @@ export async function POST(req: NextRequest) {
     const config = await updateNusukConfig(auth.agencyId, updates);
     return NextResponse.json({ data: config });
   } catch (error) {
-    console.error('POST /api/integrations/nusuk error:', error);
+    logger.error('POST /api/integrations/nusuk error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }

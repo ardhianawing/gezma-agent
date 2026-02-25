@@ -5,6 +5,7 @@ import { checkPermission } from '@/lib/auth-permissions';
 import { PERMISSIONS } from '@/lib/permissions';
 import { logActivity } from '@/lib/activity-logger';
 import { createPaymentSchema } from '@/lib/validations/payment';
+import { logger } from '@/lib/logger';
 
 type Context = { params: Promise<{ id: string }> };
 
@@ -30,7 +31,7 @@ export async function GET(req: NextRequest, { params }: Context) {
 
     return NextResponse.json({ data: payments });
   } catch (error) {
-    console.error('GET /api/pilgrims/[id]/payments error:', error);
+    logger.error('GET /api/pilgrims/[id]/payments error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }
@@ -106,7 +107,7 @@ export async function POST(req: NextRequest, { params }: Context) {
 
     return NextResponse.json(payment, { status: 201 });
   } catch (error) {
-    console.error('POST /api/pilgrims/[id]/payments error:', error);
+    logger.error('POST /api/pilgrims/[id]/payments error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }

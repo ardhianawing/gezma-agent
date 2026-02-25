@@ -5,6 +5,7 @@ import { checkPermission } from '@/lib/auth-permissions';
 import { PERMISSIONS } from '@/lib/permissions';
 import { pilgrimFormSchema } from '@/lib/validations/pilgrim';
 import { logActivity } from '@/lib/activity-logger';
+import { logger } from '@/lib/logger';
 
 type Context = { params: Promise<{ id: string }> };
 
@@ -29,7 +30,7 @@ export async function GET(req: NextRequest, { params }: Context) {
 
     return NextResponse.json(pilgrim);
   } catch (error) {
-    console.error('GET /api/pilgrims/[id] error:', error);
+    logger.error('GET /api/pilgrims/[id] error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }
@@ -131,7 +132,7 @@ export async function PUT(req: NextRequest, { params }: Context) {
 
     return NextResponse.json(pilgrim);
   } catch (error) {
-    console.error('PUT /api/pilgrims/[id] error:', error);
+    logger.error('PUT /api/pilgrims/[id] error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }
@@ -176,7 +177,7 @@ export async function DELETE(req: NextRequest, { params }: Context) {
 
     return NextResponse.json({ message: 'Jemaah berhasil dihapus' });
   } catch (error) {
-    console.error('DELETE /api/pilgrims/[id] error:', error);
+    logger.error('DELETE /api/pilgrims/[id] error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 import { listTemplates } from '@/lib/services/whatsapp.service';
+import { logger } from '@/lib/logger';
 
 export async function GET(req: NextRequest) {
   const auth = getAuthPayload(req);
@@ -10,7 +11,7 @@ export async function GET(req: NextRequest) {
     const templates = await listTemplates(auth.agencyId);
     return NextResponse.json({ data: templates });
   } catch (error) {
-    console.error('GET /api/integrations/whatsapp/templates error:', error);
+    logger.error('GET /api/integrations/whatsapp/templates error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }

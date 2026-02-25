@@ -5,6 +5,7 @@ import { checkPermission } from '@/lib/auth-permissions';
 import { PERMISSIONS } from '@/lib/permissions';
 import { packageFormSchema } from '@/lib/validations/package';
 import { logActivity } from '@/lib/activity-logger';
+import { logger } from '@/lib/logger';
 
 function slugify(text: string): string {
   return text
@@ -57,7 +58,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ data });
   } catch (error) {
-    console.error('GET /api/packages error:', error);
+    logger.error('GET /api/packages error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }
@@ -136,7 +137,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(pkg, { status: 201 });
   } catch (error) {
-    console.error('POST /api/packages error:', error);
+    logger.error('POST /api/packages error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }

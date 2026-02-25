@@ -3,6 +3,7 @@ import { getPilgrimPayload } from '@/lib/auth-pilgrim';
 import { prisma } from '@/lib/prisma';
 import { awardPilgrimPoints } from '@/lib/services/pilgrim-gamification.service';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 const useReferralSchema = z.object({
   referralCode: z.string().min(1, 'Kode referral diperlukan'),
@@ -75,7 +76,7 @@ export async function POST(req: NextRequest) {
       bonusPoints: referral.bonusPoints,
     });
   } catch (error) {
-    console.error('POST /api/pilgrim-portal/referral/use error:', error);
+    logger.error('POST /api/pilgrim-portal/referral/use error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }

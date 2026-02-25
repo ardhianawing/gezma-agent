@@ -3,6 +3,7 @@ import { getPilgrimPayload } from '@/lib/auth-pilgrim';
 import { prisma } from '@/lib/prisma';
 import { awardPilgrimPoints } from '@/lib/services/pilgrim-gamification.service';
 import { getStorage } from '@/lib/storage';
+import { logger } from '@/lib/logger';
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
 const MAX_SIZE = 5 * 1024 * 1024; // 5MB
@@ -74,7 +75,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true, fileUrl, fileName: file.name });
   } catch (error) {
-    console.error('POST /api/pilgrim-portal/documents error:', error);
+    logger.error('POST /api/pilgrim-portal/documents error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }
@@ -93,7 +94,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ data: documents });
   } catch (error) {
-    console.error('GET /api/pilgrim-portal/documents error:', error);
+    logger.error('GET /api/pilgrim-portal/documents error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }

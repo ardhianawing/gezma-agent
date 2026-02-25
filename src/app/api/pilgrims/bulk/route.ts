@@ -4,6 +4,7 @@ import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 import { checkPermission } from '@/lib/auth-permissions';
 import { PERMISSIONS } from '@/lib/permissions';
 import { logActivity } from '@/lib/activity-logger';
+import { logger } from '@/lib/logger';
 
 const VALID_STATUSES = ['lead', 'dp', 'lunas', 'dokumen', 'visa', 'ready', 'departed', 'completed'];
 
@@ -211,7 +212,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success, failed, errors: errors.length > 0 ? errors : undefined });
   } catch (error) {
-    console.error('POST /api/pilgrims/bulk error:', error);
+    logger.error('POST /api/pilgrims/bulk error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }

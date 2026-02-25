@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 import { getInvoice, cancelInvoice } from '@/lib/services/payment-gateway.service';
+import { logger } from '@/lib/logger';
 
 type Context = { params: Promise<{ id: string }> };
 
@@ -17,7 +18,7 @@ export async function GET(req: NextRequest, { params }: Context) {
     }
     return NextResponse.json(invoice);
   } catch (error) {
-    console.error('GET /api/integrations/payment/invoices/[id] error:', error);
+    logger.error('GET /api/integrations/payment/invoices/[id] error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }
@@ -33,7 +34,7 @@ export async function DELETE(req: NextRequest, { params }: Context) {
     return NextResponse.json(invoice);
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Terjadi kesalahan server';
-    console.error('DELETE /api/integrations/payment/invoices/[id] error:', error);
+    logger.error('DELETE /api/integrations/payment/invoices/[id] error', { error: String(error) });
     return NextResponse.json({ error: message }, { status: 400 });
   }
 }

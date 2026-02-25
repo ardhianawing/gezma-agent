@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 import { createScheduledReportSchema } from '@/lib/validations/scheduled-report';
 import { logActivity } from '@/lib/activity-logger';
+import { logger } from '@/lib/logger';
 
 export async function GET(req: NextRequest) {
   const auth = getAuthPayload(req);
@@ -16,7 +17,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ reports });
   } catch (error) {
-    console.error('GET /api/settings/scheduled-reports error:', error);
+    logger.error('GET /api/settings/scheduled-reports error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }
@@ -60,7 +61,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(report, { status: 201 });
   } catch (error) {
-    console.error('POST /api/settings/scheduled-reports error:', error);
+    logger.error('POST /api/settings/scheduled-reports error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }

@@ -4,6 +4,7 @@ import { sendVerificationEmail } from '@/lib/mailer';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import { rateLimit } from '@/lib/rate-limiter';
+import { logger } from '@/lib/logger';
 
 export async function POST(req: NextRequest) {
   try {
@@ -120,7 +121,7 @@ export async function POST(req: NextRequest) {
     try {
       await sendVerificationEmail(picEmail, verificationCode);
     } catch (emailError) {
-      console.error('Failed to send verification email:', emailError);
+      logger.error('Failed to send verification email', { error: String(emailError) });
     }
 
     return NextResponse.json(
@@ -131,7 +132,7 @@ export async function POST(req: NextRequest) {
       { status: 201 }
     );
   } catch (error) {
-    console.error('Register error:', error);
+    logger.error('Register error', { error: String(error) });
     return NextResponse.json(
       { error: 'Terjadi kesalahan server. Silakan coba lagi.' },
       { status: 500 }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getPilgrimPayload } from '@/lib/auth-pilgrim';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 const testimonialSchema = z.object({
   rating: z.number().int().min(1, 'Rating harus antara 1-5').max(5, 'Rating harus antara 1-5'),
@@ -44,7 +45,7 @@ export async function GET(req: NextRequest) {
       hasTripId: !!pilgrim.tripId,
     });
   } catch (error) {
-    console.error('Testimonial GET error:', error);
+    logger.error('Testimonial GET error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }
@@ -110,7 +111,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ testimonial }, { status: 201 });
   } catch (error) {
-    console.error('Testimonial POST error:', error);
+    logger.error('Testimonial POST error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }

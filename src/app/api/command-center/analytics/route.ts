@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getCCAuthPayload, ccUnauthorizedResponse } from '@/lib/auth-command-center';
 import { prisma } from '@/lib/prisma';
+import { logger } from '@/lib/logger';
 
 export async function GET(req: NextRequest) {
   try {
@@ -107,7 +108,7 @@ export async function GET(req: NextRequest) {
       categoryBreakdown,
     });
   } catch (error) {
-    console.error('GET /api/command-center/analytics error:', error);
+    logger.error('GET /api/command-center/analytics error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }

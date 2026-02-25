@@ -3,6 +3,7 @@ import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 import { prisma } from '@/lib/prisma';
 import { emailTemplateSchema } from '@/lib/validations/email-template';
 import { logActivity } from '@/lib/activity-logger';
+import { logger } from '@/lib/logger';
 
 export async function GET(req: NextRequest) {
   const auth = getAuthPayload(req);
@@ -16,7 +17,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ data: templates });
   } catch (error) {
-    console.error('[EMAIL_TEMPLATES_GET] error:', error);
+    logger.error('[EMAIL_TEMPLATES_GET] error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }
@@ -71,7 +72,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(template);
   } catch (error) {
-    console.error('[EMAIL_TEMPLATES_POST] error:', error);
+    logger.error('[EMAIL_TEMPLATES_POST] error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }

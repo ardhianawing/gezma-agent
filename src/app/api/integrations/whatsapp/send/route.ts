@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 import { sendMessage } from '@/lib/services/whatsapp.service';
+import { logger } from '@/lib/logger';
 
 export async function POST(req: NextRequest) {
   const auth = getAuthPayload(req);
@@ -33,7 +34,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ data: message });
   } catch (error) {
-    console.error('POST /api/integrations/whatsapp/send error:', error);
+    logger.error('POST /api/integrations/whatsapp/send error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }

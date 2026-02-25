@@ -3,6 +3,7 @@ import { getPilgrimPayload } from '@/lib/auth-pilgrim';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
 import { awardPilgrimPoints } from '@/lib/services/pilgrim-gamification.service';
+import { logger } from '@/lib/logger';
 
 const updateSchema = z.object({
   phone: z.string().min(1).optional(),
@@ -62,7 +63,7 @@ export async function PATCH(req: NextRequest) {
 
     return NextResponse.json({ success: true, data: pilgrim });
   } catch (error) {
-    console.error('PATCH /api/pilgrim-portal/profile error:', error);
+    logger.error('PATCH /api/pilgrim-portal/profile error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }

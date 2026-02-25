@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { logger } from '@/lib/logger';
 
 export async function GET(
   req: NextRequest,
@@ -74,7 +75,7 @@ export async function GET(
       itinerary,
     });
   } catch (error) {
-    console.error('Share itinerary GET error:', error);
+    logger.error('Share itinerary GET error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }

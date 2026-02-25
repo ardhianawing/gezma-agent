@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPilgrimPayload } from '@/lib/auth-pilgrim';
 import { prisma } from '@/lib/prisma';
+import { logger } from '@/lib/logger';
 
 function generateReferralCode(): string {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -45,7 +46,7 @@ export async function GET(req: NextRequest) {
       referrals,
     });
   } catch (error) {
-    console.error('GET /api/pilgrim-portal/referral error:', error);
+    logger.error('GET /api/pilgrim-portal/referral error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }
@@ -93,7 +94,7 @@ export async function POST(req: NextRequest) {
       message: 'Kode referral berhasil dibuat',
     });
   } catch (error) {
-    console.error('POST /api/pilgrim-portal/referral error:', error);
+    logger.error('POST /api/pilgrim-portal/referral error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }

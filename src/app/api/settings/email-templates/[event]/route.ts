@@ -3,6 +3,7 @@ import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 import { prisma } from '@/lib/prisma';
 import { emailTemplateSchema } from '@/lib/validations/email-template';
 import { logActivity } from '@/lib/activity-logger';
+import { logger } from '@/lib/logger';
 
 export async function GET(
   req: NextRequest,
@@ -29,7 +30,7 @@ export async function GET(
 
     return NextResponse.json(template);
   } catch (error) {
-    console.error('[EMAIL_TEMPLATE_EVENT_GET] error:', error);
+    logger.error('[EMAIL_TEMPLATE_EVENT_GET] error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }
@@ -88,7 +89,7 @@ export async function PATCH(
 
     return NextResponse.json(updated);
   } catch (error) {
-    console.error('[EMAIL_TEMPLATE_EVENT_PATCH] error:', error);
+    logger.error('[EMAIL_TEMPLATE_EVENT_PATCH] error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }

@@ -6,6 +6,7 @@ import { PERMISSIONS, VALID_ROLES } from '@/lib/permissions';
 import bcrypt from 'bcryptjs';
 import { createUserSchema } from '@/lib/validations/user';
 import { logActivity } from '@/lib/activity-logger';
+import { logger } from '@/lib/logger';
 
 export async function GET(req: NextRequest) {
   const auth = getAuthPayload(req);
@@ -30,7 +31,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ data: users });
   } catch (error) {
-    console.error('GET /api/users error:', error);
+    logger.error('GET /api/users error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }
@@ -108,7 +109,7 @@ export async function POST(req: NextRequest) {
       { status: 201 }
     );
   } catch (error) {
-    console.error('POST /api/users error:', error);
+    logger.error('POST /api/users error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }

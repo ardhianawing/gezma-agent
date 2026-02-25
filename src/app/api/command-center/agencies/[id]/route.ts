@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getCCAuthPayload, ccUnauthorizedResponse } from '@/lib/auth-command-center';
 import { agencyStatusSchema } from '@/lib/validations/command-center';
+import { logger } from '@/lib/logger';
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const auth = getCCAuthPayload(req);
@@ -33,7 +34,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       totalRevenue: revenue._sum.amount || 0,
     });
   } catch (error) {
-    console.error('GET /api/command-center/agencies/[id] error:', error);
+    logger.error('GET /api/command-center/agencies/[id] error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }
@@ -58,7 +59,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
     return NextResponse.json(agency);
   } catch (error) {
-    console.error('PATCH /api/command-center/agencies/[id] error:', error);
+    logger.error('PATCH /api/command-center/agencies/[id] error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }

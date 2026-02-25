@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 import { createTransfer, listTransactions } from '@/lib/services/umrahcash.service';
+import { logger } from '@/lib/logger';
 
 export async function GET(req: NextRequest) {
   const auth = getAuthPayload(req);
@@ -10,7 +11,7 @@ export async function GET(req: NextRequest) {
     const transactions = await listTransactions(auth.agencyId);
     return NextResponse.json({ data: transactions });
   } catch (error) {
-    console.error('GET /api/integrations/umrahcash/transfer error:', error);
+    logger.error('GET /api/integrations/umrahcash/transfer error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }
@@ -54,7 +55,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ data: transaction });
   } catch (error) {
-    console.error('POST /api/integrations/umrahcash/transfer error:', error);
+    logger.error('POST /api/integrations/umrahcash/transfer error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }

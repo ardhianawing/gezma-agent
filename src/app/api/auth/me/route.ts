@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import jwt from 'jsonwebtoken';
+import { logger } from '@/lib/logger';
 
 const JWT_SECRET = process.env.JWT_SECRET!;
 
@@ -63,7 +64,7 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Auth me error:', error);
+    logger.error('Auth me error', { error: String(error) });
     return NextResponse.json(
       { error: 'Terjadi kesalahan server' },
       { status: 500 }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPilgrimPayload } from '@/lib/auth-pilgrim';
 import { prisma } from '@/lib/prisma';
+import { logger } from '@/lib/logger';
 
 export async function POST(req: NextRequest) {
   const auth = getPilgrimPayload(req);
@@ -108,7 +109,7 @@ export async function POST(req: NextRequest) {
       message: 'Berhasil menemukan teman sekamar yang cocok!',
     });
   } catch (error) {
-    console.error('Roommate match error:', error);
+    logger.error('Roommate match error', { error: String(error) });
     return NextResponse.json({ error: 'Gagal mencari teman sekamar' }, { status: 500 });
   }
 }

@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 import { checkPermission } from '@/lib/auth-permissions';
 import { PERMISSIONS } from '@/lib/permissions';
+import { logger } from '@/lib/logger';
 
 type Context = { params: Promise<{ id: string }> };
 
@@ -36,7 +37,7 @@ export async function PATCH(req: NextRequest, { params }: Context) {
 
     return NextResponse.json(trip);
   } catch (error) {
-    console.error('PATCH /api/trips/[id]/checklist error:', error);
+    logger.error('PATCH /api/trips/[id]/checklist error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }

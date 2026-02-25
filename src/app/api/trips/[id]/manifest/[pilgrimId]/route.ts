@@ -4,6 +4,7 @@ import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 import { checkPermission } from '@/lib/auth-permissions';
 import { PERMISSIONS } from '@/lib/permissions';
 import { logActivity } from '@/lib/activity-logger';
+import { logger } from '@/lib/logger';
 
 type Context = { params: Promise<{ id: string; pilgrimId: string }> };
 
@@ -67,7 +68,7 @@ export async function DELETE(req: NextRequest, { params }: Context) {
 
     return NextResponse.json({ message: 'Jemaah berhasil dihapus dari manifest' });
   } catch (error) {
-    console.error('DELETE /api/trips/[id]/manifest/[pilgrimId] error:', error);
+    logger.error('DELETE /api/trips/[id]/manifest/[pilgrimId] error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }

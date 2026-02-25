@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 import { issueCertificate } from '@/lib/services/blockchain.service';
+import { logger } from '@/lib/logger';
 
 export async function GET(req: NextRequest) {
   const auth = getAuthPayload(req);
@@ -50,7 +51,7 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('GET /api/blockchain/certificates error:', error);
+    logger.error('GET /api/blockchain/certificates error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }
@@ -73,7 +74,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Terjadi kesalahan server';
     const status = message.includes('tidak ditemukan') || message.includes('sudah memiliki') ? 400 : 500;
-    console.error('POST /api/blockchain/certificates error:', error);
+    logger.error('POST /api/blockchain/certificates error', { error: String(error) });
     return NextResponse.json({ error: message }, { status });
   }
 }

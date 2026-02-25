@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { logger } from '@/lib/logger';
 
 export async function GET(
   _req: NextRequest,
@@ -31,7 +32,7 @@ export async function GET(
 
     return NextResponse.json({ data: agency });
   } catch (error) {
-    console.error('GET /api/verify/[code] error:', error);
+    logger.error('GET /api/verify/[code] error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }

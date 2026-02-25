@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPilgrimPayload } from '@/lib/auth-pilgrim';
 import { getPilgrimPortalData } from '@/lib/services/pilgrim-portal.service';
+import { logger } from '@/lib/logger';
 
 export async function GET(req: NextRequest) {
   try {
@@ -24,7 +25,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ data });
   } catch (error) {
-    console.error('Pilgrim me error:', error);
+    logger.error('Pilgrim me error', { error: String(error) });
     return NextResponse.json(
       { error: 'Terjadi kesalahan server' },
       { status: 500 }

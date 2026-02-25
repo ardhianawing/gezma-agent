@@ -4,6 +4,7 @@ import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 import { checkPermission } from '@/lib/auth-permissions';
 import { PERMISSIONS } from '@/lib/permissions';
 import { logActivity } from '@/lib/activity-logger';
+import { logger } from '@/lib/logger';
 
 type Context = { params: Promise<{ id: string; docId: string }> };
 
@@ -49,7 +50,7 @@ export async function DELETE(req: NextRequest, { params }: Context) {
 
     return NextResponse.json({ message: 'Dokumen berhasil dihapus' });
   } catch (error) {
-    console.error('DELETE /api/pilgrims/[id]/documents/[docId] error:', error);
+    logger.error('DELETE /api/pilgrims/[id]/documents/[docId] error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }

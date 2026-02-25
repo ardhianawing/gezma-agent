@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
+import { logger } from '@/lib/logger';
 
 const FUNNEL_STEPS = ['lead', 'dp', 'lunas', 'dokumen', 'visa', 'ready', 'departed', 'completed'];
 
@@ -38,7 +39,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ total, funnel });
   } catch (error) {
-    console.error('GET /api/reports/conversion error:', error);
+    logger.error('GET /api/reports/conversion error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }

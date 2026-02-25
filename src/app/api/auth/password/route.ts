@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
+import { logger } from '@/lib/logger';
 
 export async function PUT(req: NextRequest) {
   const auth = getAuthPayload(req);
@@ -46,7 +47,7 @@ export async function PUT(req: NextRequest) {
 
     return NextResponse.json({ message: 'Password berhasil diubah' });
   } catch (error) {
-    console.error('Password change error:', error);
+    logger.error('Password change error', { error: String(error) });
     return NextResponse.json(
       { error: 'Terjadi kesalahan server' },
       { status: 500 }

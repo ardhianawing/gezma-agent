@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import jwt from 'jsonwebtoken';
+import { logger } from '@/lib/logger';
 
 const JWT_SECRET = process.env.JWT_SECRET!;
 
@@ -101,7 +102,7 @@ export async function GET(
 
     return response;
   } catch (error) {
-    console.error('Verification error:', error);
+    logger.error('Verification error', { error: String(error) });
     return NextResponse.json(
       { error: 'Terjadi kesalahan server.' },
       { status: 500 }

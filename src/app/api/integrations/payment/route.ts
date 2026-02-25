@@ -5,6 +5,7 @@ import {
   updatePaymentGatewayConfig,
 } from '@/lib/services/payment-gateway.service';
 import type { PaymentProvider, PaymentChannel } from '@/lib/services/payment-gateway.service';
+import { logger } from '@/lib/logger';
 
 export async function GET(req: NextRequest) {
   const auth = getAuthPayload(req);
@@ -14,7 +15,7 @@ export async function GET(req: NextRequest) {
     const config = await getPaymentGatewayConfig(auth.agencyId);
     return NextResponse.json(config);
   } catch (error) {
-    console.error('GET /api/integrations/payment error:', error);
+    logger.error('GET /api/integrations/payment error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }
@@ -58,7 +59,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(config);
   } catch (error) {
-    console.error('POST /api/integrations/payment error:', error);
+    logger.error('POST /api/integrations/payment error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }

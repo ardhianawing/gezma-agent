@@ -4,6 +4,7 @@ import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 import { checkPermission } from '@/lib/auth-permissions';
 import { PERMISSIONS } from '@/lib/permissions';
 import { logActivity } from '@/lib/activity-logger';
+import { logger } from '@/lib/logger';
 
 type Context = { params: Promise<{ id: string }> };
 
@@ -105,7 +106,7 @@ export async function POST(req: NextRequest, { params }: Context) {
       roomType: result.roomType,
     });
   } catch (error) {
-    console.error('POST /api/trips/[id]/manifest error:', error);
+    logger.error('POST /api/trips/[id]/manifest error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }
@@ -156,7 +157,7 @@ export async function PATCH(req: NextRequest, { params }: Context) {
       roomType: updated.roomType,
     });
   } catch (error) {
-    console.error('PATCH /api/trips/[id]/manifest error:', error);
+    logger.error('PATCH /api/trips/[id]/manifest error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }

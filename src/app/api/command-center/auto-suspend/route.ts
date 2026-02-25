@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getCCAuthPayload, ccUnauthorizedResponse } from '@/lib/auth-command-center';
 import { prisma } from '@/lib/prisma';
+import { logger } from '@/lib/logger';
 
 export async function POST(req: NextRequest) {
   const auth = getCCAuthPayload(req);
@@ -51,7 +52,7 @@ export async function POST(req: NextRequest) {
       count: expiredAgencies.length,
     });
   } catch (error) {
-    console.error('Auto-suspend error:', error);
+    logger.error('Auto-suspend error', { error: String(error) });
     return NextResponse.json({ error: 'Gagal menjalankan auto-suspend' }, { status: 500 });
   }
 }

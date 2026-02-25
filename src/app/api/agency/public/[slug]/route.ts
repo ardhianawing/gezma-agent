@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { logger } from '@/lib/logger';
 
 // GET: public agency profile (NO auth required)
 export async function GET(
@@ -101,7 +102,7 @@ export async function GET(
       },
     });
   } catch (error) {
-    console.error('GET /api/agency/public/[slug] error:', error);
+    logger.error('GET /api/agency/public/[slug] error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }

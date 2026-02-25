@@ -82,6 +82,7 @@ model Agency {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
+  @@index([ppiuStatus, ppiuExpiryDate])
   @@map("agencies")
 }
 
@@ -140,6 +141,7 @@ model User {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
+  @@index([agencyId])
   @@map("users")
 }
 
@@ -212,6 +214,8 @@ model Pilgrim {
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
+  @@index([agencyId])
+  @@index([status])
   @@unique([nik, agencyId])
   @@unique([agencyId, bookingCode])
   @@map("pilgrims")
@@ -237,6 +241,7 @@ model PilgrimDocument {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
+  @@index([pilgrimId])
   @@map("pilgrim_documents")
 }
 
@@ -256,6 +261,7 @@ model PaymentRecord {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  @@index([pilgrimId])
   @@map("payment_records")
 }
 
@@ -312,6 +318,7 @@ model Package {
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 
+  @@index([agencyId])
   @@unique([slug, agencyId])
   @@map("packages")
 }
@@ -353,6 +360,7 @@ model Trip {
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
 
+  @@index([agencyId])
   @@map("trips")
 }
 
@@ -371,6 +379,9 @@ model ActivityLog {
 
   createdAt   DateTime @default(now())
 
+  @@index([agencyId])
+  @@index([userId])
+  @@index([createdAt])
   @@map("activity_logs")
 }
 
@@ -395,6 +406,7 @@ model ManasikLesson {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  @@index([agencyId])
   @@map("manasik_lessons")
 }
 
@@ -418,6 +430,7 @@ model DoaPrayer {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  @@index([agencyId])
   @@map("doa_prayers")
 }
 
@@ -472,6 +485,7 @@ model PointEvent {
 
   createdAt   DateTime @default(now())
 
+  @@index([userId, agencyId])
   @@map("point_events")
 }
 
@@ -537,6 +551,8 @@ model BlockchainCertificate {
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
 
+  @@index([agencyId])
+  @@index([pilgrimId])
   @@map("blockchain_certificates")
 }
 
@@ -578,6 +594,7 @@ model AcademyLesson {
 
   createdAt  DateTime @default(now())
 
+  @@index([courseId])
   @@map("academy_lessons")
 }
 
@@ -612,6 +629,8 @@ model PilgrimPointEvent {
 
   createdAt   DateTime @default(now())
 
+  @@index([pilgrimId])
+  @@index([pilgrimId, action])
   @@map("pilgrim_point_events")
 }
 
@@ -643,6 +662,7 @@ model LoginHistory {
   loginAt      DateTime  @default(now())
   logoutAt     DateTime?
 
+  @@index([userId])
   @@map("login_history")
 }
 
@@ -661,6 +681,8 @@ model PilgrimNote {
 
   createdAt   DateTime @default(now())
 
+  @@index([pilgrimId])
+  @@index([agencyId])
   @@map("pilgrim_notes")
 }
 
@@ -681,6 +703,7 @@ model AgencyTask {
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 
+  @@index([agencyId])
   @@map("agency_tasks")
 }
 
@@ -717,6 +740,8 @@ model WaitingList {
 
   createdAt    DateTime  @default(now())
 
+  @@index([tripId])
+  @@index([agencyId])
   @@map("waiting_list")
 }
 
@@ -733,6 +758,8 @@ model PilgrimPhoto {
 
   uploadedAt  DateTime @default(now())
 
+  @@index([pilgrimId])
+  @@index([agencyId])
   @@map("pilgrim_photos")
 }
 
@@ -769,6 +796,8 @@ model Referral {
 
   createdAt         DateTime @default(now())
 
+  @@index([pilgrimId])
+  @@index([agencyId])
   @@map("referrals")
 }
 
@@ -788,6 +817,8 @@ model Notification {
 
   createdAt DateTime  @default(now())
 
+  @@index([userId, isRead])
+  @@index([agencyId])
   @@map("notifications")
 }
 
@@ -807,6 +838,7 @@ model ScheduledReport {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
+  @@index([isActive, agencyId])
   @@map("scheduled_reports")
 }
 
@@ -835,6 +867,7 @@ model AcademyQuizQuestion {
   correctIndex Int
   order        Int      @default(0)
 
+  @@index([quizId])
   @@map("academy_quiz_questions")
 }
 
@@ -850,6 +883,8 @@ model AcademyQuizAttempt {
 
   attemptedAt DateTime @default(now())
 
+  @@index([quizId])
+  @@index([userId])
   @@map("academy_quiz_attempts")
 }
 
@@ -888,5 +923,6 @@ model RoommatePreference {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
+  @@index([agencyId])
   @@map("roommate_preferences")
 }

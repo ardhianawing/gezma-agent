@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 import { getLeaderboard } from '@/lib/services/gamification.service';
 import { leaderboardQuerySchema } from '@/lib/validations/gamification';
+import { logger } from '@/lib/logger';
 
 export async function GET(req: NextRequest) {
   const auth = getAuthPayload(req);
@@ -27,7 +28,7 @@ export async function GET(req: NextRequest) {
       })),
     });
   } catch (error) {
-    console.error('GET /api/gamification/leaderboard error:', error);
+    logger.error('GET /api/gamification/leaderboard error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }

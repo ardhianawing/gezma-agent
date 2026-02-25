@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 import { generateCertificatePdf } from '@/lib/services/academy-certificate.service';
+import { logger } from '@/lib/logger';
 
 export async function GET(
   req: NextRequest,
@@ -61,7 +62,7 @@ export async function GET(
       },
     });
   } catch (error) {
-    console.error('GET /api/academy/[courseId]/certificate error:', error);
+    logger.error('GET /api/academy/[courseId]/certificate error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }

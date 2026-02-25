@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 import { createNoteSchema } from '@/lib/validations/note';
 import { logActivity } from '@/lib/activity-logger';
+import { logger } from '@/lib/logger';
 
 type Context = { params: Promise<{ id: string }> };
 
@@ -30,7 +31,7 @@ export async function GET(req: NextRequest, { params }: Context) {
 
     return NextResponse.json({ data: notes });
   } catch (error) {
-    console.error('GET /api/pilgrims/[id]/notes error:', error);
+    logger.error('GET /api/pilgrims/[id]/notes error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }
@@ -90,7 +91,7 @@ export async function POST(req: NextRequest, { params }: Context) {
 
     return NextResponse.json(note, { status: 201 });
   } catch (error) {
-    console.error('POST /api/pilgrims/[id]/notes error:', error);
+    logger.error('POST /api/pilgrims/[id]/notes error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }

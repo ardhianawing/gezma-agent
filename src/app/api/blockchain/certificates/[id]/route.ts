@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
+import { logger } from '@/lib/logger';
 
 export async function GET(
   req: NextRequest,
@@ -26,7 +27,7 @@ export async function GET(
 
     return NextResponse.json({ data: certificate });
   } catch (error) {
-    console.error('GET /api/blockchain/certificates/[id] error:', error);
+    logger.error('GET /api/blockchain/certificates/[id] error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }

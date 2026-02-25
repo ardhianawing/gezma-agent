@@ -4,6 +4,7 @@ import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 import { checkPermission } from '@/lib/auth-permissions';
 import { PERMISSIONS } from '@/lib/permissions';
 import { logActivity } from '@/lib/activity-logger';
+import { logger } from '@/lib/logger';
 
 type Context = { params: Promise<{ id: string }> };
 
@@ -58,7 +59,7 @@ export async function POST(req: NextRequest, { params }: Context) {
 
     return NextResponse.json(doc, { status: 201 });
   } catch (error) {
-    console.error('POST /api/pilgrims/[id]/documents error:', error);
+    logger.error('POST /api/pilgrims/[id]/documents error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }

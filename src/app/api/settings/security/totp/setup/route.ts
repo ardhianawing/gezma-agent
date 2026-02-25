@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 import { generateTotpSecret } from '@/lib/services/totp.service';
+import { logger } from '@/lib/logger';
 
 export async function POST(req: NextRequest) {
   try {
@@ -14,7 +15,7 @@ export async function POST(req: NextRequest) {
       qrDataUrl,
     });
   } catch (error) {
-    console.error('TOTP setup error:', error);
+    logger.error('TOTP setup error', { error: String(error) });
     return NextResponse.json(
       { error: 'Terjadi kesalahan server.' },
       { status: 500 }

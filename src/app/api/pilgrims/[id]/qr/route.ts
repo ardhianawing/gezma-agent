@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 import QRCode from 'qrcode';
 import crypto from 'crypto';
+import { logger } from '@/lib/logger';
 
 type Context = { params: Promise<{ id: string }> };
 
@@ -51,7 +52,7 @@ export async function GET(req: NextRequest, { params }: Context) {
       },
     });
   } catch (error) {
-    console.error('GET /api/pilgrims/[id]/qr error:', error);
+    logger.error('GET /api/pilgrims/[id]/qr error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }

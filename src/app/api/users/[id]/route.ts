@@ -5,6 +5,7 @@ import { checkPermission } from '@/lib/auth-permissions';
 import { PERMISSIONS, VALID_ROLES } from '@/lib/permissions';
 import { updateUserSchema } from '@/lib/validations/user';
 import { logActivity } from '@/lib/activity-logger';
+import { logger } from '@/lib/logger';
 
 type Context = { params: Promise<{ id: string }> };
 
@@ -36,7 +37,7 @@ export async function GET(req: NextRequest, { params }: Context) {
 
     return NextResponse.json(user);
   } catch (error) {
-    console.error('GET /api/users/[id] error:', error);
+    logger.error('GET /api/users/[id] error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }
@@ -111,7 +112,7 @@ export async function PUT(req: NextRequest, { params }: Context) {
 
     return NextResponse.json(user);
   } catch (error) {
-    console.error('PUT /api/users/[id] error:', error);
+    logger.error('PUT /api/users/[id] error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }
@@ -156,7 +157,7 @@ export async function DELETE(req: NextRequest, { params }: Context) {
 
     return NextResponse.json({ message: 'User berhasil dihapus' });
   } catch (error) {
-    console.error('DELETE /api/users/[id] error:', error);
+    logger.error('DELETE /api/users/[id] error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }

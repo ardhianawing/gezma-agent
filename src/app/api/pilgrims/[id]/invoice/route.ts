@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server';
 import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 import { prisma } from '@/lib/prisma';
 import { generateInvoicePdf } from '@/lib/services/invoice.service';
+import { logger } from '@/lib/logger';
 
 export async function GET(
   req: NextRequest,
@@ -78,7 +79,7 @@ export async function GET(
     },
   });
   } catch (error) {
-    console.error('[INVOICE_GET] error:', error);
+    logger.error('[INVOICE_GET] error', { error: String(error) });
     return new Response(JSON.stringify({ error: 'Terjadi kesalahan server' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },

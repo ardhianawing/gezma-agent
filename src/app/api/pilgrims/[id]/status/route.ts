@@ -5,6 +5,7 @@ import { checkPermission } from '@/lib/auth-permissions';
 import { PERMISSIONS } from '@/lib/permissions';
 import { pilgrimStatusSchema } from '@/lib/validations/pilgrim';
 import { logActivity } from '@/lib/activity-logger';
+import { logger } from '@/lib/logger';
 
 type Context = { params: Promise<{ id: string }> };
 
@@ -53,7 +54,7 @@ export async function PATCH(req: NextRequest, { params }: Context) {
 
     return NextResponse.json(pilgrim);
   } catch (error) {
-    console.error('PATCH /api/pilgrims/[id]/status error:', error);
+    logger.error('PATCH /api/pilgrims/[id]/status error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 import { prisma } from '@/lib/prisma';
+import { logger } from '@/lib/logger';
 
 // GET: list notifications with pagination and isRead filter
 export async function GET(req: NextRequest) {
@@ -46,7 +47,7 @@ export async function GET(req: NextRequest) {
       totalPages: Math.ceil(total / limit),
     });
   } catch (error) {
-    console.error('GET /api/notifications error:', error);
+    logger.error('GET /api/notifications error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }
@@ -71,7 +72,7 @@ export async function PATCH(req: NextRequest) {
 
     return NextResponse.json({ message: 'Semua notifikasi ditandai sebagai dibaca' });
   } catch (error) {
-    console.error('PATCH /api/notifications error:', error);
+    logger.error('PATCH /api/notifications error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }

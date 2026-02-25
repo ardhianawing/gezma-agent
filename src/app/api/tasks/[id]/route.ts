@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 import { updateTaskSchema } from '@/lib/validations/task';
 import { logActivity } from '@/lib/activity-logger';
+import { logger } from '@/lib/logger';
 
 type Context = { params: Promise<{ id: string }> };
 
@@ -58,7 +59,7 @@ export async function PATCH(req: NextRequest, { params }: Context) {
 
     return NextResponse.json(task);
   } catch (error) {
-    console.error('PATCH /api/tasks/[id] error:', error);
+    logger.error('PATCH /api/tasks/[id] error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }
@@ -92,7 +93,7 @@ export async function DELETE(req: NextRequest, { params }: Context) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('DELETE /api/tasks/[id] error:', error);
+    logger.error('DELETE /api/tasks/[id] error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }

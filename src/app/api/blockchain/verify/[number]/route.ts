@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyCertificate } from '@/lib/services/blockchain.service';
+import { logger } from '@/lib/logger';
 
 export async function GET(
   _req: NextRequest,
@@ -19,7 +20,7 @@ export async function GET(
 
     return NextResponse.json({ data: certificate });
   } catch (error) {
-    console.error('GET /api/blockchain/verify/[number] error:', error);
+    logger.error('GET /api/blockchain/verify/[number] error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }

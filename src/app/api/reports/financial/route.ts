@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
+import { logger } from '@/lib/logger';
 
 interface PaymentItem {
   amount: number;
@@ -151,7 +152,7 @@ export async function GET(req: NextRequest) {
       ...(comparison ? { comparison } : {}),
     });
   } catch (error) {
-    console.error('GET /api/reports/financial error:', error);
+    logger.error('GET /api/reports/financial error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }
