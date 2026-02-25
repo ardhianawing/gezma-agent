@@ -1,6 +1,6 @@
 # 🕋 GEZMA — Blueprint Tracking Document
 
-> **Last Synced:** 2026-02-25 (Session 14 — Database & Infrastructure Hardening)
+> **Last Synced:** 2026-02-25 (Session 15 — CI/CD, Seed Data & Developer Experience)
 > **Repository:** github.com/ardhianawing/gezma-agent
 > **Blueprint Sources:**
 > 1. Cetak Biru Strategis v1 (Generasi Emas Z & Milenial)
@@ -562,11 +562,17 @@
 17. ~~**Logger Cleanup**~~ — ✅ Done (Session 14) — 180 `console.error` → `logger.error` across 132 API files
 18. ~~**Env Docs**~~ — ✅ Done (Session 14) — `.env.example` expanded from 20 → 35+ vars
 
+### ✅ Completed (Session 15)
+19. ~~**CI/CD Pipeline**~~ — ✅ Done (Session 15) — GitHub Actions (lint, typecheck, test, build)
+20. ~~**Seed Data**~~ — ✅ Done (Session 15) — `prisma/seed.ts` with demo data (idempotent upsert)
+21. ~~**API Documentation**~~ — ✅ Done (Session 15) — `API-REFERENCE.md` (138 routes, 23 domains)
+22. ~~**Pre-commit Hooks**~~ — ✅ Done (Session 15) — Husky + lint-staged (eslint --fix)
+
 ### ✅ Completed (Session 12-13)
-19. ~~**UI/UX Polish**~~ — ✅ Done (Session 12)
-20. ~~**Cron jobs for scheduled reports & PPIU expiry**~~ — ✅ Done (Session 13)
-21. ~~**File storage abstraction (local → S3/MinIO)**~~ — ✅ Done (Session 13)
-22. ~~**Env validation + CSP + Logger + Gamification hooks**~~ — ✅ Done (Session 13)
+23. ~~**UI/UX Polish**~~ — ✅ Done (Session 12)
+24. ~~**Cron jobs for scheduled reports & PPIU expiry**~~ — ✅ Done (Session 13)
+25. ~~**File storage abstraction (local → S3/MinIO)**~~ — ✅ Done (Session 13)
+26. ~~**Env validation + CSP + Logger + Gamification hooks**~~ — ✅ Done (Session 13)
 
 ---
 
@@ -581,7 +587,7 @@
 - `CHECKPOINT.md` — Development checkpoint (in repo)
 - `DEVELOPMENT-PLAN-v3.md` — Phase 2 & 3 execution plan
 - `prisma/schema.prisma` — Database models (39 models)
-- `src/app/api/` — ~134 API endpoints
+- `src/app/api/` — ~138 API endpoints
 - `src/app/(dashboard)/` — 40+ dashboard pages
 - `src/app/(command-center)/` — 7 command center pages
 - `src/app/(pilgrim)/` — 14+ pilgrim portal pages
@@ -589,10 +595,14 @@
 - `src/app/share/` — 1 public itinerary page
 - `__tests__/` — 40 test files (451 unit tests)
 - `e2e/` — 5 Playwright spec files
+- `.github/workflows/ci.yml` — GitHub Actions CI pipeline (lint, typecheck, test, build)
+- `prisma/seed.ts` — Dev seed script (agency, users, pilgrims, packages, trips, payments, gamification, academy)
+- `scripts/generate-api-docs.ts` — API docs generator → `API-REFERENCE.md`
+- `.husky/pre-commit` — Pre-commit hook (lint-staged + eslint --fix)
 
 ---
 
-*Document Version: 2.1*
+*Document Version: 2.2*
 *Created: 2026-02-23*
-*Updated: 2026-02-25 (Session 14 — Database & Infrastructure Hardening)*
+*Updated: 2026-02-25 (Session 15 — CI/CD, Seed Data & Developer Experience)*
 *Next: Real API integration (Nusuk, Payment Gateway, WhatsApp, UmrahCash)*

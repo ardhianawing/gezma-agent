@@ -1,6 +1,6 @@
 # GEZMA Agent — Development Checkpoint
 
-> **Last Updated:** 2026-02-25 (Session 14 — Database & Infrastructure Hardening)
+> **Last Updated:** 2026-02-25 (Session 15 — CI/CD, Seed Data & Developer Experience)
 > **Blueprint Reference:** `GEZMA-AGENT-PLAN-v2.md`, `DEVELOPMENT-PLAN-v3.md`
 
 ---
@@ -22,6 +22,7 @@
 | **Session 12: UI/UX Polish** | ✅ Done | Skeleton loaders, toast notifications, ConfirmDialog, button spinners, accessibility, empty states |
 | **Session 13: Production Readiness** | ✅ Done | Env validation, CSP headers, structured logger, storage abstraction, cron jobs, gamification hooks |
 | **Session 14: DB & Infra Hardening** | ✅ Done | 25+ DB indexes, health endpoints, robots/sitemap, image optimization, logger cleanup 132 files |
+| **Session 15: CI/CD & DX** | ✅ Done | GitHub Actions CI, Prisma seed script, API docs generator, Husky pre-commit, lint-staged |
 | **PWA** | ✅ Done | Service Worker, Install Prompt, Offline |
 | **Deployment** | ✅ Ready | Docker + Nginx + Traefik |
 
@@ -717,7 +718,7 @@ src/
 │   ├── (dashboard)/      → 40+ pages (+tasks, notifications, builder, detail pages, quiz, etc)                   ← UPDATED
 │   ├── (command-center)/ → 7 pages (+compliance)                                                                 ← UPDATED
 │   ├── (pilgrim)/        → 14+ pages (+packing, currency, emergency, gallery, roommate)                          ← UPDATED
-│   ├── api/              → ~133 API endpoints (+35 new routes)                                                   ← UPDATED
+│   ├── api/              → ~138 API endpoints (+35 new routes)                                                   ← UPDATED
 │   ├── agency/           → 1 page (public agency profile)                                                        ← NEW
 │   ├── share/            → 1 page (public itinerary sharing)                                                     ← NEW
 │   ├── verify/           → 3 pages (pilgrim QR, agency QR, certificate/[number])
@@ -752,16 +753,22 @@ src/
 │   └── theme/            → Light + Dark + color-utils + branding override
 ├── types/                → 5 type definition files
 ├── prisma/
-│   └── seed-academy.ts   → Academy seed script (12 courses + 36 lessons)            ← NEW
-├── tests/                → 38 unit test files (433 tests)                           ← UPDATED S13
+│   ├── seed.ts           → Main dev seed script (agency, users, pilgrims, packages, trips, payments, gamification, academy) ← NEW S15
+│   └── seed-manasik-doa.ts → Manasik & Doa seed script
+├── scripts/
+│   └── generate-api-docs.ts → API docs generator (138 routes, 23 domains)           ← NEW S15
+├── tests/                → 40 unit test files (451 tests)                           ← UPDATED S14
 └── e2e/                  → 5 Playwright spec files (auth, dashboard, pilgrims, CC, navigation)
 ```
 
 ---
 
-## P. GIT LOG (Session 3-12)
+## P. GIT LOG (Session 3-15)
 
 ```
+ed7a508 feat: Session 15 — CI/CD, seed data & developer experience
+89f3050 docs: update tracking documents with Session 14 progress
+78af582 feat: Session 14 — Database & infrastructure hardening
 295e01c feat: Session 13 — Production readiness (env validation, CSP, storage, cron, gamification)
 85b78c0 feat: Session 12 — UI/UX polish across 44 files
 eb03772 fix: Session 11 — Codebase hardening & quality improvements
@@ -839,14 +846,50 @@ Prisma schema memiliki **0 `@@index`** — semua query multi-tenant (filter by `
 
 ---
 
-## R. FUTURE STEPS (Beyond Session 14)
+## R. SESSION 15 — CI/CD, Seed Data & Developer Experience
+
+### Batch 1: DX Scripts + GitHub Actions CI ✅
+- **`package.json`** — Added 5 DX scripts: `typecheck`, `db:generate`, `db:push`, `db:seed`, `docs:api`
+- **`.github/workflows/ci.yml`** — 3-job CI pipeline:
+  - `lint-and-typecheck`: eslint + tsc --noEmit
+  - `unit-tests`: vitest run (451 tests)
+  - `build`: next build (depends on lint + tests)
+- Node 20, npm cache, concurrency with cancel-in-progress
+
+### Batch 2: Seed Script + API Docs ✅
+- **`prisma/seed.ts`** — Idempotent dev seed via upsert:
+  - 1 agency, 3 users (owner/admin/staff), 10 pilgrims (all statuses)
+  - 3 packages (reguler/VIP/ramadhan), 2 trips, 5 payments
+  - Gamification (4 point events + 3 badges), 1 system admin
+  - 2 academy courses + 4 lessons, demo credentials printed
+- **`scripts/generate-api-docs.ts`** — Scans `src/app/api/` for route.ts files
+- **`API-REFERENCE.md`** — Generated: 138 routes across 23 domains
+
+### Batch 3: Husky + lint-staged ✅
+- **`husky`** + **`lint-staged`** installed as devDeps
+- **`.husky/pre-commit`** — runs `npx lint-staged`
+- **`lint-staged`** config — `eslint --fix` on `*.{ts,tsx}`
+
+### Verification ✅
+- TypeScript: 0 errors
+- Tests: 40 files, 451 passed
+- Build: success
+- API docs: 138 routes, 23 domains
+- Pre-commit hook: works (tested during commit)
+
+---
+
+## S. FUTURE STEPS (Beyond Session 15)
 
 1. **Phase 3: Real API** — Connect real API keys (Nusuk, Payment Gateway, WhatsApp, UmrahCash)
 2. **Mobile Native** — Flutter app (di luar scope web — separate project)
 3. **Production Hardening** — Change SystemAdmin default password, secure JWT_SECRET, SSL certs, TOTP_ENCRYPTION_KEY
-4. **E2E Test CI** — Integrate Playwright into CI/CD pipeline
+4. **E2E Test CI** — Integrate Playwright into CI/CD pipeline (needs DB + server in CI)
 5. **Real Blockchain** — Replace mock tx hash with actual blockchain integration (e.g., Polygon/Base)
 6. **Academy Content** — Add real course content, video embeds, seed quiz data
 7. **S3 Storage** — Configure STORAGE_DRIVER=s3 with MinIO/S3 bucket for production file storage
 8. **Error Monitoring** — Sentry integration for real-time error tracking
-9. **API Documentation** — OpenAPI/Swagger auto-generated from Zod schemas
+9. ~~**API Documentation**~~ — ✅ Done (Session 15) — `API-REFERENCE.md` auto-generated (138 routes, 23 domains)
+10. ~~**CI/CD Pipeline**~~ — ✅ Done (Session 15) — GitHub Actions (lint, typecheck, test, build)
+11. ~~**Seed Data**~~ — ✅ Done (Session 15) — `prisma/seed.ts` with demo agency, users, pilgrims, packages
+12. ~~**Pre-commit Hooks**~~ — ✅ Done (Session 15) — Husky + lint-staged (eslint --fix)
