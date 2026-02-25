@@ -24,6 +24,7 @@ import {
   EyeOff,
   CalendarClock,
   FileText,
+  Loader2,
 } from 'lucide-react';
 
 interface AgencyInfo {
@@ -482,7 +483,12 @@ export default function SettingsPage() {
                   opacity: pwLoading ? 0.7 : 1,
                 }}
               >
-                {pwLoading ? 'Menyimpan...' : 'Ubah Password'}
+                {pwLoading ? (
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                    <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} />
+                    Menyimpan...
+                  </span>
+                ) : 'Ubah Password'}
               </button>
             </div>
           </div>

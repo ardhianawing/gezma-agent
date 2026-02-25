@@ -4,6 +4,7 @@ import { useState, useRef } from 'react';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
 import { usePilgrim } from '@/lib/contexts/pilgrim-context';
+import { useToast } from '@/components/ui/toast';
 
 const PILGRIM_GREEN = '#059669';
 
@@ -36,6 +37,7 @@ export default function PilgrimDocumentsPage() {
   const { c } = useTheme();
   const { isMobile } = useResponsive();
   const { data, refreshData } = usePilgrim();
+  const { addToast } = useToast();
 
   const [uploading, setUploading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -90,12 +92,16 @@ export default function PilgrimDocumentsPage() {
       const json = await res.json();
       if (res.ok) {
         setSuccess(`${DOCUMENT_LABELS[activeDocType] || activeDocType} berhasil diunggah.`);
+        addToast({ type: 'success', title: `${DOCUMENT_LABELS[activeDocType] || activeDocType} berhasil diunggah` });
         refreshData?.();
       } else {
-        setError(json.error || 'Gagal mengunggah file.');
+        const errMsg = json.error || 'Gagal mengunggah file.';
+        setError(errMsg);
+        addToast({ type: 'error', title: errMsg });
       }
     } catch {
       setError('Gagal terhubung ke server.');
+      addToast({ type: 'error', title: 'Gagal terhubung ke server' });
     } finally {
       setUploading(null);
       setActiveDocType(null);

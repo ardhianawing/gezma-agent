@@ -7,6 +7,7 @@ import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
 import { StatusBadge } from '@/components/shared/status-badge';
 import { ConfirmDialog } from '@/components/shared/confirm-dialog';
+import { useToast } from '@/components/ui/toast';
 import { formatDate, formatCurrency } from '@/lib/utils';
 import type { TripStatus, PilgrimStatus } from '@/types';
 
@@ -105,6 +106,8 @@ export default function TripDetailPage({ params }: { params: Promise<{ id: strin
   const [wlForm, setWlForm] = useState({ pilgrimName: '', phone: '', email: '', notes: '' });
   const [savingWl, setSavingWl] = useState(false);
   const [deletingWlId, setDeletingWlId] = useState<string | null>(null);
+
+  const { addToast } = useToast();
 
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -217,7 +220,7 @@ export default function TripDetailPage({ params }: { params: Promise<{ id: strin
 
       if (!res.ok) {
         const data = await res.json();
-        alert(data.error || 'Gagal menambahkan jemaah');
+        addToast({ type: 'error', title: 'Gagal menambahkan jemaah', description: data.error });
         return;
       }
 
@@ -226,7 +229,7 @@ export default function TripDetailPage({ params }: { params: Promise<{ id: strin
       // Remove from available list
       setAvailablePilgrims((prev) => prev.filter((p) => p.id !== pilgrimId));
     } catch {
-      alert('Terjadi kesalahan');
+      addToast({ type: 'error', title: 'Terjadi kesalahan' });
     } finally {
       setAddingPilgrimId(null);
     }
@@ -242,14 +245,14 @@ export default function TripDetailPage({ params }: { params: Promise<{ id: strin
 
       if (!res.ok) {
         const data = await res.json();
-        alert(data.error || 'Gagal menghapus jemaah');
+        addToast({ type: 'error', title: 'Gagal menghapus jemaah', description: data.error });
         return;
       }
 
       fetchTrip();
       setRemoveTarget(null);
     } catch {
-      alert('Terjadi kesalahan');
+      addToast({ type: 'error', title: 'Terjadi kesalahan' });
     } finally {
       setRemoving(false);
     }
@@ -269,7 +272,7 @@ export default function TripDetailPage({ params }: { params: Promise<{ id: strin
 
       if (!res.ok) {
         const data = await res.json();
-        alert(data.error || 'Gagal update room');
+        addToast({ type: 'error', title: 'Gagal update room', description: data.error });
         return;
       }
 
@@ -287,7 +290,7 @@ export default function TripDetailPage({ params }: { params: Promise<{ id: strin
       });
       setEditingRoom(null);
     } catch {
-      alert('Terjadi kesalahan');
+      addToast({ type: 'error', title: 'Terjadi kesalahan' });
     }
   }
 
@@ -752,6 +755,7 @@ export default function TripDetailPage({ params }: { params: Promise<{ id: strin
                             justifyContent: 'center',
                           }}
                           title="Hapus dari manifest"
+                          aria-label="Hapus"
                         >
                           <Trash2 style={{ width: '16px', height: '16px' }} />
                         </button>
@@ -977,6 +981,7 @@ export default function TripDetailPage({ params }: { params: Promise<{ id: strin
                         flexShrink: 0,
                       }}
                       title="Hapus dari daftar tunggu"
+                      aria-label="Hapus"
                     >
                       <Trash2 style={{ width: '16px', height: '16px' }} />
                     </button>
@@ -1010,6 +1015,8 @@ export default function TripDetailPage({ params }: { params: Promise<{ id: strin
             }}
           />
           <div
+            role="dialog"
+            aria-modal="true"
             style={{
               position: 'relative',
               backgroundColor: c.cardBg,

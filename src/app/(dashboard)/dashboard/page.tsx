@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { Users, Package, Plane, FileText, Calendar, Clock, Trophy, Star, Medal, TrendingUp, Settings2, Eye, EyeOff, RotateCcw, GripVertical } from 'lucide-react';
+import { EmptyState } from '@/components/shared/empty-state';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
 import { StatCard } from '@/components/shared/stat-card';
@@ -13,6 +14,7 @@ import { PilgrimStatusChart } from '@/components/dashboard/pilgrim-status-chart'
 import { TripCapacityChart } from '@/components/dashboard/trip-capacity-chart';
 import { OnboardingTour } from '@/components/shared/onboarding-tour';
 import { useAuth } from '@/lib/auth';
+import { StatsSkeleton, TableSkeleton } from '@/components/shared/loading-skeleton';
 
 interface Activity {
   id: string;
@@ -360,7 +362,7 @@ export default function DashboardPage() {
                 <h3 style={{ fontSize: '16px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>Top 5 Bulan Ini</h3>
               </div>
               {leaderboardMini.length === 0 ? (
-                <p style={{ fontSize: '13px', color: c.textMuted }}>Belum ada data.</p>
+                <EmptyState icon={Trophy} title="Belum ada data" />
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   {leaderboardMini.map(entry => (
@@ -416,9 +418,7 @@ export default function DashboardPage() {
               </div>
               <div style={{ padding: isMobile ? '16px' : '24px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {upcomingTrips.length === 0 ? (
-                  <p style={{ textAlign: 'center', fontSize: '14px', color: c.textMuted, padding: '24px 0' }}>
-                    No upcoming trips.
-                  </p>
+                  <EmptyState icon={Calendar} title="Belum ada trip mendatang" />
                 ) : (
                   upcomingTrips.map((trip) => {
                     const status = statusMap[trip.status] || { bg: '#F3F4F6', text: '#6B7280', label: trip.status };
@@ -476,9 +476,9 @@ export default function DashboardPage() {
               </div>
               <div style={{ padding: isMobile ? '16px' : '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 {activitiesLoading ? (
-                  <p style={{ textAlign: 'center', fontSize: '14px', color: c.textMuted, padding: '24px 0' }}>Loading...</p>
+                  <TableSkeleton rows={4} columns={3} />
                 ) : activities.length === 0 ? (
-                  <p style={{ textAlign: 'center', fontSize: '14px', color: c.textMuted, padding: '24px 0' }}>Belum ada aktivitas.</p>
+                  <EmptyState icon={Clock} title="Belum ada aktivitas" />
                 ) : (
                   activities.slice(0, 6).map((activity) => {
                     const dotColor = activityIconColors[activity.type] || c.textMuted;

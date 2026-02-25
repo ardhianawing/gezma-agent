@@ -29,6 +29,12 @@ export function ConfirmDialog({
 }: ConfirmDialogProps) {
   const { c } = useTheme();
   const dialogRef = useRef<HTMLDivElement>(null);
+  const cancelRef = useRef<HTMLButtonElement>(null);
+
+  // Auto-focus cancel button on open
+  useEffect(() => {
+    if (open) cancelRef.current?.focus();
+  }, [open]);
 
   // Close on escape
   useEffect(() => {
@@ -79,6 +85,9 @@ export function ConfirmDialog({
       {/* Dialog */}
       <div
         ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="confirm-dialog-title"
         style={{
           position: 'relative',
           backgroundColor: c.cardBg,
@@ -112,7 +121,7 @@ export function ConfirmDialog({
         </div>
 
         {/* Content */}
-        <h3 style={{ fontSize: '16px', fontWeight: '600', color: c.textPrimary, margin: '0 0 8px 0' }}>
+        <h3 id="confirm-dialog-title" style={{ fontSize: '16px', fontWeight: '600', color: c.textPrimary, margin: '0 0 8px 0' }}>
           {title}
         </h3>
         {description && (
@@ -124,6 +133,7 @@ export function ConfirmDialog({
         {/* Actions */}
         <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
           <button
+            ref={cancelRef}
             onClick={onClose}
             disabled={loading}
             style={{

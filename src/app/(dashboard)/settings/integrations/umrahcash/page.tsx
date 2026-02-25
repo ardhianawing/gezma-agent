@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { PageHeader } from '@/components/layout/page-header';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
+import { useToast } from '@/components/ui/toast';
 import {
   ArrowLeft,
   RefreshCw,
@@ -118,6 +119,7 @@ function StatusBadge({ status, c }: { status: string; c: Record<string, string> 
 export default function UmrahCashSettingsPage() {
   const { c } = useTheme();
   const { isMobile, isTablet } = useResponsive();
+  const { addToast } = useToast();
 
   // State
   const [config, setConfig] = useState<UmrahCashConfig | null>(null);
@@ -170,10 +172,11 @@ export default function UmrahCashSettingsPage() {
       if (txData.data) setTransactions(txData.data);
     } catch {
       setMessage({ type: 'error', text: 'Gagal memuat data UmrahCash' });
+      addToast({ type: 'error', title: 'Gagal memuat data UmrahCash' });
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [addToast]);
 
   useEffect(() => {
     fetchData();
@@ -217,9 +220,11 @@ export default function UmrahCashSettingsPage() {
       if (data.data) {
         setConfig(data.data);
         setMessage({ type: 'success', text: 'Pendaftaran berhasil dikirim! Tim UmrahCash akan menghubungi Anda dalam 1-3 hari kerja.' });
+        addToast({ type: 'success', title: 'Pendaftaran berhasil dikirim' });
       }
     } catch {
       setMessage({ type: 'error', text: 'Gagal mendaftar. Silakan coba lagi.' });
+      addToast({ type: 'error', title: 'Gagal mendaftar' });
     } finally {
       setRegisterLoading(false);
     }
@@ -240,9 +245,11 @@ export default function UmrahCashSettingsPage() {
       if (data.data) {
         setLockedRate(data.data);
         setMessage({ type: 'success', text: 'Kurs berhasil dikunci selama 30 menit!' });
+        addToast({ type: 'success', title: 'Kurs berhasil dikunci' });
       }
     } catch {
       setMessage({ type: 'error', text: 'Gagal mengunci kurs' });
+      addToast({ type: 'error', title: 'Gagal mengunci kurs' });
     } finally {
       setLockLoading(false);
     }
@@ -278,6 +285,7 @@ export default function UmrahCashSettingsPage() {
       } else if (data.data) {
         setTransactions((prev) => [data.data, ...prev]);
         setMessage({ type: 'success', text: 'Transfer berhasil dibuat! Status: Pending' });
+        addToast({ type: 'success', title: 'Transfer berhasil dibuat' });
         setAmountSAR('');
         setRecipientName('');
         setRecipientBank('');
@@ -285,6 +293,7 @@ export default function UmrahCashSettingsPage() {
       }
     } catch {
       setMessage({ type: 'error', text: 'Gagal membuat transfer' });
+      addToast({ type: 'error', title: 'Gagal membuat transfer' });
     } finally {
       setTransferLoading(false);
     }
@@ -337,15 +346,12 @@ export default function UmrahCashSettingsPage() {
             <span style={{ fontSize: '14px' }}>Memuat data UmrahCash...</span>
           </div>
         </div>
-        <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
       </div>
     );
   }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '16px' : '24px' }}>
-      {/* Spin animation for loaders */}
-      <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
 
       {/* Back button + Header */}
       <div>

@@ -4,15 +4,18 @@ import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
+import { useToast } from '@/components/ui/toast';
 import { PackageForm } from '@/components/packages/package-form';
 import type { PackageFormData } from '@/lib/validations/package';
 import type { Package } from '@/types/package';
+import { FormSkeleton } from '@/components/shared/loading-skeleton';
 
 export default function EditPackagePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const router = useRouter();
   const { c } = useTheme();
   const { isMobile } = useResponsive();
+  const { addToast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -50,24 +53,24 @@ export default function EditPackagePage({ params }: { params: Promise<{ id: stri
 
       if (!res.ok) {
         const body = await res.json();
-        setError(body.error || 'Gagal memperbarui paket');
+        const message = body.error || 'Gagal memperbarui paket';
+        setError(message);
+        addToast({ type: 'error', title: 'Gagal memperbarui', description: message });
         return;
       }
 
+      addToast({ type: 'success', title: 'Paket berhasil diperbarui' });
       router.push(`/packages/${id}`);
     } catch {
       setError('Terjadi kesalahan jaringan');
+      addToast({ type: 'error', title: 'Terjadi kesalahan jaringan' });
     } finally {
       setIsLoading(false);
     }
   };
 
   if (isFetching) {
-    return (
-      <div style={{ padding: '48px', textAlign: 'center', color: c.textMuted }}>
-        Memuat data paket...
-      </div>
-    );
+    return <FormSkeleton fields={8} />;
   }
 
   if (!initialData) {

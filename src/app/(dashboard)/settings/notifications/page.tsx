@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react';
 import { PageHeader } from '@/components/layout/page-header';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
-import { Bell, ArrowLeft, Save } from 'lucide-react';
+import { useToast } from '@/components/ui/toast';
+import { Bell, ArrowLeft, Save, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import {
   NOTIFICATION_CATEGORIES,
@@ -17,6 +18,7 @@ export default function NotificationPreferencesPage() {
   const { isMobile } = useResponsive();
   const [prefs, setPrefs] = useState<NotificationPreferences | null>(null);
   const [loading, setLoading] = useState(true);
+  const { addToast } = useToast();
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
@@ -52,11 +54,14 @@ export default function NotificationPreferencesPage() {
       });
       if (res.ok) {
         setMessage({ type: 'success', text: 'Preferensi berhasil disimpan' });
+        addToast({ type: 'success', title: 'Preferensi berhasil disimpan' });
       } else {
         setMessage({ type: 'error', text: 'Gagal menyimpan preferensi' });
+        addToast({ type: 'error', title: 'Gagal menyimpan preferensi' });
       }
     } catch {
       setMessage({ type: 'error', text: 'Terjadi kesalahan' });
+      addToast({ type: 'error', title: 'Terjadi kesalahan' });
     } finally {
       setSaving(false);
     }
@@ -193,7 +198,11 @@ export default function NotificationPreferencesPage() {
               cursor: saving ? 'not-allowed' : 'pointer',
             }}
           >
-            <Save style={{ width: '16px', height: '16px' }} />
+            {saving ? (
+              <Loader2 style={{ width: '16px', height: '16px', animation: 'spin 1s linear infinite' }} />
+            ) : (
+              <Save style={{ width: '16px', height: '16px' }} />
+            )}
             {saving ? 'Menyimpan...' : 'Simpan Preferensi'}
           </button>
           {message && (

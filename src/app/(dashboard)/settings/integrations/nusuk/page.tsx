@@ -5,6 +5,7 @@ import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
 import { PageHeader } from '@/components/layout/page-header';
 import { BackButton } from '@/components/shared/back-button';
+import { useToast } from '@/components/ui/toast';
 import {
   Eye,
   EyeOff,
@@ -25,6 +26,7 @@ interface NusukConfigData {
 export default function NusukIntegrationPage() {
   const { c } = useTheme();
   const { isMobile } = useResponsive();
+  const { addToast } = useToast();
 
   const [config, setConfig] = useState<NusukConfigData>({
     isEnabled: false,
@@ -81,9 +83,11 @@ export default function NusukIntegrationPage() {
       } else {
         setConfig(json.data);
         setSaveMessage({ type: 'success', text: 'Konfigurasi berhasil disimpan' });
+        addToast({ type: 'success', title: 'Konfigurasi berhasil disimpan' });
       }
     } catch {
       setSaveMessage({ type: 'error', text: 'Terjadi kesalahan jaringan' });
+      addToast({ type: 'error', title: 'Terjadi kesalahan jaringan' });
     } finally {
       setSaving(false);
     }
@@ -123,6 +127,7 @@ export default function NusukIntegrationPage() {
       });
     } catch {
       setConfig((prev) => ({ ...prev, isEnabled: !newEnabled }));
+      addToast({ type: 'error', title: 'Gagal mengubah status integrasi' });
     }
   };
 
@@ -310,7 +315,10 @@ export default function NusukIntegrationPage() {
                 transition: 'opacity 0.2s',
               }}
             >
-              {saving ? 'Menyimpan...' : 'Simpan Konfigurasi'}
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                {saving && <Loader2 style={{ width: '16px', height: '16px', animation: 'spin 1s linear infinite' }} />}
+                {saving ? 'Menyimpan...' : 'Simpan Konfigurasi'}
+              </span>
             </button>
 
             <button
@@ -557,13 +565,6 @@ export default function NusukIntegrationPage() {
         </div>
       </div>
 
-      {/* Spin animation for Loader2 */}
-      <style>{`
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-      `}</style>
     </div>
   );
 }

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, ChevronLeft, ChevronRight, CheckCircle, XCircle, Award, Send } from 'lucide-react';
+import { ArrowLeft, ChevronLeft, ChevronRight, CheckCircle, XCircle, Award, Send, Loader2 } from 'lucide-react';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
 
@@ -343,7 +343,11 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
               opacity: submitting ? 0.7 : 1,
             }}
           >
-            <Send style={{ width: '16px', height: '16px' }} />
+            {submitting ? (
+              <Loader2 style={{ width: '16px', height: '16px', animation: 'spin 1s linear infinite' }} />
+            ) : (
+              <Send style={{ width: '16px', height: '16px' }} />
+            )}
             {submitting ? 'Mengirim...' : 'Kirim Jawaban'}
           </button>
         ) : (

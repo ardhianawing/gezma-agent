@@ -2,9 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Plus, Trash2, Send, Clock, Mail, ToggleLeft, ToggleRight } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, Send, Clock, Mail, ToggleLeft, ToggleRight, FileText, Loader2 } from 'lucide-react';
+import { EmptyState } from '@/components/shared/empty-state';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
+import { useToast } from '@/components/ui/toast';
+import { ConfirmDialog } from '@/components/shared/confirm-dialog';
 
 interface ScheduledReport {
   id: string;
@@ -33,6 +36,8 @@ export default function ScheduledReportsPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [sending, setSending] = useState<string | null>(null);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const { addToast } = useToast();
+  const [deleteReportId, setDeleteReportId] = useState<string | null>(null);
 
   // Form state
   const [frequency, setFrequency] = useState('weekly');
@@ -111,15 +116,18 @@ export default function ScheduledReportsPage() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Hapus laporan terjadwal ini?')) return;
+  const handleDelete = async () => {
+    if (!deleteReportId) return;
     try {
-      const res = await fetch(`/api/settings/scheduled-reports/${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/settings/scheduled-reports/${deleteReportId}`, { method: 'DELETE' });
       if (res.ok) {
-        setReports(reports.filter(r => r.id !== id));
-        setMessage({ type: 'success', text: 'Berhasil dihapus' });
+        setReports(reports.filter(r => r.id !== deleteReportId));
+        addToast({ type: 'success', title: 'Berhasil dihapus' });
       }
-    } catch { /* ignore */ }
+    } catch {
+      addToast({ type: 'error', title: 'Gagal menghapus' });
+    }
+    setDeleteReportId(null);
   };
 
   const handleToggle = async (id: string, currentActive: boolean) => {
@@ -302,7 +310,10 @@ export default function ScheduledReportsPage() {
                 opacity: formLoading ? 0.7 : 1,
               }}
             >
-              {formLoading ? 'Menyimpan...' : (editingId ? 'Perbarui' : 'Simpan')}
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                {formLoading && <Loader2 style={{ width: '16px', height: '16px', animation: 'spin 1s linear infinite' }} />}
+                {formLoading ? 'Menyimpan...' : (editingId ? 'Perbarui' : 'Simpan')}
+              </span>
             </button>
           </div>
         </div>
@@ -314,10 +325,8 @@ export default function ScheduledReportsPage() {
       ) : reports.length === 0 ? (
         <div style={{
           backgroundColor: c.cardBg, borderRadius: '12px', border: `1px solid ${c.border}`,
-          padding: '40px', textAlign: 'center',
         }}>
-          <Clock style={{ width: '40px', height: '40px', color: c.textLight, margin: '0 auto 12px' }} />
-          <p style={{ fontSize: '14px', color: c.textMuted, margin: 0 }}>Belum ada laporan terjadwal</p>
+          <EmptyState icon={FileText} title="Belum ada laporan terjadwal" />
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -379,8 +388,12 @@ export default function ScheduledReportsPage() {
                       opacity: sending === r.id ? 0.7 : 1,
                     }}
                   >
-                    <Send style={{ width: '13px', height: '13px' }} />
-                    {sending === r.id ? '...' : 'Kirim'}
+                    {sending === r.id ? (
+                      <Loader2 style={{ width: '13px', height: '13px', animation: 'spin 1s linear infinite' }} />
+                    ) : (
+                      <Send style={{ width: '13px', height: '13px' }} />
+                    )}
+                    {sending === r.id ? 'Mengirim...' : 'Kirim'}
                   </button>
                   <button
                     onClick={() => openEdit(r)}
@@ -393,7 +406,7 @@ export default function ScheduledReportsPage() {
                     Edit
                   </button>
                   <button
-                    onClick={() => handleDelete(r.id)}
+                    onClick={() => setDeleteReportId(r.id)}
                     title="Hapus"
                     style={{
                       display: 'inline-flex', alignItems: 'center', padding: '6px',
@@ -409,6 +422,15 @@ export default function ScheduledReportsPage() {
           ))}
         </div>
       )}
+      <ConfirmDialog
+        open={!!deleteReportId}
+        onClose={() => setDeleteReportId(null)}
+        onConfirm={handleDelete}
+        title="Hapus laporan terjadwal?"
+        description="Laporan akan dihapus dan tidak akan dikirim lagi."
+        confirmLabel="Hapus"
+        variant="destructive"
+      />
     </div>
   );
 }

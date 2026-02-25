@@ -3,6 +3,9 @@
 import { useState, useEffect } from 'react';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
+import { useToast } from '@/components/ui/toast';
+import { ConfirmDialog } from '@/components/shared/confirm-dialog';
+import { Loader2 } from 'lucide-react';
 
 const GREEN = '#059669';
 const GREEN_LIGHT = '#ECFDF5';
@@ -25,6 +28,8 @@ export default function GalleryPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const { addToast } = useToast();
+  const [deletePhotoId, setDeletePhotoId] = useState<string | null>(null);
 
   const fetchPhotos = async () => {
     try {
@@ -67,18 +72,22 @@ export default function GalleryPage() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Hapus foto ini?')) return;
-    setDeletingId(id);
+  const handleDelete = async () => {
+    if (!deletePhotoId) return;
+    setDeletingId(deletePhotoId);
     try {
-      const res = await fetch('/api/pilgrim-portal/gallery/' + id, { method: 'DELETE' });
+      const res = await fetch('/api/pilgrim-portal/gallery/' + deletePhotoId, { method: 'DELETE' });
       if (res.ok) {
-        setPhotos(photos.filter((p) => p.id !== id));
+        setPhotos(photos.filter((p) => p.id !== deletePhotoId));
+        addToast({ type: 'success', title: 'Foto berhasil dihapus' });
+      } else {
+        addToast({ type: 'error', title: 'Gagal menghapus foto' });
       }
     } catch {
-      // ignore
+      addToast({ type: 'error', title: 'Terjadi kesalahan' });
     } finally {
       setDeletingId(null);
+      setDeletePhotoId(null);
     }
   };
 
@@ -173,7 +182,10 @@ export default function GalleryPage() {
               opacity: submitting ? 0.7 : 1,
             }}
           >
-            {submitting ? 'Mengunggah...' : 'Simpan Foto'}
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+              {submitting && <Loader2 style={{ width: '16px', height: '16px', animation: 'spin 1s linear infinite' }} />}
+              {submitting ? 'Mengunggah...' : 'Simpan Foto'}
+            </span>
           </button>
         </div>
       </div>
@@ -266,7 +278,7 @@ export default function GalleryPage() {
                     {new Date(photo.uploadedAt).toLocaleDateString('id-ID')}
                   </span>
                   <button
-                    onClick={() => handleDelete(photo.id)}
+                    onClick={() => setDeletePhotoId(photo.id)}
                     disabled={deletingId === photo.id}
                     style={{
                       fontSize: '11px',
@@ -287,6 +299,15 @@ export default function GalleryPage() {
           ))}
         </div>
       )}
+      <ConfirmDialog
+        open={!!deletePhotoId}
+        onClose={() => setDeletePhotoId(null)}
+        onConfirm={handleDelete}
+        title="Hapus foto ini?"
+        description="Foto akan dihapus permanen dari galeri."
+        confirmLabel="Hapus"
+        variant="destructive"
+      />
     </div>
   );
 }

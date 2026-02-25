@@ -6,8 +6,11 @@ import Link from 'next/link';
 import { ArrowLeft, Edit, Trash2, DollarSign, Building2, FileText, CheckCircle, XCircle, Copy, Download, MapPin, Calendar } from 'lucide-react';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
+import { useToast } from '@/components/ui/toast';
+import { ConfirmDialog } from '@/components/shared/confirm-dialog';
 import { formatCurrency } from '@/lib/utils';
 import type { Package, ItineraryDay } from '@/types/package';
+import { DetailSkeleton } from '@/components/shared/loading-skeleton';
 
 export default function PackageDetailPage() {
   const params = useParams();
@@ -20,6 +23,8 @@ export default function PackageDetailPage() {
   const [loading, setLoading] = useState(true);
   const [duplicating, setDuplicating] = useState(false);
   const [generatingPdf, setGeneratingPdf] = useState(false);
+  const { addToast } = useToast();
+  const [deleteTarget, setDeleteTarget] = useState(false);
 
   useEffect(() => {
     async function fetchPackage() {
@@ -37,18 +42,20 @@ export default function PackageDetailPage() {
   }, [id]);
 
   const handleDelete = async () => {
-    if (!pkg || !confirm(`Hapus paket "${pkg.name}"?`)) return;
+    if (!pkg) return;
     try {
       const res = await fetch(`/api/packages/${id}`, { method: 'DELETE' });
       if (res.ok) {
+        addToast({ type: 'success', title: 'Paket berhasil dihapus' });
         router.push('/packages');
       } else {
         const data = await res.json().catch(() => ({}));
-        alert(data.error || 'Gagal menghapus paket');
+        addToast({ type: 'error', title: 'Gagal menghapus paket', description: data.error || 'Terjadi kesalahan' });
       }
     } catch {
-      alert('Terjadi kesalahan jaringan');
+      addToast({ type: 'error', title: 'Terjadi kesalahan jaringan' });
     }
+    setDeleteTarget(false);
   };
 
   const handleDuplicate = async () => {
@@ -59,12 +66,13 @@ export default function PackageDetailPage() {
       if (res.ok) {
         const newPkg = await res.json();
         router.push(`/packages/${newPkg.id}`);
+        addToast({ type: 'success', title: 'Paket berhasil diduplikasi' });
       } else {
         const data = await res.json().catch(() => ({}));
-        alert(data.error || 'Gagal menduplikasi paket');
+        addToast({ type: 'error', title: 'Gagal menduplikasi paket', description: data.error });
       }
     } catch {
-      alert('Terjadi kesalahan jaringan');
+      addToast({ type: 'error', title: 'Terjadi kesalahan jaringan' });
     } finally {
       setDuplicating(false);
     }
@@ -87,17 +95,17 @@ export default function PackageDetailPage() {
         setTimeout(() => URL.revokeObjectURL(url), 100);
       } else {
         const data = await res.json().catch(() => ({}));
-        alert(data.error || 'Gagal membuat brosur');
+        addToast({ type: 'error', title: 'Gagal membuat brosur', description: data.error });
       }
     } catch {
-      alert('Terjadi kesalahan jaringan');
+      addToast({ type: 'error', title: 'Terjadi kesalahan jaringan' });
     } finally {
       setGeneratingPdf(false);
     }
   };
 
   if (loading) {
-    return <div style={{ padding: '40px', textAlign: 'center', color: c.textMuted }}>Memuat data...</div>;
+    return <DetailSkeleton />;
   }
 
   if (!pkg) {
@@ -187,7 +195,7 @@ export default function PackageDetailPage() {
               Edit Package
             </button>
           </Link>
-          <button onClick={handleDelete} style={{
+          <button onClick={() => setDeleteTarget(true)} style={{
             display: 'inline-flex', alignItems: 'center', gap: '8px',
             backgroundColor: c.cardBg, color: c.textSecondary, border: `1px solid ${c.border}`,
             borderRadius: '12px', padding: '12px 24px', fontSize: '14px', fontWeight: '600', cursor: 'pointer',
@@ -391,6 +399,15 @@ export default function PackageDetailPage() {
           </div>
         </div>
       </div>
+      <ConfirmDialog
+        open={deleteTarget}
+        onClose={() => setDeleteTarget(false)}
+        onConfirm={handleDelete}
+        title={`Hapus paket "${pkg?.name}"?`}
+        description="Data paket akan dihapus permanen."
+        confirmLabel="Hapus"
+        variant="destructive"
+      />
     </div>
   );
 }

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Building2, Search, ChevronLeft, ChevronRight } from 'lucide-react';
+import { TableSkeleton } from '@/components/shared/loading-skeleton';
 
 const cc = {
   primary: '#2563EB',
@@ -138,7 +139,7 @@ export default function CCAgenciesPage() {
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={8} style={{ padding: '40px', textAlign: 'center', color: cc.textMuted }}>Loading...</td></tr>
+                <tr><td colSpan={8}><TableSkeleton rows={5} columns={6} /></td></tr>
               ) : agencies.length === 0 ? (
                 <tr><td colSpan={8} style={{ padding: '40px', textAlign: 'center', color: cc.textMuted }}>Tidak ada agensi.</td></tr>
               ) : agencies.map(agency => {

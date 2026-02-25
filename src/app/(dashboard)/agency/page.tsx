@@ -6,6 +6,7 @@ import { formatDate } from '@/lib/utils';
 import { useTheme } from '@/lib/theme';
 import { useLanguage } from '@/lib/i18n';
 import { useResponsive } from '@/lib/hooks/use-responsive';
+import { useToast } from '@/components/ui/toast';
 import {
   Building2,
   Mail,
@@ -18,7 +19,8 @@ import {
   Edit2,
   Copy,
   ExternalLink,
-  Download
+  Download,
+  Loader2
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -63,6 +65,7 @@ export default function AgencyPage() {
   const { c, theme } = useTheme();
   const { t } = useLanguage();
   const { isMobile, isTablet } = useResponsive();
+  const { addToast } = useToast();
   const [agency, setAgency] = useState<AgencyData | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -116,12 +119,16 @@ export default function AgencyPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(editForm),
       });
-      if (!res.ok) return;
+      if (!res.ok) {
+        addToast({ type: 'error', title: 'Gagal menyimpan profil agensi' });
+        return;
+      }
       const updated = await res.json();
       setAgency(updated);
       setShowEdit(false);
+      addToast({ type: 'success', title: 'Profil agensi berhasil disimpan' });
     } catch {
-      // silently fail
+      addToast({ type: 'error', title: 'Gagal menyimpan profil agensi' });
     } finally {
       setSaving(false);
     }
@@ -361,7 +368,10 @@ export default function AgencyPage() {
                     opacity: saving ? 0.6 : 1,
                   }}
                 >
-                  {saving ? 'Menyimpan...' : 'Simpan'}
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                    {saving && <Loader2 style={{ width: '16px', height: '16px', animation: 'spin 1s linear infinite' }} />}
+                    {saving ? 'Menyimpan...' : 'Simpan'}
+                  </span>
                 </button>
               </div>
             </form>

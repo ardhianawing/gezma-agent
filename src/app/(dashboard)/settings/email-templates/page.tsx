@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
-import { Mail, Save, ChevronLeft, ToggleLeft, ToggleRight } from 'lucide-react';
+import { useToast } from '@/components/ui/toast';
+import { Mail, Save, ChevronLeft, ToggleLeft, ToggleRight, Loader2 } from 'lucide-react';
 
 interface EmailTemplate {
   id: string;
@@ -59,6 +60,7 @@ export default function EmailTemplatesPage() {
   const [formSubject, setFormSubject] = useState('');
   const [formBody, setFormBody] = useState('');
   const [formActive, setFormActive] = useState(true);
+  const { addToast } = useToast();
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState('');
 
@@ -118,13 +120,16 @@ export default function EmailTemplatesPage() {
           return [...prev, saved];
         });
         setSaveSuccess('Template berhasil disimpan');
+        addToast({ type: 'success', title: 'Template berhasil disimpan' });
         setTimeout(() => {
           setEditingEvent(null);
           setSaveSuccess('');
         }, 1500);
+      } else {
+        addToast({ type: 'error', title: 'Gagal menyimpan template' });
       }
     } catch {
-      // silently fail
+      addToast({ type: 'error', title: 'Gagal menyimpan template' });
     } finally {
       setSaving(false);
     }
@@ -333,7 +338,11 @@ export default function EmailTemplatesPage() {
                 gap: '8px',
               }}
             >
-              <Save style={{ width: '16px', height: '16px' }} />
+              {saving ? (
+                <Loader2 style={{ width: '16px', height: '16px', animation: 'spin 1s linear infinite' }} />
+              ) : (
+                <Save style={{ width: '16px', height: '16px' }} />
+              )}
               {saving ? 'Menyimpan...' : 'Simpan Template'}
             </button>
           </div>

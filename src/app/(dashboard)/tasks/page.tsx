@@ -1,10 +1,13 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { Plus, X, GripVertical, Trash2, Calendar, Flag, User, Loader2 } from 'lucide-react';
+import { Plus, X, GripVertical, Trash2, Calendar, Flag, User, Loader2, CheckSquare } from 'lucide-react';
+import { EmptyState } from '@/components/shared/empty-state';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
 import { useAuth } from '@/lib/auth';
+import { useToast } from '@/components/ui/toast';
+import { ConfirmDialog } from '@/components/shared/confirm-dialog';
 
 interface Task {
   id: string;
@@ -48,6 +51,8 @@ export default function TasksPage() {
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [draggedTask, setDraggedTask] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const { addToast } = useToast();
+  const [deleteTaskId, setDeleteTaskId] = useState<string | null>(null);
 
   // Form state
   const [form, setForm] = useState({
@@ -122,9 +127,10 @@ export default function TasksPage() {
         setTasks((prev) => [newTask, ...prev]);
         setShowModal(false);
         setForm({ title: '', description: '', priority: 'medium', dueDate: '', assignedTo: '', assigneeName: '' });
+        addToast({ type: 'success', title: 'Task berhasil disimpan' });
       }
     } catch {
-      // silently fail
+      addToast({ type: 'error', title: 'Gagal menyimpan task' });
     } finally {
       setSaving(false);
     }
@@ -145,14 +151,18 @@ export default function TasksPage() {
     }
   }
 
-  async function handleDeleteTask(taskId: string) {
+  async function handleDeleteTask() {
+    if (!deleteTaskId) return;
     try {
-      const res = await fetch(`/api/tasks/${taskId}`, { method: 'DELETE' });
+      const res = await fetch(`/api/tasks/${deleteTaskId}`, { method: 'DELETE' });
       if (res.ok) {
-        setTasks((prev) => prev.filter((t) => t.id !== taskId));
+        setTasks((prev) => prev.filter((t) => t.id !== deleteTaskId));
+        addToast({ type: 'success', title: 'Task berhasil dihapus' });
       }
     } catch {
-      // silently fail
+      addToast({ type: 'error', title: 'Gagal menghapus task' });
+    } finally {
+      setDeleteTaskId(null);
     }
   }
 
@@ -285,9 +295,7 @@ export default function TasksPage() {
                     <Loader2 style={{ width: '20px', height: '20px', animation: 'spin 1s linear infinite' }} />
                   </div>
                 ) : colTasks.length === 0 ? (
-                  <div style={{ padding: '32px 12px', textAlign: 'center', fontSize: '13px', color: c.textMuted, border: `2px dashed ${c.border}`, borderRadius: '8px' }}>
-                    Tidak ada task
-                  </div>
+                  <EmptyState icon={CheckSquare} title="Tidak ada task" />
                 ) : (
                   colTasks.map((task) => {
                     const priorityCfg = PRIORITY_CONFIG[task.priority] || PRIORITY_CONFIG.medium;
@@ -326,8 +334,9 @@ export default function TasksPage() {
                             )}
                           </div>
                           <button
-                            onClick={() => handleDeleteTask(task.id)}
+                            onClick={() => setDeleteTaskId(task.id)}
                             title="Hapus task"
+                            aria-label="Hapus"
                             style={{ padding: '4px', border: 'none', backgroundColor: 'transparent', color: c.textMuted, cursor: 'pointer', display: 'flex', flexShrink: 0 }}
                           >
                             <Trash2 style={{ width: '14px', height: '14px' }} />
@@ -543,7 +552,10 @@ export default function TasksPage() {
                     border: 'none', borderRadius: '12px', cursor: saving ? 'not-allowed' : 'pointer',
                   }}
                 >
-                  {saving ? 'Menyimpan...' : 'Buat Task'}
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                    {saving && <Loader2 style={{ width: '16px', height: '16px', animation: 'spin 1s linear infinite' }} />}
+                    {saving ? 'Menyimpan...' : 'Buat Task'}
+                  </span>
                 </button>
               </div>
             </form>
@@ -551,13 +563,16 @@ export default function TasksPage() {
         </div>
       )}
 
-      {/* Spin keyframe for loader */}
-      <style>{`
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-      `}</style>
+      <ConfirmDialog
+        open={!!deleteTaskId}
+        onClose={() => setDeleteTaskId(null)}
+        onConfirm={handleDeleteTask}
+        title="Hapus task ini?"
+        description="Task akan dihapus permanen."
+        confirmLabel="Hapus"
+        variant="destructive"
+      />
+
     </div>
   );
 }

@@ -94,6 +94,8 @@ function ToastItem({ toast, onClose }: { toast: Toast; onClose: () => void }) {
 
   return (
     <div
+      role="alert"
+      aria-live="assertive"
       style={{
         display: 'flex',
         alignItems: 'flex-start',
@@ -118,6 +120,7 @@ function ToastItem({ toast, onClose }: { toast: Toast; onClose: () => void }) {
       </div>
       <button
         onClick={onClose}
+        aria-label="Tutup notifikasi"
         style={{
           flexShrink: 0,
           borderRadius: '8px',

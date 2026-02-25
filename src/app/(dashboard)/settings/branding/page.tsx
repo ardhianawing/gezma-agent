@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Palette, Save, RotateCcw } from 'lucide-react';
+import { Palette, Save, RotateCcw, Loader2 } from 'lucide-react';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
+import { useToast } from '@/components/ui/toast';
 import { useBranding } from '@/lib/contexts/branding-context';
 
 export default function BrandingSettingsPage() {
@@ -17,6 +18,7 @@ export default function BrandingSettingsPage() {
   const [logoLightUrl, setLogoLightUrl] = useState('');
   const [logoDarkUrl, setLogoDarkUrl] = useState('');
   const [faviconUrl, setFaviconUrl] = useState('');
+  const { addToast } = useToast();
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
 
@@ -47,12 +49,15 @@ export default function BrandingSettingsPage() {
       });
       if (res.ok) {
         setMessage('Branding berhasil disimpan!');
+        addToast({ type: 'success', title: 'Branding berhasil disimpan' });
         await refreshBranding();
       } else {
         setMessage('Gagal menyimpan branding.');
+        addToast({ type: 'error', title: 'Gagal menyimpan branding' });
       }
     } catch {
       setMessage('Terjadi kesalahan.');
+      addToast({ type: 'error', title: 'Terjadi kesalahan' });
     } finally {
       setSaving(false);
     }
@@ -281,7 +286,11 @@ export default function BrandingSettingsPage() {
                 gap: '6px',
               }}
             >
-              <Save style={{ width: '16px', height: '16px' }} />
+              {saving ? (
+                <Loader2 style={{ width: '16px', height: '16px', animation: 'spin 1s linear infinite' }} />
+              ) : (
+                <Save style={{ width: '16px', height: '16px' }} />
+              )}
               {saving ? 'Menyimpan...' : 'Simpan'}
             </button>
           </div>

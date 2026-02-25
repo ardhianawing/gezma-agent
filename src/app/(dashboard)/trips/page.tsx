@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
-import { Plus, Plane, List, CalendarDays, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, Plane, List, CalendarDays, ChevronLeft, ChevronRight, MapPin } from 'lucide-react';
+import { EmptyState } from '@/components/shared/empty-state';
 import { PageHeader } from '@/components/layout/page-header';
 import { StatusBadge } from '@/components/shared/status-badge';
 import type { TripStatus } from '@/types';
@@ -11,6 +12,7 @@ import { useTheme } from '@/lib/theme';
 import { useLanguage } from '@/lib/i18n';
 import { useResponsive } from '@/lib/hooks/use-responsive';
 import { usePermission, PERMISSIONS } from '@/lib/hooks/use-permissions';
+import { CardSkeleton } from '@/components/shared/loading-skeleton';
 
 interface TripData {
   id: string;
@@ -342,13 +344,13 @@ export default function TripsPage() {
           }}
         >
           {loading && (
-            <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px', color: c.textSecondary }}>
-              Memuat data trip...
+            <div style={{ gridColumn: '1 / -1', display: 'grid', gridTemplateColumns: gridColumns, gap: '16px' }}>
+              {Array.from({ length: 4 }).map((_, i) => <CardSkeleton key={i} />)}
             </div>
           )}
           {!loading && trips.length === 0 && (
-            <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px', color: c.textSecondary }}>
-              Belum ada trip. Buat trip pertama Anda.
+            <div style={{ gridColumn: '1 / -1' }}>
+              <EmptyState icon={MapPin} title="Belum ada trip" description="Buat trip pertama Anda." />
             </div>
           )}
           {trips.map((trip) => {

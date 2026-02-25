@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { Plus, Star, Plane, Clock, ArrowRight, Blocks } from 'lucide-react';
+import { Plus, Star, Plane, Clock, ArrowRight, Blocks, Package as PackageIcon } from 'lucide-react';
+import { EmptyState } from '@/components/shared/empty-state';
 import { PageHeader } from '@/components/layout/page-header';
 import { formatCurrency } from '@/lib/utils';
 import { useTheme } from '@/lib/theme';
@@ -10,6 +11,7 @@ import { useLanguage } from '@/lib/i18n';
 import { useResponsive } from '@/lib/hooks/use-responsive';
 import { usePermission, PERMISSIONS } from '@/lib/hooks/use-permissions';
 import type { Package } from '@/types/package';
+import { CardSkeleton } from '@/components/shared/loading-skeleton';
 
 export default function PackagesPage() {
   const { c } = useTheme();
@@ -149,11 +151,15 @@ export default function PackagesPage() {
       </div>
 
       {loading ? (
-        <div style={{ padding: '40px', textAlign: 'center', color: c.textMuted }}>Memuat data...</div>
-      ) : packages.length === 0 ? (
-        <div style={{ padding: '40px', textAlign: 'center', color: c.textMuted }}>
-          {search || category ? 'Tidak ada paket yang cocok.' : 'Belum ada paket.'}
+        <div style={{ display: 'grid', gridTemplateColumns: gridColumns, gap: isMobile ? '16px' : '20px' }}>
+          {Array.from({ length: 4 }).map((_, i) => <CardSkeleton key={i} />)}
         </div>
+      ) : packages.length === 0 ? (
+        <EmptyState
+          icon={PackageIcon}
+          title={search || category ? 'Tidak ada paket yang cocok' : 'Belum ada paket'}
+          description={search || category ? 'Coba ubah filter pencarian Anda.' : undefined}
+        />
       ) : (
         <div
           style={{

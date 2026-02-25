@@ -4,6 +4,7 @@ import { useState, useEffect, CSSProperties } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
+import { useToast } from '@/components/ui/toast';
 import {
   ArrowLeft,
   MessageCircle,
@@ -77,6 +78,7 @@ export default function WhatsAppSettingsPage() {
   const router = useRouter();
   const { c } = useTheme();
   const { isMobile } = useResponsive();
+  const { addToast } = useToast();
 
   // Config state
   const [config, setConfig] = useState<WAConfig>({
@@ -121,7 +123,7 @@ export default function WhatsAppSettingsPage() {
       const json = await res.json();
       if (json.data) setConfig(json.data);
     } catch {
-      // ignore
+      addToast({ type: 'error', title: 'Gagal memuat konfigurasi WhatsApp' });
     } finally {
       setLoading(false);
     }
@@ -133,7 +135,7 @@ export default function WhatsAppSettingsPage() {
       const json = await res.json();
       if (json.data) setTemplates(json.data);
     } catch {
-      // ignore
+      addToast({ type: 'error', title: 'Gagal memuat template WhatsApp' });
     }
   }
 
@@ -157,9 +159,11 @@ export default function WhatsAppSettingsPage() {
       } else {
         setConfig(json.data);
         setSaveMessage({ type: 'success', text: 'Konfigurasi berhasil disimpan' });
+        addToast({ type: 'success', title: 'Konfigurasi berhasil disimpan' });
       }
     } catch {
       setSaveMessage({ type: 'error', text: 'Terjadi kesalahan' });
+      addToast({ type: 'error', title: 'Gagal menyimpan konfigurasi' });
     } finally {
       setSaving(false);
     }
@@ -179,6 +183,7 @@ export default function WhatsAppSettingsPage() {
       }
     } catch {
       setTestResult({ success: false, message: 'Gagal menguji koneksi' });
+      addToast({ type: 'error', title: 'Gagal menguji koneksi' });
     } finally {
       setTesting(false);
     }
@@ -201,11 +206,13 @@ export default function WhatsAppSettingsPage() {
         setQuickResult({ type: 'error', text: json.data.error || 'Gagal mengirim pesan' });
       } else {
         setQuickResult({ type: 'success', text: 'Pesan berhasil dikirim!' });
+        addToast({ type: 'success', title: 'Pesan berhasil dikirim' });
         setQuickPhone('');
         setQuickMessage('');
       }
     } catch {
       setQuickResult({ type: 'error', text: 'Terjadi kesalahan' });
+      addToast({ type: 'error', title: 'Gagal mengirim pesan' });
     } finally {
       setQuickSending(false);
     }
@@ -306,14 +313,12 @@ export default function WhatsAppSettingsPage() {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '40vh' }}>
           <Loader2 size={32} color={WA_GREEN} style={{ animation: 'spin 1s linear infinite' }} />
         </div>
-        <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
       </div>
     );
   }
 
   return (
     <div style={{ padding: isMobile ? '16px' : '32px', minHeight: '100vh', backgroundColor: c.pageBg }}>
-      <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
 
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '28px' }}>

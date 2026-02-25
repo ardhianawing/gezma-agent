@@ -2,9 +2,11 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, BookOpen, Clock, CheckCircle, Circle, ChevronDown, ChevronUp, User, Award, FileQuestion, Star, Trash2, Send } from 'lucide-react';
+import { ArrowLeft, BookOpen, Clock, CheckCircle, Circle, ChevronDown, ChevronUp, User, Award, FileQuestion, Star, Trash2, Send, Loader2 } from 'lucide-react';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
+import { useToast } from '@/components/ui/toast';
+import { ConfirmDialog } from '@/components/shared/confirm-dialog';
 import { levels, categories } from '@/data/mock-academy';
 
 interface Lesson {
@@ -95,6 +97,8 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
   const [submittingReview, setSubmittingReview] = useState(false);
   const [reviewMessage, setReviewMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [currentUserId, setCurrentUserId] = useState<string>('');
+  const { addToast } = useToast();
+  const [deleteReviewTarget, setDeleteReviewTarget] = useState<string | null>(null);
 
   useEffect(() => {
     params.then((p) => setCourseId(p.id));
@@ -228,14 +232,20 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
     }
   };
 
-  const handleDeleteReview = async (reviewId: string) => {
-    if (!confirm('Hapus ulasan Anda?')) return;
+  const handleDeleteReview = async () => {
+    if (!deleteReviewTarget) return;
     try {
-      const res = await fetch(`/api/academy/${courseId}/reviews/${reviewId}`, { method: 'DELETE' });
+      const res = await fetch(`/api/academy/${courseId}/reviews/${deleteReviewTarget}`, { method: 'DELETE' });
       if (res.ok) {
+        addToast({ type: 'success', title: 'Ulasan berhasil dihapus' });
         fetchReviews();
+      } else {
+        addToast({ type: 'error', title: 'Gagal menghapus ulasan' });
       }
-    } catch { /* ignore */ }
+    } catch {
+      addToast({ type: 'error', title: 'Terjadi kesalahan' });
+    }
+    setDeleteReviewTarget(null);
   };
 
   const isLessonCompleted = (lessonId: string) => {
@@ -636,7 +646,11 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
               opacity: submittingReview ? 0.7 : 1,
             }}
           >
-            <Send size={14} />
+            {submittingReview ? (
+              <Loader2 size={14} style={{ animation: 'spin 1s linear infinite' }} />
+            ) : (
+              <Send size={14} />
+            )}
             {submittingReview ? 'Mengirim...' : 'Kirim Ulasan'}
           </button>
         </div>
@@ -672,7 +686,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
                 </div>
                 {review.userId === currentUserId && (
                   <button
-                    onClick={() => handleDeleteReview(review.id)}
+                    onClick={() => setDeleteReviewTarget(review.id)}
                     style={{
                       display: 'inline-flex', padding: '4px', border: 'none',
                       backgroundColor: 'transparent', cursor: 'pointer', color: c.error,
@@ -687,6 +701,15 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
           ))}
         </div>
       </div>
+      <ConfirmDialog
+        open={!!deleteReviewTarget}
+        onClose={() => setDeleteReviewTarget(null)}
+        onConfirm={handleDeleteReview}
+        title="Hapus ulasan Anda?"
+        description="Ulasan akan dihapus permanen."
+        confirmLabel="Hapus"
+        variant="destructive"
+      />
     </div>
   );
 }

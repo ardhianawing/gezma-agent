@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Trophy, Star, Medal, TrendingUp, ChevronLeft, ChevronRight } from 'lucide-react';
+import { EmptyState } from '@/components/shared/empty-state';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
 
@@ -230,9 +231,7 @@ export default function GamificationPage() {
           </div>
           <div style={{ padding: '20px' }}>
             {leaderboard.length === 0 ? (
-              <p style={{ textAlign: 'center', fontSize: '14px', color: c.textMuted, padding: '24px 0' }}>
-                Belum ada data leaderboard.
-              </p>
+              <EmptyState icon={Trophy} title="Belum ada data leaderboard" />
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 {leaderboard.map(entry => {
@@ -307,9 +306,7 @@ export default function GamificationPage() {
         </div>
         <div style={{ padding: '20px' }}>
           {history.length === 0 ? (
-            <p style={{ textAlign: 'center', fontSize: '14px', color: c.textMuted, padding: '24px 0' }}>
-              Belum ada riwayat poin. Mulai kelola jemaah untuk mendapatkan poin!
-            </p>
+            <EmptyState icon={Star} title="Belum ada riwayat poin" description="Mulai kelola jemaah untuk mendapatkan poin!" />
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {history.map(event => (

@@ -1,9 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Shield, Plus, X, CheckCircle2, XCircle, Clock, Eye, AlertTriangle, Copy, ExternalLink } from 'lucide-react';
+import { Shield, Plus, X, CheckCircle2, XCircle, Clock, Eye, AlertTriangle, Copy, ExternalLink, Loader2 } from 'lucide-react';
+import { EmptyState } from '@/components/shared/empty-state';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
+import { useToast } from '@/components/ui/toast';
+import { TableSkeleton, StatsSkeleton } from '@/components/shared/loading-skeleton';
 
 interface Certificate {
   id: string;
@@ -34,6 +37,7 @@ interface Pilgrim {
 export default function BlockchainPage() {
   const { c } = useTheme();
   const { isMobile, isTablet } = useResponsive();
+  const { addToast } = useToast();
 
   const [certificates, setCertificates] = useState<Certificate[]>([]);
   const [stats, setStats] = useState<Stats>({ total: 0, verified: 0, revoked: 0 });
@@ -107,10 +111,12 @@ export default function BlockchainPage() {
         return;
       }
       setShowIssueModal(false);
+      addToast({ type: 'success', title: 'Sertifikat berhasil diterbitkan' });
       setPage(1);
       fetchCertificates(1);
     } catch {
       setIssueError('Terjadi kesalahan jaringan');
+      addToast({ type: 'error', title: 'Terjadi kesalahan jaringan' });
     } finally {
       setIssuing(false);
     }
@@ -140,10 +146,13 @@ export default function BlockchainPage() {
       if (res.ok) {
         setShowRevokeConfirm(false);
         setShowDetailModal(false);
+        addToast({ type: 'success', title: 'Sertifikat berhasil dicabut' });
         fetchCertificates(page);
+      } else {
+        addToast({ type: 'error', title: 'Gagal mencabut sertifikat' });
       }
     } catch {
-      console.error('Revoke failed');
+      addToast({ type: 'error', title: 'Gagal mencabut sertifikat' });
     } finally {
       setRevoking(false);
     }
@@ -201,11 +210,9 @@ export default function BlockchainPage() {
 
   if (loading) {
     return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
-        <div style={{ textAlign: 'center' }}>
-          <Shield style={{ width: '48px', height: '48px', color: c.textMuted, marginBottom: '16px' }} />
-          <p style={{ color: c.textMuted, fontSize: '14px', margin: 0 }}>Memuat data blockchain...</p>
-        </div>
+      <div style={{ padding: isMobile ? '16px' : '24px' }}>
+        <StatsSkeleton count={3} />
+        <div style={{ marginTop: '24px' }}><TableSkeleton rows={5} columns={5} /></div>
       </div>
     );
   }
@@ -303,10 +310,7 @@ export default function BlockchainPage() {
           /* Mobile: Card layout */
           <div style={{ padding: '12px' }}>
             {certificates.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '40px 16px' }}>
-                <Shield style={{ width: '40px', height: '40px', color: c.textMuted, marginBottom: '12px' }} />
-                <p style={{ color: c.textMuted, fontSize: '14px', margin: 0 }}>Belum ada sertifikat</p>
-              </div>
+              <EmptyState icon={Shield} title="Belum ada sertifikat" />
             ) : (
               certificates.map((cert) => (
                 <div
@@ -362,9 +366,8 @@ export default function BlockchainPage() {
               <tbody>
                 {certificates.length === 0 ? (
                   <tr>
-                    <td colSpan={6} style={{ textAlign: 'center', padding: '40px 16px' }}>
-                      <Shield style={{ width: '40px', height: '40px', color: c.textMuted, marginBottom: '12px' }} />
-                      <p style={{ color: c.textMuted, fontSize: '14px', margin: 0 }}>Belum ada sertifikat</p>
+                    <td colSpan={6}>
+                      <EmptyState icon={Shield} title="Belum ada sertifikat" />
                     </td>
                   </tr>
                 ) : (
@@ -485,7 +488,7 @@ export default function BlockchainPage() {
           backdropFilter: 'blur(4px)',
           padding: '16px',
         }}>
-          <div style={{
+          <div role="dialog" aria-modal="true" style={{
             backgroundColor: c.cardBg,
             borderRadius: '16px',
             border: `1px solid ${c.border}`,
@@ -577,7 +580,10 @@ export default function BlockchainPage() {
                   opacity: issuing ? 0.7 : 1,
                 }}
               >
-                {issuing ? 'Memproses...' : 'Terbitkan'}
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                  {issuing && <Loader2 style={{ width: '16px', height: '16px', animation: 'spin 1s linear infinite' }} />}
+                  {issuing ? 'Memproses...' : 'Terbitkan'}
+                </span>
               </button>
             </div>
           </div>
@@ -597,7 +603,7 @@ export default function BlockchainPage() {
           backdropFilter: 'blur(4px)',
           padding: '16px',
         }}>
-          <div style={{
+          <div role="dialog" aria-modal="true" style={{
             backgroundColor: c.cardBg,
             borderRadius: '16px',
             border: `1px solid ${c.border}`,
@@ -689,6 +695,7 @@ export default function BlockchainPage() {
                       <button
                         onClick={() => copyToClipboard(selectedCert.txHash)}
                         title="Salin"
+                        aria-label="Salin"
                         style={{
                           padding: '6px',
                           backgroundColor: 'transparent',
@@ -808,7 +815,7 @@ export default function BlockchainPage() {
           backgroundColor: 'rgba(0,0,0,0.5)',
           padding: '16px',
         }}>
-          <div style={{
+          <div role="dialog" aria-modal="true" style={{
             backgroundColor: c.cardBg,
             borderRadius: '16px',
             border: `1px solid ${c.border}`,
@@ -865,7 +872,10 @@ export default function BlockchainPage() {
                   opacity: revoking ? 0.7 : 1,
                 }}
               >
-                {revoking ? 'Memproses...' : 'Ya, Cabut'}
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                  {revoking && <Loader2 style={{ width: '16px', height: '16px', animation: 'spin 1s linear infinite' }} />}
+                  {revoking ? 'Memproses...' : 'Ya, Cabut'}
+                </span>
               </button>
             </div>
           </div>

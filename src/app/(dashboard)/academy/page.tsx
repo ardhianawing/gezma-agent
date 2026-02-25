@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Search, BookOpen, Award, GraduationCap, Clock, Users } from 'lucide-react';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
+import { CardSkeleton } from '@/components/shared/loading-skeleton';
 import {
   categories,
   levels,
@@ -323,16 +324,8 @@ export default function AcademyPage() {
 
       {/* Loading */}
       {loading ? (
-        <div
-          style={{
-            textAlign: 'center',
-            padding: '60px 20px',
-            backgroundColor: c.cardBg,
-            borderRadius: '16px',
-            border: '1px solid ' + c.borderLight,
-          }}
-        >
-          <div style={{ fontSize: '14px', color: c.textMuted }}>Memuat kursus...</div>
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : isTablet ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)', gap: '20px' }}>
+          {Array.from({ length: 6 }).map((_, i) => <CardSkeleton key={i} />)}
         </div>
       ) : coursesData.length === 0 ? (
         <div

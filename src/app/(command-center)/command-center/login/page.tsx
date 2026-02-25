@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Shield, LogIn } from 'lucide-react';
+import { Shield, LogIn, Loader2 } from 'lucide-react';
 
 export default function CCLoginPage() {
   const router = useRouter();
@@ -150,7 +150,11 @@ export default function CCLoginPage() {
               marginTop: '8px',
             }}
           >
-            <LogIn style={{ width: '18px', height: '18px' }} />
+            {loading ? (
+              <Loader2 style={{ width: '18px', height: '18px', animation: 'spin 1s linear infinite' }} />
+            ) : (
+              <LogIn style={{ width: '18px', height: '18px' }} />
+            )}
             {loading ? 'Signing in...' : 'Sign In'}
           </button>
         </form>

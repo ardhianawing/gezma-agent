@@ -12,8 +12,10 @@ import {
   Monitor,
   ChevronLeft,
   ChevronRight,
+  Loader2,
 } from 'lucide-react';
 import Link from 'next/link';
+import { TableSkeleton } from '@/components/shared/loading-skeleton';
 
 interface LoginHistoryItem {
   id: string;
@@ -258,7 +260,12 @@ export default function SecuritySettingsPage() {
                 opacity: pwLoading ? 0.7 : 1,
               }}
             >
-              {pwLoading ? 'Menyimpan...' : 'Ubah Password'}
+              {pwLoading ? (
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                  <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} />
+                  Menyimpan...
+                </span>
+              ) : 'Ubah Password'}
             </button>
           </div>
         </div>
@@ -342,9 +349,7 @@ export default function SecuritySettingsPage() {
 
         <div style={{ padding: isMobile ? '12px' : '16px' }}>
           {historyLoading ? (
-            <p style={{ textAlign: 'center', color: c.textMuted, fontSize: '14px', padding: '20px 0' }}>
-              Memuat...
-            </p>
+            <TableSkeleton rows={4} columns={2} />
           ) : history.length === 0 ? (
             <p style={{ textAlign: 'center', color: c.textMuted, fontSize: '14px', padding: '20px 0' }}>
               Belum ada riwayat login.

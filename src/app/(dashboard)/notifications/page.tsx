@@ -2,8 +2,10 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Bell, CheckCircle, Trash2, CreditCard, Users, Plane, AlertCircle, ListTodo, ChevronLeft, ChevronRight } from 'lucide-react';
+import { EmptyState } from '@/components/shared/empty-state';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
+import { useToast } from '@/components/ui/toast';
 
 interface NotificationItem {
   id: string;
@@ -62,6 +64,7 @@ export default function NotificationsPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [unreadCount, setUnreadCount] = useState(0);
   const limit = 15;
+  const { addToast } = useToast();
 
   const fetchNotifications = useCallback(async () => {
     setLoading(true);
@@ -93,7 +96,7 @@ export default function NotificationsPage() {
       await fetch('/api/notifications', { method: 'PATCH' });
       setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
       setUnreadCount(0);
-    } catch { /* silently fail */ }
+    } catch { addToast({ type: 'error', title: 'Terjadi kesalahan' }); }
   }
 
   async function handleMarkRead(id: string) {
@@ -101,7 +104,7 @@ export default function NotificationsPage() {
       await fetch(`/api/notifications/${id}`, { method: 'PATCH' });
       setNotifications(prev => prev.map(n => n.id === id ? { ...n, isRead: true } : n));
       setUnreadCount(prev => Math.max(0, prev - 1));
-    } catch { /* silently fail */ }
+    } catch { addToast({ type: 'error', title: 'Terjadi kesalahan' }); }
   }
 
   async function handleDelete(id: string) {
@@ -110,7 +113,7 @@ export default function NotificationsPage() {
       await fetch(`/api/notifications/${id}`, { method: 'DELETE' });
       setNotifications(prev => prev.filter(n => n.id !== id));
       if (wasUnread) setUnreadCount(prev => Math.max(0, prev - 1));
-    } catch { /* silently fail */ }
+    } catch { addToast({ type: 'error', title: 'Terjadi kesalahan' }); }
   }
 
   const tabStyle = (active: boolean): React.CSSProperties => ({
@@ -188,12 +191,10 @@ export default function NotificationsPage() {
             Memuat notifikasi...
           </div>
         ) : notifications.length === 0 ? (
-          <div style={{ padding: '40px', textAlign: 'center' }}>
-            <Bell style={{ width: '40px', height: '40px', color: c.textLight, margin: '0 auto 12px auto', display: 'block' }} />
-            <p style={{ fontSize: '14px', color: c.textMuted }}>
-              {tab === 'unread' ? 'Tidak ada notifikasi yang belum dibaca' : 'Belum ada notifikasi'}
-            </p>
-          </div>
+          <EmptyState
+            icon={Bell}
+            title={tab === 'unread' ? 'Tidak ada notifikasi yang belum dibaca' : 'Belum ada notifikasi'}
+          />
         ) : (
           notifications.map((notif, i) => {
             const Icon = typeIcons[notif.type] || Bell;
@@ -277,6 +278,7 @@ export default function NotificationsPage() {
                     <button
                       onClick={() => handleMarkRead(notif.id)}
                       title="Tandai dibaca"
+                      aria-label="Tandai dibaca"
                       style={{
                         padding: '6px',
                         borderRadius: '8px',
@@ -291,6 +293,7 @@ export default function NotificationsPage() {
                   <button
                     onClick={() => handleDelete(notif.id)}
                     title="Hapus"
+                    aria-label="Hapus"
                     style={{
                       padding: '6px',
                       borderRadius: '8px',

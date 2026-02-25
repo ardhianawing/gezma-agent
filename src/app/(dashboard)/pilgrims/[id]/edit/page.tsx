@@ -6,6 +6,7 @@ import { Save, Loader2, User, Phone, Shield, Bed, FileText } from 'lucide-react'
 import { SectionCard, BackButton, FormSkeleton, EmptyState } from '@/components/shared';
 import { useFormStyles } from '@/lib/hooks/use-form-styles';
 import { useResponsive } from '@/lib/hooks/use-responsive';
+import { useToast } from '@/components/ui/toast';
 
 export default function EditPilgrimPage() {
   const router = useRouter();
@@ -13,6 +14,7 @@ export default function EditPilgrimPage() {
   const id = params.id as string;
   const { inputStyle, selectStyle, textareaStyle, labelStyle, c } = useFormStyles();
   const { isMobile } = useResponsive();
+  const { addToast } = useToast();
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -119,9 +121,12 @@ export default function EditPilgrimPage() {
         throw new Error(data.error || 'Gagal menyimpan');
       }
 
+      addToast({ type: 'success', title: 'Data jemaah berhasil disimpan' });
       router.push(`/pilgrims/${id}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Gagal menyimpan data jemaah.');
+      const message = err instanceof Error ? err.message : 'Gagal menyimpan data jemaah.';
+      setError(message);
+      addToast({ type: 'error', title: 'Gagal menyimpan', description: message });
       setSaving(false);
     }
   };

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { PageHeader } from '@/components/layout/page-header';
 import Link from 'next/link';
 import { FileText, Calendar, AlertCircle, CheckCircle2, Clock, ExternalLink } from 'lucide-react';
+import { EmptyState } from '@/components/shared/empty-state';
 import { formatDate } from '@/lib/utils';
 import { useTheme } from '@/lib/theme';
 import { useLanguage } from '@/lib/i18n';
@@ -268,9 +269,7 @@ export default function DocumentsPage() {
         {/* Document Items */}
         <div>
           {documents.length === 0 ? (
-            <div style={{ padding: '40px', textAlign: 'center', color: c.textMuted, fontSize: '14px' }}>
-              Belum ada dokumen agency.
-            </div>
+            <EmptyState icon={FileText} title="Belum ada dokumen" />
           ) : (
             documents.map((doc, index) => {
               const config = statusConfig[doc.status];

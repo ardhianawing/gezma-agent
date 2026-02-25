@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { Edit, Plus, Trash2, Plane, User, CreditCard, ClipboardCheck, FileText, DollarSign, StickyNote, History, QrCode, Download, Link2, FileDown, MessageSquare, Send } from 'lucide-react';
+import { Edit, Plus, Trash2, Plane, User, CreditCard, ClipboardCheck, FileText, DollarSign, StickyNote, History, QrCode, Download, Link2, FileDown, MessageSquare, Send, Loader2 } from 'lucide-react';
 import { StatusBadge, SectionCard, BackButton, DetailSkeleton, EmptyState, ConfirmDialog } from '@/components/shared';
 import { DocumentUpload } from '@/components/pilgrims/document-upload';
 import { StatusTimeline } from '@/components/pilgrims/status-timeline';
@@ -11,6 +11,7 @@ import { useFormStyles } from '@/lib/hooks/use-form-styles';
 import { useAuth } from '@/lib/auth';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { useResponsive } from '@/lib/hooks/use-responsive';
+import { useToast } from '@/components/ui/toast';
 import type { Pilgrim } from '@/types/pilgrim';
 import { PILGRIM_STATUS_CONFIG } from '@/types';
 import type { PilgrimStatus, DocumentType } from '@/types';
@@ -21,6 +22,7 @@ export default function PilgrimDetailPage() {
   const { inputStyle, selectStyle, labelStyle, c } = useFormStyles();
   const { isMobile } = useResponsive();
   const { user: authUser } = useAuth();
+  const { addToast } = useToast();
 
   const [pilgrim, setPilgrim] = useState<Pilgrim | null>(null);
   const [loading, setLoading] = useState(true);
@@ -84,9 +86,12 @@ export default function PilgrimDetailPage() {
       });
       if (res.ok) {
         setPilgrim((prev) => prev ? { ...prev, tripId: newTripId as string | undefined } : prev);
+        addToast({ type: 'success', title: 'Trip berhasil diubah' });
+      } else {
+        addToast({ type: 'error', title: 'Gagal mengubah trip' });
       }
     } catch {
-      // silently fail
+      addToast({ type: 'error', title: 'Gagal mengubah trip' });
     } finally {
       setSavingTrip(false);
     }
@@ -138,9 +143,12 @@ export default function PilgrimDetailPage() {
         const newNote = await res.json();
         setInternalNotes((prev) => [newNote, ...prev]);
         setNoteContent('');
+        addToast({ type: 'success', title: 'Catatan berhasil ditambahkan' });
+      } else {
+        addToast({ type: 'error', title: 'Gagal menambahkan catatan' });
       }
     } catch {
-      // silently fail
+      addToast({ type: 'error', title: 'Gagal menambahkan catatan' });
     } finally {
       setSavingNote(false);
     }
@@ -151,9 +159,12 @@ export default function PilgrimDetailPage() {
       const res = await fetch(`/api/pilgrims/${id}/notes/${noteId}`, { method: 'DELETE' });
       if (res.ok) {
         setInternalNotes((prev) => prev.filter((n) => n.id !== noteId));
+        addToast({ type: 'success', title: 'Catatan berhasil dihapus' });
+      } else {
+        addToast({ type: 'error', title: 'Gagal menghapus catatan' });
       }
     } catch {
-      // silently fail
+      addToast({ type: 'error', title: 'Gagal menghapus catatan' });
     }
   }
 
@@ -186,7 +197,10 @@ export default function PilgrimDetailPage() {
           notes: paymentForm.notes || undefined,
         }),
       });
-      if (!res.ok) return;
+      if (!res.ok) {
+        addToast({ type: 'error', title: 'Gagal menyimpan pembayaran' });
+        return;
+      }
       const newPayment = await res.json();
       const newAmount = parseFloat(paymentForm.amount);
       setPilgrim((prev) =>
@@ -201,8 +215,9 @@ export default function PilgrimDetailPage() {
       );
       setShowPayment(false);
       setPaymentForm({ amount: '', type: 'dp', method: 'transfer', date: new Date().toISOString().split('T')[0], notes: '' });
+      addToast({ type: 'success', title: 'Pembayaran berhasil disimpan' });
     } catch {
-      // silently fail
+      addToast({ type: 'error', title: 'Gagal menyimpan pembayaran' });
     } finally {
       setSavingPayment(false);
     }
@@ -216,15 +231,19 @@ export default function PilgrimDetailPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus }),
       });
-      if (!res.ok) return;
+      if (!res.ok) {
+        addToast({ type: 'error', title: 'Gagal mengubah status' });
+        return;
+      }
       setPilgrim((prev) => prev ? { ...prev, status: newStatus as PilgrimStatus } : prev);
+      addToast({ type: 'success', title: 'Status berhasil diubah' });
       // Refresh status history after change
       fetch(`/api/pilgrims/${id}/history`)
         .then((r) => r.json())
         .then((json) => setStatusHistory(json.data || []))
         .catch(() => {});
     } catch {
-      // silently fail
+      addToast({ type: 'error', title: 'Gagal mengubah status' });
     }
   }
 
@@ -232,7 +251,10 @@ export default function PilgrimDetailPage() {
     if (!deletePayment) return;
     try {
       const res = await fetch(`/api/pilgrims/${id}/payments/${deletePayment.id}`, { method: 'DELETE' });
-      if (!res.ok) return;
+      if (!res.ok) {
+        addToast({ type: 'error', title: 'Gagal menghapus pembayaran' });
+        return;
+      }
       setPilgrim((prev) =>
         prev
           ? {
@@ -243,8 +265,9 @@ export default function PilgrimDetailPage() {
             }
           : prev
       );
+      addToast({ type: 'success', title: 'Pembayaran berhasil dihapus' });
     } catch {
-      // silently fail
+      addToast({ type: 'error', title: 'Gagal menghapus pembayaran' });
     } finally {
       setDeletePayment(null);
     }
@@ -255,7 +278,10 @@ export default function PilgrimDetailPage() {
     setDownloadingInvoice(true);
     try {
       const res = await fetch(`/api/pilgrims/${id}/invoice`);
-      if (!res.ok) return;
+      if (!res.ok) {
+        addToast({ type: 'error', title: 'Gagal mengunduh kwitansi' });
+        return;
+      }
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -264,7 +290,7 @@ export default function PilgrimDetailPage() {
       a.click();
       URL.revokeObjectURL(url);
     } catch {
-      // silently fail
+      addToast({ type: 'error', title: 'Gagal mengunduh kwitansi' });
     } finally {
       setDownloadingInvoice(false);
     }
@@ -278,9 +304,11 @@ export default function PilgrimDetailPage() {
       if (res.ok) {
         const json = await res.json();
         setQrData(json.data);
+      } else {
+        addToast({ type: 'error', title: 'Gagal generate QR code' });
       }
     } catch {
-      // silently fail
+      addToast({ type: 'error', title: 'Gagal generate QR code' });
     } finally {
       setLoadingQr(false);
     }
@@ -588,7 +616,11 @@ export default function PilgrimDetailPage() {
                     height: isMobile ? 'auto' : '44px',
                   }}
                 >
-                  <Send style={{ width: '14px', height: '14px' }} />
+                  {savingNote ? (
+                    <Loader2 style={{ width: '14px', height: '14px', animation: 'spin 1s linear infinite' }} />
+                  ) : (
+                    <Send style={{ width: '14px', height: '14px' }} />
+                  )}
                   {savingNote ? 'Mengirim...' : 'Kirim'}
                 </button>
               </form>
@@ -780,7 +812,8 @@ export default function PilgrimDetailPage() {
                 <button type="button" onClick={() => setShowPayment(false)} style={{ padding: '12px 24px', fontSize: '14px', fontWeight: '500', color: c.textSecondary, backgroundColor: c.cardBg, border: `1px solid ${c.border}`, borderRadius: '12px', cursor: 'pointer' }}>
                   Batal
                 </button>
-                <button type="submit" disabled={savingPayment} style={{ padding: '12px 24px', fontSize: '14px', fontWeight: '600', color: 'white', backgroundColor: savingPayment ? c.textMuted : c.primary, border: 'none', borderRadius: '12px', cursor: savingPayment ? 'not-allowed' : 'pointer' }}>
+                <button type="submit" disabled={savingPayment} style={{ padding: '12px 24px', fontSize: '14px', fontWeight: '600', color: 'white', backgroundColor: savingPayment ? c.textMuted : c.primary, border: 'none', borderRadius: '12px', cursor: savingPayment ? 'not-allowed' : 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                  {savingPayment && <Loader2 style={{ width: '16px', height: '16px', animation: 'spin 1s linear infinite' }} />}
                   {savingPayment ? 'Menyimpan...' : 'Simpan'}
                 </button>
               </div>

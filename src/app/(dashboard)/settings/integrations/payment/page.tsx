@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
+import { useToast } from '@/components/ui/toast';
 import {
   ArrowLeft,
   Save,
@@ -63,6 +64,7 @@ export default function PaymentConfigPage() {
   const router = useRouter();
   const { c } = useTheme();
   const { isMobile } = useResponsive();
+  const { addToast } = useToast();
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -117,9 +119,11 @@ export default function PaymentConfigPage() {
       } else {
         setConfig(data);
         setMessage({ type: 'success', text: 'Konfigurasi berhasil disimpan' });
+        addToast({ type: 'success', title: 'Konfigurasi berhasil disimpan' });
       }
     } catch {
       setMessage({ type: 'error', text: 'Terjadi kesalahan' });
+      addToast({ type: 'error', title: 'Gagal menyimpan konfigurasi' });
     } finally {
       setSaving(false);
     }

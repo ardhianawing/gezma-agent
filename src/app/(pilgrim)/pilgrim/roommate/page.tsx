@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
-import { Users, Search, Save, CheckCircle, AlertCircle } from 'lucide-react';
+import { Users, Search, Save, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import { FormSkeleton } from '@/components/shared/loading-skeleton';
 
 const PILGRIM_GREEN = '#059669';
 const PILGRIM_GREEN_LIGHT = '#ECFDF5';
@@ -156,9 +157,7 @@ export default function RoommatePage() {
   };
 
   if (loading) {
-    return (
-      <div style={{ padding: '40px', textAlign: 'center', color: c.textMuted }}>Memuat...</div>
-    );
+    return <FormSkeleton fields={6} />;
   }
 
   return (
@@ -304,7 +303,11 @@ export default function RoommatePage() {
             opacity: saving ? 0.6 : 1,
           }}
         >
-          <Save style={{ width: '18px', height: '18px' }} />
+          {saving ? (
+            <Loader2 style={{ width: '18px', height: '18px', animation: 'spin 1s linear infinite' }} />
+          ) : (
+            <Save style={{ width: '18px', height: '18px' }} />
+          )}
           {saving ? 'Menyimpan...' : 'Simpan Preferensi'}
         </button>
       </div>
@@ -345,7 +348,11 @@ export default function RoommatePage() {
             opacity: matching ? 0.6 : 1,
           }}
         >
-          <Search style={{ width: '18px', height: '18px' }} />
+          {matching ? (
+            <Loader2 style={{ width: '18px', height: '18px', animation: 'spin 1s linear infinite' }} />
+          ) : (
+            <Search style={{ width: '18px', height: '18px' }} />
+          )}
           {matching ? 'Mencari...' : 'Cari Teman Sekamar'}
         </button>
 

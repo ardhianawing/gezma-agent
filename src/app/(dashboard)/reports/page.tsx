@@ -5,7 +5,8 @@ import { PageHeader } from '@/components/layout/page-header';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
 import { formatCurrency } from '@/lib/utils';
-import { DollarSign, TrendingUp, Users, AlertCircle, Download, ArrowUpRight, ArrowDownRight, GitCompareArrows } from 'lucide-react';
+import { DollarSign, TrendingUp, Users, AlertCircle, Download, ArrowUpRight, ArrowDownRight, GitCompareArrows, BarChart3 } from 'lucide-react';
+import { EmptyState } from '@/components/shared/empty-state';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
 
 // ========== TYPES ==========
@@ -353,7 +354,7 @@ function FinancialTab({ data, c, isMobile }: { data: FinancialReport; c: ReturnT
           </div>
           <div>
             {data.tripRevenue.length === 0 ? (
-              <p style={{ padding: '24px', textAlign: 'center', fontSize: '14px', color: c.textMuted }}>Belum ada data</p>
+              <EmptyState icon={BarChart3} title="Belum ada data laporan" />
             ) : data.tripRevenue.map((trip, i) => (
               <div key={i} style={{
                 display: 'flex', alignItems: isMobile ? 'flex-start' : 'center', flexDirection: isMobile ? 'column' : 'row',
@@ -427,7 +428,7 @@ function BreakdownCard({ title, data, labels, color, c, isMobile }: {
           );
         })}
         {Object.keys(data).length === 0 && (
-          <p style={{ fontSize: '13px', color: c.textMuted, textAlign: 'center' }}>Belum ada data</p>
+          <EmptyState icon={BarChart3} title="Belum ada data" />
         )}
       </div>
     </div>
@@ -484,7 +485,7 @@ function DemografiTab({ data, c, isMobile }: { data: DemographicsReport; c: Retu
         </div>
         <div>
           {data.provinceBreakdown.length === 0 ? (
-            <p style={{ padding: '24px', textAlign: 'center', fontSize: '14px', color: c.textMuted }}>Belum ada data</p>
+            <EmptyState icon={BarChart3} title="Belum ada data" />
           ) : data.provinceBreakdown.map((p, i) => (
             <div key={p.province} style={{
               display: 'flex', justifyContent: 'space-between', alignItems: 'center',
@@ -511,7 +512,7 @@ function DokumenTab({ data, c }: { data: DocumentsReport; c: ReturnType<typeof u
       </div>
       <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
         {data.completion.length === 0 ? (
-          <p style={{ textAlign: 'center', fontSize: '14px', color: c.textMuted }}>Belum ada data</p>
+          <EmptyState icon={BarChart3} title="Belum ada data" />
         ) : data.completion.map(doc => (
           <div key={doc.type}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
@@ -569,7 +570,7 @@ function AgingTab({ data, c, isMobile }: { data: AgingReport; c: ReturnType<type
           </div>
           <div>
             {data.topDebtors.length === 0 ? (
-              <p style={{ padding: '24px', textAlign: 'center', fontSize: '14px', color: c.textMuted }}>Tidak ada piutang</p>
+              <EmptyState icon={BarChart3} title="Tidak ada piutang" />
             ) : data.topDebtors.map((d, i) => (
               <div key={i} style={{
                 display: 'flex', justifyContent: 'space-between', alignItems: 'center',

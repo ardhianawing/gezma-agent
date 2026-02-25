@@ -4,7 +4,9 @@ import { useState, useEffect, useCallback } from 'react';
 import { PageHeader } from '@/components/layout/page-header';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
-import { Clock, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Activity, Clock, ChevronLeft, ChevronRight } from 'lucide-react';
+import { EmptyState } from '@/components/shared/empty-state';
+import { TableSkeleton } from '@/components/shared/loading-skeleton';
 
 interface Activity {
   id: string;
@@ -141,14 +143,9 @@ export default function ActivitiesPage() {
         border: `1px solid ${c.border}`, overflow: 'hidden',
       }}>
         {loading ? (
-          <div style={{ padding: '40px', textAlign: 'center', color: c.textMuted, fontSize: '14px' }}>
-            Memuat...
-          </div>
+          <TableSkeleton rows={5} columns={3} />
         ) : activities.length === 0 ? (
-          <div style={{ padding: '40px', textAlign: 'center' }}>
-            <Clock style={{ width: '40px', height: '40px', color: c.textLight, margin: '0 auto 12px' }} />
-            <p style={{ fontSize: '14px', color: c.textMuted }}>Belum ada aktivitas.</p>
-          </div>
+          <EmptyState icon={Activity} title="Belum ada aktivitas" />
         ) : (
           <div>
             {activities.map((activity, i) => {

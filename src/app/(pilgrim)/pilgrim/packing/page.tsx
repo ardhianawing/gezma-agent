@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
+import { useToast } from '@/components/ui/toast';
 
 const GREEN = '#059669';
 const GREEN_LIGHT = '#ECFDF5';
@@ -66,6 +67,7 @@ function getStorageKey(category: string, item: string): string {
 export default function PackingChecklistPage() {
   const { c } = useTheme();
   const { isMobile } = useResponsive();
+  const { addToast } = useToast();
   const [state, setState] = useState<PackingState>({ checked: {}, customItems: {} });
   const [newItemInputs, setNewItemInputs] = useState<Record<string, string>>({});
   const [loaded, setLoaded] = useState(false);
@@ -77,7 +79,7 @@ export default function PackingChecklistPage() {
         setState(JSON.parse(saved));
       }
     } catch {
-      // ignore
+      addToast({ type: 'error', title: 'Gagal memuat data packing' });
     }
     setLoaded(true);
   }, []);
@@ -87,7 +89,7 @@ export default function PackingChecklistPage() {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(newState));
     } catch {
-      // ignore
+      addToast({ type: 'error', title: 'Gagal menyimpan data packing' });
     }
   }, []);
 

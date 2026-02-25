@@ -3,6 +3,7 @@
 import { useState, useEffect, use } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Building2, Users, DollarSign, Plane, Package, CheckCircle, XCircle } from 'lucide-react';
+import { DetailSkeleton } from '@/components/shared/loading-skeleton';
 
 const cc = {
   primary: '#2563EB',
@@ -78,7 +79,7 @@ export default function CCAgencyDetailPage({ params }: { params: Promise<{ id: s
   };
 
   if (loading) {
-    return <p style={{ color: cc.textMuted }}>Loading...</p>;
+    return <DetailSkeleton />;
   }
 
   if (!agency) {

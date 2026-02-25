@@ -5,6 +5,7 @@ import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
 import { usePilgrim } from '@/lib/contexts/pilgrim-context';
 import { useRouter } from 'next/navigation';
+import { useToast } from '@/components/ui/toast';
 
 const GREEN = '#059669';
 const GREEN_LIGHT = '#ECFDF5';
@@ -36,6 +37,7 @@ export default function ProfilePage() {
   const { isMobile } = useResponsive();
   const { data, logout } = usePilgrim();
   const router = useRouter();
+  const { addToast } = useToast();
 
   // Referral state
   const [referralCode, setReferralCode] = useState<string | null>(null);
@@ -86,7 +88,9 @@ export default function ProfilePage() {
         setReferralCode(d.referralCode);
         fetchReferral();
       }
-    } catch { /* silently fail */ } finally {
+    } catch {
+      addToast({ type: 'error', title: 'Gagal membuat kode referral' });
+    } finally {
       setReferralLoading(false);
     }
   }
@@ -96,7 +100,9 @@ export default function ProfilePage() {
     navigator.clipboard.writeText(referralCode).then(() => {
       setReferralCopied(true);
       setTimeout(() => setReferralCopied(false), 2000);
-    }).catch(() => {});
+    }).catch(() => {
+      addToast({ type: 'error', title: 'Gagal menyalin kode referral' });
+    });
   }
 
   async function handleSubmitReview() {
@@ -121,8 +127,11 @@ export default function ProfilePage() {
       setExistingTestimonial(d.testimonial);
       setCanReview(false);
       setReviewSuccess(true);
+      addToast({ type: 'success', title: 'Ulasan berhasil dikirim' });
     } catch (err) {
-      setReviewError(err instanceof Error ? err.message : 'Gagal mengirim ulasan');
+      const msg = err instanceof Error ? err.message : 'Gagal mengirim ulasan';
+      setReviewError(msg);
+      addToast({ type: 'error', title: msg });
     } finally {
       setReviewSubmitting(false);
     }

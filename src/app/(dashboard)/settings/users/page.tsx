@@ -4,7 +4,10 @@ import { useState, useEffect } from 'react';
 import { PageHeader } from '@/components/layout/page-header';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
-import { Plus, Edit2, Trash2, X, Shield } from 'lucide-react';
+import { Plus, Edit2, Trash2, X, Shield, Users, Loader2 } from 'lucide-react';
+import { EmptyState } from '@/components/shared/empty-state';
+import { useToast } from '@/components/ui/toast';
+import { ConfirmDialog } from '@/components/shared/confirm-dialog';
 import { usePermission } from '@/lib/hooks/use-permissions';
 import { PERMISSIONS } from '@/lib/permissions';
 import { ROLE_PERMISSIONS, PERMISSION_GROUPS } from '@/lib/permissions';
@@ -46,6 +49,8 @@ export default function UsersPage() {
   const [form, setForm] = useState<UserForm>(emptyForm);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const { addToast } = useToast();
+  const [deleteTarget, setDeleteTarget] = useState<{id: string, name: string} | null>(null);
 
   const fetchUsers = () => {
     fetch('/api/users')
@@ -110,6 +115,7 @@ export default function UsersPage() {
         }
       }
       setShowModal(false);
+      addToast({ type: 'success', title: editingId ? 'User berhasil diperbarui' : 'User berhasil ditambahkan' });
       fetchUsers();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Terjadi kesalahan');
@@ -118,20 +124,21 @@ export default function UsersPage() {
     }
   };
 
-  const handleDelete = async (id: string, name: string) => {
-    if (!confirm(`Hapus user "${name}"?`)) return;
-
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
     try {
-      const res = await fetch(`/api/users/${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/users/${deleteTarget.id}`, { method: 'DELETE' });
       if (!res.ok) {
         const data = await res.json();
-        alert(data.error || 'Gagal menghapus');
+        addToast({ type: 'error', title: 'Gagal menghapus', description: data.error });
         return;
       }
+      addToast({ type: 'success', title: 'User berhasil dihapus' });
       fetchUsers();
     } catch {
-      alert('Terjadi kesalahan');
+      addToast({ type: 'error', title: 'Terjadi kesalahan' });
     }
+    setDeleteTarget(null);
   };
 
   const handleToggleActive = async (user: UserData) => {
@@ -197,7 +204,7 @@ export default function UsersPage() {
         {loading ? (
           <div style={{ padding: '40px', textAlign: 'center', color: c.textSecondary }}>Memuat data...</div>
         ) : users.length === 0 ? (
-          <div style={{ padding: '40px', textAlign: 'center', color: c.textSecondary }}>Belum ada user</div>
+          <EmptyState icon={Users} title="Belum ada user" description="Tambahkan user baru untuk memulai." />
         ) : (
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
@@ -245,13 +252,15 @@ export default function UsersPage() {
                         <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
                           <button
                             onClick={() => openEdit(user)}
+                            aria-label="Edit"
                             style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', color: c.textSecondary }}
                           >
                             <Edit2 style={{ width: '16px', height: '16px' }} />
                           </button>
                           {can(PERMISSIONS.USERS_DELETE) && (
                             <button
-                              onClick={() => handleDelete(user.id, user.name)}
+                              onClick={() => setDeleteTarget({id: user.id, name: user.name})}
+                              aria-label="Hapus"
                               style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', color: '#dc2626' }}
                             >
                               <Trash2 style={{ width: '16px', height: '16px' }} />
@@ -340,6 +349,8 @@ export default function UsersPage() {
           onClick={(e) => { if (e.target === e.currentTarget) setShowModal(false); }}
         >
           <div
+            role="dialog"
+            aria-modal="true"
             style={{
               backgroundColor: c.cardBg,
               borderRadius: '16px',
@@ -440,12 +451,26 @@ export default function UsersPage() {
                 disabled={saving}
                 style={{ padding: '10px 20px', borderRadius: '8px', border: 'none', backgroundColor: c.primary, color: 'white', fontWeight: '500', cursor: saving ? 'not-allowed' : 'pointer', fontSize: '14px', opacity: saving ? 0.7 : 1 }}
               >
-                {saving ? 'Menyimpan...' : 'Simpan'}
+                {saving ? (
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                    <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} />
+                    Menyimpan...
+                  </span>
+                ) : 'Simpan'}
               </button>
             </div>
           </div>
         </div>
       )}
+      <ConfirmDialog
+        open={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={handleDelete}
+        title={`Hapus user "${deleteTarget?.name}"?`}
+        description="User akan dihapus permanen dan kehilangan akses."
+        confirmLabel="Hapus"
+        variant="destructive"
+      />
     </div>
   );
 }

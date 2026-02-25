@@ -416,13 +416,13 @@ function PilgrimsPageContent() {
       render: (row) => (
         <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
           <Link href={`/pilgrims/${row.id}`}>
-            <button title={t.common.view} style={actionBtnStyle}>
+            <button title={t.common.view} aria-label="Lihat detail" style={actionBtnStyle}>
               <Eye style={{ width: '18px', height: '18px' }} />
             </button>
           </Link>
           {can(PERMISSIONS.PILGRIMS_EDIT) && (
           <Link href={`/pilgrims/${row.id}/edit`}>
-            <button title={t.common.edit} style={actionBtnStyle}>
+            <button title={t.common.edit} aria-label="Edit" style={actionBtnStyle}>
               <Edit2 style={{ width: '18px', height: '18px' }} />
             </button>
           </Link>
@@ -430,6 +430,7 @@ function PilgrimsPageContent() {
           {can(PERMISSIONS.PILGRIMS_DELETE) && (
           <button
             title={t.common.delete}
+            aria-label="Hapus"
             onClick={(e) => { e.stopPropagation(); setDeleteTarget({ id: row.id, name: row.name }); }}
             style={actionBtnStyle}
           >
