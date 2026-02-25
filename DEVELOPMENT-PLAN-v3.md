@@ -1,8 +1,8 @@
 # 🕋 GEZMA Development Plan v3.0
 
 > **Created:** 2026-02-23
-> **Last Updated:** 2026-02-25 (Session 10 — Mega Feature Session: 37 Features)
-> **Status:** Phase 1-4 Complete + Session 10 (37 features, 39 models, 330 tests)
+> **Last Updated:** 2026-02-25 (Session 11 — Codebase Hardening & Quality)
+> **Status:** Phase 1-4 Complete + Session 11 (hardening, 39 models, 415 tests)
 > **Scope:** Phase 2 (Platform & Ecosystem) + Phase 3 (Integration) + Phase 4 (Advanced)
 
 ---
@@ -112,6 +112,7 @@
 **Session 8:** Blockchain, CC Polish, Academy LMS, 235 unit tests, E2E Playwright
 **Session 9:** Error Boundaries, Security Settings, Pilgrim Gamification, CC Analytics, 274 unit tests
 **Session 10:** 37 features, 15 new models, ~74 new files, ~21 modified, 15,223 insertions, 330 unit tests
+**Session 11:** Codebase hardening — Zod on 16 routes, rate limiting on 7 auth routes, try/catch on 9 routes, logActivity on 13 routes, 5 new schemas, 85 new tests → 415 total (34 files)
 
 ---
 
@@ -206,6 +207,18 @@
 │  ├── Detail: News, Forum, Marketplace, Help/FAQ       ✅       │
 │  ├── Other: Roommate Matching, Package Builder        ✅       │
 │  └── Tests: 56 new → 330 total (28 files)            ✅       │
+│                                                                 │
+│  ─────────────────────────────────────────────────────────────  │
+│                                                                 │
+│  SESSION 11 ✅ ─── Codebase Hardening & Quality                │
+│  ├── Zod Validation: 16 routes wired with safeParse   ✅       │
+│  ├── Rate Limiting: 7 auth routes protected            ✅       │
+│  ├── Error Handling: try/catch on 9 route files        ✅       │
+│  ├── Activity Logging: logActivity on 13 mutations     ✅       │
+│  ├── Schemas: 5 new Zod validation schemas             ✅       │
+│  ├── Password Policy: min(6)→min(8) normalized         ✅       │
+│  ├── Cleanup: 3 unused deps removed, zod imports       ✅       │
+│  └── Tests: 85 new → 415 total (34 files)             ✅       │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -912,6 +925,79 @@ Prayer Times Widget: `src/lib/utils/prayer-times.ts` — Astronomical calculatio
 
 ---
 
+### 8.21 Session 11 — Batch 1: Foundation (Activity Logger + Password + Schemas)
+
+**Activity Logger Types Extended:**
+- `src/lib/activity-logger.ts` — type union: added `user | agency | settings | system`; action union: added `revoked | sent`
+
+**Password Policy Fix:**
+- `src/lib/validations/security.ts` — `resetPasswordSchema` min(6) → min(8)
+- `src/app/api/auth/reset-password/route.ts` — hardcoded `length < 6` → `length < 8`
+
+**New Zod Schemas (5):**
+- `src/lib/validations/note.ts` — `createNoteSchema` (content min 1, max 2000)
+- `src/lib/validations/waiting-list.ts` — `createWaitingListSchema` (pilgrimName, phone, email?, notes?)
+- `src/lib/validations/notification.ts` — `createNotificationSchema` (title, body, type enum, userId)
+- `src/lib/validations/scheduled-report.ts` — `createScheduledReportSchema` + `updateScheduledReportSchema`
+- `src/lib/validations/academy-review.ts` — `createReviewSchema` (rating 1-5, comment?)
+
+### 8.22 Session 11 — Batch 2: Zod Validation on 16 Routes
+
+Wired `safeParse()` + `error.flatten().fieldErrors` on:
+- `api/users/route.ts` POST, `api/users/[id]/route.ts` PUT
+- `api/pilgrims/[id]/payments/route.ts` POST, `api/pilgrims/[id]/notes/route.ts` POST
+- `api/trips/[id]/waiting-list/route.ts` POST
+- `api/settings/scheduled-reports/route.ts` POST, `api/settings/scheduled-reports/[id]/route.ts` PATCH
+- `api/academy/[courseId]/reviews/route.ts` POST
+- `api/pilgrim-portal/testimonial/route.ts` POST (inline schema)
+- `api/pilgrim-portal/gallery/route.ts` POST (inline schema)
+- `api/pilgrim-portal/referral/use/route.ts` POST (inline schema)
+- `api/pilgrim-portal/roommate/route.ts` POST (inline schema)
+- Verified existing wiring on email-templates and change-password routes
+
+### 8.23 Session 11 — Batch 3: Rate Limiting on 7 Auth Routes
+
+Added `rateLimit(req, { limit, window })` to:
+- `api/auth/register/route.ts` — 3 req/60s
+- `api/auth/forgot-password/route.ts` — 3 req/60s
+- `api/auth/reset-password/route.ts` — 5 req/60s
+- `api/auth/totp-verify/route.ts` — 5 req/60s
+- `api/command-center/auth/login/route.ts` — 5 req/60s
+- `api/pilgrim-portal/login/route.ts` — 5 req/60s
+- `api/settings/security/change-password/route.ts` — 3 req/60s
+
+### 8.24 Session 11 — Batch 4: try/catch + logActivity
+
+**try/catch on 9 route files:**
+- academy/courses, academy/courses/[id], academy/courses/[id]/lessons/[lessonId]
+- academy/progress, academy/progress/[courseId]
+- pilgrims/[id]/invoice, settings/email-templates, settings/email-templates/[event]
+- trips/[id]/waiting-list
+
+**logActivity on 13 mutation routes:**
+- users POST/PUT/DELETE, agency PUT, pilgrims/[id]/notes POST
+- settings/email-templates POST/PATCH, settings/scheduled-reports POST/PATCH/DELETE
+- blockchain/certificates/[id]/revoke POST, reports/send-scheduled POST
+- trips/[id]/waiting-list POST
+
+### 8.25 Session 11 — Batch 5: Cleanup + Tests
+
+**Cleanup:**
+- Removed unused deps: `class-variance-authority`, `@tanstack/react-table`, `dotenv`
+- Normalized `zod/v4` → `zod` imports in `command-center.ts`, `gamification.ts`
+
+**New Test Files (6, 85 tests):**
+- `new-schemas.test.ts` — 34 tests (all 5 new schemas + updated security)
+- `auth.test.ts` — 10 tests (rate limiting + validation on login/register/forgot/reset)
+- `users.test.ts` — 9 tests (CRUD validation, auth guard, Zod errors, logActivity)
+- `pilgrims-extended.test.ts` — 10 tests (notes, payments, invoice validation)
+- `academy.test.ts` — 11 tests (courses, lessons, reviews, progress)
+- `settings.test.ts` — 10 tests (email-templates, scheduled-reports, change-password)
+
+**Total: 415 tests in 34 files (was 330 in 28 files)**
+
+---
+
 ## 9. TECHNICAL GUIDELINES
 
 ### 9.1 Styling Rules
@@ -1083,12 +1169,13 @@ await logActivity({ agencyId: auth.agencyId, userId: auth.userId, ... });
 ✅ BLOCKCHAIN — Mock simulation, service + 5 API + dashboard + public verify
 ✅ ACADEMY LMS — Full DB (7 models), 10 API, seed data, course detail, quiz, certificates, reviews
 ✅ CC POLISH — Audit log UI, responsive layout, PPIU expiry alerts
-✅ TESTING — 330 unit tests (28 files) + Playwright E2E (5 specs)
+✅ TESTING — 415 unit tests (34 files) + Playwright E2E (5 specs)
 ✅ ERROR BOUNDARIES — Pilgrim (green) + CC (blue) error boundaries in layouts
 ✅ SECURITY SETTINGS — LoginHistory, login recording, change password, 2FA/TOTP, session management, rate limiting
 ✅ PILGRIM GAMIFICATION — 6 point rules, 6 badges, service, 3 API, achievements page, dashboard widget, nav
 ✅ CC ANALYTICS — Analytics API (5 datasets), 4 Recharts, period filter
 ✅ SESSION 10 — 37 features: productivity, pilgrim portal, platform, detail pages, notifications, etc.
+✅ SESSION 11 — Hardening: Zod 16 routes, rate limit 7 routes, try/catch 9 routes, logActivity 13 routes, 85 new tests
 □ MOBILE NATIVE — Flutter app (out of scope for Next.js)
 ```
 
