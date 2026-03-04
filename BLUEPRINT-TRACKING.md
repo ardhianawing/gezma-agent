@@ -1,6 +1,6 @@
 # 🕋 GEZMA — Blueprint Tracking Document
 
-> **Last Synced:** 2026-02-25 (Session 15 — CI/CD, Seed Data & Developer Experience)
+> **Last Synced:** 2026-03-04 (Session 17 — Marketplace, Forum, News & Trade Centre Backend)
 > **Repository:** github.com/ardhianawing/gezma-agent
 > **Blueprint Sources:**
 > 1. Cetak Biru Strategis v1 (Generasi Emas Z & Milenial)
@@ -17,7 +17,7 @@
 | **Gezma Pilgrim** (B2C App) | ✓ | ✅ Full Featured + Profile Edit | **97%** |
 | **Gezma Academy** (LMS) | ✓ | ✅ Quiz + Certs + Reviews | **90%** |
 | **Gezma Command Center** | ✓ | ✅ Compliance + Auto-suspend | **95%** |
-| **Platform Pages** | ✓ | ✅ Mock UI + Detail Pages | **75%** |
+| **Platform Pages** | ✓ | ✅ Real API Backend (S17) | **90%** |
 | **Nusuk Integration** | ✓ Critical | ⏸️ Mock Service | 10% |
 | **Fintech Integration** | ✓ | ⏸️ Mock Service | 10% |
 | **Blockchain Verification** | ✓ | ✅ Mock Done | **80%** |
@@ -338,34 +338,34 @@
 ### Referensi Blueprint:
 - Semua dokumen cetak biru
 
-### Status: ✅ 75% — Mock UI + Detail Pages (Session 10)
+### Status: ✅ 90% — Real API Backend (Session 17)
 
-| Page | Route | Status | Mock Data | UI Design |
-|------|-------|--------|-----------|-----------|
-| **Marketplace** | `/marketplace` | ✅ Mock UI | ✅ 30 items | ✅ Done |
-| ↳ **Item Detail** | `/marketplace/[id]` | ✅ S10 | ✅ | Full display, related items |
-| ↳ Hotel (Makkah/Madinah) | | 🔲 | ✅ 12 items | |
-| ↳ Visa | | 🔲 | ✅ 3 items | |
-| ↳ Bus & Handling | | 🔲 | ✅ 3 items | |
-| ↳ Asuransi | | 🔲 | ✅ 3 items | |
-| ↳ Mutawwif | | 🔲 | ✅ 3 items | |
-| ↳ Tiket Pesawat | | 🔲 | ✅ 5 items | |
-| **Forum** | `/forum` | ✅ Mock UI | ✅ 12 threads | ✅ Done |
-| ↳ **Thread Detail** | `/forum/[id]` | ✅ S10 | ✅ | Full content, mock replies |
-| ↳ Kategori (7 types) | | 🔲 | ✅ 7 cats | |
-| ↳ Threads | | 🔲 | ✅ 12 threads | |
-| ↳ Kaskus-style Table | | 🔲 | | |
-| **Berita** | `/news` | ✅ Mock UI | ✅ 10 artikel | ✅ Done |
-| ↳ **Article Detail** | `/news/[id]` | ✅ S10 | ✅ | Full content, related articles |
-| ↳ Regulasi | | 🔲 | ✅ | |
-| ↳ Pengumuman | | 🔲 | ✅ | |
-| ↳ Event | | 🔲 | ✅ | |
-| ↳ Tips | | 🔲 | ✅ | |
-| ↳ Peringatan | | 🔲 | ✅ | |
-| **Trade Centre** | `/trade` | ✅ Mock UI | ✅ 20 items | ✅ Done |
-| ↳ Katalog Produk Ekspor | | 🔲 | ✅ 20 items | |
-| ↳ Pengajuan Produk | | 🔲 | | |
-| ↳ Proses Kurasi | | 🔲 | | |
+| Page | Route | Status | Backend | UI Design |
+|------|-------|--------|---------|-----------|
+| **Marketplace** | `/marketplace` | ✅ Real API | ✅ 5 endpoints | ✅ Done |
+| ↳ **Item Detail** | `/marketplace/[id]` | ✅ Real API | ✅ GET + reviews | Full display, related items |
+| ↳ Hotel (Makkah/Madinah) | | ✅ S17 | ✅ Seeded | |
+| ↳ Visa | | ✅ S17 | ✅ Seeded | |
+| ↳ Bus & Handling | | ✅ S17 | ✅ Seeded | |
+| ↳ Asuransi | | ✅ S17 | ✅ Seeded | |
+| ↳ Mutawwif | | ✅ S17 | ✅ Seeded | |
+| ↳ Tiket Pesawat | | ✅ S17 | ✅ Seeded | |
+| **Forum** | `/forum` | ✅ Real API | ✅ 4 endpoints | ✅ Done |
+| ↳ **Thread Detail** | `/forum/[id]` | ✅ Real API | ✅ GET + replies | Full content, real replies |
+| ↳ Kategori (6 types) | | ✅ S17 | ✅ Zod enum | |
+| ↳ Threads | | ✅ S17 | ✅ CRUD | |
+| ↳ Pin/Lock/Moderate | | ✅ S17 | ✅ CC endpoint | |
+| **Berita** | `/news` | ✅ Real API | ✅ 4 endpoints | ✅ Done |
+| ↳ **Article Detail** | `/news/[id]` | ✅ Real API | ✅ GET | Full content, related articles |
+| ↳ Regulasi | | ✅ S17 | ✅ Seeded | |
+| ↳ Pengumuman | | ✅ S17 | ✅ Seeded | |
+| ↳ Event | | ✅ S17 | ✅ Seeded | |
+| ↳ Tips | | ✅ S17 | ✅ Seeded | |
+| ↳ Peringatan | | ✅ S17 | ✅ Seeded | |
+| **Trade Centre** | `/trade` | ✅ Real API | ✅ 6 endpoints | ✅ Done |
+| ↳ Katalog Produk Ekspor | | ✅ S17 | ✅ GET catalog | |
+| ↳ Pengajuan Produk | | ✅ S17 | ✅ POST submit | |
+| ↳ Proses Kurasi | | ✅ S17 | ✅ CC curate | |
 | **Layanan** | `/services` | ✅ Mock UI | ✅ 6 services | ✅ Done |
 | ↳ Konsultasi Legal | | 🔲 | | |
 | ↳ Partner Visa | | 🔲 | | |
@@ -586,17 +586,17 @@
 ### Implementation Files
 - `CHECKPOINT.md` — Development checkpoint (in repo)
 - `DEVELOPMENT-PLAN-v3.md` — Phase 2 & 3 execution plan
-- `prisma/schema.prisma` — Database models (39 models)
-- `src/app/api/` — ~138 API endpoints
+- `prisma/schema.prisma` — Database models (46 models)
+- `src/app/api/` — ~157 API endpoints
 - `src/app/(dashboard)/` — 40+ dashboard pages
 - `src/app/(command-center)/` — 7 command center pages
 - `src/app/(pilgrim)/` — 14+ pilgrim portal pages
 - `src/app/agency/` — 1 public agency page
 - `src/app/share/` — 1 public itinerary page
-- `__tests__/` — 40 test files (451 unit tests)
+- `__tests__/` — 48 test files (500+ unit tests)
 - `e2e/` — 5 Playwright spec files
 - `.github/workflows/ci.yml` — GitHub Actions CI pipeline (lint, typecheck, test, build)
-- `prisma/seed.ts` — Dev seed script (agency, users, pilgrims, packages, trips, payments, gamification, academy)
+- `prisma/seed.ts` — Dev seed script (agency, users, pilgrims, packages, trips, payments, gamification, academy, marketplace, forum, news, trade)
 - `scripts/generate-api-docs.ts` — API docs generator → `API-REFERENCE.md`
 - `.husky/pre-commit` — Pre-commit hook (lint-staged + eslint --fix)
 
@@ -604,5 +604,5 @@
 
 *Document Version: 2.2*
 *Created: 2026-02-23*
-*Updated: 2026-02-25 (Session 15 — CI/CD, Seed Data & Developer Experience)*
+*Updated: 2026-03-04 (Session 17 — Marketplace, Forum, News & Trade Centre Backend)*
 *Next: Real API integration (Nusuk, Payment Gateway, WhatsApp, UmrahCash)*

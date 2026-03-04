@@ -34,6 +34,14 @@ export const PERMISSIONS = {
 
   // Reports
   REPORTS_VIEW: 'reports:view',
+
+  // Forum
+  FORUM_CREATE: 'forum:create',
+  FORUM_MODERATE: 'forum:moderate',
+
+  // Trade Centre
+  TRADE_VIEW: 'trade:view',
+  TRADE_SUBMIT: 'trade:submit',
 } as const;
 
 export type Permission = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];
@@ -65,6 +73,10 @@ export const ROLE_PERMISSIONS: Record<string, Permission[]> = {
     PERMISSIONS.SETTINGS_VIEW,
     PERMISSIONS.SETTINGS_EDIT,
     PERMISSIONS.REPORTS_VIEW,
+    PERMISSIONS.FORUM_CREATE,
+    PERMISSIONS.FORUM_MODERATE,
+    PERMISSIONS.TRADE_VIEW,
+    PERMISSIONS.TRADE_SUBMIT,
   ],
   staff: [
     PERMISSIONS.PACKAGES_VIEW,
@@ -73,6 +85,8 @@ export const ROLE_PERMISSIONS: Record<string, Permission[]> = {
     PERMISSIONS.PILGRIMS_EDIT,
     PERMISSIONS.TRIPS_VIEW,
     PERMISSIONS.PAYMENTS_CREATE,
+    PERMISSIONS.FORUM_CREATE,
+    PERMISSIONS.TRADE_VIEW,
   ],
   marketing: [
     PERMISSIONS.PACKAGES_VIEW,
@@ -82,6 +96,9 @@ export const ROLE_PERMISSIONS: Record<string, Permission[]> = {
     PERMISSIONS.PILGRIMS_CREATE,
     PERMISSIONS.TRIPS_VIEW,
     PERMISSIONS.REPORTS_VIEW,
+    PERMISSIONS.FORUM_CREATE,
+    PERMISSIONS.TRADE_VIEW,
+    PERMISSIONS.TRADE_SUBMIT,
   ],
 };
 
@@ -160,6 +177,20 @@ export const PERMISSION_GROUPS = [
     label: 'Laporan',
     permissions: [
       { key: PERMISSIONS.REPORTS_VIEW, label: 'Lihat' },
+    ],
+  },
+  {
+    label: 'Forum',
+    permissions: [
+      { key: PERMISSIONS.FORUM_CREATE, label: 'Buat Thread & Reply' },
+      { key: PERMISSIONS.FORUM_MODERATE, label: 'Moderasi' },
+    ],
+  },
+  {
+    label: 'Trade Centre',
+    permissions: [
+      { key: PERMISSIONS.TRADE_VIEW, label: 'Lihat Katalog' },
+      { key: PERMISSIONS.TRADE_SUBMIT, label: 'Ajukan Produk' },
     ],
   },
 ];

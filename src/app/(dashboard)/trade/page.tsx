@@ -1,13 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { PageHeader } from '@/components/layout/page-header';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
 import {
-  tradeProducts,
   tradeCategories,
-  tradeStats,
   type TradeCategory,
   type TradeProduct,
 } from '@/data/mock-trade';
@@ -32,24 +30,68 @@ export default function TradePage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
 
-  const filteredProducts = tradeProducts.filter((product) => {
-    const matchCategory = activeCategory === 'all' || product.category === activeCategory;
-    const matchSearch =
-      !searchQuery ||
-      product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.producer.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.origin.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.description.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchCategory && matchSearch;
-  });
+  const [products, setProducts] = useState<TradeProduct[]>([]);
+  const [myProducts, setMyProducts] = useState<TradeProduct[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [apiStats, setApiStats] = useState({ totalProducts: 0, activeListings: 0, producers: 0, targetCountries: 0 });
 
-  const myProducts = tradeProducts.filter((p) => p.isOwn);
+  const fetchProducts = useCallback(async () => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams();
+      if (activeCategory && activeCategory !== 'all') params.set('category', activeCategory);
+      if (searchQuery.trim()) params.set('search', searchQuery.trim());
+
+      const res = await fetch(`/api/trade?${params.toString()}`);
+      if (res.ok) {
+        const json = await res.json();
+        setProducts(json.data ?? []);
+        if (json.stats) {
+          setApiStats((prev) => ({
+            ...prev,
+            totalProducts: json.stats.totalProducts ?? prev.totalProducts,
+            activeListings: json.stats.activeListings ?? prev.activeListings,
+            producers: json.stats.producers ?? prev.producers,
+            targetCountries: json.stats.targetCountries ?? prev.targetCountries,
+          }));
+        }
+      }
+    } catch {
+      // silently fail — products stay empty
+    } finally {
+      setLoading(false);
+    }
+  }, [activeCategory, searchQuery]);
+
+  const fetchMyProducts = useCallback(async () => {
+    try {
+      const res = await fetch('/api/trade/my-products');
+      if (res.ok) {
+        const json = await res.json();
+        setMyProducts(json.data ?? []);
+      }
+    } catch {
+      // silently fail
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
+
+  useEffect(() => {
+    if (activeTab === 'pengajuan') {
+      fetchMyProducts();
+    }
+  }, [activeTab, fetchMyProducts]);
+
+  const filteredProducts = products;
 
   const stats = [
-    { label: 'Total Produk', value: tradeStats.totalProducts, icon: Package, color: c.primary, bg: c.primaryLight },
-    { label: 'Listing Aktif', value: tradeStats.activeListings, icon: ShoppingBag, color: c.success, bg: c.successLight },
-    { label: 'Produsen', value: tradeStats.producers, icon: Factory, color: c.info, bg: c.infoLight },
-    { label: 'Negara Tujuan', value: tradeStats.targetCountries, icon: Globe, color: c.warning, bg: c.warningLight },
+    { label: 'Total Produk', value: apiStats.totalProducts, icon: Package, color: c.primary, bg: c.primaryLight },
+    { label: 'Listing Aktif', value: apiStats.activeListings, icon: ShoppingBag, color: c.success, bg: c.successLight },
+    { label: 'Produsen', value: apiStats.producers, icon: Factory, color: c.info, bg: c.infoLight },
+    { label: 'Negara Tujuan', value: apiStats.targetCountries, icon: Globe, color: c.warning, bg: c.warningLight },
   ];
 
   const getCategoryColor = (category: string): string => {

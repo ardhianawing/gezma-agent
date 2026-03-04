@@ -1,11 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
 import { PageHeader } from '@/components/layout/page-header';
 import {
-  newsArticles,
   newsCategories,
   type NewsArticle,
   type NewsCategory,
@@ -76,32 +75,42 @@ export default function NewsPage() {
   const { isMobile, isTablet } = useResponsive();
   const [activeCategory, setActiveCategory] = useState<NewsCategory>('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [articles, setArticles] = useState<NewsArticle[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Filter articles
-  const filteredArticles = newsArticles.filter((article) => {
-    const matchesCategory =
-      activeCategory === 'all' || article.category === activeCategory;
-    const matchesSearch =
-      searchQuery === '' ||
-      article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      article.excerpt.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      article.tags.some((t) =>
-        t.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    return matchesCategory && matchesSearch;
-  });
+  const fetchArticles = useCallback(async () => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams();
+      if (activeCategory !== 'all') params.set('category', activeCategory);
+      if (searchQuery) params.set('search', searchQuery);
+      const res = await fetch(`/api/news?${params.toString()}`);
+      if (res.ok) {
+        const data = await res.json();
+        setArticles(data);
+      }
+    } catch (err) {
+      console.error('Failed to fetch news articles:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, [activeCategory, searchQuery]);
 
-  // Featured articles (always from full list, not filtered)
-  const featuredArticles = newsArticles.filter((a) => a.isFeatured);
+  useEffect(() => {
+    fetchArticles();
+  }, [fetchArticles]);
+
+  // Featured articles (from fetched articles that have isFeatured: true)
+  const featuredArticles = articles.filter((a) => a.isFeatured);
   const mainFeatured = featuredArticles[0];
   const sideFeatured = featuredArticles[1];
 
-  // Non-featured filtered articles
-  const regularArticles = filteredArticles.filter((a) => !a.isFeatured);
+  // Non-featured articles
+  const regularArticles = articles.filter((a) => !a.isFeatured);
   // If a category is active or search is active, show featured ones too if they match
   const displayArticles =
     activeCategory !== 'all' || searchQuery
-      ? filteredArticles
+      ? articles
       : regularArticles;
 
   return (

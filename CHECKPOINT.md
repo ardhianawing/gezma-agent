@@ -1,6 +1,6 @@
 # GEZMA Agent — Development Checkpoint
 
-> **Last Updated:** 2026-02-25 (Session 15 — CI/CD, Seed Data & Developer Experience)
+> **Last Updated:** 2026-03-04 (Session 17 — Marketplace, Forum, News & Trade Centre Backend)
 > **Blueprint Reference:** `GEZMA-AGENT-PLAN-v2.md`, `DEVELOPMENT-PLAN-v3.md`
 
 ---
@@ -10,7 +10,7 @@
 | Kategori | Status | Keterangan |
 |----------|--------|------------|
 | **Phase 1: Core Agent Dashboard** | ✅ 100% Done | Semua modul + API |
-| **Phase 2A: Platform Pages** | ✅ Done | 6 halaman dengan mock data |
+| **Phase 2A: Platform Pages** | ✅ Done | 6 halaman + real API backend (Marketplace, Forum, News, Trade) |
 | **Phase 2B: Agent Backlog** | ✅ 100% Done | Manifest, Timeline, Bulk, Import CSV + 5 low-priority backlog + 28 bug fixes |
 | **Phase 2C: Gezma Pilgrim MVP** | ✅ Done | 6 → 8 halaman (+ documents, payments) + layout + real DB |
 | **Phase 2D: Internal Features** | ✅ Done | 7 fitur: charts, reports, activity log, doc upload, CSV export |
@@ -23,6 +23,7 @@
 | **Session 13: Production Readiness** | ✅ Done | Env validation, CSP headers, structured logger, storage abstraction, cron jobs, gamification hooks |
 | **Session 14: DB & Infra Hardening** | ✅ Done | 25+ DB indexes, health endpoints, robots/sitemap, image optimization, logger cleanup 132 files |
 | **Session 15: CI/CD & DX** | ✅ Done | GitHub Actions CI, Prisma seed script, API docs generator, Husky pre-commit, lint-staged |
+| **Session 17: Platform Backend** | ✅ Done | 7 Prisma models, 19 API endpoints, 4 Zod schemas, 4 permissions, 7 pages wired to API, seed data, 8 test files |
 | **PWA** | ✅ Done | Service Worker, Install Prompt, Offline |
 | **Deployment** | ✅ Ready | Docker + Nginx + Traefik |
 
@@ -879,7 +880,43 @@ Prisma schema memiliki **0 `@@index`** — semua query multi-tenant (filter by `
 
 ---
 
-## S. FUTURE STEPS (Beyond Session 15)
+## SESSION 17 — Marketplace, Forum, News & Trade Centre Backend (2026-03-04)
+
+### Database (7 new models → 46 total)
+- MarketplaceItem, MarketplaceReview, ForumThread, ForumReply, NewsArticle, TradeProduct, TradeInquiry
+- Migration: `session17_marketplace_forum_news_trade`
+
+### Validation Schemas (4 files)
+- `src/lib/validations/marketplace.ts` — create/update item + review
+- `src/lib/validations/forum.ts` — create/update thread + reply
+- `src/lib/validations/news.ts` — create/update article
+- `src/lib/validations/trade.ts` — create/update product + curate + inquiry
+
+### Permissions (4 new → 29 total)
+- `forum:create`, `forum:moderate`, `trade:view`, `trade:submit`
+
+### API Routes (19 new endpoints)
+- Marketplace: 5 routes (GET list, GET detail, POST review, CC create, CC update/delete)
+- Forum: 4 routes (GET/POST threads, GET/PATCH thread, POST reply, PATCH pin)
+- News: 4 routes (GET list, GET detail, CC create, CC update/delete)
+- Trade: 6 routes (GET/POST catalog, GET/PUT product, GET my-products, POST inquiry, CC list, CC curate)
+
+### Frontend Wiring (7 pages updated)
+- Marketplace page + detail → fetch `/api/marketplace`
+- Forum page + detail → fetch `/api/forum`
+- News page + detail → fetch `/api/news`
+- Trade page → fetch `/api/trade` + `/api/trade/my-products`
+
+### Seed Data
+- `prisma/seed-session17.ts` — 30 marketplace items, 12 forum threads, 10 news articles, 20 trade products
+
+### Tests (8 new files)
+- 4 validation tests: marketplace, forum, news, trade
+- 4 API tests: marketplace, forum, news, trade
+
+---
+
+## S. FUTURE STEPS (Beyond Session 17)
 
 1. **Phase 3: Real API** — Connect real API keys (Nusuk, Payment Gateway, WhatsApp, UmrahCash)
 2. **Mobile Native** — Flutter app (di luar scope web — separate project)

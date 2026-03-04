@@ -1,8 +1,8 @@
 # 🕋 GEZMA Development Plan v3.0
 
 > **Created:** 2026-02-23
-> **Last Updated:** 2026-02-25 (Session 15 — CI/CD, Seed Data & Developer Experience)
-> **Status:** Phase 1-4 Complete + Session 15 (CI/CD, seed, API docs, pre-commit hooks, 39 models, 451 tests)
+> **Last Updated:** 2026-03-04 (Session 17 — Marketplace, Forum, News & Trade Centre Backend)
+> **Status:** Phase 1-4 Complete + Session 17 (Platform backend: 46 models, 19 new API routes, 7 pages wired)
 > **Scope:** Phase 2 (Platform & Ecosystem) + Phase 3 (Integration) + Phase 4 (Advanced)
 
 ---
@@ -41,14 +41,14 @@
 
 ### ✅ Phase 2A — Platform Pages (100%)
 
-| Page | Route | Status | Mock Data |
-|------|-------|--------|-----------|
-| Berita | `/news` | ✅ Done | 10 artikel |
-| Akademi | `/academy` | ✅ Done | 12 kursus |
+| Page | Route | Status | Backend |
+|------|-------|--------|---------|
+| Berita | `/news` | ✅ Done | ✅ Real API (S17) |
+| Akademi | `/academy` | ✅ Done | ✅ Real API |
 | Layanan | `/services` | ✅ Done | Static |
-| Trade Centre | `/trade` | ✅ Done | 20 produk |
-| Marketplace | `/marketplace` | ✅ Done | 30 items |
-| Forum | `/forum` | ✅ Done | 12 threads |
+| Trade Centre | `/trade` | ✅ Done | ✅ Real API (S17) |
+| Marketplace | `/marketplace` | ✅ Done | ✅ Real API (S17) |
+| Forum | `/forum` | ✅ Done | ✅ Real API (S17) |
 
 ### ✅ Phase 2B — Agent Backlog (100%)
 
@@ -1141,6 +1141,18 @@ await logActivity({ agencyId: auth.agencyId, userId: auth.userId, ... });
 ---
 
 ## 10. EXECUTION CHECKLIST
+
+### Session 17: Platform Backend ✅
+
+```
+✅ PRISMA MODELS — 7 new models (MarketplaceItem, MarketplaceReview, ForumThread, ForumReply, NewsArticle, TradeProduct, TradeInquiry)
+✅ ZOD VALIDATIONS — 4 schema files (marketplace, forum, news, trade)
+✅ PERMISSIONS — 4 new (forum:create, forum:moderate, trade:view, trade:submit)
+✅ API ROUTES — 19 endpoints (5 marketplace + 4 forum + 4 news + 6 trade)
+✅ FRONTEND WIRING — 7 pages updated (marketplace, forum, news, trade + detail pages)
+✅ SEED DATA — seed-session17.ts (30 + 12 + 10 + 20 items)
+✅ TESTS — 8 test files (4 validation + 4 API)
+```
 
 ### Phase 2A: Platform Pages ✅
 

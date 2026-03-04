@@ -1,17 +1,21 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
 import {
-  forumThreads,
   forumCategories,
-  forumStats,
   ForumCategory,
   ForumThread,
 } from '@/data/mock-forum';
 
 type SortBy = 'terbaru' | 'terpanas' | 'top';
+
+const SORT_MAPPING: Record<SortBy, string> = {
+  terbaru: 'latest',
+  terpanas: 'hot',
+  top: 'top',
+};
 
 function timeAgo(dateStr: string): string {
   const now = new Date();
@@ -40,37 +44,44 @@ export default function ForumPage() {
   const [activeCategory, setActiveCategory] = useState<ForumCategory>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<SortBy>('terbaru');
+  const [threads, setThreads] = useState<ForumThread[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [totalThreads, setTotalThreads] = useState(0);
+  const [categoryCounts, setCategoryCounts] = useState<Record<string, number>>({});
 
-  const filteredThreads = useMemo(() => {
-    let threads = [...forumThreads];
+  const fetchThreads = useCallback(async () => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams();
+      if (activeCategory !== 'all') params.set('category', activeCategory);
+      if (searchQuery.trim()) params.set('search', searchQuery.trim());
+      params.set('sort', SORT_MAPPING[sortBy]);
+      params.set('page', '1');
 
-    if (activeCategory !== 'all') {
-      threads = threads.filter((t) => t.category === activeCategory);
+      const res = await fetch(`/api/forum?${params.toString()}`);
+      if (res.ok) {
+        const json = await res.json();
+        // Map API fields (authorName) to ForumThread interface (author)
+        const mapped = (json.data || []).map((t: Record<string, unknown>) => ({
+          ...t,
+          author: t.authorName ?? t.author ?? '',
+        })) as ForumThread[];
+        setThreads(mapped);
+        setTotalThreads(json.stats?.totalThreads ?? json.total ?? 0);
+        if (json.stats?.categoryCounts) {
+          setCategoryCounts(json.stats.categoryCounts);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to fetch forum threads:', error);
+    } finally {
+      setLoading(false);
     }
-
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
-      threads = threads.filter(
-        (t) =>
-          t.title.toLowerCase().includes(q) ||
-          t.author.toLowerCase().includes(q) ||
-          t.tags.some((tag) => tag.toLowerCase().includes(q))
-      );
-    }
-
-    const pinned = threads.filter((t) => t.isPinned);
-    const unpinned = threads.filter((t) => !t.isPinned);
-
-    if (sortBy === 'terbaru') {
-      unpinned.sort((a, b) => new Date(b.lastReplyAt).getTime() - new Date(a.lastReplyAt).getTime());
-    } else if (sortBy === 'terpanas') {
-      unpinned.sort((a, b) => b.replyCount - a.replyCount);
-    } else {
-      unpinned.sort((a, b) => b.viewCount - a.viewCount);
-    }
-
-    return [...pinned, ...unpinned];
   }, [activeCategory, searchQuery, sortBy]);
+
+  useEffect(() => {
+    fetchThreads();
+  }, [fetchThreads]);
 
   const sortTabs: { key: SortBy; label: string }[] = [
     { key: 'terbaru', label: 'Terbaru' },
@@ -97,13 +108,7 @@ export default function ForumPage() {
           </h1>
           <div style={{ display: 'flex', gap: 16, marginTop: 6, fontSize: 13, color: c.textMuted }}>
             <span>
-              <span style={{ color: c.success, fontWeight: 600 }}>{forumStats.onlineMembers}</span> online
-            </span>
-            <span>
-              <span style={{ fontWeight: 600, color: c.textSecondary }}>{forumStats.totalMembers.toLocaleString('id-ID')}</span> member
-            </span>
-            <span>
-              <span style={{ fontWeight: 600, color: c.textSecondary }}>{forumStats.totalThreads.toLocaleString('id-ID')}</span> thread
+              <span style={{ fontWeight: 600, color: c.textSecondary }}>{totalThreads.toLocaleString('id-ID')}</span> thread
             </span>
           </div>
         </div>
@@ -168,7 +173,9 @@ export default function ForumPage() {
                   borderRadius: 10,
                 }}
               >
-                {cat.count}
+                {cat.key === 'all'
+                  ? totalThreads
+                  : categoryCounts[cat.key] ?? cat.count}
               </span>
             </button>
           );
@@ -258,12 +265,17 @@ export default function ForumPage() {
         )}
 
         {/* Thread Rows */}
-        {filteredThreads.length === 0 && (
+        {loading && (
+          <div style={{ padding: 40, textAlign: 'center', color: c.textMuted, fontSize: 14 }}>
+            Memuat thread...
+          </div>
+        )}
+        {!loading && threads.length === 0 && (
           <div style={{ padding: 40, textAlign: 'center', color: c.textMuted, fontSize: 14 }}>
             Tidak ada thread ditemukan.
           </div>
         )}
-        {filteredThreads.map((thread) => (
+        {!loading && threads.map((thread) => (
           <ThreadRow key={thread.id} thread={thread} c={c} isMobile={isMobile} />
         ))}
       </div>
@@ -282,8 +294,8 @@ export default function ForumPage() {
         }}
       >
         <span>
-          Menampilkan <strong style={{ color: c.textSecondary }}>1-{filteredThreads.length}</strong> dari{' '}
-          <strong style={{ color: c.textSecondary }}>{forumStats.totalThreads}</strong> thread
+          Menampilkan <strong style={{ color: c.textSecondary }}>1-{threads.length}</strong> dari{' '}
+          <strong style={{ color: c.textSecondary }}>{totalThreads}</strong> thread
         </span>
         <div style={{ display: 'flex', gap: 4 }}>
           {[1, 2, 3, '...', 32].map((page, idx) => (

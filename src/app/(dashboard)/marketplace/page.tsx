@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { PageHeader } from '@/components/layout/page-header';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
-import { marketItems, marketCategories, MarketCategory, MarketItem } from '@/data/mock-marketplace';
+import { marketCategories, MarketCategory, MarketItem } from '@/data/mock-marketplace';
 
 type SortBy = 'price_asc' | 'rating' | 'popular';
 type CityFilter = 'all' | 'Makkah' | 'Madinah';
@@ -16,10 +16,6 @@ const badgeColors: Record<string, { bg: string; text: string }> = {
   Popular: { bg: '#3b82f6', text: '#fff' },
   New: { bg: '#22c55e', text: '#fff' },
 };
-
-function parsePrice(price: string): number {
-  return parseInt(price.replace(/[^0-9]/g, ''), 10) || 0;
-}
 
 function StarRating({ rating }: { rating: number }) {
   const full = Math.floor(rating);
@@ -235,47 +231,36 @@ export default function MarketplacePage() {
   const [cityFilter, setCityFilter] = useState<CityFilter>('all');
   const [minRating, setMinRating] = useState<MinRating>(0);
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
+  const [items, setItems] = useState<MarketItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const filteredItems = useMemo(() => {
-    let items = marketItems.filter((item) => item.category === activeCategory);
+  const fetchItems = useCallback(async () => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams();
+      params.set('category', activeCategory);
+      if (searchQuery.trim()) params.set('search', searchQuery.trim());
+      params.set('sort', sortBy);
+      if (activeCategory === 'hotel' && cityFilter !== 'all') params.set('city', cityFilter);
+      if (activeCategory === 'hotel' && minRating > 0) params.set('minRating', String(minRating));
 
-    // Search
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
-      items = items.filter(
-        (item) =>
-          item.name.toLowerCase().includes(q) ||
-          item.vendor.toLowerCase().includes(q) ||
-          item.description.toLowerCase().includes(q) ||
-          item.tags.some((t) => t.toLowerCase().includes(q))
-      );
-    }
-
-    // Hotel-only filters
-    if (activeCategory === 'hotel') {
-      if (cityFilter !== 'all') {
-        items = items.filter((item) => item.city === cityFilter);
+      const res = await fetch(`/api/marketplace?${params.toString()}`);
+      if (res.ok) {
+        const data = await res.json();
+        setItems(data);
       }
-      if (minRating > 0) {
-        items = items.filter((item) => item.rating >= minRating);
-      }
+    } catch (error) {
+      console.error('Failed to fetch marketplace items:', error);
+    } finally {
+      setLoading(false);
     }
-
-    // Sort
-    switch (sortBy) {
-      case 'price_asc':
-        items = [...items].sort((a, b) => parsePrice(a.price) - parsePrice(b.price));
-        break;
-      case 'rating':
-        items = [...items].sort((a, b) => b.rating - a.rating);
-        break;
-      case 'popular':
-        items = [...items].sort((a, b) => b.reviewCount - a.reviewCount);
-        break;
-    }
-
-    return items;
   }, [activeCategory, searchQuery, sortBy, cityFilter, minRating]);
+
+  useEffect(() => {
+    fetchItems();
+  }, [fetchItems]);
+
+  const filteredItems = items;
 
   const gridColumns = isMobile ? 1 : isTablet ? 2 : 3;
 
@@ -483,7 +468,25 @@ export default function MarketplacePage() {
       </div>
 
       {/* Product Grid */}
-      {filteredItems.length > 0 ? (
+      {loading ? (
+        <div
+          style={{
+            textAlign: 'center',
+            padding: '60px 20px',
+            backgroundColor: c.cardBg,
+            borderRadius: '16px',
+            border: '1px solid ' + c.border,
+          }}
+        >
+          <div style={{ fontSize: '48px', marginBottom: '12px' }}>{'\u23F3'}</div>
+          <p style={{ fontSize: '16px', fontWeight: 600, color: c.textPrimary, margin: '0 0 4px' }}>
+            Memuat data...
+          </p>
+          <p style={{ fontSize: '14px', color: c.textMuted, margin: 0 }}>
+            Mohon tunggu sebentar
+          </p>
+        </div>
+      ) : filteredItems.length > 0 ? (
         <div
           style={{
             display: 'grid',

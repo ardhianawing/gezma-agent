@@ -78,6 +78,8 @@ model Agency {
   notifications   Notification[]
   scheduledReports ScheduledReport[]
   roommatePreferences RoommatePreference[]
+  tradeProducts   TradeProduct[]
+  tradeInquiries  TradeInquiry[]
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -925,4 +927,187 @@ model RoommatePreference {
 
   @@index([agencyId])
   @@map("roommate_preferences")
+}
+
+// === SESSION 17: MARKETPLACE, FORUM, NEWS, TRADE CENTRE ===
+
+// Marketplace Item (Global — managed by Command Center)
+model MarketplaceItem {
+  id            String   @id @default(uuid())
+  name          String
+  vendor        String
+  category      String   // hotel, visa, transport, asuransi, mutawwif, tiket
+  description   String
+  emoji         String   @default("📦")
+  badge         String?  // Best Seller, Premium, Popular, New
+  rating        Float    @default(0)
+  reviewCount   Int      @default(0)
+  tags          String[] @default([])
+  details       Json     @default("{}")
+  price         String
+  priceAmount   Float    @default(0)
+  priceUnit     String
+  city          String?
+  isActive      Boolean  @default(true)
+  createdBy     String?  // systemAdmin id
+
+  reviews       MarketplaceReview[]
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([category])
+  @@index([isActive])
+  @@map("marketplace_items")
+}
+
+// Marketplace Review (Global — any agency user can review)
+model MarketplaceReview {
+  id          String   @id @default(uuid())
+  itemId      String
+  item        MarketplaceItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  userId      String
+  userName    String
+  agencyName  String
+  rating      Int      // 1-5
+  comment     String
+
+  createdAt   DateTime @default(now())
+
+  @@index([itemId])
+  @@unique([itemId, userId])
+  @@map("marketplace_reviews")
+}
+
+// Forum Thread (Global — all agency users)
+model ForumThread {
+  id            String   @id @default(uuid())
+  title         String
+  content       String
+  excerpt       String
+  category      String   // review, regulasi, operasional, sharing, scam, tanya
+  tags          String[] @default([])
+  authorId      String
+  authorName    String
+  authorAvatar  String   @default("")
+  authorBadge   String?  // Admin, Moderator, Verified, Top Contributor
+  agencyName    String?
+  replyCount    Int      @default(0)
+  viewCount     Int      @default(0)
+  isPinned      Boolean  @default(false)
+  isHot         Boolean  @default(false)
+  isSolved      Boolean  @default(false)
+  isLocked      Boolean  @default(false)
+  lastReplyBy   String?
+  lastReplyAt   DateTime?
+
+  replies       ForumReply[]
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([category])
+  @@index([isPinned])
+  @@index([createdAt])
+  @@map("forum_threads")
+}
+
+// Forum Reply
+model ForumReply {
+  id            String   @id @default(uuid())
+  threadId      String
+  thread        ForumThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  content       String
+  authorId      String
+  authorName    String
+  authorAvatar  String   @default("")
+  authorBadge   String?
+  likes         Int      @default(0)
+
+  createdAt     DateTime @default(now())
+
+  @@index([threadId])
+  @@map("forum_replies")
+}
+
+// News Article (Global — managed by Command Center)
+model NewsArticle {
+  id            String    @id @default(uuid())
+  title         String
+  excerpt       String
+  content       String
+  category      String    // regulasi, pengumuman, event, tips, peringatan
+  emoji         String    @default("📰")
+  tags          String[]  @default([])
+  author        String
+  authorRole    String
+  createdBy     String?   // systemAdmin id
+  readTime      Int       @default(5)
+  isBreaking    Boolean   @default(false)
+  isOfficial    Boolean   @default(false)
+  isFeatured    Boolean   @default(false)
+  isPublished   Boolean   @default(false)
+  publishedAt   DateTime?
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([isPublished])
+  @@index([category])
+  @@index([publishedAt])
+  @@map("news_articles")
+}
+
+// Trade Product (Hybrid — agency submits, CC curates)
+model TradeProduct {
+  id              String    @id @default(uuid())
+  name            String
+  producer        String
+  origin          String
+  category        String    // makanan, buah, fashion, kosmetik, kerajinan, ibadah
+  description     String
+  emoji           String    @default("📦")
+  certifications  String[]  @default([])
+  rating          Float     @default(0)
+  inquiryCount    Int       @default(0)
+  moq             String
+  targetMarkets   String[]  @default([])
+  price           String
+  status          String    @default("pending") // pending, active, rejected
+  rejectionReason String?
+  agencyId        String
+  agency          Agency    @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  submittedBy     String
+  submitterName   String
+  curatedBy       String?
+  curatedAt       DateTime?
+
+  inquiries       TradeInquiry[]
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([agencyId])
+  @@index([status])
+  @@index([category])
+  @@map("trade_products")
+}
+
+// Trade Inquiry
+model TradeInquiry {
+  id          String   @id @default(uuid())
+  productId   String
+  product     TradeProduct @relation(fields: [productId], references: [id], onDelete: Cascade)
+  agencyId    String
+  agency      Agency   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  userId      String
+  userName    String
+  message     String
+  status      String   @default("pending") // pending, responded, closed
+
+  createdAt   DateTime @default(now())
+
+  @@index([productId])
+  @@index([agencyId])
+  @@map("trade_inquiries")
 }

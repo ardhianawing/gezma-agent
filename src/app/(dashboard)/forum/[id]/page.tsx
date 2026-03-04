@@ -1,13 +1,13 @@
 'use client';
 
-import { use, useState } from 'react';
+import { use, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Clock, Eye, MessageSquare, Tag, CheckCircle2, Pin } from 'lucide-react';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
-import { forumThreads, forumCategories } from '@/data/mock-forum';
+import { forumCategories } from '@/data/mock-forum';
 
-interface MockReply {
+interface ThreadReply {
   id: string;
   author: string;
   avatar: string;
@@ -17,58 +17,33 @@ interface MockReply {
   likes: number;
 }
 
-function getMockReplies(threadId: string): MockReply[] {
-  // Generate static mock replies based on thread
-  const baseReplies: MockReply[] = [
-    {
-      id: `${threadId}-r1`,
-      author: 'AgenJakarta',
-      avatar: 'AJ',
-      badge: 'Verified',
-      content: 'Terima kasih infonya, sangat bermanfaat. Saya sudah mengikuti langkah-langkahnya dan berhasil. Semoga teman-teman yang lain juga terbantu.',
-      createdAt: '2026-02-23T10:00:00Z',
-      likes: 12,
-    },
-    {
-      id: `${threadId}-r2`,
-      author: 'ModRina',
-      avatar: 'MR',
-      badge: 'Moderator',
-      content: 'Terima kasih sudah sharing. Thread ini sangat informatif dan berguna untuk komunitas. Saya pin supaya lebih mudah ditemukan.',
-      createdAt: '2026-02-23T11:30:00Z',
-      likes: 8,
-    },
-    {
-      id: `${threadId}-r3`,
-      author: 'NewbiePKB',
-      avatar: 'NP',
-      content: 'Baru bergabung di forum ini. Banyak sekali ilmu yang bisa didapat. Izin bookmark thread ini ya. Nanti kalau ada pertanyaan saya tanya di sini.',
-      createdAt: '2026-02-23T13:15:00Z',
-      likes: 5,
-    },
-    {
-      id: `${threadId}-r4`,
-      author: 'ProAgent99',
-      avatar: 'PA',
-      badge: 'Top Contributor',
-      content: 'Saya mau tambahin sedikit. Dari pengalaman saya selama 3 tahun di bidang ini, memang pendekatan yang disebutkan di atas sudah cukup tepat. Yang perlu diperhatikan adalah konsistensi dan follow-up rutin.',
-      createdAt: '2026-02-23T15:45:00Z',
-      likes: 15,
-    },
-    {
-      id: `${threadId}-r5`,
-      author: 'AgenBandung',
-      avatar: 'AB',
-      content: 'Setuju dengan OP dan komentar di atas. Saya juga sudah coba dan hasilnya memang signifikan. Recommended!',
-      createdAt: '2026-02-23T17:00:00Z',
-      likes: 3,
-    },
-  ];
-  return baseReplies;
-}
-
-function getFullContent(thread: typeof forumThreads[0]): string {
-  return `${thread.excerpt}\n\nBerikut penjelasan lebih detail mengenai topik ini. Saya sudah mengumpulkan berbagai informasi dari sumber terpercaya dan pengalaman pribadi selama beberapa tahun terakhir.\n\nHal yang perlu diperhatikan:\n- Pastikan semua data dan dokumen sudah lengkap sebelum memulai\n- Ikuti prosedur yang berlaku sesuai regulasi terbaru\n- Jangan ragu untuk bertanya jika ada yang kurang jelas\n- Selalu update informasi dari sumber resmi\n\nSemoga thread ini bermanfaat untuk semua anggota forum. Silakan diskusi di kolom balasan.`;
+interface ThreadData {
+  id: string;
+  title: string;
+  content: string;
+  excerpt: string;
+  category: string;
+  tags: string[];
+  authorName: string;
+  authorAvatar: string;
+  authorBadge?: string;
+  replyCount: number;
+  viewCount: number;
+  isPinned: boolean;
+  isHot: boolean;
+  isSolved: boolean;
+  lastReplyBy?: string;
+  lastReplyAt?: string;
+  createdAt: string;
+  replies?: Array<{
+    id: string;
+    content: string;
+    authorName: string;
+    authorAvatar: string;
+    authorBadge?: string;
+    likes: number;
+    createdAt: string;
+  }>;
 }
 
 const badgeColors: Record<string, { bg: string; text: string }> = {
@@ -83,8 +58,48 @@ export default function ForumDetailPage({ params }: { params: Promise<{ id: stri
   const { c } = useTheme();
   const { isMobile } = useResponsive();
   const [replyText, setReplyText] = useState('');
+  const [thread, setThread] = useState<ThreadData | null>(null);
+  const [replies, setReplies] = useState<ThreadReply[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const thread = forumThreads.find(t => t.id === id);
+  useEffect(() => {
+    async function fetchThread() {
+      setLoading(true);
+      try {
+        const res = await fetch(`/api/forum/${id}`);
+        if (res.ok) {
+          const json = await res.json();
+          const data = json.data as ThreadData;
+          setThread(data);
+          // Map API reply fields to component format
+          setReplies(
+            (data.replies || []).map((r) => ({
+              id: r.id,
+              author: r.authorName,
+              avatar: r.authorAvatar,
+              badge: r.authorBadge || undefined,
+              content: r.content,
+              createdAt: r.createdAt,
+              likes: r.likes,
+            }))
+          );
+        }
+      } catch (error) {
+        console.error('Failed to fetch thread:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchThread();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div style={{ padding: '60px 20px', textAlign: 'center' }}>
+        <p style={{ fontSize: '16px', color: c.textMuted }}>Memuat thread...</p>
+      </div>
+    );
+  }
 
   if (!thread) {
     return (
@@ -98,8 +113,7 @@ export default function ForumDetailPage({ params }: { params: Promise<{ id: stri
   }
 
   const categoryInfo = forumCategories.find(cat => cat.key === thread.category);
-  const replies = getMockReplies(thread.id);
-  const fullContent = getFullContent(thread);
+  const fullContent = thread.content || thread.excerpt;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '16px' : '24px' }}>
@@ -168,7 +182,7 @@ export default function ForumDetailPage({ params }: { params: Promise<{ id: stri
               >
                 {thread.authorAvatar}
               </div>
-              <span style={{ fontSize: '14px', fontWeight: '600', color: c.textPrimary }}>{thread.author}</span>
+              <span style={{ fontSize: '14px', fontWeight: '600', color: c.textPrimary }}>{thread.authorName}</span>
               {thread.authorBadge && (
                 <span
                   style={{

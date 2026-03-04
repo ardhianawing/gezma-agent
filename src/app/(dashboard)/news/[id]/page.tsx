@@ -1,14 +1,14 @@
 'use client';
 
-import { use } from 'react';
+import { use, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Clock, Tag, User } from 'lucide-react';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
-import { newsArticles, newsCategories } from '@/data/mock-news';
+import { newsCategories, type NewsArticle } from '@/data/mock-news';
 
 // Generate full content for articles that have empty content
-function getFullContent(article: typeof newsArticles[0]): string {
+function getFullContent(article: NewsArticle): string {
   if (article.content) return article.content;
   // Generate mock full content based on excerpt
   return `${article.excerpt}\n\nPerkembangan ini menjadi perhatian serius bagi para pelaku industri travel umrah di Indonesia. Dengan adanya perubahan ini, setiap Penyelenggara Perjalanan Ibadah Umrah (PPIU) diharapkan segera melakukan penyesuaian terhadap sistem dan prosedur operasional mereka.\n\nMenurut sumber terpercaya, langkah ini diambil untuk meningkatkan kualitas layanan dan keamanan bagi para jamaah. "Kami berharap semua pihak terkait dapat berkoordinasi dengan baik untuk memastikan transisi yang lancar," ujar pihak berwenang.\n\nDalam konteks yang lebih luas, perubahan ini juga sejalan dengan upaya modernisasi sistem pelayanan ibadah umrah secara global. Beberapa negara lain juga telah menerapkan langkah serupa untuk memastikan standar layanan yang lebih baik.\n\nBagi para agen travel dan PPIU, disarankan untuk:\n1. Segera mempelajari ketentuan baru yang berlaku\n2. Melakukan update sistem sesuai persyaratan terbaru\n3. Menginformasikan perubahan kepada seluruh jamaah\n4. Berkonsultasi dengan pihak terkait jika ada kendala\n\nGEZMA akan terus memantau perkembangan terkait hal ini dan memberikan update secara berkala melalui platform ini.`;
@@ -18,8 +18,52 @@ export default function NewsDetailPage({ params }: { params: Promise<{ id: strin
   const { id } = use(params);
   const { c } = useTheme();
   const { isMobile } = useResponsive();
+  const [article, setArticle] = useState<NewsArticle | null>(null);
+  const [relatedArticles, setRelatedArticles] = useState<NewsArticle[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const article = newsArticles.find(a => a.id === id);
+  useEffect(() => {
+    let cancelled = false;
+    async function fetchData() {
+      setLoading(true);
+      try {
+        const res = await fetch(`/api/news/${id}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (!cancelled) {
+            setArticle(data);
+            // Fetch related articles by same category
+            if (data.category) {
+              const relRes = await fetch(`/api/news?category=${data.category}&limit=4`);
+              if (relRes.ok) {
+                const relData = await relRes.json();
+                if (!cancelled) {
+                  setRelatedArticles(relData.filter((a: NewsArticle) => a.id !== id).slice(0, 3));
+                }
+              }
+            }
+          }
+        } else {
+          if (!cancelled) setArticle(null);
+        }
+      } catch (err) {
+        console.error('Failed to fetch article:', err);
+        if (!cancelled) setArticle(null);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+    fetchData();
+    return () => { cancelled = true; };
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div style={{ padding: '60px 20px', textAlign: 'center' }}>
+        <p style={{ fontSize: '16px', color: c.textMuted }}>Memuat artikel...</p>
+      </div>
+    );
+  }
 
   if (!article) {
     return (
@@ -33,9 +77,6 @@ export default function NewsDetailPage({ params }: { params: Promise<{ id: strin
   }
 
   const categoryInfo = newsCategories.find(cat => cat.id === article.category);
-  const relatedArticles = newsArticles
-    .filter(a => a.category === article.category && a.id !== article.id)
-    .slice(0, 3);
 
   const fullContent = getFullContent(article);
 

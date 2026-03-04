@@ -1,11 +1,11 @@
 'use client';
 
-import { use, useState } from 'react';
+import { use, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Star, ShoppingCart, MapPin, Tag } from 'lucide-react';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
-import { marketItems, marketCategories } from '@/data/mock-marketplace';
+import { marketCategories, MarketItem } from '@/data/mock-marketplace';
 
 const badgeColors: Record<string, { bg: string; text: string }> = {
   'Best Seller': { bg: '#DCFCE7', text: '#15803D' },
@@ -19,8 +19,45 @@ export default function MarketplaceDetailPage({ params }: { params: Promise<{ id
   const { c } = useTheme();
   const { isMobile } = useResponsive();
   const [ordered, setOrdered] = useState(false);
+  const [item, setItem] = useState<MarketItem | null>(null);
+  const [relatedItems, setRelatedItems] = useState<MarketItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const item = marketItems.find(i => i.id === id);
+  useEffect(() => {
+    async function fetchItem() {
+      setLoading(true);
+      try {
+        const res = await fetch(`/api/marketplace/${id}`);
+        if (res.ok) {
+          const data = await res.json();
+          setItem(data);
+
+          // Fetch related items based on the item's category
+          if (data.category) {
+            const relRes = await fetch(`/api/marketplace?category=${data.category}&limit=4`);
+            if (relRes.ok) {
+              const relData = await relRes.json();
+              setRelatedItems(relData.filter((i: MarketItem) => i.id !== id).slice(0, 3));
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch marketplace item:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchItem();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div style={{ padding: '60px 20px', textAlign: 'center' }}>
+        <div style={{ fontSize: '48px', marginBottom: '12px' }}>{'\u23F3'}</div>
+        <p style={{ fontSize: '16px', color: c.textMuted }}>Memuat data...</p>
+      </div>
+    );
+  }
 
   if (!item) {
     return (
@@ -34,9 +71,6 @@ export default function MarketplaceDetailPage({ params }: { params: Promise<{ id
   }
 
   const categoryInfo = marketCategories.find(cat => cat.key === item.category);
-  const relatedItems = marketItems
-    .filter(i => i.category === item.category && i.id !== item.id)
-    .slice(0, 3);
 
   const handleOrder = () => {
     setOrdered(true);

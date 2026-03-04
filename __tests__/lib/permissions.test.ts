@@ -18,8 +18,8 @@ describe('PERMISSIONS', () => {
     expect(PERMISSIONS.REPORTS_VIEW).toBe('reports:view')
   })
 
-  it('has 21 total permissions', () => {
-    expect(Object.keys(PERMISSIONS)).toHaveLength(21)
+  it('has 25 total permissions', () => {
+    expect(Object.keys(PERMISSIONS)).toHaveLength(25)
   })
 })
 
@@ -105,8 +105,8 @@ describe('hasPermission', () => {
 })
 
 describe('PERMISSION_GROUPS', () => {
-  it('has 7 groups', () => {
-    expect(PERMISSION_GROUPS).toHaveLength(7)
+  it('has 9 groups', () => {
+    expect(PERMISSION_GROUPS).toHaveLength(9)
   })
 
   it('first group is Paket', () => {
