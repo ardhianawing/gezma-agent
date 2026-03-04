@@ -156,7 +156,8 @@ export async function DELETE(req: NextRequest, { params }: Context) {
       return NextResponse.json({ error: 'Paket tidak ditemukan' }, { status: 404 });
     }
 
-    await prisma.package.delete({ where: { id } });
+    // Soft delete
+    await prisma.package.update({ where: { id }, data: { deletedAt: new Date(), isActive: false } });
 
     logActivity({
       type: 'package',

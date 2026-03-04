@@ -4,6 +4,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import { rateLimit } from '@/lib/rate-limiter';
+import { checkBruteForce, recordFailedAttempt, recordSuccessfulLogin } from '@/lib/brute-force';
 import { logger } from '@/lib/logger';
 import { JWT_SECRET } from '@/lib/auth-server';
 
@@ -28,6 +29,15 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Brute force check (per email)
+    const bruteCheck = checkBruteForce(`agent:${email}`);
+    if (!bruteCheck.allowed) {
+      return NextResponse.json(
+        { error: `Akun terkunci karena terlalu banyak percobaan gagal. Coba lagi dalam ${Math.ceil(bruteCheck.retryAfter / 60)} menit.` },
+        { status: 423, headers: { 'Retry-After': String(bruteCheck.retryAfter) } }
+      );
+    }
+
     // Find user with agency
     const user = await prisma.user.findUnique({
       where: { email },
@@ -35,6 +45,7 @@ export async function POST(req: NextRequest) {
     });
 
     if (!user) {
+      recordFailedAttempt(`agent:${email}`);
       return NextResponse.json(
         { error: 'Email atau password salah' },
         { status: 401 }
@@ -44,9 +55,13 @@ export async function POST(req: NextRequest) {
     // Check password
     const isValidPassword = await bcrypt.compare(password, user.password);
     if (!isValidPassword) {
+      const result = recordFailedAttempt(`agent:${email}`);
+      const msg = result.remainingAttempts > 0
+        ? `Email atau password salah. ${result.remainingAttempts} percobaan tersisa.`
+        : `Akun terkunci selama ${Math.ceil(result.retryAfter / 60)} menit.`;
       return NextResponse.json(
-        { error: 'Email atau password salah' },
-        { status: 401 }
+        { error: msg },
+        { status: result.remainingAttempts > 0 ? 401 : 423 }
       );
     }
 
@@ -65,6 +80,9 @@ export async function POST(req: NextRequest) {
         { status: 403 }
       );
     }
+
+    // Clear brute force on successful password check
+    recordSuccessfulLogin(`agent:${email}`);
 
     // If TOTP is enabled, return tempToken for 2FA verification
     if (user.totpEnabled) {
@@ -103,7 +121,7 @@ export async function POST(req: NextRequest) {
     const ipAddress = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || req.headers.get('x-real-ip') || null;
     const userAgent = req.headers.get('user-agent') || null;
 
-    await Promise.all([
+    await prisma.$transaction([
       prisma.user.update({
         where: { id: user.id },
         data: { lastLoginAt: new Date() },

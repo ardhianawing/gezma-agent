@@ -1,6 +1,6 @@
 # GEZMA Agent — Development Checkpoint
 
-> **Last Updated:** 2026-03-04 (Session 19 — Production Hardening, E2E CI, Error Monitoring, Services API, Academy Quizzes, Pilgrim Safety)
+> **Last Updated:** 2026-03-05 (Session 20 — DeepSeek Review Fixes: Encryption, Brute Force, Transactions, Soft Delete)
 > **Blueprint Reference:** `GEZMA-AGENT-PLAN-v2.md`, `DEVELOPMENT-PLAN-v3.md`
 
 ---
@@ -25,6 +25,7 @@
 | **Session 15: CI/CD & DX** | ✅ Done | GitHub Actions CI, Prisma seed script, API docs generator, Husky pre-commit, lint-staged |
 | **Session 17: Platform Backend** | ✅ Done | 7 Prisma models, 19 API endpoints, 4 Zod schemas, 4 permissions, 7 pages wired to API, seed data, 8 test files |
 | **Session 19: Hardening & Safety** | ✅ Done | Production security, E2E CI, error monitoring, services API, academy quizzes, SOS button |
+| **Session 20: Security Review Fixes** | ✅ Done | Data encryption, brute force protection, DB transactions, soft delete |
 | **PWA** | ✅ Done | Service Worker, Install Prompt, Offline |
 | **Deployment** | ✅ Ready | Docker + Nginx + Traefik |
 
@@ -982,7 +983,66 @@ Prisma schema memiliki **0 `@@index`** — semua query multi-tenant (filter by `
 
 ---
 
-## S. FUTURE STEPS (Beyond Session 19)
+## SESSION 20 — DeepSeek Review Fixes: Encryption, Brute Force, Transactions, Soft Delete
+
+Based on DeepSeek code review (score: 8.5/10), addressed all HIGH PRIORITY issues:
+
+### Batch 1: Data Encryption at Rest ✅
+| Fitur | Status | Keterangan |
+|-------|--------|------------|
+| Encryption utility | ✅ | `src/lib/encryption.ts` — AES-256-GCM, same pattern as TOTP |
+| Pilgrim field encrypt/decrypt | ✅ | encryptPilgrimFields/decryptPilgrimFields for nik, phone, email, whatsapp |
+| Legacy data support | ✅ | decryptField gracefully handles unencrypted data (migration-safe) |
+| Masking helpers | ✅ | maskNIK, maskPhone, maskEmail for display |
+| ENV var | ✅ | DATA_ENCRYPTION_KEY (64 hex chars) in env schema |
+| Pilgrims route wired | ✅ | POST encrypts, GET decrypts |
+
+### Batch 2: Brute Force Protection ✅
+| Fitur | Status | Keterangan |
+|-------|--------|------------|
+| Brute force service | ✅ | `src/lib/brute-force.ts` — in-memory, exponential backoff |
+| Max 5 attempts | ✅ | Lock after 5 failures, 15min base lockout |
+| Exponential backoff | ✅ | 15min → 30min → 60min → 2hr cap |
+| Agent login wired | ✅ | `agent:${email}` namespace |
+| CC login wired | ✅ | `cc:${email}` namespace |
+| Pilgrim login wired | ✅ | `pilgrim:${bookingCode}` namespace |
+| Success reset | ✅ | recordSuccessfulLogin clears failed count |
+| User-friendly messages | ✅ | Shows remaining attempts + lockout duration |
+
+### Batch 3: Database Transactions ✅
+| Route | Change | Keterangan |
+|-------|--------|------------|
+| auth/login | Promise.all → $transaction | User update + login history atomic |
+| trips/[id] DELETE | Added $transaction | Unassign pilgrims + delete trip atomic |
+| (already had) pilgrims/[id] PUT/DELETE | ✅ | Already uses $transaction |
+| (already had) pilgrims/bulk | ✅ | Already uses $transaction |
+
+### Batch 4: Soft Delete ✅
+| Model | deletedAt | Keterangan |
+|-------|-----------|------------|
+| Pilgrim | ✅ | SET deletedAt + null tripId, filter in GET |
+| User | ✅ | SET deletedAt + isActive=false |
+| Package | ✅ | SET deletedAt + isActive=false |
+| Trip | ✅ | SET deletedAt + status='cancelled' |
+| ForumThread | ✅ | Added field (not yet wired to route) |
+| CC Restore endpoint | ✅ | `/api/command-center/deleted-records` GET + POST |
+
+### Batch 5: Tests ✅
+| Test File | Tests | Keterangan |
+|-----------|-------|------------|
+| encryption.test.ts | 12 | encrypt/decrypt, masking, pilgrim helpers |
+| brute-force.test.ts | 10 | lockout, reset, isolation, namespaces |
+| soft-delete.test.ts | 6 | filter, restore, model coverage |
+
+### DeepSeek Review Corrections
+Security headers (X-Content-Type-Options, X-Frame-Options, Referrer-Policy) were already present in next.config.ts since Session 13. DeepSeek's review was inaccurate on this point.
+
+**New files:** 5 | **Modified:** 12
+**New API endpoints:** 2 (CC deleted-records GET + POST)
+
+---
+
+## S. FUTURE STEPS (Beyond Session 20)
 
 1. **Phase 3: Real API** — Connect real API keys (Nusuk, Payment Gateway, WhatsApp, UmrahCash)
 2. **Mobile Native** — Flutter app (di luar scope web — separate project)
@@ -996,3 +1056,9 @@ Prisma schema memiliki **0 `@@index`** — semua query multi-tenant (filter by `
 10. ~~**CI/CD Pipeline**~~ — ✅ Done (Session 15) — GitHub Actions (lint, typecheck, test, build)
 11. ~~**Seed Data**~~ — ✅ Done (Session 15) — `prisma/seed.ts` with demo agency, users, pilgrims, packages
 12. ~~**Pre-commit Hooks**~~ — ✅ Done (Session 15) — Husky + lint-staged (eslint --fix)
+13. ~~**Data Encryption**~~ — ✅ Done (Session 20) — AES-256-GCM for NIK, phone, email, whatsapp
+14. ~~**Brute Force Protection**~~ — ✅ Done (Session 20) — Exponential backoff + account lockout
+15. ~~**Database Transactions**~~ — ✅ Done (Session 20) — $transaction on critical multi-write routes
+16. ~~**Soft Delete**~~ — ✅ Done (Session 20) — deletedAt on Pilgrim, User, Package, Trip, ForumThread + CC restore
+17. **Redis Rate Limiter** — Replace in-memory with Redis for multi-instance (needs Redis)
+18. **Wire encryption to all pilgrim routes** — Currently only pilgrims/route.ts, need pilgrims/[id], import, etc.

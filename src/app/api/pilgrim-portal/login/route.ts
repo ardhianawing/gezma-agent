@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { signPilgrimToken } from '@/lib/auth-pilgrim';
 import { findPilgrimByBookingCode } from '@/lib/services/pilgrim-portal.service';
 import { rateLimit } from '@/lib/rate-limiter';
+import { checkBruteForce, recordFailedAttempt, recordSuccessfulLogin } from '@/lib/brute-force';
 import { prisma } from '@/lib/prisma';
 import { awardPilgrimPoints } from '@/lib/services/pilgrim-gamification.service';
 import { logger } from '@/lib/logger';
@@ -23,15 +24,26 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Brute force check (per booking code)
+    const bruteCheck = checkBruteForce(`pilgrim:${bookingCode}`);
+    if (!bruteCheck.allowed) {
+      return NextResponse.json(
+        { error: `Terlalu banyak percobaan gagal. Coba lagi dalam ${Math.ceil(bruteCheck.retryAfter / 60)} menit.` },
+        { status: 423 }
+      );
+    }
+
     const result = await findPilgrimByBookingCode(bookingCode);
 
     if (!result) {
+      recordFailedAttempt(`pilgrim:${bookingCode}`);
       return NextResponse.json(
         { error: 'Kode booking tidak ditemukan. Periksa kembali kode Anda.' },
         { status: 404 }
       );
     }
 
+    recordSuccessfulLogin(`pilgrim:${bookingCode}`);
     const token = signPilgrimToken(result.pilgrimId, result.agencyId);
 
     // Award daily login points (fire-and-forget)

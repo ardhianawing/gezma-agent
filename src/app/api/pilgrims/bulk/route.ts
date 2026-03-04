@@ -182,7 +182,8 @@ export async function POST(req: NextRequest) {
 
         for (const pilgrim of pilgrims) {
           try {
-            await tx.pilgrim.delete({ where: { id: pilgrim.id } });
+            // Soft delete
+            await tx.pilgrim.update({ where: { id: pilgrim.id }, data: { deletedAt: new Date(), tripId: null } });
             success++;
           } catch (err) {
             failed++;
@@ -190,9 +191,9 @@ export async function POST(req: NextRequest) {
           }
         }
 
-        // Update registeredCount for affected trips
+        // Update registeredCount for affected trips (exclude soft-deleted)
         for (const tid of affectedTripIds) {
-          const count = await tx.pilgrim.count({ where: { tripId: tid } });
+          const count = await tx.pilgrim.count({ where: { tripId: tid, deletedAt: null } });
           await tx.trip.update({ where: { id: tid }, data: { registeredCount: count } });
         }
       });

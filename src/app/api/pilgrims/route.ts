@@ -6,6 +6,7 @@ import { PERMISSIONS } from '@/lib/permissions';
 import { pilgrimFormSchema } from '@/lib/validations/pilgrim';
 import { logActivity } from '@/lib/activity-logger';
 import { logger } from '@/lib/logger';
+import { encryptPilgrimFields, decryptPilgrimFields } from '@/lib/encryption';
 
 export async function GET(req: NextRequest) {
   const auth = getAuthPayload(req);
@@ -18,7 +19,7 @@ export async function GET(req: NextRequest) {
   const status = searchParams.get('status') || '';
   const tripId = searchParams.get('tripId') || '';
 
-  const where: Record<string, unknown> = { agencyId: auth.agencyId };
+  const where: Record<string, unknown> = { agencyId: auth.agencyId, deletedAt: null };
 
   if (status) {
     where.status = status;
@@ -54,8 +55,10 @@ export async function GET(req: NextRequest) {
       prisma.pilgrim.count({ where }),
     ]);
 
+    const decryptedData = data.map(p => decryptPilgrimFields(p));
+
     return NextResponse.json({
-      data,
+      data: decryptedData,
       pagination: {
         page,
         limit,
@@ -113,9 +116,16 @@ export async function POST(req: NextRequest) {
       healthCertificate: false,
     };
 
+    const encryptedData = encryptPilgrimFields({
+      nik: data.nik,
+      phone: data.phone,
+      email: data.email,
+      whatsapp: data.whatsapp || null,
+    });
+
     const pilgrim = await prisma.pilgrim.create({
       data: {
-        nik: data.nik,
+        nik: encryptedData.nik,
         name: data.name,
         gender: data.gender,
         birthPlace: data.birthPlace,
@@ -124,9 +134,9 @@ export async function POST(req: NextRequest) {
         city: data.city,
         province: data.province,
         postalCode: data.postalCode || null,
-        phone: data.phone,
-        email: data.email,
-        whatsapp: data.whatsapp || null,
+        phone: encryptedData.phone,
+        email: encryptedData.email,
+        whatsapp: encryptedData.whatsapp || null,
         emergencyContact: data.emergencyContact,
         checklist: defaultChecklist,
         status: 'lead',
@@ -147,7 +157,7 @@ export async function POST(req: NextRequest) {
       metadata: { entityId: pilgrim.id },
     });
 
-    return NextResponse.json(pilgrim, { status: 201 });
+    return NextResponse.json(decryptPilgrimFields(pilgrim), { status: 201 });
   } catch (error) {
     logger.error('POST /api/pilgrims error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });

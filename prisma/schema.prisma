@@ -135,6 +135,9 @@ model User {
   // Session tracking
   lastLoginAt     DateTime?
 
+  // Soft delete
+  deletedAt       DateTime?
+
   // Relations
   activityLogs    ActivityLog[]
   notificationPrefs NotificationPreference?
@@ -150,6 +153,7 @@ model User {
   updatedAt       DateTime @updatedAt
 
   @@index([agencyId])
+  @@index([deletedAt])
   @@map("users")
 }
 
@@ -200,6 +204,9 @@ model Pilgrim {
   // Metadata
   createdBy         String?
 
+  // Soft delete
+  deletedAt         DateTime?
+
   // Multi-tenant
   agencyId          String
   agency            Agency   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
@@ -224,6 +231,7 @@ model Pilgrim {
 
   @@index([agencyId])
   @@index([status])
+  @@index([deletedAt])
   @@unique([nik, agencyId])
   @@unique([agencyId, bookingCode])
   @@map("pilgrims")
@@ -319,6 +327,9 @@ model Package {
   thumbnailUrl        String?
   brochureUrl         String?
 
+  // Soft delete
+  deletedAt           DateTime?
+
   // Multi-tenant
   agencyId            String
   agency              Agency   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
@@ -327,6 +338,7 @@ model Package {
   updatedAt           DateTime @updatedAt
 
   @@index([agencyId])
+  @@index([deletedAt])
   @@unique([slug, agencyId])
   @@map("packages")
 }
@@ -358,6 +370,9 @@ model Trip {
   // Sharing
   shareCode             String?  @unique
 
+  // Soft delete
+  deletedAt             DateTime?
+
   // Multi-tenant
   agencyId              String
   agency                Agency   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
@@ -369,6 +384,7 @@ model Trip {
   updatedAt             DateTime @updatedAt
 
   @@index([agencyId])
+  @@index([deletedAt])
   @@map("trips")
 }
 
@@ -1007,6 +1023,9 @@ model ForumThread {
   lastReplyBy   String?
   lastReplyAt   DateTime?
 
+  // Soft delete
+  deletedAt     DateTime?
+
   replies       ForumReply[]
 
   createdAt     DateTime @default(now())
@@ -1015,6 +1034,7 @@ model ForumThread {
   @@index([category])
   @@index([isPinned])
   @@index([createdAt])
+  @@index([deletedAt])
   @@map("forum_threads")
 }
 

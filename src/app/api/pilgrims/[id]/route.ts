@@ -156,11 +156,12 @@ export async function DELETE(req: NextRequest, { params }: Context) {
     }
 
     await prisma.$transaction(async (tx) => {
-      await tx.pilgrim.delete({ where: { id } });
+      // Soft delete: set deletedAt instead of hard delete
+      await tx.pilgrim.update({ where: { id }, data: { deletedAt: new Date(), tripId: null } });
 
       // Decrement trip registeredCount if pilgrim was assigned to a trip
       if (existing.tripId) {
-        const count = await tx.pilgrim.count({ where: { tripId: existing.tripId } });
+        const count = await tx.pilgrim.count({ where: { tripId: existing.tripId, deletedAt: null } });
         await tx.trip.update({ where: { id: existing.tripId }, data: { registeredCount: count } });
       }
     });

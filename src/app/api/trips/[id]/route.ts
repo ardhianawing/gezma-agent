@@ -127,7 +127,15 @@ export async function DELETE(req: NextRequest, { params }: Context) {
       return NextResponse.json({ error: 'Trip tidak ditemukan' }, { status: 404 });
     }
 
-    await prisma.trip.delete({ where: { id } });
+    await prisma.$transaction(async (tx) => {
+      // Unassign pilgrims from this trip
+      await tx.pilgrim.updateMany({
+        where: { tripId: id },
+        data: { tripId: null },
+      });
+      // Soft delete
+      await tx.trip.update({ where: { id }, data: { deletedAt: new Date(), status: 'cancelled' } });
+    });
 
     logActivity({
       type: 'trip',

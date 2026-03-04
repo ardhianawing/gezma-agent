@@ -27,6 +27,7 @@ const envSchema = z.object({
 
   // Security
   TOTP_ENCRYPTION_KEY: z.string().min(32, 'TOTP_ENCRYPTION_KEY must be at least 32 characters').optional(),
+  DATA_ENCRYPTION_KEY: z.string().min(64, 'DATA_ENCRYPTION_KEY must be 64 hex chars (32 bytes)').optional(),
 
   // Cron
   CRON_ENABLED: z.string().default('true').transform(v => v === 'true'),
@@ -67,6 +68,9 @@ export function validateEnv(): Env {
     }
     if (!result.data.TOTP_ENCRYPTION_KEY) {
       console.warn('[SECURITY] TOTP_ENCRYPTION_KEY is not set. 2FA will not work in production.');
+    }
+    if (!result.data.DATA_ENCRYPTION_KEY) {
+      console.warn('[SECURITY] DATA_ENCRYPTION_KEY is not set. Sensitive fields (NIK, phone) will be stored in plaintext.');
     }
   }
 

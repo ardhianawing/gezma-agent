@@ -143,7 +143,8 @@ export async function DELETE(req: NextRequest, { params }: Context) {
       return NextResponse.json({ error: 'User tidak ditemukan' }, { status: 404 });
     }
 
-    await prisma.user.delete({ where: { id } });
+    // Soft delete
+    await prisma.user.update({ where: { id }, data: { deletedAt: new Date(), isActive: false } });
 
     logActivity({
       type: 'user',
