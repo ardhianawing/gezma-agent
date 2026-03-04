@@ -55,3 +55,52 @@ jobs:
       - run: npm ci
       - run: npx prisma generate
       - run: npm run build
+
+  e2e-tests:
+    name: E2E Tests
+    needs: [build]
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: gezma
+          POSTGRES_PASSWORD: gezma_test
+          POSTGRES_DB: gezma_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://gezma:gezma_test@localhost:5432/gezma_test
+      JWT_SECRET: e2e-test-jwt-secret-key-minimum-32-characters-long
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+      NODE_ENV: test
+      CRON_ENABLED: 'false'
+      TOTP_ENCRYPTION_KEY: e2e-test-totp-encryption-key-min-32chars
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npx prisma generate
+      - run: npx prisma db push
+      - run: npx tsx prisma/seed.ts
+      - run: npx playwright install --with-deps chromium
+      - name: Build & Start Server
+        run: |
+          npm run build
+          npm run start &
+          npx wait-on http://localhost:3000 --timeout 60000
+      - run: npx playwright test
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7

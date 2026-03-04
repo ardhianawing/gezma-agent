@@ -88,6 +88,38 @@ export default function EmergencyContactsPage() {
   const { c } = useTheme();
   const { isMobile } = useResponsive();
 
+  const handleShareLocation = () => {
+    if (!navigator.geolocation) {
+      alert('Geolokasi tidak didukung oleh browser Anda');
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        const msg = `SOS! Saya butuh bantuan. Lokasi saya: https://maps.google.com/?q=${latitude},${longitude}`;
+        window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+      },
+      () => {
+        alert('Tidak dapat mengakses lokasi. Pastikan GPS aktif.');
+      }
+    );
+  };
+
+  const handleSaveContacts = () => {
+    const contacts = EMERGENCY_DATA.flatMap(g => g.contacts);
+    const vcf = contacts.map(ct => {
+      const tel = ct.phone.replace(/[^0-9+]/g, '');
+      return `BEGIN:VCARD\nVERSION:3.0\nFN:${ct.name}\nTEL:${tel}\nNOTE:${ct.description || ''}\nEND:VCARD`;
+    }).join('\n');
+    const blob = new Blob([vcf], { type: 'text/vcard' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'kontak-darurat-umrah.vcf';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div style={{ paddingBottom: '80px' }}>
       {/* Header */}
@@ -107,6 +139,57 @@ export default function EmergencyContactsPage() {
         }}>
           Nomor penting yang perlu Anda simpan selama perjalanan umrah
         </p>
+      </div>
+
+      {/* Quick action buttons */}
+      <div style={{
+        display: 'flex',
+        gap: '8px',
+        marginBottom: '16px',
+        flexWrap: 'wrap',
+      }}>
+        <button
+          onClick={handleShareLocation}
+          style={{
+            flex: 1,
+            minWidth: '140px',
+            padding: '12px 16px',
+            borderRadius: '12px',
+            border: 'none',
+            backgroundColor: GREEN,
+            color: '#FFFFFF',
+            fontSize: '13px',
+            fontWeight: 600,
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '6px',
+          }}
+        >
+          {'\u{1F4CD}'} Bagikan Lokasi
+        </button>
+        <button
+          onClick={handleSaveContacts}
+          style={{
+            flex: 1,
+            minWidth: '140px',
+            padding: '12px 16px',
+            borderRadius: '12px',
+            border: '1px solid ' + GREEN,
+            backgroundColor: GREEN_LIGHT,
+            color: GREEN,
+            fontSize: '13px',
+            fontWeight: 600,
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '6px',
+          }}
+        >
+          {'\u{1F4BE}'} Simpan Semua Kontak
+        </button>
       </div>
 
       {/* Warning banner */}

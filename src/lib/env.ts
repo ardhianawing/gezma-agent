@@ -5,6 +5,9 @@ const envSchema = z.object({
   JWT_SECRET: z.string().min(32, 'JWT_SECRET must be at least 32 characters'),
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
 
+  // App
+  NEXT_PUBLIC_APP_URL: z.string().optional(),
+
   // SMTP (optional)
   SMTP_HOST: z.string().optional(),
   SMTP_PORT: z.string().optional(),
@@ -23,10 +26,14 @@ const envSchema = z.object({
   S3_SECRET_KEY: z.string().optional(),
 
   // Security
-  TOTP_ENCRYPTION_KEY: z.string().min(1, 'TOTP_ENCRYPTION_KEY is required for 2FA').optional(),
+  TOTP_ENCRYPTION_KEY: z.string().min(32, 'TOTP_ENCRYPTION_KEY must be at least 32 characters').optional(),
 
   // Cron
   CRON_ENABLED: z.string().default('true').transform(v => v === 'true'),
+
+  // Error Monitoring
+  ERROR_MONITOR_DSN: z.string().optional(),
+  APP_VERSION: z.string().optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;
@@ -49,6 +56,17 @@ export function validateEnv(): Env {
       .filter(k => !result.data[k as keyof Env]);
     if (missing.length > 0) {
       throw new Error(`STORAGE_DRIVER=s3 requires: ${missing.join(', ')}`);
+    }
+  }
+
+  // Production security checks
+  if (result.data.NODE_ENV === 'production') {
+    const secret = result.data.JWT_SECRET;
+    if (secret.includes('dummy') || secret.includes('default') || secret.includes('changeme')) {
+      throw new Error('JWT_SECRET contains a default/dummy value. Set a strong secret in production.');
+    }
+    if (!result.data.TOTP_ENCRYPTION_KEY) {
+      console.warn('[SECURITY] TOTP_ENCRYPTION_KEY is not set. 2FA will not work in production.');
     }
   }
 

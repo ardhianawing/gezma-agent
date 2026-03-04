@@ -6,6 +6,7 @@ import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
 import { PilgrimProvider, usePilgrim } from '@/lib/contexts/pilgrim-context';
 import { PilgrimErrorBoundary } from '@/components/pilgrim-error-boundary';
+import SOSButton from '@/components/pilgrim/sos-button';
 
 const PILGRIM_GREEN = '#059669';
 const PILGRIM_GREEN_HOVER = '#047857';
@@ -196,6 +197,9 @@ function PilgrimLayoutInner({ children }: { children: React.ReactNode }) {
           {children}
         </PilgrimErrorBoundary>
       </main>
+
+      {/* SOS Button */}
+      <SOSButton />
 
       {/* Mobile bottom nav */}
       {isMobile && (

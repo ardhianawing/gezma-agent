@@ -14,6 +14,8 @@ import { Pool } from 'pg';
 import { hashSync } from 'bcryptjs';
 import { seedSession17 } from './seed-session17';
 import { seedSession18 } from './seed-session18';
+import { seedSession19 } from './seed-session19';
+import { seedAcademyQuizzes } from './seed-academy-quizzes';
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaPg(pool);
@@ -615,6 +617,8 @@ async function main() {
   await seedQuizzes();
   await seedSession17(prisma);
   await seedSession18(prisma);
+  await seedSession19(prisma);
+  await seedAcademyQuizzes(prisma);
 
   console.log('\n=== Seed Complete! ===\n');
   console.log('Demo Credentials:');
@@ -627,6 +631,8 @@ async function main() {
   console.log('Command Center:');
   console.log('  Admin:  superadmin@gezma.id / password123');
   console.log('─────────────────────────────────────────');
+  console.log('');
+  console.warn('\u26A0\uFE0F  CHANGE DEFAULT ADMIN PASSWORD IN PRODUCTION!');
 }
 
 main()

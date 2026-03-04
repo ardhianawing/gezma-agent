@@ -147,6 +147,8 @@ export async function POST(req: NextRequest) {
     return response;
   } catch (error) {
     logger.error('Login error', { error: String(error) });
+    const { captureException } = await import('@/lib/error-monitor');
+    captureException(error, { route: '/api/auth/login', action: 'login' });
     return NextResponse.json(
       { error: 'Terjadi kesalahan server. Silakan coba lagi.' },
       { status: 500 }
