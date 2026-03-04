@@ -512,9 +512,9 @@ export default function ServicesPage() {
                     if (contact.title === 'Live Chat') {
                       alert('Fitur live chat akan segera tersedia');
                     } else if (contact.title === 'WhatsApp') {
-                      alert('Fitur WhatsApp akan segera tersedia');
+                      window.open('https://wa.me/6281234567890?text=Halo%20GEZMA%2C%20saya%20butuh%20bantuan', '_blank');
                     } else {
-                      alert('Fitur email akan segera tersedia');
+                      window.open('mailto:support@gezma.id?subject=Bantuan%20GEZMA', '_blank');
                     }
                   }}
                   style={{

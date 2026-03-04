@@ -66,6 +66,10 @@ const IDS = {
     '00000000-0000-4000-a000-000000000602',
     '00000000-0000-4000-a000-000000000603',
   ],
+  quizzes: {
+    operasional: '00000000-0000-4000-a000-000000000700',
+    manasik: '00000000-0000-4000-a000-000000000701',
+  },
 };
 
 const PASSWORD_HASH = hashSync('password123', 10);
@@ -491,6 +495,107 @@ async function seedAcademy() {
   }
 }
 
+async function seedQuizzes() {
+  console.log('Seeding academy quizzes...');
+
+  const quizzes = [
+    {
+      id: IDS.quizzes.operasional,
+      courseId: IDS.courses.operasional,
+      title: 'Quiz: Manajemen Operasional Travel Umrah',
+      passScore: 70,
+      questions: [
+        {
+          question: 'Apa kepanjangan dari PPIU?',
+          options: ['Penyelenggara Perjalanan Ibadah Umrah', 'Pusat Pelayanan Ibadah Umrah', 'Pengelola Perjalanan dan Ibadah Umrah', 'Perkumpulan Penyelenggara Ibadah Umrah'],
+          correctIndex: 0,
+          order: 1,
+        },
+        {
+          question: 'Berapa minimal masa berlaku paspor untuk bisa mengajukan visa umrah?',
+          options: ['3 bulan', '6 bulan', '12 bulan', '1 bulan'],
+          correctIndex: 1,
+          order: 2,
+        },
+        {
+          question: 'Sistem apa yang digunakan Kemenag untuk mengawasi PPIU?',
+          options: ['Siskopatuh', 'Simpeg', 'Simkah', 'Siskohat'],
+          correctIndex: 0,
+          order: 3,
+        },
+        {
+          question: 'Apa fungsi utama CRM dalam bisnis travel umrah?',
+          options: ['Mengelola keuangan perusahaan', 'Mengelola data dan hubungan dengan jamaah', 'Mengatur jadwal penerbangan', 'Mengurus dokumen visa'],
+          correctIndex: 1,
+          order: 4,
+        },
+        {
+          question: 'Dokumen apa yang WAJIB dimiliki jamaah sebelum keberangkatan?',
+          options: ['KTP saja', 'Paspor dan visa', 'SIM dan SKCK', 'Kartu keluarga saja'],
+          correctIndex: 1,
+          order: 5,
+        },
+      ],
+    },
+    {
+      id: IDS.quizzes.manasik,
+      courseId: IDS.courses.manasik,
+      title: 'Quiz: Panduan Manasik Umrah',
+      passScore: 70,
+      questions: [
+        {
+          question: 'Apa rukun umrah yang pertama dilakukan?',
+          options: ['Tawaf', 'Ihram dari miqat', "Sa'i", 'Tahallul'],
+          correctIndex: 1,
+          order: 1,
+        },
+        {
+          question: 'Berapa kali putaran tawaf mengelilingi Ka\'bah?',
+          options: ['3 kali', '5 kali', '7 kali', '9 kali'],
+          correctIndex: 2,
+          order: 2,
+        },
+        {
+          question: "Sa'i dilakukan antara bukit apa?",
+          options: ['Arafah dan Muzdalifah', 'Shafa dan Marwah', 'Uhud dan Hira', 'Mina dan Arafah'],
+          correctIndex: 1,
+          order: 3,
+        },
+        {
+          question: 'Apa yang dimaksud dengan tahallul?',
+          options: ['Membaca talbiyah', 'Mencukur atau memotong rambut', 'Memakai ihram', 'Berniat umrah'],
+          correctIndex: 1,
+          order: 4,
+        },
+        {
+          question: 'Miqat untuk jamaah yang datang dari arah Madinah adalah?',
+          options: ['Yalamlam', 'Dzul Hulaifah (Bir Ali)', 'Qarnul Manazil', 'Juhfah'],
+          correctIndex: 1,
+          order: 5,
+        },
+      ],
+    },
+  ];
+
+  for (const quiz of quizzes) {
+    const existing = await prisma.academyQuiz.findUnique({ where: { id: quiz.id } });
+    if (!existing) {
+      await prisma.academyQuiz.create({
+        data: {
+          id: quiz.id,
+          courseId: quiz.courseId,
+          title: quiz.title,
+          passScore: quiz.passScore,
+          questions: {
+            create: quiz.questions,
+          },
+        },
+      });
+    }
+  }
+  console.log('  Created 2 quizzes with 5 questions each');
+}
+
 // ============ Main ============
 
 async function main() {
@@ -506,6 +611,7 @@ async function main() {
   await seedGamification();
   await seedSystemAdmin();
   await seedAcademy();
+  await seedQuizzes();
   await seedSession17(prisma);
 
   console.log('\n=== Seed Complete! ===\n');
