@@ -4,6 +4,7 @@ import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 import { checkPermission } from '@/lib/auth-permissions';
 import { PERMISSIONS } from '@/lib/permissions';
 import { createForumReplySchema } from '@/lib/validations/forum';
+import { rateLimit } from '@/lib/rate-limiter';
 import { logger } from '@/lib/logger';
 
 export async function POST(
@@ -15,6 +16,11 @@ export async function POST(
 
   const denied = await checkPermission(auth, PERMISSIONS.FORUM_CREATE);
   if (denied) return denied;
+
+  const { allowed } = rateLimit(req, { limit: 10, window: 60 });
+  if (!allowed) {
+    return NextResponse.json({ error: 'Terlalu banyak permintaan, coba lagi nanti' }, { status: 429 });
+  }
 
   const { id } = await params;
 

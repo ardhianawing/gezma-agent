@@ -4,6 +4,7 @@ import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 import { checkPermission } from '@/lib/auth-permissions';
 import { PERMISSIONS } from '@/lib/permissions';
 import { createTradeProductSchema } from '@/lib/validations/trade';
+import { rateLimit } from '@/lib/rate-limiter';
 import { logger } from '@/lib/logger';
 
 export async function GET(req: NextRequest) {
@@ -12,6 +13,11 @@ export async function GET(req: NextRequest) {
 
   const denied = await checkPermission(auth, PERMISSIONS.TRADE_VIEW);
   if (denied) return denied;
+
+  const { allowed } = rateLimit(req, { limit: 30, window: 60 });
+  if (!allowed) {
+    return NextResponse.json({ error: 'Terlalu banyak permintaan, coba lagi nanti' }, { status: 429 });
+  }
 
   const { searchParams } = new URL(req.url);
   const category = searchParams.get('category') || '';
@@ -78,6 +84,11 @@ export async function POST(req: NextRequest) {
 
   const denied = await checkPermission(auth, PERMISSIONS.TRADE_SUBMIT);
   if (denied) return denied;
+
+  const { allowed } = rateLimit(req, { limit: 10, window: 60 });
+  if (!allowed) {
+    return NextResponse.json({ error: 'Terlalu banyak permintaan, coba lagi nanti' }, { status: 429 });
+  }
 
   try {
     const body = await req.json();

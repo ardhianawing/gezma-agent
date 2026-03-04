@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 import { createTradeInquirySchema } from '@/lib/validations/trade';
+import { rateLimit } from '@/lib/rate-limiter';
 import { logger } from '@/lib/logger';
 
 export async function POST(
@@ -10,6 +11,11 @@ export async function POST(
 ) {
   const auth = getAuthPayload(req);
   if (!auth) return unauthorizedResponse();
+
+  const { allowed } = rateLimit(req, { limit: 10, window: 60 });
+  if (!allowed) {
+    return NextResponse.json({ error: 'Terlalu banyak permintaan, coba lagi nanti' }, { status: 429 });
+  }
 
   const { id } = await params;
 

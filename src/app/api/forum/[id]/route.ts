@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 import { updateForumThreadSchema } from '@/lib/validations/forum';
+import { rateLimit } from '@/lib/rate-limiter';
 import { logger } from '@/lib/logger';
 
 export async function GET(
@@ -10,6 +11,11 @@ export async function GET(
 ) {
   const auth = getAuthPayload(req);
   if (!auth) return unauthorizedResponse();
+
+  const { allowed } = rateLimit(req, { limit: 30, window: 60 });
+  if (!allowed) {
+    return NextResponse.json({ error: 'Terlalu banyak permintaan, coba lagi nanti' }, { status: 429 });
+  }
 
   const { id } = await params;
 
@@ -46,6 +52,11 @@ export async function PATCH(
 ) {
   const auth = getAuthPayload(req);
   if (!auth) return unauthorizedResponse();
+
+  const { allowed } = rateLimit(req, { limit: 10, window: 60 });
+  if (!allowed) {
+    return NextResponse.json({ error: 'Terlalu banyak permintaan, coba lagi nanti' }, { status: 429 });
+  }
 
   const { id } = await params;
 
