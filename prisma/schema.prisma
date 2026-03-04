@@ -86,6 +86,7 @@ model Agency {
   gezmaPayWallets GezmaPayWallet[]
   umrahSavings    UmrahSavings[]
   payLaterApps    PayLaterApplication[]
+  webhookEndpoints WebhookEndpoint[]
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -1297,4 +1298,84 @@ model PlatformDocument {
 
   @@index([isActive])
   @@map("platform_documents")
+}
+
+// === SESSION 20: SECURITY & EXTENSIBILITY ===
+
+// Webhook Endpoint (per agency)
+model WebhookEndpoint {
+  id          String   @id @default(uuid())
+  agencyId    String
+  agency      Agency   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  url         String   // HTTPS URL to receive events
+  secret      String   // HMAC signing secret
+  events      String[] @default([]) // pilgrim.created, payment.received, trip.departed, etc
+  isActive    Boolean  @default(true)
+  description String?
+
+  deliveries  WebhookDelivery[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([agencyId])
+  @@index([isActive])
+  @@map("webhook_endpoints")
+}
+
+// Webhook Delivery Log
+model WebhookDelivery {
+  id           String    @id @default(uuid())
+  endpointId   String
+  endpoint     WebhookEndpoint @relation(fields: [endpointId], references: [id], onDelete: Cascade)
+  event        String    // e.g. pilgrim.created
+  payload      Json
+  statusCode   Int?
+  response     String?
+  success      Boolean   @default(false)
+  attempts     Int       @default(1)
+  error        String?
+  deliveredAt  DateTime  @default(now())
+
+  @@index([endpointId])
+  @@index([event])
+  @@index([deliveredAt])
+  @@map("webhook_deliveries")
+}
+
+// Feature Flag (global or per-agency)
+model FeatureFlag {
+  id          String    @id @default(uuid())
+  key         String    @unique // e.g. "gezmapay", "blockchain", "academy_quiz"
+  name        String    // Human-readable name
+  description String?
+  isEnabled   Boolean   @default(false) // Global default
+  agencyOverrides Json  @default("{}") // { agencyId: true/false }
+  createdBy   String?   // systemAdmin id
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("feature_flags")
+}
+
+// Audit Trail (field-level change tracking)
+model AuditTrail {
+  id          String   @id @default(uuid())
+  entityType  String   // pilgrim, user, package, trip, agency
+  entityId    String
+  action      String   // created, updated, deleted, restored
+  changes     Json     // [{ field, oldValue, newValue }]
+  performedBy String   // userId or adminId
+  performerName String
+  ipAddress   String?
+  agencyId    String?
+
+  createdAt   DateTime @default(now())
+
+  @@index([entityType, entityId])
+  @@index([performedBy])
+  @@index([agencyId])
+  @@index([createdAt])
+  @@map("audit_trails")
 }

@@ -5,6 +5,7 @@ import { checkPermission } from '@/lib/auth-permissions';
 import { PERMISSIONS, VALID_ROLES } from '@/lib/permissions';
 import { updateUserSchema } from '@/lib/validations/user';
 import { logActivity } from '@/lib/activity-logger';
+import { auditUpdate, auditDelete } from '@/lib/audit-trail';
 import { logger } from '@/lib/logger';
 
 type Context = { params: Promise<{ id: string }> };
@@ -110,6 +111,12 @@ export async function PUT(req: NextRequest, { params }: Context) {
       metadata: { entityId: user.id },
     });
 
+    // Field-level audit trail
+    auditUpdate('user', id, existing as Record<string, unknown>, user as Record<string, unknown>,
+      { id: auth.userId, name: auth.email },
+      { agencyId: auth.agencyId, fieldsToTrack: ['name', 'role', 'position', 'phone', 'isActive'] }
+    );
+
     return NextResponse.json(user);
   } catch (error) {
     logger.error('PUT /api/users/[id] error', { error: String(error) });
@@ -155,6 +162,12 @@ export async function DELETE(req: NextRequest, { params }: Context) {
       agencyId: auth.agencyId,
       metadata: { entityId: id },
     });
+
+    // Audit trail
+    auditDelete('user', id,
+      { id: auth.userId, name: auth.email },
+      { agencyId: auth.agencyId }
+    );
 
     return NextResponse.json({ message: 'User berhasil dihapus' });
   } catch (error) {

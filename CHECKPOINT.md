@@ -26,6 +26,7 @@
 | **Session 17: Platform Backend** | ✅ Done | 7 Prisma models, 19 API endpoints, 4 Zod schemas, 4 permissions, 7 pages wired to API, seed data, 8 test files |
 | **Session 19: Hardening & Safety** | ✅ Done | Production security, E2E CI, error monitoring, services API, academy quizzes, SOS button |
 | **Session 20: Security Review Fixes** | ✅ Done | Data encryption, brute force protection, DB transactions, soft delete |
+| **Session 20B: Infra & Observability** | ✅ Done | Circuit breaker, request dedup, API metrics, webhooks, feature flags, audit trail, DB maintenance cron |
 | **PWA** | ✅ Done | Service Worker, Install Prompt, Offline |
 | **Deployment** | ✅ Ready | Docker + Nginx + Traefik |
 
@@ -685,7 +686,9 @@ Notifications:   3 endpoints (list+markAllRead, markRead+delete per id)         
 Tasks:           2 endpoints (list+create, update+delete per id)                                          ← NEW
 Public:          3 endpoints (agency/public/[slug], share/itinerary/[code], agency/[slug] page)           ← NEW
 Gamification:    4 endpoints (stats, badges, leaderboard, history)
-Command Center: 11 endpoints (login, me, logout, agencies, agencies/[id], stats, audit-log, alerts, analytics, compliance, auto-suspend) ← UPDATED
+Command Center: 16 endpoints (login, me, logout, agencies, agencies/[id], stats, audit-log, alerts, analytics, compliance, auto-suspend, metrics, feature-flags, audit-trail, deleted-records, errors) ← UPDATED
+Settings:       12 endpoints (notifications, security ×5, email-templates ×2, scheduled-reports ×2, onboarding, webhooks)                ← UPDATED
+Cron:            1 endpoint  (db-maintenance — CRON_SECRET protected)                                                                    ← NEW
 Blockchain:      5 endpoints (POST/GET certificates, GET detail, POST revoke, GET public verify)
 Academy:        10 endpoints (courses, course detail, lesson, progress, user progress, quiz, quiz/attempt, certificate, reviews ×2) ← UPDATED
 ```
@@ -699,7 +702,7 @@ Academy:        10 endpoints (courses, course detail, lesson, progress, user pro
 | Framework | Next.js 16 (App Router) |
 | Language | TypeScript |
 | Styling | 100% inline styles + useTheme() |
-| Database | PostgreSQL + Prisma v7 (39 models) |
+| Database | PostgreSQL + Prisma v7 (52 models) |
 | Auth | JWT (HTTP-only cookies) |
 | Email | Nodemailer (SMTP) |
 | AI | Google Gemini 2.0 Flash |
@@ -1042,6 +1045,84 @@ Security headers (X-Content-Type-Options, X-Frame-Options, Referrer-Policy) were
 
 ---
 
+## SESSION 20B — Infrastructure & Observability (Medium/Low Priority from DeepSeek Review)
+
+### Batch 1: Circuit Breaker ✅
+| Fitur | Status | Keterangan |
+|-------|--------|------------|
+| Circuit breaker library | ✅ | `src/lib/circuit-breaker.ts` — closed/open/half_open states |
+| Configurable per-service | ✅ | failureThreshold, resetTimeout, successThreshold |
+| withCircuitBreaker wrapper | ✅ | Auto state transitions, error propagation |
+| Webhook integration | ✅ | Webhook delivery uses circuit breaker |
+
+### Batch 2: Request Deduplication ✅
+| Fitur | Status | Keterangan |
+|-------|--------|------------|
+| Dedup library | ✅ | `src/lib/request-dedup.ts` — Idempotency-Key header or body hash |
+| 5-second TTL | ✅ | In-memory cache with auto-cleanup |
+| checkDuplicate + cacheResponse | ✅ | Key = hash(method + path + idempotencyKey) |
+
+### Batch 3: API Performance Metrics ✅
+| Fitur | Status | Keterangan |
+|-------|--------|------------|
+| Metrics tracker | ✅ | `src/lib/api-metrics.ts` — per-route tracking |
+| Percentile calculations | ✅ | p50, p95, p99 response times |
+| CC metrics endpoint | ✅ | `/api/command-center/metrics` — metrics + slow routes + circuit breaker status |
+
+### Batch 4: Webhook System ✅
+| Fitur | Status | Keterangan |
+|-------|--------|------------|
+| 2 Prisma models | ✅ | WebhookEndpoint + WebhookDelivery |
+| Webhook service | ✅ | `src/lib/services/webhook.service.ts` — HMAC-SHA256, 12 events |
+| Agency webhook API | ✅ | `/api/settings/webhooks` — GET list, POST create |
+| Delivery logging | ✅ | Status code, response body, error tracking |
+| Circuit breaker | ✅ | Webhook delivery uses circuit breaker pattern |
+
+### Batch 5: Feature Flags ✅
+| Fitur | Status | Keterangan |
+|-------|--------|------------|
+| FeatureFlag Prisma model | ✅ | Global isEnabled + per-agency JSON overrides |
+| Feature flags library | ✅ | `src/lib/feature-flags.ts` — 60s cache, 9 predefined keys |
+| CC management API | ✅ | `/api/command-center/feature-flags` — GET, POST, PATCH |
+| isFeatureEnabled helper | ✅ | Agency-specific resolution with global fallback |
+
+### Batch 6: Field-Level Audit Trail ✅
+| Fitur | Status | Keterangan |
+|-------|--------|------------|
+| AuditTrail Prisma model | ✅ | entityType, entityId, action, changes (JSON), performer |
+| Audit trail library | ✅ | `src/lib/audit-trail.ts` — diffChanges, auditCreate/Update/Delete/Restore |
+| Sensitive field masking | ✅ | password, NIK, token fields automatically masked |
+| Pilgrim routes wired | ✅ | PUT and DELETE log field-level changes |
+| User routes wired | ✅ | PUT and DELETE log field-level changes |
+| CC audit trail API | ✅ | `/api/command-center/audit-trail` — paginated, filterable |
+
+### Batch 7: DB Maintenance Cron ✅
+| Fitur | Status | Keterangan |
+|-------|--------|------------|
+| Maintenance service | ✅ | `src/lib/cron/db-maintenance.ts` — 5 cleanup tasks |
+| Audit trail cleanup | ✅ | Delete records older than 90 days |
+| Webhook delivery cleanup | ✅ | Delete records older than 30 days |
+| Activity log cleanup | ✅ | Delete records older than 60 days |
+| Soft delete purge | ✅ | Hard delete soft-deleted records older than 30 days |
+| Login history cleanup | ✅ | Delete records older than 90 days |
+| Cron API endpoint | ✅ | `/api/cron/db-maintenance` — CRON_SECRET protected |
+
+### Batch 8: Tests ✅
+| Test File | Tests | Keterangan |
+|-----------|-------|------------|
+| circuit-breaker.test.ts | 7 | State transitions, threshold, reset, half-open |
+| request-dedup.test.ts | 6 | Cache/miss, key differentiation, reset |
+| api-metrics.test.ts | 6 | Record, percentiles, slow routes, errors |
+| feature-flags.test.ts | 8 | Global, override, cache, invalidation, getAllFlags |
+| audit-trail.test.ts | 7 | diffChanges, masking, fieldsToTrack, nulls |
+| db-maintenance.test.ts | 7 | Each cleanup task, runAll, custom retention |
+
+**New files:** 14 | **Modified:** 4
+**New Prisma models:** 4 (WebhookEndpoint, WebhookDelivery, FeatureFlag, AuditTrail) — total 52 models
+**New API endpoints:** 5 (CC metrics, CC feature-flags, CC audit-trail, settings/webhooks, cron/db-maintenance)
+
+---
+
 ## S. FUTURE STEPS (Beyond Session 20)
 
 1. **Phase 3: Real API** — Connect real API keys (Nusuk, Payment Gateway, WhatsApp, UmrahCash)
@@ -1062,3 +1143,10 @@ Security headers (X-Content-Type-Options, X-Frame-Options, Referrer-Policy) were
 16. ~~**Soft Delete**~~ — ✅ Done (Session 20) — deletedAt on Pilgrim, User, Package, Trip, ForumThread + CC restore
 17. **Redis Rate Limiter** — Replace in-memory with Redis for multi-instance (needs Redis)
 18. **Wire encryption to all pilgrim routes** — Currently only pilgrims/route.ts, need pilgrims/[id], import, etc.
+19. ~~**Circuit Breaker**~~ — ✅ Done (Session 20B) — For external API resilience
+20. ~~**Request Dedup**~~ — ✅ Done (Session 20B) — Idempotency-Key header support
+21. ~~**API Metrics**~~ — ✅ Done (Session 20B) — Per-route tracking with percentiles
+22. ~~**Webhook System**~~ — ✅ Done (Session 20B) — HMAC-SHA256 signed webhooks + delivery logging
+23. ~~**Feature Flags**~~ — ✅ Done (Session 20B) — Global + per-agency overrides
+24. ~~**Audit Trail**~~ — ✅ Done (Session 20B) — Field-level change tracking on Pilgrim + User routes
+25. ~~**DB Maintenance**~~ — ✅ Done (Session 20B) — Automated cleanup cron for old records

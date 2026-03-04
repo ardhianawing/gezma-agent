@@ -5,6 +5,7 @@ import { checkPermission } from '@/lib/auth-permissions';
 import { PERMISSIONS } from '@/lib/permissions';
 import { pilgrimFormSchema } from '@/lib/validations/pilgrim';
 import { logActivity } from '@/lib/activity-logger';
+import { auditUpdate, auditDelete, diffChanges } from '@/lib/audit-trail';
 import { logger } from '@/lib/logger';
 
 type Context = { params: Promise<{ id: string }> };
@@ -130,6 +131,12 @@ export async function PUT(req: NextRequest, { params }: Context) {
       metadata: { entityId: pilgrim.id },
     });
 
+    // Field-level audit trail
+    auditUpdate('pilgrim', id, existing as Record<string, unknown>, pilgrim as Record<string, unknown>,
+      { id: auth.userId, name: auth.email },
+      { agencyId: auth.agencyId, fieldsToTrack: ['name', 'nik', 'phone', 'email', 'address', 'city', 'province', 'tripId', 'roomNumber', 'roomType'] }
+    );
+
     return NextResponse.json(pilgrim);
   } catch (error) {
     logger.error('PUT /api/pilgrims/[id] error', { error: String(error) });
@@ -175,6 +182,12 @@ export async function DELETE(req: NextRequest, { params }: Context) {
       agencyId: auth.agencyId,
       metadata: { entityId: id },
     });
+
+    // Audit trail
+    auditDelete('pilgrim', id,
+      { id: auth.userId, name: auth.email },
+      { agencyId: auth.agencyId }
+    );
 
     return NextResponse.json({ message: 'Jemaah berhasil dihapus' });
   } catch (error) {
