@@ -13,6 +13,7 @@ import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
 import { hashSync } from 'bcryptjs';
 import { seedSession17 } from './seed-session17';
+import { seedSession18 } from './seed-session18';
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaPg(pool);
@@ -613,6 +614,7 @@ async function main() {
   await seedAcademy();
   await seedQuizzes();
   await seedSession17(prisma);
+  await seedSession18(prisma);
 
   console.log('\n=== Seed Complete! ===\n');
   console.log('Demo Credentials:');

@@ -266,7 +266,21 @@ export default function ServicesPage() {
 
               {/* CTA Button */}
               <button
-                onClick={() => alert('Fitur ini akan segera tersedia')}
+                onClick={() => {
+                  if (service.title === 'Konsultasi Legal') {
+                    window.open('https://wa.me/6281234567890?text=Halo%20GEZMA%2C%20saya%20butuh%20konsultasi%20legal', '_blank');
+                  } else if (service.title === 'Partner Visa Resmi') {
+                    window.location.href = '/marketplace?category=visa';
+                  } else if (service.title === 'Download Dokumen') {
+                    document.getElementById('download-dokumen-section')?.scrollIntoView({ behavior: 'smooth' });
+                  } else if (service.title === 'Support & Bantuan') {
+                    window.location.href = '/help';
+                  } else if (service.title === 'Partner Asuransi') {
+                    window.location.href = '/marketplace?category=asuransi';
+                  } else if (service.title === 'Komunitas & Networking') {
+                    window.location.href = '/forum';
+                  }
+                }}
                 style={{
                   width: '100%',
                   padding: '10px 16px',
@@ -290,6 +304,7 @@ export default function ServicesPage() {
 
       {/* Download Documents Section */}
       <div
+        id="download-dokumen-section"
         style={{
           backgroundColor: c.cardBg,
           border: '1px solid ' + c.border,
@@ -406,7 +421,7 @@ export default function ServicesPage() {
 
                 {/* Download Button */}
                 <button
-                  onClick={() => alert('Fitur download akan segera tersedia')}
+                  onClick={() => window.open('#', '_blank')}
                   style={{
                     width: '36px',
                     height: '36px',

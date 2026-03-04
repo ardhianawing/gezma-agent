@@ -670,6 +670,87 @@ export default function TripDetailPage() {
         })()
       )}
 
+      {/* Emergency / SOS Card */}
+      <div style={{
+        backgroundColor: c.cardBg,
+        border: '2px solid #DC2626',
+        borderRadius: '16px',
+        padding: '20px',
+      }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+          marginBottom: '14px',
+        }}>
+          <span style={{ fontSize: '20px' }}>{'\u{1F4DE}'}</span>
+          <h2 style={{
+            fontSize: '16px',
+            fontWeight: 700,
+            color: '#DC2626',
+            margin: 0,
+          }}>
+            Darurat / SOS
+          </h2>
+        </div>
+
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '10px',
+        }}>
+          <a
+            href="tel:997"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              padding: '12px 16px',
+              borderRadius: '10px',
+              backgroundColor: '#FEF2F2',
+              textDecoration: 'none',
+              transition: 'background-color 0.15s',
+            }}
+          >
+            <span style={{ fontSize: '18px' }}>{'\u{1F4DE}'}</span>
+            <div>
+              <p style={{ fontSize: '14px', fontWeight: 600, color: '#DC2626', margin: '0 0 2px 0' }}>
+                Hubungi 997 (Saudi Emergency)
+              </p>
+              <p style={{ fontSize: '12px', color: '#991B1B', margin: 0 }}>
+                Ketuk untuk menelepon
+              </p>
+            </div>
+          </a>
+
+          {trip.muthawwifPhone && (
+            <a
+              href={'tel:' + trip.muthawwifPhone}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px',
+                padding: '12px 16px',
+                borderRadius: '10px',
+                backgroundColor: GREEN_LIGHT,
+                textDecoration: 'none',
+                transition: 'background-color 0.15s',
+              }}
+            >
+              <span style={{ fontSize: '18px' }}>{'\u{1F4DE}'}</span>
+              <div>
+                <p style={{ fontSize: '14px', fontWeight: 600, color: GREEN_DARK, margin: '0 0 2px 0' }}>
+                  Hubungi Muthawwif
+                </p>
+                <p style={{ fontSize: '12px', color: GREEN, margin: 0 }}>
+                  {trip.muthawwifName} - {trip.muthawwifPhone}
+                </p>
+              </div>
+            </a>
+          )}
+        </div>
+      </div>
+
       {/* 7. Itinerary Section */}
       {trip.itinerary && trip.itinerary.length > 0 && (
         <div
@@ -812,6 +893,32 @@ export default function TripDetailPage() {
           </div>
         </div>
       )}
+
+      {/* Floating SOS Button */}
+      <a
+        href="tel:997"
+        style={{
+          position: 'fixed',
+          bottom: isMobile ? '80px' : '32px',
+          right: '24px',
+          width: '56px',
+          height: '56px',
+          borderRadius: '50%',
+          backgroundColor: '#DC2626',
+          color: 'white',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: '14px',
+          fontWeight: 800,
+          textDecoration: 'none',
+          boxShadow: '0 4px 20px rgba(220, 38, 38, 0.4)',
+          zIndex: 40,
+          letterSpacing: '0.05em',
+        }}
+      >
+        SOS
+      </a>
     </div>
   );
 }

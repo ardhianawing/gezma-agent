@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { Trophy, Star, Medal, TrendingUp, ChevronLeft, ChevronRight } from 'lucide-react';
 import { EmptyState } from '@/components/shared/empty-state';
 import { useTheme } from '@/lib/theme';
@@ -153,6 +154,48 @@ export default function GamificationPage() {
           );
         })}
       </div>
+
+      {/* Rewards Link Card */}
+      <Link href="/gamification/rewards" style={{ textDecoration: 'none' }}>
+        <div
+          style={{
+            backgroundColor: c.cardBg,
+            borderRadius: '12px',
+            border: '1px solid #F59E0B40',
+            padding: '20px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '16px',
+            cursor: 'pointer',
+            background: `linear-gradient(135deg, ${c.cardBg} 0%, #F59E0B08 100%)`,
+            transition: 'all 0.2s',
+          }}
+        >
+          <div
+            style={{
+              width: '48px',
+              height: '48px',
+              borderRadius: '12px',
+              backgroundColor: '#10B98115',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '24px',
+              flexShrink: 0,
+            }}
+          >
+            🎁
+          </div>
+          <div style={{ flex: 1 }}>
+            <p style={{ fontSize: '16px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>
+              Tukarkan Poin
+            </p>
+            <p style={{ fontSize: '13px', color: c.textMuted, margin: '4px 0 0 0' }}>
+              Lihat hadiah yang bisa Anda tukarkan →
+            </p>
+          </div>
+        </div>
+      </Link>
 
       {/* Badge Showcase + Leaderboard */}
       <div

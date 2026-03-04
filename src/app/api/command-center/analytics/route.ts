@@ -99,6 +99,24 @@ export async function GET(req: NextRequest) {
       { category: 'Ramadhan', count: Math.ceil(pilgrims.length * 0.05) },
     ];
 
+    // 6. Hotel preferences — mock data
+    const hotelPreferences = [
+      { name: 'Bintang 5', value: 35 },
+      { name: 'Bintang 4', value: 30 },
+      { name: 'Bintang 3', value: 25 },
+      { name: 'Bintang 2', value: 10 },
+    ];
+
+    // 7. Spending patterns — mock data
+    const spendingPatterns = [
+      { category: 'Tiket Pesawat', amount: 450 },
+      { category: 'Hotel', amount: 320 },
+      { category: 'Transport Lokal', amount: 85 },
+      { category: 'Makan', amount: 120 },
+      { category: 'Oleh-oleh', amount: 95 },
+      { category: 'Visa', amount: 150 },
+    ];
+
     return NextResponse.json({
       period,
       pilgrimGrowth,
@@ -106,6 +124,8 @@ export async function GET(req: NextRequest) {
       tripStats,
       revenueEstimate,
       categoryBreakdown,
+      hotelPreferences,
+      spendingPatterns,
     });
   } catch (error) {
     logger.error('GET /api/command-center/analytics error', { error: String(error) });

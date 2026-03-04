@@ -57,6 +57,9 @@ model Agency {
   // Public profile
   slug            String?  @unique
 
+  // Custom Domain (white-label)
+  customDomain    String?  @unique
+
   // Relations
   users           User[]
   pilgrims        Pilgrim[]
@@ -80,6 +83,9 @@ model Agency {
   roommatePreferences RoommatePreference[]
   tradeProducts   TradeProduct[]
   tradeInquiries  TradeInquiry[]
+  gezmaPayWallets GezmaPayWallet[]
+  umrahSavings    UmrahSavings[]
+  payLaterApps    PayLaterApplication[]
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -1110,4 +1116,122 @@ model TradeInquiry {
   @@index([productId])
   @@index([agencyId])
   @@map("trade_inquiries")
+}
+
+// === SESSION 18: FINANCIAL FEATURES ===
+
+// GezmaPay Wallet
+model GezmaPayWallet {
+  id            String   @id @default(uuid())
+  agencyId      String
+  agency        Agency   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  balance       Float    @default(0)
+  currency      String   @default("IDR")
+  isActive      Boolean  @default(true)
+
+  transactions  GezmaPayTransaction[]
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([agencyId])
+  @@map("gezmapay_wallets")
+}
+
+// GezmaPay Transaction
+model GezmaPayTransaction {
+  id            String   @id @default(uuid())
+  walletId      String
+  wallet        GezmaPayWallet @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  type          String   // topup, payment, refund, transfer
+  amount        Float
+  description   String
+  reference     String?
+  status        String   @default("completed") // pending, completed, failed
+  balanceAfter  Float    @default(0)
+
+  createdAt     DateTime @default(now())
+
+  @@index([walletId])
+  @@index([createdAt])
+  @@map("gezmapay_transactions")
+}
+
+// Tabungan Umrah (Umrah Savings)
+model UmrahSavings {
+  id            String   @id @default(uuid())
+  agencyId      String
+  agency        Agency   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  pilgrimName   String
+  targetAmount  Float
+  currentAmount Float    @default(0)
+  targetDate    DateTime
+  packageName   String?
+  status        String   @default("active") // active, completed, cancelled
+
+  deposits      UmrahSavingsDeposit[]
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([agencyId])
+  @@map("umrah_savings")
+}
+
+// Tabungan Umrah Deposit
+model UmrahSavingsDeposit {
+  id          String   @id @default(uuid())
+  savingsId   String
+  savings     UmrahSavings @relation(fields: [savingsId], references: [id], onDelete: Cascade)
+  amount      Float
+  method      String   // transfer, cash, auto_debit
+  notes       String?
+  balanceAfter Float   @default(0)
+
+  createdAt   DateTime @default(now())
+
+  @@index([savingsId])
+  @@map("umrah_savings_deposits")
+}
+
+// PayLater Syariah Application
+model PayLaterApplication {
+  id              String   @id @default(uuid())
+  agencyId        String
+  agency          Agency   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  pilgrimName     String
+  pilgrimPhone    String
+  totalAmount     Float
+  tenorMonths     Int      // 3, 6, 12
+  monthlyAmount   Float
+  akadType        String   @default("murabahah") // murabahah, ijarah
+  marginRate      Float    @default(0) // percentage
+  status          String   @default("pending") // pending, approved, rejected, active, completed
+  notes           String?
+
+  installments    PayLaterInstallment[]
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([agencyId])
+  @@index([status])
+  @@map("paylater_applications")
+}
+
+// PayLater Installment
+model PayLaterInstallment {
+  id              String    @id @default(uuid())
+  applicationId   String
+  application     PayLaterApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  installmentNo   Int
+  amount          Float
+  dueDate         DateTime
+  paidAt          DateTime?
+  status          String    @default("pending") // pending, paid, overdue
+
+  createdAt       DateTime  @default(now())
+
+  @@index([applicationId])
+  @@map("paylater_installments")
 }

@@ -28,6 +28,9 @@ import {
   Shield,
   CheckSquare,
   Bell,
+  Wallet,
+  PiggyBank,
+  CreditCard,
 } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n';
 import { useTheme } from '@/lib/theme';
@@ -64,6 +67,9 @@ const platformItems: MenuItem[] = [
   { label: 'Berita', href: '/news', icon: Newspaper },
   { label: 'Akademi', href: '/academy', icon: GraduationCap },
   { label: 'Layanan', href: '/services', icon: HeadphonesIcon },
+  { label: 'GezmaPay', href: '/gezmapay', icon: Wallet },
+  { label: 'Tabungan', href: '/tabungan', icon: PiggyBank },
+  { label: 'PayLater', href: '/paylater', icon: CreditCard },
 ];
 
 // === LAINNYA ===

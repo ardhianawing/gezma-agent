@@ -361,6 +361,62 @@ export default function ManasikPage() {
         </p>
       </div>
 
+      {/* Manasik AR Banner */}
+      <a
+        href="/pilgrim/manasik-ar"
+        style={{
+          display: 'block',
+          textDecoration: 'none',
+          background: `linear-gradient(135deg, ${GREEN}, ${GREEN_DARK})`,
+          borderRadius: '16px',
+          padding: '20px',
+          color: 'white',
+          position: 'relative',
+          overflow: 'hidden',
+        }}
+      >
+        <div style={{
+          position: 'absolute',
+          top: '-15px',
+          right: '-10px',
+          width: '80px',
+          height: '80px',
+          borderRadius: '50%',
+          backgroundColor: 'rgba(255,255,255,0.1)',
+        }} />
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '14px',
+        }}>
+          <span style={{ fontSize: '36px', flexShrink: 0 }}>{'\u{1F97D}'}</span>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <p style={{
+              fontSize: '16px',
+              fontWeight: 700,
+              margin: '0 0 4px 0',
+              lineHeight: 1.3,
+            }}>
+              Baru! Manasik AR
+            </p>
+            <p style={{
+              fontSize: '13px',
+              margin: '0 0 8px 0',
+              opacity: 0.9,
+            }}>
+              Belajar manasik dengan Augmented Reality
+            </p>
+            <span style={{
+              fontSize: '13px',
+              fontWeight: 600,
+              opacity: 0.95,
+            }}>
+              {'Coba Sekarang \u2192'}
+            </span>
+          </div>
+        </div>
+      </a>
+
       {/* Progress card */}
       <div style={{
         ...cardStyle,

@@ -556,6 +556,75 @@ export default function CCDashboardPage() {
                 </ResponsiveContainer>
               </div>
             </div>
+
+            {/* Hotel Preferences - Pie Chart */}
+            <div style={{
+              backgroundColor: cc.cardBg,
+              borderRadius: '12px',
+              border: `1px solid ${cc.border}`,
+              padding: '20px',
+            }}>
+              <h3 style={{ fontSize: '15px', fontWeight: '600', color: cc.textPrimary, margin: '0 0 16px 0' }}>
+                Preferensi Hotel
+              </h3>
+              <div style={{ width: '100%', height: 250 }}>
+                <ResponsiveContainer>
+                  <PieChart>
+                    <Pie
+                      data={[
+                        { name: 'Bintang 5', value: 35 },
+                        { name: 'Bintang 4', value: 30 },
+                        { name: 'Bintang 3', value: 25 },
+                        { name: 'Bintang 2', value: 10 },
+                      ]}
+                      dataKey="value"
+                      nameKey="name"
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={90}
+                      label={(props) => `${props.name} (${props.value}%)`}
+                      labelLine={false}
+                    >
+                      {[0, 1, 2, 3].map((i) => (
+                        <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip contentStyle={{ borderRadius: '8px', fontSize: '13px' }} />
+                    <Legend wrapperStyle={{ fontSize: '12px' }} />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            {/* Spending Patterns - Bar Chart */}
+            <div style={{
+              backgroundColor: cc.cardBg,
+              borderRadius: '12px',
+              border: `1px solid ${cc.border}`,
+              padding: '20px',
+            }}>
+              <h3 style={{ fontSize: '15px', fontWeight: '600', color: cc.textPrimary, margin: '0 0 16px 0' }}>
+                Pola Pengeluaran (Juta Rp)
+              </h3>
+              <div style={{ width: '100%', height: 250 }}>
+                <ResponsiveContainer>
+                  <BarChart data={[
+                    { category: 'Tiket Pesawat', amount: 450 },
+                    { category: 'Hotel', amount: 320 },
+                    { category: 'Transport Lokal', amount: 85 },
+                    { category: 'Makan', amount: 120 },
+                    { category: 'Oleh-oleh', amount: 95 },
+                    { category: 'Visa', amount: 150 },
+                  ]}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
+                    <XAxis dataKey="category" tick={{ fontSize: 11, fill: '#64748B' }} />
+                    <YAxis tick={{ fontSize: 11, fill: '#64748B' }} />
+                    <Tooltip contentStyle={{ borderRadius: '8px', fontSize: '13px' }} />
+                    <Bar dataKey="amount" name="Jumlah (Juta Rp)" fill="#2563EB" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
           </div>
         )}
       </div>

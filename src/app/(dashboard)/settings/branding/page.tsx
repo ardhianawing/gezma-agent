@@ -18,6 +18,7 @@ export default function BrandingSettingsPage() {
   const [logoLightUrl, setLogoLightUrl] = useState('');
   const [logoDarkUrl, setLogoDarkUrl] = useState('');
   const [faviconUrl, setFaviconUrl] = useState('');
+  const [customDomain, setCustomDomain] = useState('');
   const { addToast } = useToast();
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
@@ -29,6 +30,7 @@ export default function BrandingSettingsPage() {
     setLogoLightUrl(branding.logoLightUrl || '');
     setLogoDarkUrl(branding.logoDarkUrl || '');
     setFaviconUrl(branding.faviconUrl || '');
+    setCustomDomain((branding as unknown as Record<string, string>).customDomain || '');
   }, [branding]);
 
   const handleSave = async () => {
@@ -45,6 +47,7 @@ export default function BrandingSettingsPage() {
           logoLightUrl: logoLightUrl || null,
           logoDarkUrl: logoDarkUrl || null,
           faviconUrl: faviconUrl || null,
+          customDomain: customDomain || null,
         }),
       });
       if (res.ok) {
@@ -70,6 +73,7 @@ export default function BrandingSettingsPage() {
     setLogoLightUrl('');
     setLogoDarkUrl('');
     setFaviconUrl('');
+    setCustomDomain('');
   };
 
   const inputStyle = {
@@ -204,6 +208,21 @@ export default function BrandingSettingsPage() {
               placeholder="https://..."
               style={inputStyle}
             />
+          </div>
+
+          {/* Custom Domain */}
+          <div>
+            <label style={labelStyle}>Custom Domain</label>
+            <input
+              type="text"
+              value={customDomain}
+              onChange={e => setCustomDomain(e.target.value)}
+              placeholder="umrah.yourdomain.com"
+              style={inputStyle}
+            />
+            <p style={{ fontSize: '12px', color: c.textMuted, margin: '4px 0 0 0' }}>
+              Gunakan domain kustom untuk white-label portal Anda. Hubungi support untuk setup DNS.
+            </p>
           </div>
 
           {/* Live Preview */}

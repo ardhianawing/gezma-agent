@@ -1,11 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const protectedPaths = ['/dashboard', '/pilgrims', '/packages', '/trips', '/documents', '/agency', '/settings', '/marketplace', '/trade', '/forum', '/news', '/academy', '/services', '/help', '/reports', '/activities', '/gamification', '/blockchain', '/tasks', '/notifications'];
+const protectedPaths = ['/dashboard', '/pilgrims', '/packages', '/trips', '/documents', '/agency', '/settings', '/marketplace', '/trade', '/forum', '/news', '/academy', '/services', '/help', '/reports', '/activities', '/gamification', '/blockchain', '/tasks', '/notifications', '/gezmapay', '/tabungan', '/paylater'];
 const authPaths = ['/login', '/register'];
 
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
   const token = req.cookies.get('token')?.value;
+
+  // Custom domain resolution — set header for downstream usage
+  const host = req.headers.get('host') || '';
+  const isCustomDomain = host && !host.includes('gezma') && !host.includes('localhost') && !host.includes('127.0.0.1');
+  const response = NextResponse.next();
+  if (isCustomDomain) {
+    response.headers.set('x-custom-domain', host);
+  }
 
   // Command Center auth (separate system)
   if (pathname.startsWith('/command-center') && pathname !== '/command-center/login') {
@@ -30,7 +38,7 @@ export function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL('/dashboard', req.url));
   }
 
-  return NextResponse.next();
+  return response;
 }
 
 export const config = {
