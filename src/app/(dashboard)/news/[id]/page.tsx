@@ -29,16 +29,18 @@ export default function NewsDetailPage({ params }: { params: Promise<{ id: strin
       try {
         const res = await fetch(`/api/news/${id}`);
         if (res.ok) {
-          const data = await res.json();
+          const json = await res.json();
+          const data = json.data || json;
           if (!cancelled) {
             setArticle(data);
             // Fetch related articles by same category
             if (data.category) {
               const relRes = await fetch(`/api/news?category=${data.category}&limit=4`);
               if (relRes.ok) {
-                const relData = await relRes.json();
+                const relJson = await relRes.json();
+                const relList = relJson.data || relJson;
                 if (!cancelled) {
-                  setRelatedArticles(relData.filter((a: NewsArticle) => a.id !== id).slice(0, 3));
+                  setRelatedArticles((Array.isArray(relList) ? relList : []).filter((a: NewsArticle) => a.id !== id).slice(0, 3));
                 }
               }
             }
