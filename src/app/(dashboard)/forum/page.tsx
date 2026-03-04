@@ -49,6 +49,15 @@ export default function ForumPage() {
   const [totalThreads, setTotalThreads] = useState(0);
   const [categoryCounts, setCategoryCounts] = useState<Record<string, number>>({});
 
+  // Create thread form state
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [newTitle, setNewTitle] = useState('');
+  const [newContent, setNewContent] = useState('');
+  const [newCategory, setNewCategory] = useState<string>('sharing');
+  const [newTags, setNewTags] = useState('');
+  const [creating, setCreating] = useState(false);
+  const [createError, setCreateError] = useState('');
+
   const fetchThreads = useCallback(async () => {
     setLoading(true);
     try {
@@ -113,7 +122,7 @@ export default function ForumPage() {
           </div>
         </div>
         <button
-          onClick={() => alert('Fitur forum akan segera tersedia')}
+          onClick={() => setShowCreateForm(!showCreateForm)}
           style={{
             padding: '10px 20px',
             backgroundColor: c.primary,
@@ -124,12 +133,148 @@ export default function ForumPage() {
             fontSize: 14,
             cursor: 'pointer',
           }}
-          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = c.primaryHover)}
-          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = c.primary)}
         >
-          + Buat Thread
+          {showCreateForm ? '✕ Batal' : '+ Buat Thread'}
         </button>
       </div>
+
+      {/* Create Thread Form */}
+      {showCreateForm && (
+        <div
+          style={{
+            backgroundColor: c.cardBg,
+            border: '1px solid ' + c.border,
+            borderRadius: '16px',
+            padding: isMobile ? '16px' : '24px',
+            marginBottom: 16,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '14px',
+          }}
+        >
+          <h3 style={{ fontSize: '16px', fontWeight: 600, color: c.textPrimary, margin: 0 }}>Buat Thread Baru</h3>
+          <input
+            type="text"
+            placeholder="Judul thread..."
+            value={newTitle}
+            onChange={(e) => setNewTitle(e.target.value)}
+            style={{
+              width: '100%',
+              padding: '10px 14px',
+              borderRadius: 8,
+              border: '1px solid ' + c.border,
+              backgroundColor: c.inputBg,
+              color: c.textPrimary,
+              fontSize: 14,
+              outline: 'none',
+              boxSizing: 'border-box',
+            }}
+          />
+          <textarea
+            placeholder="Isi thread..."
+            value={newContent}
+            onChange={(e) => setNewContent(e.target.value)}
+            rows={5}
+            style={{
+              width: '100%',
+              padding: '10px 14px',
+              borderRadius: 8,
+              border: '1px solid ' + c.border,
+              backgroundColor: c.inputBg,
+              color: c.textPrimary,
+              fontSize: 14,
+              outline: 'none',
+              boxSizing: 'border-box',
+              resize: 'vertical',
+            }}
+          />
+          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+            <select
+              value={newCategory}
+              onChange={(e) => setNewCategory(e.target.value)}
+              style={{
+                padding: '10px 14px',
+                borderRadius: 8,
+                border: '1px solid ' + c.border,
+                backgroundColor: c.inputBg,
+                color: c.textPrimary,
+                fontSize: 14,
+                outline: 'none',
+              }}
+            >
+              {forumCategories.filter(cat => cat.key !== 'all').map(cat => (
+                <option key={cat.key} value={cat.key}>{cat.icon} {cat.label}</option>
+              ))}
+            </select>
+            <input
+              type="text"
+              placeholder="Tags (pisahkan koma)"
+              value={newTags}
+              onChange={(e) => setNewTags(e.target.value)}
+              style={{
+                flex: 1,
+                minWidth: 150,
+                padding: '10px 14px',
+                borderRadius: 8,
+                border: '1px solid ' + c.border,
+                backgroundColor: c.inputBg,
+                color: c.textPrimary,
+                fontSize: 14,
+                outline: 'none',
+                boxSizing: 'border-box',
+              }}
+            />
+          </div>
+          {createError && (
+            <p style={{ fontSize: 13, color: '#DC2626', margin: 0 }}>{createError}</p>
+          )}
+          <button
+            disabled={creating || !newTitle.trim() || !newContent.trim()}
+            onClick={async () => {
+              setCreating(true);
+              setCreateError('');
+              try {
+                const res = await fetch('/api/forum', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    title: newTitle.trim(),
+                    content: newContent.trim(),
+                    category: newCategory,
+                    tags: newTags.split(',').map(t => t.trim()).filter(Boolean),
+                  }),
+                });
+                if (!res.ok) {
+                  const json = await res.json();
+                  throw new Error(json.error || 'Gagal membuat thread');
+                }
+                setNewTitle('');
+                setNewContent('');
+                setNewTags('');
+                setShowCreateForm(false);
+                fetchThreads();
+              } catch (err) {
+                setCreateError(err instanceof Error ? err.message : 'Gagal membuat thread');
+              } finally {
+                setCreating(false);
+              }
+            }}
+            style={{
+              padding: '10px 24px',
+              backgroundColor: creating || !newTitle.trim() || !newContent.trim() ? c.textLight : c.primary,
+              color: '#fff',
+              border: 'none',
+              borderRadius: 8,
+              fontWeight: 600,
+              fontSize: 14,
+              cursor: creating || !newTitle.trim() || !newContent.trim() ? 'not-allowed' : 'pointer',
+              alignSelf: 'flex-end',
+            }}
+          >
+            {creating ? 'Membuat...' : 'Kirim Thread'}
+          </button>
+        </div>
+      )}
 
       {/* Category Pills */}
       <div

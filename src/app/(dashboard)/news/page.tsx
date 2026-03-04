@@ -86,8 +86,8 @@ export default function NewsPage() {
       if (searchQuery) params.set('search', searchQuery);
       const res = await fetch(`/api/news?${params.toString()}`);
       if (res.ok) {
-        const data = await res.json();
-        setArticles(data);
+        const json = await res.json();
+        setArticles(json.data || []);
       }
     } catch (err) {
       console.error('Failed to fetch news articles:', err);
