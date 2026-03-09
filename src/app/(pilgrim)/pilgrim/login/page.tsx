@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
 import { usePilgrim } from '@/lib/contexts/pilgrim-context';
@@ -72,14 +73,14 @@ export default function PilgrimLoginPage() {
         flexDirection: 'column',
         alignItems: 'center',
       }}>
-        {/* Kaaba emoji */}
-        <div style={{
-          fontSize: '64px',
-          marginBottom: '16px',
-          lineHeight: 1,
-        }}>
-          {'\u{1F54B}'}
-        </div>
+        {/* Logo */}
+        <Image
+          src="/logo-light.png"
+          alt="GEZMA"
+          width={64}
+          height={64}
+          style={{ objectFit: 'contain', marginBottom: '16px' }}
+        />
 
         {/* Branding */}
         <h1 style={{
