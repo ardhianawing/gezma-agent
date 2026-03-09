@@ -19,6 +19,21 @@ export default function PilgrimLoginPage() {
   const [bookingCode, setBookingCode] = useState('');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDemoLoading, setIsDemoLoading] = useState(false);
+
+  const handleDemoLogin = async () => {
+    setIsDemoLoading(true);
+    setError('');
+    setBookingCode('UMR-2026-DEMO');
+
+    const result = await login('UMR-2026-DEMO');
+    if (result.success) {
+      router.replace('/pilgrim');
+    } else {
+      setError(result.error || 'Gagal login demo.');
+      setIsDemoLoading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -200,6 +215,35 @@ export default function PilgrimLoginPage() {
               {isSubmitting ? 'Memverifikasi...' : 'Masuk'}
             </button>
           </form>
+
+          {/* Divider */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', margin: '16px 0' }}>
+            <div style={{ flex: 1, height: '1px', background: c.border }} />
+            <span style={{ fontSize: '12px', color: c.textMuted }}>atau</span>
+            <div style={{ flex: 1, height: '1px', background: c.border }} />
+          </div>
+
+          {/* Demo Button */}
+          <button
+            type="button"
+            onClick={handleDemoLogin}
+            disabled={isSubmitting || isDemoLoading}
+            style={{
+              width: '100%',
+              padding: '12px',
+              fontSize: '14px',
+              fontWeight: 600,
+              color: isSubmitting || isDemoLoading ? c.textMuted : PILGRIM_GREEN,
+              backgroundColor: PILGRIM_GREEN_LIGHT,
+              border: '1.5px solid ' + PILGRIM_GREEN,
+              borderRadius: '10px',
+              cursor: isSubmitting || isDemoLoading ? 'not-allowed' : 'pointer',
+              transition: 'all 0.15s',
+              opacity: isSubmitting || isDemoLoading ? 0.6 : 1,
+            }}
+          >
+            {isDemoLoading ? 'Memverifikasi...' : 'Coba Demo (UMR-2026-DEMO)'}
+          </button>
         </div>
 
         {/* Footer */}
