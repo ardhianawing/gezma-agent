@@ -12,6 +12,7 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+RUN rm -rf src/generated/prisma
 RUN npx prisma generate
 RUN npm run build
 
