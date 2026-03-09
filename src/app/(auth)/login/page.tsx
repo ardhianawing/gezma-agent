@@ -20,14 +20,14 @@ export default function LoginPage() {
   const handleDemoLogin = async () => {
     setIsDemoLoading(true);
     setError('');
-    setEmail('owner@gezma.id');
-    setPassword('password123');
+    setEmail('demo@demotravel.com');
+    setPassword('demo1234');
 
     try {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: 'owner@gezma.id', password: 'password123' }),
+        body: JSON.stringify({ email: 'demo@demotravel.com', password: 'demo1234' }),
       });
 
       const data = await res.json();
