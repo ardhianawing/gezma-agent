@@ -99,7 +99,7 @@ export default function DoaPage() {
     const catInfo = doaCategories.find(cat => cat.id === selectedDoa.category);
 
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', paddingBottom: '80px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', paddingBottom: '80px', overflow: 'hidden', maxWidth: '100%' }}>
         {/* Back button */}
         <button
           onClick={() => setSelectedDoa(null)}
@@ -174,6 +174,8 @@ export default function DoaPage() {
             marginBottom: '16px',
             textAlign: 'center',
             direction: 'rtl',
+            overflow: 'hidden',
+            wordBreak: 'break-word',
           }}>
             <p style={{
               fontSize: isMobile ? '22px' : '28px',
@@ -305,7 +307,7 @@ export default function DoaPage() {
 
   // List view
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', paddingBottom: '80px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', paddingBottom: '80px', overflow: 'hidden', maxWidth: '100%' }}>
       {/* Header */}
       <div>
         <h1 style={{
@@ -481,7 +483,7 @@ export default function DoaPage() {
                   <p style={{
                     fontSize: '16px',
                     color: c.textSecondary,
-                    margin: '4px 0 6px 0',
+                    margin: '4px 0 0 0',
                     direction: 'rtl',
                     fontFamily: '"Amiri", "Traditional Arabic", serif',
                     lineHeight: 1.8,
@@ -490,6 +492,21 @@ export default function DoaPage() {
                     textOverflow: 'ellipsis',
                   }}>
                     {doa.arabic}
+                  </p>
+
+                  {/* Latin preview */}
+                  <p style={{
+                    fontSize: '12px',
+                    color: c.textMuted,
+                    margin: '4px 0 6px 0',
+                    fontStyle: 'italic',
+                    lineHeight: 1.5,
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden',
+                  }}>
+                    {doa.latin}
                   </p>
 
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
