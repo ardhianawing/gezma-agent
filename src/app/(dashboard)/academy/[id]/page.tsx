@@ -536,6 +536,23 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
                       </div>
                     ) : content ? (
                       <>
+                        {lesson.videoUrl && (
+                          <div style={{
+                            borderRadius: '12px', overflow: 'hidden',
+                            marginTop: '16px', aspectRatio: '16/9',
+                          }}>
+                            <iframe
+                              width="100%"
+                              height="100%"
+                              src={lesson.videoUrl.replace('watch?v=', 'embed/')}
+                              title={lesson.title}
+                              frameBorder="0"
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                              allowFullScreen
+                              style={{ border: 'none', borderRadius: '12px' }}
+                            />
+                          </div>
+                        )}
                         <div
                           style={{ padding: '16px 0', fontSize: '14px', lineHeight: 1.7, color: c.textPrimary }}
                           dangerouslySetInnerHTML={{ __html: renderMarkdown(content) }}

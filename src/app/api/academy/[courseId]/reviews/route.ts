@@ -1,102 +1,78 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
-import { createReviewSchema } from '@/lib/validations/academy-review';
-import { logger } from '@/lib/logger';
+
+const mockReviews = [
+  {
+    id: 'review-001',
+    rating: 5,
+    comment: 'Sangat bermanfaat! Materi disampaikan dengan jelas dan mudah dipahami.',
+    userName: 'Ahmad Hidayat',
+    userId: 'user-001',
+    createdAt: '2025-02-15T10:30:00Z',
+  },
+  {
+    id: 'review-002',
+    rating: 4,
+    comment: 'Bagus, tapi bisa ditambah lebih banyak contoh praktik.',
+    userName: 'Siti Rahmawati',
+    userId: 'user-002',
+    createdAt: '2025-02-10T14:20:00Z',
+  },
+  {
+    id: 'review-003',
+    rating: 5,
+    comment: 'Instruktur sangat kompeten. Recommended untuk semua level.',
+    userName: 'Budi Prasetyo',
+    userId: 'user-003',
+    createdAt: '2025-01-28T09:15:00Z',
+  },
+  {
+    id: 'review-004',
+    rating: 4,
+    comment: 'Materinya lengkap dan terstruktur dengan baik.',
+    userName: 'Dewi Anggraini',
+    userId: 'user-004',
+    createdAt: '2025-01-20T16:45:00Z',
+  },
+];
 
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ courseId: string }> }
 ) {
-  const { courseId } = await params;
+  await params; // consume params
 
-  try {
-    const reviews = await prisma.academyCourseReview.findMany({
-      where: { courseId },
-      include: {
-        user: { select: { id: true, name: true } },
-      },
-      orderBy: { createdAt: 'desc' },
-    });
+  const totalRating = mockReviews.reduce((sum, r) => sum + r.rating, 0);
+  const avgRating = Math.round((totalRating / mockReviews.length) * 10) / 10;
 
-    // Calculate avg rating
-    const totalRating = reviews.reduce((sum, r) => sum + r.rating, 0);
-    const avgRating = reviews.length > 0 ? Math.round((totalRating / reviews.length) * 10) / 10 : 0;
-
-    return NextResponse.json({
-      reviews: reviews.map(r => ({
-        id: r.id,
-        rating: r.rating,
-        comment: r.comment,
-        userName: r.user.name,
-        userId: r.user.id,
-        createdAt: r.createdAt,
-      })),
-      avgRating,
-      totalReviews: reviews.length,
-    });
-  } catch (error) {
-    logger.error('GET /api/academy/[courseId]/reviews error', { error: String(error) });
-    return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
-  }
+  return NextResponse.json({
+    reviews: mockReviews,
+    avgRating,
+    totalReviews: mockReviews.length,
+  });
 }
 
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ courseId: string }> }
 ) {
-  const auth = getAuthPayload(req);
-  if (!auth) return unauthorizedResponse();
-
   const { courseId } = await params;
+  const body = await req.json();
+  const { rating, comment } = body as { rating: number; comment?: string };
 
-  try {
-    const body = await req.json();
-    const parsed = createReviewSchema.safeParse(body);
-
-    if (!parsed.success) {
-      const errors = parsed.error.flatten().fieldErrors;
-      return NextResponse.json({ error: 'Validasi gagal', errors }, { status: 400 });
-    }
-
-    const { rating, comment } = parsed.data;
-
-    // Check course exists
-    const course = await prisma.academyCourse.findUnique({ where: { id: courseId } });
-    if (!course) {
-      return NextResponse.json({ error: 'Kursus tidak ditemukan' }, { status: 404 });
-    }
-
-    // Check if already reviewed (unique constraint)
-    const existing = await prisma.academyCourseReview.findUnique({
-      where: { courseId_userId: { courseId, userId: auth.userId } },
-    });
-    if (existing) {
-      return NextResponse.json({ error: 'Anda sudah memberikan ulasan untuk kursus ini' }, { status: 409 });
-    }
-
-    const review = await prisma.academyCourseReview.create({
-      data: {
-        courseId,
-        userId: auth.userId,
-        rating,
-        comment: comment || null,
-      },
-      include: {
-        user: { select: { name: true } },
-      },
-    });
-
-    return NextResponse.json({
-      id: review.id,
-      rating: review.rating,
-      comment: review.comment,
-      userName: review.user.name,
-      userId: review.userId,
-      createdAt: review.createdAt,
-    }, { status: 201 });
-  } catch (error) {
-    logger.error('POST /api/academy/[courseId]/reviews error', { error: String(error) });
-    return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
+  if (!rating || rating < 1 || rating > 5) {
+    return NextResponse.json({ error: 'Rating harus antara 1-5' }, { status: 400 });
   }
+
+  return NextResponse.json(
+    {
+      id: `review-new-${Date.now()}`,
+      rating,
+      comment: comment || null,
+      userName: 'Demo User',
+      userId: 'demo-user',
+      courseId,
+      createdAt: new Date().toISOString(),
+    },
+    { status: 201 }
+  );
 }

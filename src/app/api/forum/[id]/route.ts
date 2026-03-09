@@ -1,108 +1,50 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
-import { updateForumThreadSchema } from '@/lib/validations/forum';
-import { rateLimit } from '@/lib/rate-limiter';
-import { logger } from '@/lib/logger';
+import { forumThreads } from '@/data/mock-forum';
+
+const mockReplies = [
+  {
+    id: 'reply-001',
+    author: 'ModRina',
+    authorAvatar: 'MR',
+    authorBadge: 'Moderator',
+    content: 'Terima kasih sudah membuat thread ini. Sangat bermanfaat untuk komunitas.',
+    createdAt: '2026-02-20T10:00:00Z',
+    likeCount: 12,
+  },
+  {
+    id: 'reply-002',
+    author: 'AgenBandung',
+    authorAvatar: 'AB',
+    content: 'Setuju banget! Saya juga punya pengalaman serupa. Semoga bisa jadi pembelajaran bersama.',
+    createdAt: '2026-02-20T11:30:00Z',
+    likeCount: 8,
+  },
+  {
+    id: 'reply-003',
+    author: 'ProAgent99',
+    authorAvatar: 'PA',
+    authorBadge: 'Top Contributor',
+    content: 'Kalau boleh nambahin, ada beberapa poin penting yang perlu diperhatikan juga. Nanti saya share detail-nya.',
+    createdAt: '2026-02-20T14:15:00Z',
+    likeCount: 5,
+  },
+];
 
 export async function GET(
-  req: NextRequest,
+  _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const auth = getAuthPayload(req);
-  if (!auth) return unauthorizedResponse();
-
-  const { allowed } = rateLimit(req, { limit: 30, window: 60 });
-  if (!allowed) {
-    return NextResponse.json({ error: 'Terlalu banyak permintaan, coba lagi nanti' }, { status: 429 });
-  }
-
   const { id } = await params;
+  const thread = forumThreads.find((t) => t.id === id);
 
-  try {
-    const thread = await prisma.forumThread.findUnique({
-      where: { id },
-      include: {
-        replies: {
-          orderBy: { createdAt: 'asc' },
-        },
-      },
-    });
-
-    if (!thread) {
-      return NextResponse.json({ error: 'Thread tidak ditemukan' }, { status: 404 });
-    }
-
-    // Increment view count
-    await prisma.forumThread.update({
-      where: { id },
-      data: { viewCount: { increment: 1 } },
-    });
-
-    return NextResponse.json({ data: thread });
-  } catch (error) {
-    logger.error('GET /api/forum/[id] error', { error: String(error) });
-    return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
-  }
-}
-
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  const auth = getAuthPayload(req);
-  if (!auth) return unauthorizedResponse();
-
-  const { allowed } = rateLimit(req, { limit: 10, window: 60 });
-  if (!allowed) {
-    return NextResponse.json({ error: 'Terlalu banyak permintaan, coba lagi nanti' }, { status: 429 });
+  if (!thread) {
+    return NextResponse.json({ error: 'Thread tidak ditemukan' }, { status: 404 });
   }
 
-  const { id } = await params;
-
-  try {
-    const thread = await prisma.forumThread.findUnique({ where: { id } });
-    if (!thread) {
-      return NextResponse.json({ error: 'Thread tidak ditemukan' }, { status: 404 });
-    }
-
-    // Only author can update content, CC can update moderation fields
-    if (thread.authorId !== auth.userId) {
-      return NextResponse.json({ error: 'Anda tidak memiliki akses' }, { status: 403 });
-    }
-
-    const body = await req.json();
-    const parsed = updateForumThreadSchema.safeParse(body);
-    if (!parsed.success) {
-      return NextResponse.json(
-        { error: 'Validasi gagal', details: parsed.error.flatten().fieldErrors },
-        { status: 400 }
-      );
-    }
-
-    // Authors can only update title, content, category, tags, isSolved
-    const allowedFields = ['title', 'content', 'category', 'tags', 'isSolved'];
-    const updateData: Record<string, unknown> = {};
-    for (const key of allowedFields) {
-      if (key in parsed.data) {
-        updateData[key] = (parsed.data as Record<string, unknown>)[key];
-      }
-    }
-
-    if (updateData.content && typeof updateData.content === 'string') {
-      updateData.excerpt = updateData.content.length > 200
-        ? updateData.content.substring(0, 200) + '...'
-        : updateData.content;
-    }
-
-    const updated = await prisma.forumThread.update({
-      where: { id },
-      data: updateData,
-    });
-
-    return NextResponse.json(updated);
-  } catch (error) {
-    logger.error('PATCH /api/forum/[id] error', { error: String(error) });
-    return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
-  }
+  return NextResponse.json({
+    data: {
+      ...thread,
+      replies: mockReplies,
+    },
+  });
 }

@@ -1,23 +1,140 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import { logger } from '@/lib/logger';
 
 export async function GET() {
-  try {
-    const [services, documents] = await Promise.all([
-      prisma.platformService.findMany({
-        where: { isActive: true },
-        orderBy: { order: 'asc' },
-      }),
-      prisma.platformDocument.findMany({
-        where: { isActive: true },
-        orderBy: { createdAt: 'desc' },
-      }),
-    ]);
-
-    return NextResponse.json({ services, documents });
-  } catch (error) {
-    logger.error('GET /api/services error', { error: String(error) });
-    return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
-  }
+  return NextResponse.json({
+    services: [
+      {
+        id: "svc-1",
+        title: "Customer Support",
+        description: "Layanan bantuan 24/7 untuk jamaah umrah via WhatsApp dan telepon",
+        emoji: "\uD83C\uDFA7",
+        color: "#2563EB",
+        category: "support",
+        features: [
+          "Chat langsung 24/7",
+          "Respon cepat via WhatsApp",
+          "Tim support berpengalaman",
+        ],
+        ctaText: "Hubungi Support",
+        ctaLink: "#contact-section",
+      },
+      {
+        id: "svc-2",
+        title: "Visa Processing",
+        description: "Pengurusan visa umrah Saudi Arabia termasuk tracking status real-time",
+        emoji: "\uD83D\uDEC2",
+        color: "#059669",
+        category: "dokumen",
+        features: [
+          "Tracking status real-time",
+          "Proses cepat & aman",
+          "Notifikasi otomatis",
+        ],
+        ctaText: "Proses Visa",
+        ctaLink: "/pilgrims",
+      },
+      {
+        id: "svc-3",
+        title: "Travel Insurance",
+        description: "Asuransi perjalanan umrah dengan coverage medis dan perjalanan",
+        emoji: "\uD83D\uDEE1\uFE0F",
+        color: "#7C3AED",
+        category: "asuransi",
+        features: [
+          "Coverage medis lengkap",
+          "Perlindungan perjalanan",
+          "Klaim mudah & cepat",
+        ],
+        ctaText: "Lihat Paket",
+        ctaLink: "/packages",
+      },
+      {
+        id: "svc-4",
+        title: "Manasik Training",
+        description: "Pelatihan manasik umrah online dan offline untuk jamaah",
+        emoji: "\uD83D\uDCD6",
+        color: "#D97706",
+        category: "edukasi",
+        features: [
+          "Materi lengkap & terstruktur",
+          "Video tutorial interaktif",
+          "Sertifikat kelulusan",
+        ],
+        ctaText: "Mulai Belajar",
+        ctaLink: "/academy",
+      },
+      {
+        id: "svc-5",
+        title: "Document Management",
+        description: "Pengelolaan dokumen jamaah secara digital termasuk passport, visa, dan surat kesehatan",
+        emoji: "\uD83D\uDCC1",
+        color: "#DC2626",
+        category: "dokumen",
+        features: [
+          "Upload & kelola dokumen digital",
+          "Template dokumen siap pakai",
+          "Penyimpanan aman & terenkripsi",
+        ],
+        ctaText: "Kelola Dokumen",
+        ctaLink: "#download-dokumen-section",
+      },
+      {
+        id: "svc-6",
+        title: "Payment Gateway",
+        description: "Pembayaran paket umrah mudah dengan berbagai metode pembayaran",
+        emoji: "\uD83D\uDCB3",
+        color: "#0891B2",
+        category: "pembayaran",
+        features: [
+          "Transfer bank & e-wallet",
+          "Cicilan tanpa bunga",
+          "Invoice otomatis",
+        ],
+        ctaText: "Lihat Pembayaran",
+        ctaLink: "/gezmapay",
+      },
+    ],
+    documents: [
+      {
+        id: "doc-1",
+        name: "Template Surat Kuasa",
+        format: "PDF",
+        fileSize: "245 KB",
+        fileUrl: "/documents/surat-kuasa-template.pdf",
+        downloadCount: 128,
+      },
+      {
+        id: "doc-2",
+        name: "Checklist Perlengkapan Umrah",
+        format: "PDF",
+        fileSize: "180 KB",
+        fileUrl: "/documents/checklist-perlengkapan.pdf",
+        downloadCount: 256,
+      },
+      {
+        id: "doc-3",
+        name: "Panduan Visa Saudi Arabia",
+        format: "PDF",
+        fileSize: "520 KB",
+        fileUrl: "/documents/panduan-visa-saudi.pdf",
+        downloadCount: 342,
+      },
+      {
+        id: "doc-4",
+        name: "Template Laporan Keuangan",
+        format: "XLSX",
+        fileSize: "98 KB",
+        fileUrl: "/documents/laporan-keuangan-template.xlsx",
+        downloadCount: 87,
+      },
+      {
+        id: "doc-5",
+        name: "Kontrak Kerjasama Hotel",
+        format: "DOCX",
+        fileSize: "156 KB",
+        fileUrl: "/documents/kontrak-hotel-template.docx",
+        downloadCount: 64,
+      },
+    ],
+  });
 }

@@ -1,50 +1,32 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
-import { logger } from '@/lib/logger';
+import { NextResponse } from 'next/server';
 
-const DOC_LABELS: Record<string, string> = {
-  ktp: 'KTP', passport: 'Paspor', photo: 'Pas Foto', kk: 'Kartu Keluarga',
-  vaccine: 'Vaksin', akta: 'Akta/Ijazah', book_nikah: 'Buku Nikah', surat_mahram: 'Surat Mahram',
-};
+export async function GET() {
+  const totalPilgrims = 156;
 
-export async function GET(req: NextRequest) {
-  const auth = getAuthPayload(req);
-  if (!auth) return unauthorizedResponse();
+  const docs = [
+    { type: "passport", label: "Passport", total: totalPilgrims, uploaded: 14, verified: 128 },
+    { type: "visa", label: "Visa", total: totalPilgrims, uploaded: 13, verified: 85 },
+    { type: "insurance", label: "Asuransi", total: totalPilgrims, uploaded: 5, verified: 115 },
+    { type: "health_certificate", label: "Surat Kesehatan", total: totalPilgrims, uploaded: 11, verified: 78 },
+    { type: "photo", label: "Foto 4x6", total: totalPilgrims, uploaded: 3, verified: 145 },
+  ];
 
-  try {
-    const documents = await prisma.pilgrimDocument.findMany({
-      where: { pilgrim: { agencyId: auth.agencyId } },
-      select: { type: true, status: true },
-    });
+  const completion = docs.map(doc => {
+    const missing = doc.total - doc.uploaded - doc.verified;
+    const completionRate = doc.total > 0 ? Math.round((doc.verified / doc.total) * 100) : 0;
+    return {
+      type: doc.type,
+      label: doc.label,
+      verified: doc.verified,
+      uploaded: doc.uploaded,
+      missing: missing > 0 ? missing : 0,
+      total: doc.total,
+      completionRate,
+    };
+  });
 
-    const totalPilgrims = await prisma.pilgrim.count({ where: { agencyId: auth.agencyId } });
-
-    // Group by type
-    const typeStats: Record<string, { verified: number; uploaded: number; missing: number; total: number }> = {};
-    for (const doc of documents) {
-      if (!typeStats[doc.type]) {
-        typeStats[doc.type] = { verified: 0, uploaded: 0, missing: 0, total: 0 };
-      }
-      typeStats[doc.type].total++;
-      if (doc.status === 'verified') typeStats[doc.type].verified++;
-      else if (doc.status === 'uploaded') typeStats[doc.type].uploaded++;
-      else typeStats[doc.type].missing++;
-    }
-
-    const completion = Object.entries(typeStats).map(([type, stats]) => ({
-      type,
-      label: DOC_LABELS[type] || type,
-      verified: stats.verified,
-      uploaded: stats.uploaded,
-      missing: Math.max(0, totalPilgrims - stats.total) + stats.missing,
-      total: totalPilgrims,
-      completionRate: totalPilgrims > 0 ? Math.round(((stats.verified + stats.uploaded) / totalPilgrims) * 100) : 0,
-    }));
-
-    return NextResponse.json({ totalPilgrims, completion });
-  } catch (error) {
-    logger.error('GET /api/reports/documents error', { error: String(error) });
-    return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
-  }
+  return NextResponse.json({
+    totalPilgrims,
+    completion,
+  });
 }

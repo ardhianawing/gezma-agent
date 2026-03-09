@@ -1,197 +1,52 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
-import { checkPermission } from '@/lib/auth-permissions';
-import { PERMISSIONS } from '@/lib/permissions';
-import { pilgrimFormSchema } from '@/lib/validations/pilgrim';
-import { logActivity } from '@/lib/activity-logger';
-import { auditUpdate, auditDelete, diffChanges } from '@/lib/audit-trail';
-import { logger } from '@/lib/logger';
+import { mockPilgrims } from '@/data/mock-pilgrims';
 
 type Context = { params: Promise<{ id: string }> };
 
 export async function GET(req: NextRequest, { params }: Context) {
-  const auth = getAuthPayload(req);
-  if (!auth) return unauthorizedResponse();
-
   const { id } = await params;
 
-  try {
-    const pilgrim = await prisma.pilgrim.findFirst({
-      where: { id, agencyId: auth.agencyId },
-      include: {
-        documents: { orderBy: { createdAt: 'desc' } },
-        payments: { orderBy: { date: 'desc' } },
-      },
-    });
+  const pilgrim = mockPilgrims.find((p) => p.id === id);
 
-    if (!pilgrim) {
-      return NextResponse.json({ error: 'Jemaah tidak ditemukan' }, { status: 404 });
-    }
-
-    return NextResponse.json(pilgrim);
-  } catch (error) {
-    logger.error('GET /api/pilgrims/[id] error', { error: String(error) });
-    return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
+  if (!pilgrim) {
+    return NextResponse.json({ error: 'Jemaah tidak ditemukan' }, { status: 404 });
   }
+
+  return NextResponse.json(pilgrim);
 }
 
 export async function PUT(req: NextRequest, { params }: Context) {
-  const auth = getAuthPayload(req);
-  if (!auth) return unauthorizedResponse();
-
-  const denied = await checkPermission(auth, PERMISSIONS.PILGRIMS_EDIT);
-  if (denied) return denied;
-
   const { id } = await params;
+
+  const pilgrim = mockPilgrims.find((p) => p.id === id);
+
+  if (!pilgrim) {
+    return NextResponse.json({ error: 'Jemaah tidak ditemukan' }, { status: 404 });
+  }
 
   try {
     const body = await req.json();
-    const parsed = pilgrimFormSchema.safeParse(body);
 
-    if (!parsed.success) {
-      return NextResponse.json(
-        { error: 'Validasi gagal', details: parsed.error.flatten().fieldErrors },
-        { status: 400 }
-      );
-    }
+    const updated = {
+      ...pilgrim,
+      ...body,
+      id: pilgrim.id, // prevent id override
+    };
 
-    const data = parsed.data;
-
-    const existing = await prisma.pilgrim.findFirst({
-      where: { id, agencyId: auth.agencyId },
-    });
-
-    if (!existing) {
-      return NextResponse.json({ error: 'Jemaah tidak ditemukan' }, { status: 404 });
-    }
-
-    if (data.nik !== existing.nik) {
-      const nikConflict = await prisma.pilgrim.findFirst({
-        where: { nik: data.nik, agencyId: auth.agencyId, id: { not: id } },
-      });
-      if (nikConflict) {
-        return NextResponse.json(
-          { error: 'NIK sudah terdaftar di agency ini' },
-          { status: 409 }
-        );
-      }
-    }
-
-    const newTripId = body.tripId !== undefined ? (body.tripId || null) : existing.tripId;
-    const oldTripId = existing.tripId;
-
-    const pilgrim = await prisma.$transaction(async (tx) => {
-      const updated = await tx.pilgrim.update({
-        where: { id },
-        data: {
-          nik: data.nik,
-          name: data.name,
-          gender: data.gender,
-          birthPlace: data.birthPlace,
-          birthDate: data.birthDate,
-          address: data.address,
-          city: data.city,
-          province: data.province,
-          postalCode: data.postalCode || null,
-          phone: data.phone,
-          email: data.email,
-          whatsapp: data.whatsapp || null,
-          emergencyContact: data.emergencyContact,
-          notes: data.notes || null,
-          ...(body.roomNumber !== undefined && { roomNumber: body.roomNumber || null }),
-          ...(body.roomType !== undefined && { roomType: body.roomType || null }),
-          ...(body.tripId !== undefined && { tripId: newTripId }),
-        },
-        include: { documents: true, payments: true },
-      });
-
-      // Update trip registeredCount when trip assignment changes
-      if (oldTripId !== newTripId) {
-        if (oldTripId) {
-          const oldCount = await tx.pilgrim.count({ where: { tripId: oldTripId } });
-          await tx.trip.update({ where: { id: oldTripId }, data: { registeredCount: oldCount } });
-        }
-        if (newTripId) {
-          const newCount = await tx.pilgrim.count({ where: { tripId: newTripId } });
-          await tx.trip.update({ where: { id: newTripId }, data: { registeredCount: newCount } });
-        }
-      }
-
-      return updated;
-    });
-
-    logActivity({
-      type: 'pilgrim',
-      action: 'updated',
-      title: 'Data jemaah diperbarui',
-      description: `Data ${pilgrim.name} telah diperbarui`,
-      userId: auth.userId,
-      agencyId: auth.agencyId,
-      metadata: { entityId: pilgrim.id },
-    });
-
-    // Field-level audit trail
-    auditUpdate('pilgrim', id, existing as Record<string, unknown>, pilgrim as Record<string, unknown>,
-      { id: auth.userId, name: auth.email },
-      { agencyId: auth.agencyId, fieldsToTrack: ['name', 'nik', 'phone', 'email', 'address', 'city', 'province', 'tripId', 'roomNumber', 'roomType'] }
-    );
-
-    return NextResponse.json(pilgrim);
-  } catch (error) {
-    logger.error('PUT /api/pilgrims/[id] error', { error: String(error) });
+    return NextResponse.json(updated);
+  } catch {
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }
 
 export async function DELETE(req: NextRequest, { params }: Context) {
-  const auth = getAuthPayload(req);
-  if (!auth) return unauthorizedResponse();
-
-  const denied = await checkPermission(auth, PERMISSIONS.PILGRIMS_DELETE);
-  if (denied) return denied;
-
   const { id } = await params;
 
-  try {
-    const existing = await prisma.pilgrim.findFirst({
-      where: { id, agencyId: auth.agencyId },
-    });
+  const pilgrim = mockPilgrims.find((p) => p.id === id);
 
-    if (!existing) {
-      return NextResponse.json({ error: 'Jemaah tidak ditemukan' }, { status: 404 });
-    }
-
-    await prisma.$transaction(async (tx) => {
-      // Soft delete: set deletedAt instead of hard delete
-      await tx.pilgrim.update({ where: { id }, data: { deletedAt: new Date(), tripId: null } });
-
-      // Decrement trip registeredCount if pilgrim was assigned to a trip
-      if (existing.tripId) {
-        const count = await tx.pilgrim.count({ where: { tripId: existing.tripId, deletedAt: null } });
-        await tx.trip.update({ where: { id: existing.tripId }, data: { registeredCount: count } });
-      }
-    });
-
-    logActivity({
-      type: 'pilgrim',
-      action: 'deleted',
-      title: 'Jemaah dihapus',
-      description: `${existing.name} telah dihapus`,
-      userId: auth.userId,
-      agencyId: auth.agencyId,
-      metadata: { entityId: id },
-    });
-
-    // Audit trail
-    auditDelete('pilgrim', id,
-      { id: auth.userId, name: auth.email },
-      { agencyId: auth.agencyId }
-    );
-
-    return NextResponse.json({ message: 'Jemaah berhasil dihapus' });
-  } catch (error) {
-    logger.error('DELETE /api/pilgrims/[id] error', { error: String(error) });
-    return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
+  if (!pilgrim) {
+    return NextResponse.json({ error: 'Jemaah tidak ditemukan' }, { status: 404 });
   }
+
+  return NextResponse.json({ message: 'Jemaah berhasil dihapus' });
 }

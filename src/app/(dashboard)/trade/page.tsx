@@ -163,18 +163,30 @@ export default function TradePage() {
           flexDirection: 'column' as const,
         }}
       >
-        {/* Emoji Thumbnail */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '28px',
-            backgroundColor: getCategoryBg(product.category),
-          }}
-        >
-          <span style={{ fontSize: '48px', lineHeight: 1 }}>{product.emoji}</span>
-        </div>
+        {/* Product Image */}
+        {product.imageUrl ? (
+          <img
+            src={product.imageUrl}
+            alt={product.name}
+            style={{
+              width: '100%',
+              height: '140px',
+              objectFit: 'cover',
+            }}
+          />
+        ) : (
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '28px',
+              backgroundColor: getCategoryBg(product.category),
+            }}
+          >
+            <span style={{ fontSize: '48px', lineHeight: 1 }}>{product.emoji}</span>
+          </div>
+        )}
 
         {/* Certifications + Category */}
         <div
@@ -711,22 +723,36 @@ export default function TradePage() {
                       cursor: 'pointer',
                     }}
                   >
-                    {/* Emoji */}
-                    <div
-                      style={{
-                        width: '52px',
-                        height: '52px',
-                        borderRadius: '12px',
-                        backgroundColor: catColor + '15',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: '28px',
-                        flexShrink: 0,
-                      }}
-                    >
-                      {product.emoji}
-                    </div>
+                    {/* Product Thumbnail */}
+                    {product.imageUrl ? (
+                      <img
+                        src={product.imageUrl}
+                        alt={product.name}
+                        style={{
+                          width: '52px',
+                          height: '52px',
+                          borderRadius: '12px',
+                          objectFit: 'cover',
+                          flexShrink: 0,
+                        }}
+                      />
+                    ) : (
+                      <div
+                        style={{
+                          width: '52px',
+                          height: '52px',
+                          borderRadius: '12px',
+                          backgroundColor: catColor + '15',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '28px',
+                          flexShrink: 0,
+                        }}
+                      >
+                        {product.emoji}
+                      </div>
+                    )}
 
                     {/* Info */}
                     <div style={{ flex: 1, minWidth: 0 }}>

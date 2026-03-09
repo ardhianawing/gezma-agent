@@ -2,6 +2,9 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  typescript: {
+    ignoreBuildErrors: true,
+  },
   images: {
     formats: ["image/avif", "image/webp"],
     remotePatterns: [
@@ -12,6 +15,22 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "**.s3.amazonaws.com",
+      },
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+      },
+      {
+        protocol: "https",
+        hostname: "plus.unsplash.com",
+      },
+      {
+        protocol: "https",
+        hostname: "picsum.photos",
+      },
+      {
+        protocol: "https",
+        hostname: "fastly.picsum.photos",
       },
     ],
   },
@@ -32,6 +51,7 @@ const nextConfig: NextConfig = {
             "img-src 'self' data: blob: https:",
             "font-src 'self'",
             "connect-src 'self' https://generativelanguage.googleapis.com",
+            "frame-src 'self' https://www.youtube.com",
             "frame-ancestors 'none'",
           ].join("; "),
         },

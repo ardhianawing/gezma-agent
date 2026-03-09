@@ -86,21 +86,35 @@ function MarketCard({
       <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', flex: 1 }}>
         {/* Emoji + Vendor + Name */}
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', marginBottom: '10px' }}>
-          <div
-            style={{
-              width: '48px',
-              height: '48px',
-              borderRadius: '12px',
-              backgroundColor: c.primaryLight,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '24px',
-              flexShrink: 0,
-            }}
-          >
-            {item.emoji}
-          </div>
+          {item.imageUrl ? (
+            <img
+              src={item.imageUrl}
+              alt={item.name}
+              style={{
+                width: '48px',
+                height: '48px',
+                borderRadius: '12px',
+                objectFit: 'cover',
+                flexShrink: 0,
+              }}
+            />
+          ) : (
+            <div
+              style={{
+                width: '48px',
+                height: '48px',
+                borderRadius: '12px',
+                backgroundColor: c.primaryLight,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '24px',
+                flexShrink: 0,
+              }}
+            >
+              {item.emoji}
+            </div>
+          )}
           <div style={{ flex: 1, minWidth: 0 }}>
             <p
               style={{
@@ -246,8 +260,8 @@ export default function MarketplacePage() {
 
       const res = await fetch(`/api/marketplace?${params.toString()}`);
       if (res.ok) {
-        const data = await res.json();
-        setItems(data);
+        const json = await res.json();
+        setItems(json.data || json);
       }
     } catch (error) {
       console.error('Failed to fetch marketplace items:', error);

@@ -180,19 +180,32 @@ export default function ShopPage() {
             onMouseEnter={() => setHoveredProduct(product.id)}
             onMouseLeave={() => setHoveredProduct(null)}
           >
-            {/* Product emoji icon */}
-            <div style={{
-              width: '100%',
-              height: isMobile ? '80px' : '100px',
-              backgroundColor: GREEN_LIGHT,
-              borderRadius: '12px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: isMobile ? '36px' : '44px',
-            }}>
-              {product.emoji}
-            </div>
+            {/* Product image */}
+            {product.imageUrl ? (
+              <img
+                src={product.imageUrl}
+                alt={product.name}
+                style={{
+                  width: '100%',
+                  height: isMobile ? '80px' : '100px',
+                  borderRadius: '12px',
+                  objectFit: 'cover',
+                }}
+              />
+            ) : (
+              <div style={{
+                width: '100%',
+                height: isMobile ? '80px' : '100px',
+                backgroundColor: GREEN_LIGHT,
+                borderRadius: '12px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: isMobile ? '36px' : '44px',
+              }}>
+                {product.emoji}
+              </div>
+            )}
 
             {/* Category badge */}
             <span style={{

@@ -34,7 +34,7 @@ export const manasikLessons: ManasikLesson[] = [
     category: 'persiapan',
     order: 1,
     duration: 15,
-    videoUrl: null,
+    videoUrl: 'https://www.youtube.com/watch?v=upncYHG5EmM',
     content: `## Niat Umrah
 
 Niat adalah syarat sah ibadah umrah. Niatkan di dalam hati bahwa Anda akan melaksanakan ibadah umrah karena Allah SWT.
@@ -75,7 +75,7 @@ Niat adalah syarat sah ibadah umrah. Niatkan di dalam hati bahwa Anda akan melak
     category: 'ihram',
     order: 2,
     duration: 20,
-    videoUrl: null,
+    videoUrl: 'https://www.youtube.com/watch?v=bN76oHKm_ck',
     content: `## Pengertian Miqat
 
 Miqat adalah batas tempat di mana jamaah umrah wajib memulai ihram. Untuk jamaah yang datang dari Indonesia melalui udara, biasanya berihram di atas pesawat sebelum melewati batas miqat.

@@ -135,32 +135,32 @@ export default function SettingsPage() {
       icon: Plug,
       title: 'Integrasi',
       description: 'Nusuk API, Payment Gateway, WhatsApp',
-      color: '#059669',
-      bgColor: '#ECFDF5',
+      color: c.success,
+      bgColor: c.successLight,
       href: '/settings/integrations',
     },
     {
       icon: CalendarClock,
       title: 'Laporan Terjadwal',
       description: 'Kirim laporan otomatis ke email secara berkala',
-      color: '#0EA5E9',
-      bgColor: '#E0F2FE',
+      color: c.info,
+      bgColor: c.infoLight,
       href: '/settings/scheduled-reports',
     },
     {
       icon: FileText,
       title: 'Template Email',
       description: 'Kelola template email notifikasi',
-      color: '#D946EF',
-      bgColor: '#FAE8FF',
+      color: c.primary,
+      bgColor: c.primaryLight,
       href: '/settings/email-templates',
     },
     {
       icon: Globe,
       title: t.settings.languageRegion,
       description: t.settings.languageRegionDesc,
-      color: '#7C3AED',
-      bgColor: '#F5F3FF',
+      color: c.textMuted,
+      bgColor: c.cardBgHover,
       href: null,
     },
   ];
@@ -496,10 +496,11 @@ export default function SettingsPage() {
           {/* Account Info */}
           <div
             style={{
-              background: 'linear-gradient(to bottom right, #111827, #374151)',
+              background: theme === 'dark' ? 'linear-gradient(to bottom right, #111827, #374151)' : `linear-gradient(to bottom right, ${c.cardBg}, ${c.cardBgHover})`,
               borderRadius: '12px',
               padding: isMobile ? '16px' : '20px',
-              color: 'white',
+              color: c.textPrimary,
+              border: `1px solid ${c.border}`,
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px' }}>
@@ -508,29 +509,29 @@ export default function SettingsPage() {
                   width: isMobile ? '40px' : '48px',
                   height: isMobile ? '40px' : '48px',
                   borderRadius: '50%',
-                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                  backgroundColor: c.primaryLight,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   flexShrink: 0,
                 }}
               >
-                <span style={{ fontSize: isMobile ? '14px' : '18px', fontWeight: '700' }}>{agencyInitials}</span>
+                <span style={{ fontSize: isMobile ? '14px' : '18px', fontWeight: '700', color: c.primary }}>{agencyInitials}</span>
               </div>
               <div>
-                <p style={{ fontSize: '14px', fontWeight: '600', margin: 0 }}>{agency?.name || '...'}</p>
-                <p style={{ fontSize: '14px', color: 'rgba(255, 255, 255, 0.6)', margin: '4px 0 0 0' }}>Professional Plan</p>
+                <p style={{ fontSize: '14px', fontWeight: '600', margin: 0, color: c.textPrimary }}>{agency?.name || '...'}</p>
+                <p style={{ fontSize: '14px', color: c.textMuted, margin: '4px 0 0 0' }}>Professional Plan</p>
               </div>
             </div>
             <div style={{ fontSize: '14px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                <span style={{ color: 'rgba(255, 255, 255, 0.6)' }}>{t.settings.storageUsed}</span>
-                <span style={{ fontWeight: '500' }}>— / 10 GB</span>
+                <span style={{ color: c.textMuted }}>{t.settings.storageUsed}</span>
+                <span style={{ fontWeight: '500', color: c.textSecondary }}>— / 10 GB</span>
               </div>
               <div
                 style={{
                   height: '8px',
-                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                  backgroundColor: c.borderLight,
                   borderRadius: '9999px',
                   overflow: 'hidden',
                 }}
@@ -551,9 +552,9 @@ export default function SettingsPage() {
                 marginTop: '16px',
                 padding: '10px',
                 borderRadius: '8px',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
+                border: `1px solid ${c.border}`,
                 backgroundColor: 'transparent',
-                color: 'white',
+                color: c.textPrimary,
                 fontSize: '14px',
                 fontWeight: '500',
                 cursor: 'pointer',

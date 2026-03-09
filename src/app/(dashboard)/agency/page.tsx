@@ -388,12 +388,12 @@ export default function AgencyPage() {
           overflow: 'hidden',
         }}
       >
-        {/* Dark Header */}
+        {/* Header */}
         <div
           style={{
-            background: theme === 'dark' ? `linear-gradient(to right, ${c.cardBgHover}, ${c.cardBg})` : 'linear-gradient(to right, #111827, #374151)',
+            background: theme === 'dark' ? `linear-gradient(to right, ${c.cardBgHover}, ${c.cardBg})` : `linear-gradient(to right, ${c.cardBg}, ${c.cardBgHover})`,
             padding: isMobile ? '20px' : '24px',
-            color: 'white',
+            color: c.textPrimary,
           }}
         >
           <div style={{ display: 'flex', alignItems: isMobile ? 'flex-start' : 'center', gap: isMobile ? '16px' : '24px', flexDirection: isMobile ? 'column' : 'row' }}>
@@ -402,20 +402,19 @@ export default function AgencyPage() {
                 width: isMobile ? '64px' : '80px',
                 height: isMobile ? '64px' : '80px',
                 borderRadius: '16px',
-                backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                backdropFilter: 'blur(4px)',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
+                backgroundColor: c.primaryLight,
+                border: `1px solid ${c.border}`,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 flexShrink: 0,
               }}
             >
-              <Building2 style={{ width: isMobile ? '32px' : '40px', height: isMobile ? '32px' : '40px' }} />
+              <Building2 style={{ width: isMobile ? '32px' : '40px', height: isMobile ? '32px' : '40px', color: c.primary }} />
             </div>
             <div style={{ flex: 1 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px', flexWrap: 'wrap' }}>
-                <h2 style={{ fontSize: isMobile ? '20px' : '24px', fontWeight: '700', margin: 0, color: 'white' }}>
+                <h2 style={{ fontSize: isMobile ? '20px' : '24px', fontWeight: '700', margin: 0, color: c.textPrimary }}>
                   {agency.name}
                 </h2>
                 {agency.isVerified && (
@@ -424,8 +423,8 @@ export default function AgencyPage() {
                       display: 'flex',
                       alignItems: 'center',
                       gap: '4px',
-                      backgroundColor: '#16A34A',
-                      color: 'white',
+                      backgroundColor: c.successLight,
+                      color: c.success,
                       fontSize: '12px',
                       fontWeight: '500',
                       padding: '4px 10px',
@@ -437,8 +436,8 @@ export default function AgencyPage() {
                   </span>
                 )}
               </div>
-              <p style={{ color: 'rgba(255, 255, 255, 0.7)', margin: 0 }}>{agency.legalName}</p>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', marginTop: '16px', fontSize: '14px', color: 'rgba(255, 255, 255, 0.8)' }}>
+              <p style={{ color: c.textMuted, margin: 0 }}>{agency.legalName}</p>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', marginTop: '16px', fontSize: '14px', color: c.textSecondary }}>
                 <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <Mail style={{ width: '16px', height: '16px' }} />
                   {agency.email}

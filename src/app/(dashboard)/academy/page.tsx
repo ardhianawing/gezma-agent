@@ -28,6 +28,7 @@ interface CourseData {
   category: string;
   level: string;
   thumbnailUrl: string | null;
+  imageUrl?: string;
   duration: string;
   instructorName: string;
   totalLessons: number;
@@ -376,20 +377,32 @@ export default function AcademyPage() {
                   boxShadow: isHovered ? '0 8px 24px rgba(0,0,0,0.12)' : '0 1px 3px rgba(0,0,0,0.04)',
                 }}
               >
-                {/* Emoji Header */}
-                <div
-                  style={{
-                    height: '100px',
-                    backgroundColor: categoryColor + '10',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <span style={{ fontSize: '48px' }}>
-                    {categories.find((ct) => ct.key === course.category)?.emoji || '📚'}
-                  </span>
-                </div>
+                {/* Course Image Header */}
+                {course.imageUrl ? (
+                  <img
+                    src={course.imageUrl}
+                    alt={course.title}
+                    style={{
+                      width: '100%',
+                      height: '140px',
+                      objectFit: 'cover',
+                    }}
+                  />
+                ) : (
+                  <div
+                    style={{
+                      height: '100px',
+                      backgroundColor: categoryColor + '10',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <span style={{ fontSize: '48px' }}>
+                      {categories.find((ct) => ct.key === course.category)?.emoji || '📚'}
+                    </span>
+                  </div>
+                )}
 
                 {/* Content */}
                 <div style={{ padding: '16px' }}>

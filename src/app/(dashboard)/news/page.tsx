@@ -314,20 +314,29 @@ function FeaturedCard({
         e.currentTarget.style.transform = 'translateY(0)';
       }}
     >
-      {/* Emoji Hero Area */}
+      {/* Hero Image Area */}
       <div
         style={{
           height: isMain ? (isMobile ? '160px' : '200px') : (isMobile ? '140px' : '160px'),
-          background: `linear-gradient(135deg, ${catColor}22 0%, ${catColor}11 100%)`,
+          background: article.imageUrl ? 'none' : `linear-gradient(135deg, ${catColor}22 0%, ${catColor}11 100%)`,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           position: 'relative',
+          overflow: 'hidden',
         }}
       >
-        <span style={{ fontSize: isMain ? '72px' : '56px' }}>
-          {article.emoji}
-        </span>
+        {article.imageUrl ? (
+          <img
+            src={article.imageUrl}
+            alt={article.title}
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          />
+        ) : (
+          <span style={{ fontSize: isMain ? '72px' : '56px' }}>
+            {article.emoji}
+          </span>
+        )}
 
         {/* Breaking Badge */}
         {article.isBreaking && (
@@ -493,21 +502,35 @@ function ArticleCard({
           gap: '14px',
         }}
       >
-        {/* Emoji Circle */}
-        <div
-          style={{
-            width: '52px',
-            height: '52px',
-            borderRadius: '50%',
-            backgroundColor: getEmojiBgColor(article.category),
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexShrink: 0,
-          }}
-        >
-          <span style={{ fontSize: '26px' }}>{article.emoji}</span>
-        </div>
+        {/* Article Thumbnail */}
+        {article.imageUrl ? (
+          <img
+            src={article.imageUrl}
+            alt={article.title}
+            style={{
+              width: '52px',
+              height: '52px',
+              borderRadius: '50%',
+              objectFit: 'cover',
+              flexShrink: 0,
+            }}
+          />
+        ) : (
+          <div
+            style={{
+              width: '52px',
+              height: '52px',
+              borderRadius: '50%',
+              backgroundColor: getEmojiBgColor(article.category),
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+            }}
+          >
+            <span style={{ fontSize: '26px' }}>{article.emoji}</span>
+          </div>
+        )}
 
         <div style={{ flex: 1, minWidth: 0 }}>
           {/* Badges Row */}

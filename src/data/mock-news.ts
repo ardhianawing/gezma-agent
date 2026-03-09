@@ -16,6 +16,7 @@ export interface NewsArticle {
   isOfficial: boolean;
   isFeatured: boolean;
   emoji: string;
+  imageUrl?: string;
   tags: string[];
 }
 
@@ -43,6 +44,7 @@ export const newsArticles: NewsArticle[] = [
     isOfficial: true,
     isFeatured: true,
     emoji: '🕌',
+    imageUrl: 'https://images.unsplash.com/photo-1580418827493-f2b22c0a76cb?w=600&h=400&fit=crop',
     tags: ['Nusuk', 'Visa', 'Saudi Arabia'],
   },
   {
@@ -59,6 +61,7 @@ export const newsArticles: NewsArticle[] = [
     isOfficial: false,
     isFeatured: true,
     emoji: '📊',
+    imageUrl: 'https://images.unsplash.com/photo-1564769625905-50e93615e769?w=600&h=400&fit=crop',
     tags: ['Kuota', 'Kemenag', 'Umrah 2026'],
   },
   {
@@ -75,6 +78,7 @@ export const newsArticles: NewsArticle[] = [
     isOfficial: true,
     isFeatured: false,
     emoji: '🚀',
+    imageUrl: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=400&fit=crop',
     tags: ['GEZMA', 'AI', 'Update'],
   },
   {
@@ -91,6 +95,7 @@ export const newsArticles: NewsArticle[] = [
     isOfficial: true,
     isFeatured: false,
     emoji: '🎓',
+    imageUrl: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600&h=400&fit=crop',
     tags: ['Webinar', 'Marketing', 'AI'],
   },
   {
@@ -107,6 +112,7 @@ export const newsArticles: NewsArticle[] = [
     isOfficial: false,
     isFeatured: false,
     emoji: '💰',
+    imageUrl: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=600&h=400&fit=crop',
     tags: ['Keuangan', 'Tips', 'HPP'],
   },
   {
@@ -123,6 +129,7 @@ export const newsArticles: NewsArticle[] = [
     isOfficial: true,
     isFeatured: false,
     emoji: '🚨',
+    imageUrl: 'https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=600&h=400&fit=crop',
     tags: ['Scam', 'Penipuan', 'Keamanan'],
   },
   {
@@ -139,6 +146,7 @@ export const newsArticles: NewsArticle[] = [
     isOfficial: true,
     isFeatured: false,
     emoji: '🤝',
+    imageUrl: 'https://images.unsplash.com/photo-1519817914152-22d216bb9170?w=600&h=400&fit=crop',
     tags: ['Gathering', 'Networking', 'PPIU'],
   },
   {
@@ -155,6 +163,7 @@ export const newsArticles: NewsArticle[] = [
     isOfficial: false,
     isFeatured: false,
     emoji: '📋',
+    imageUrl: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=600&h=400&fit=crop',
     tags: ['PPIU', 'Izin', 'Siskopatuh'],
   },
   {
@@ -171,6 +180,7 @@ export const newsArticles: NewsArticle[] = [
     isOfficial: false,
     isFeatured: false,
     emoji: '✈️',
+    imageUrl: 'https://images.unsplash.com/photo-1569629743817-70d8db6c323b?w=600&h=400&fit=crop',
     tags: ['Tiket', 'Ramadhan', 'Maskapai'],
   },
   {
@@ -187,6 +197,7 @@ export const newsArticles: NewsArticle[] = [
     isOfficial: false,
     isFeatured: false,
     emoji: '🧳',
+    imageUrl: 'https://images.unsplash.com/photo-1556388158-158ea5ccacbd?w=600&h=400&fit=crop',
     tags: ['Bagasi', 'Maskapai', 'Aturan'],
   },
 ];

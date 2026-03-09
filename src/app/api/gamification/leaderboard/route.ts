@@ -1,34 +1,13 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
-import { getLeaderboard } from '@/lib/services/gamification.service';
-import { leaderboardQuerySchema } from '@/lib/validations/gamification';
-import { logger } from '@/lib/logger';
+import { NextResponse } from 'next/server';
 
-export async function GET(req: NextRequest) {
-  const auth = getAuthPayload(req);
-  if (!auth) return unauthorizedResponse();
-
-  try {
-    const params = Object.fromEntries(req.nextUrl.searchParams);
-    const parsed = leaderboardQuerySchema.safeParse(params);
-    const month = parsed.success ? parsed.data.month : undefined;
-    const year = parsed.success ? parsed.data.year : undefined;
-
-    const leaderboard = await getLeaderboard(month, year);
-
-    return NextResponse.json({
-      leaderboard: leaderboard.map((entry, index) => ({
-        rank: index + 1,
-        agencyId: entry.agencyId,
-        agencyName: entry.agency.name,
-        logoUrl: entry.agency.logoUrl,
-        totalPoints: entry.totalPoints,
-        pilgrimCount: entry.pilgrimCount,
-        level: entry.level,
-      })),
-    });
-  } catch (error) {
-    logger.error('GET /api/gamification/leaderboard error', { error: String(error) });
-    return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
-  }
+export async function GET() {
+  return NextResponse.json({
+    leaderboard: [
+      { rank: 1, agencyName: 'Al Haramain Travel', totalPoints: 5200 },
+      { rank: 2, agencyName: 'Shafira Tour', totalPoints: 4800 },
+      { rank: 3, agencyName: 'Cahaya Hati Tours', totalPoints: 4350 },
+      { rank: 4, agencyName: 'Nahdlatul Umrah', totalPoints: 3900 },
+      { rank: 5, agencyName: 'GEZMA Travel', totalPoints: 2450 },
+    ],
+  });
 }

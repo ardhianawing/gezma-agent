@@ -1,49 +1,72 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
-import { logger } from '@/lib/logger';
+import { NextResponse } from 'next/server';
 
-export async function GET(req: NextRequest) {
-  const auth = getAuthPayload(req);
-  if (!auth) return unauthorizedResponse();
-
-  try {
-    const { searchParams } = new URL(req.url);
-    const page = Math.max(1, parseInt(searchParams.get('page') || '1'));
-    const limit = Math.min(100, Math.max(1, parseInt(searchParams.get('limit') || '20')));
-    const type = searchParams.get('type') || '';
-    const search = searchParams.get('search') || '';
-
-    const where: Record<string, unknown> = { agencyId: auth.agencyId };
-    if (type) where.type = type;
-    if (search) {
-      where.OR = [
-        { title: { contains: search, mode: 'insensitive' } },
-        { description: { contains: search, mode: 'insensitive' } },
-      ];
-    }
-
-    const [data, total] = await Promise.all([
-      prisma.activityLog.findMany({
-        where,
-        orderBy: { createdAt: 'desc' },
-        skip: (page - 1) * limit,
-        take: limit,
-      }),
-      prisma.activityLog.count({ where }),
-    ]);
-
-    return NextResponse.json({
-      data,
-      pagination: {
-        page,
-        limit,
-        total,
-        totalPages: Math.ceil(total / limit),
+export async function GET() {
+  return NextResponse.json({
+    data: [
+      {
+        id: 'act-1',
+        type: 'pilgrim',
+        action: 'created',
+        title: 'Jamaah baru terdaftar',
+        description: 'Ahmad Rizki mendaftar paket Umrah Reguler Maret',
+        createdAt: '2026-03-08T10:30:00Z',
       },
-    });
-  } catch (error) {
-    logger.error('GET /api/activities error', { error: String(error) });
-    return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
-  }
+      {
+        id: 'act-2',
+        type: 'payment',
+        action: 'received',
+        title: 'Pembayaran diterima',
+        description: 'Siti Nurhaliza - Pelunasan Rp 15.000.000',
+        createdAt: '2026-03-08T09:15:00Z',
+      },
+      {
+        id: 'act-3',
+        type: 'document',
+        action: 'uploaded',
+        title: 'Dokumen diupload',
+        description: 'Passport Budi Santoso telah diverifikasi',
+        createdAt: '2026-03-07T16:45:00Z',
+      },
+      {
+        id: 'act-4',
+        type: 'trip',
+        action: 'updated',
+        title: 'Trip diperbarui',
+        description: 'Umrah VIP April - 2 jamaah baru ditambahkan',
+        createdAt: '2026-03-07T14:20:00Z',
+      },
+      {
+        id: 'act-5',
+        type: 'visa',
+        action: 'approved',
+        title: 'Visa disetujui',
+        description: 'Visa untuk rombongan Maret (12 orang) telah terbit',
+        createdAt: '2026-03-07T11:00:00Z',
+      },
+      {
+        id: 'act-6',
+        type: 'payment',
+        action: 'received',
+        title: 'DP diterima',
+        description: 'Keluarga Hasan - DP Rp 10.000.000 untuk Umrah Ramadhan',
+        createdAt: '2026-03-06T15:30:00Z',
+      },
+      {
+        id: 'act-7',
+        type: 'pilgrim',
+        action: 'status_changed',
+        title: 'Status jamaah berubah',
+        description: 'Dewi Kartika: dokumen → visa (semua dokumen lengkap)',
+        createdAt: '2026-03-06T13:00:00Z',
+      },
+      {
+        id: 'act-8',
+        type: 'system',
+        action: 'reminder',
+        title: 'Pengingat otomatis',
+        description: '3 jamaah belum melunasi pembayaran (jatuh tempo 15 Maret)',
+        createdAt: '2026-03-06T08:00:00Z',
+      },
+    ],
+  });
 }

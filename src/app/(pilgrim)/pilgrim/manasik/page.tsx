@@ -166,20 +166,24 @@ export default function ManasikPage() {
             </h1>
           </div>
 
-          {/* Video placeholder */}
+          {/* Video embed */}
           {selectedLesson.videoUrl && (
             <div style={{
-              backgroundColor: c.pageBg,
               borderRadius: '12px',
-              border: '1px solid ' + c.borderLight,
-              padding: '40px 20px',
-              textAlign: 'center',
+              overflow: 'hidden',
               marginBottom: '20px',
+              aspectRatio: '16/9',
             }}>
-              <span style={{ fontSize: '48px', display: 'block', marginBottom: '8px' }}>🎬</span>
-              <p style={{ fontSize: '14px', color: c.textMuted, margin: 0 }}>
-                Video akan tersedia segera
-              </p>
+              <iframe
+                width="100%"
+                height="100%"
+                src={selectedLesson.videoUrl.replace('watch?v=', 'embed/')}
+                title={selectedLesson.title}
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                style={{ border: 'none', borderRadius: '12px' }}
+              />
             </div>
           )}
 

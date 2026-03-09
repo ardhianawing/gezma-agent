@@ -1,165 +1,101 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
-import { checkPermission } from '@/lib/auth-permissions';
-import { PERMISSIONS } from '@/lib/permissions';
-import { pilgrimFormSchema } from '@/lib/validations/pilgrim';
-import { logActivity } from '@/lib/activity-logger';
-import { logger } from '@/lib/logger';
-import { encryptPilgrimFields, decryptPilgrimFields } from '@/lib/encryption';
+import { mockPilgrims } from '@/data/mock-pilgrims';
 
 export async function GET(req: NextRequest) {
-  const auth = getAuthPayload(req);
-  if (!auth) return unauthorizedResponse();
-
   const { searchParams } = new URL(req.url);
   const page = Math.max(1, parseInt(searchParams.get('page') || '1'));
   const limit = Math.min(100, Math.max(1, parseInt(searchParams.get('limit') || '20')));
   const search = searchParams.get('search') || '';
   const status = searchParams.get('status') || '';
   const tripId = searchParams.get('tripId') || '';
+  const available = searchParams.get('available');
 
-  const where: Record<string, unknown> = { agencyId: auth.agencyId, deletedAt: null };
+  let filtered = [...mockPilgrims];
 
   if (status) {
-    where.status = status;
+    filtered = filtered.filter((p) => p.status === status);
   }
 
   if (tripId) {
-    where.tripId = tripId;
+    filtered = filtered.filter((p) => p.tripId === tripId);
   }
 
-  const available = searchParams.get('available');
   if (available === '1') {
-    where.tripId = null;
+    filtered = filtered.filter((p) => p.tripId === null);
   }
 
   if (search) {
-    where.OR = [
-      { name: { contains: search, mode: 'insensitive' } },
-      { nik: { contains: search, mode: 'insensitive' } },
-      { email: { contains: search, mode: 'insensitive' } },
-      { phone: { contains: search, mode: 'insensitive' } },
-    ];
+    const q = search.toLowerCase();
+    filtered = filtered.filter(
+      (p) =>
+        p.name.toLowerCase().includes(q) ||
+        p.nik.includes(q) ||
+        p.email.toLowerCase().includes(q) ||
+        p.phone.includes(q)
+    );
   }
 
-  try {
-    const [data, total] = await Promise.all([
-      prisma.pilgrim.findMany({
-        where,
-        include: { documents: true },
-        orderBy: { createdAt: 'desc' },
-        skip: (page - 1) * limit,
-        take: limit,
-      }),
-      prisma.pilgrim.count({ where }),
-    ]);
+  const total = filtered.length;
+  const start = (page - 1) * limit;
+  const data = filtered.slice(start, start + limit);
 
-    const decryptedData = data.map(p => decryptPilgrimFields(p));
-
-    return NextResponse.json({
-      data: decryptedData,
-      pagination: {
-        page,
-        limit,
-        total,
-        totalPages: Math.ceil(total / limit),
-      },
-    });
-  } catch (error) {
-    logger.error('GET /api/pilgrims error', { error: String(error) });
-    return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
-  }
+  return NextResponse.json({
+    data,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    },
+  });
 }
 
 export async function POST(req: NextRequest) {
-  const auth = getAuthPayload(req);
-  if (!auth) return unauthorizedResponse();
-
-  const denied = await checkPermission(auth, PERMISSIONS.PILGRIMS_CREATE);
-  if (denied) return denied;
-
   try {
     const body = await req.json();
-    const parsed = pilgrimFormSchema.safeParse(body);
 
-    if (!parsed.success) {
-      return NextResponse.json(
-        { error: 'Validasi gagal', details: parsed.error.flatten().fieldErrors },
-        { status: 400 }
-      );
-    }
-
-    const data = parsed.data;
-
-    // Check NIK uniqueness within agency
-    const existing = await prisma.pilgrim.findFirst({
-      where: { nik: data.nik, agencyId: auth.agencyId },
-    });
-
-    if (existing) {
-      return NextResponse.json(
-        { error: 'NIK sudah terdaftar di agency ini' },
-        { status: 409 }
-      );
-    }
-
-    const defaultChecklist = {
-      ktpUploaded: false,
-      passportUploaded: false,
-      passportValid: false,
-      photoUploaded: false,
-      dpPaid: false,
-      fullPayment: false,
-      visaSubmitted: false,
-      visaReceived: false,
-      healthCertificate: false,
+    const newPilgrim = {
+      id: `plg-${Date.now()}`,
+      name: body.name || '',
+      nik: body.nik || '',
+      email: body.email || '',
+      phone: body.phone || '',
+      gender: body.gender || 'L',
+      birthDate: body.birthDate || '',
+      birthPlace: body.birthPlace || '',
+      address: body.address || '',
+      city: body.city || '',
+      province: body.province || '',
+      postalCode: body.postalCode || '',
+      whatsapp: body.whatsapp || '',
+      emergencyContact: body.emergencyContact || '',
+      status: 'lead' as const,
+      tripId: null,
+      tripName: null,
+      packageName: null,
+      totalCost: 0,
+      totalPaid: 0,
+      documents: [],
+      payments: [],
+      checklist: {
+        ktpUploaded: false,
+        passportUploaded: false,
+        passportValid: false,
+        photoUploaded: false,
+        dpPaid: false,
+        fullPayment: false,
+        visaSubmitted: false,
+        visaReceived: false,
+        healthCertificate: false,
+      },
+      registeredAt: new Date().toISOString().split('T')[0],
+      notes: body.notes || '',
+      roomNumber: null,
+      roomType: null,
     };
 
-    const encryptedData = encryptPilgrimFields({
-      nik: data.nik,
-      phone: data.phone,
-      email: data.email,
-      whatsapp: data.whatsapp || null,
-    });
-
-    const pilgrim = await prisma.pilgrim.create({
-      data: {
-        nik: encryptedData.nik,
-        name: data.name,
-        gender: data.gender,
-        birthPlace: data.birthPlace,
-        birthDate: data.birthDate,
-        address: data.address,
-        city: data.city,
-        province: data.province,
-        postalCode: data.postalCode || null,
-        phone: encryptedData.phone,
-        email: encryptedData.email,
-        whatsapp: encryptedData.whatsapp || null,
-        emergencyContact: data.emergencyContact,
-        checklist: defaultChecklist,
-        status: 'lead',
-        notes: data.notes || null,
-        createdBy: auth.userId,
-        agencyId: auth.agencyId,
-      },
-      include: { documents: true, payments: true },
-    });
-
-    logActivity({
-      type: 'pilgrim',
-      action: 'created',
-      title: 'Jemaah baru ditambahkan',
-      description: `${pilgrim.name} ditambahkan sebagai jemaah baru`,
-      userId: auth.userId,
-      agencyId: auth.agencyId,
-      metadata: { entityId: pilgrim.id },
-    });
-
-    return NextResponse.json(decryptPilgrimFields(pilgrim), { status: 201 });
-  } catch (error) {
-    logger.error('POST /api/pilgrims error', { error: String(error) });
+    return NextResponse.json(newPilgrim, { status: 201 });
+  } catch {
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }

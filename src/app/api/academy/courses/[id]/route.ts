@@ -1,51 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
-import { logger } from '@/lib/logger';
+import { courses } from '@/data/mock-academy';
 
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const auth = getAuthPayload(req);
-  if (!auth) return unauthorizedResponse();
-
   const { id } = await params;
 
-  try {
-  const course = await prisma.academyCourse.findUnique({
-    where: { id },
-    include: {
-      lessons: {
-        orderBy: { order: 'asc' },
-        select: {
-          id: true,
-          title: true,
-          order: true,
-          duration: true,
-          videoUrl: true,
-        },
-      },
-      progress: {
-        where: { userId: auth.userId },
-        select: {
-          id: true,
-          completedLessons: true,
-          completedLessonIds: true,
-          totalLessons: true,
-          status: true,
-          startedAt: true,
-          completedAt: true,
-        },
-      },
-    },
-  });
-
+  const course = courses.find((c) => c.id === id);
   if (!course) {
     return NextResponse.json({ error: 'Kursus tidak ditemukan' }, { status: 404 });
   }
 
-  const userProgress = course.progress[0] || null;
+  // Generate mock lessons from course data
+  const lessons = Array.from({ length: course.lessonCount }, (_, i) => ({
+    id: `${course.id}-lesson-${i + 1}`,
+    title: `Pelajaran ${i + 1}: ${course.title} - Bagian ${i + 1}`,
+    order: i + 1,
+    duration: `${Math.floor(Math.random() * 20 + 10)} menit`,
+    videoUrl: course.videoUrl,
+  }));
+
+  const progressPercent = course.progress ?? 0;
+  const completedCount = Math.round((progressPercent / 100) * course.lessonCount);
 
   return NextResponse.json({
     id: course.id,
@@ -53,29 +30,22 @@ export async function GET(
     description: course.description,
     category: course.category,
     level: course.level,
-    thumbnailUrl: course.thumbnailUrl,
+    thumbnailUrl: course.imageUrl || null,
     duration: course.duration,
-    instructorName: course.instructorName,
-    totalLessons: course.totalLessons,
-    isPublished: course.isPublished,
-    lessons: course.lessons,
-    progress: userProgress
+    instructorName: course.instructor,
+    totalLessons: course.lessonCount,
+    isPublished: true,
+    lessons,
+    progress: course.progress != null
       ? {
-          completedLessons: userProgress.completedLessons,
-          completedLessonIds: userProgress.completedLessonIds,
-          totalLessons: userProgress.totalLessons,
-          status: userProgress.status,
-          startedAt: userProgress.startedAt,
-          completedAt: userProgress.completedAt,
-          percent:
-            userProgress.totalLessons > 0
-              ? Math.round((userProgress.completedLessons / userProgress.totalLessons) * 100)
-              : 0,
+          completedLessons: completedCount,
+          completedLessonIds: lessons.slice(0, completedCount).map((l) => l.id),
+          totalLessons: course.lessonCount,
+          status: course.progress >= 100 ? 'completed' : 'in_progress',
+          startedAt: '2025-01-15T08:00:00Z',
+          completedAt: course.progress >= 100 ? '2025-02-20T14:30:00Z' : null,
+          percent: course.progress,
         }
       : null,
   });
-  } catch (error) {
-    logger.error('[ACADEMY_COURSE_GET] error', { error: String(error) });
-    return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
-  }
 }

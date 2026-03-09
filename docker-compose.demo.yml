@@ -1,0 +1,38 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.demo
+    restart: unless-stopped
+    ports:
+      - "3001:3000"
+    environment:
+      DATABASE_URL: postgresql://demo:demo@localhost:5432/demo
+      JWT_SECRET: gezma-agent-preview-secret-key-2024-investor-show
+      JWT_EXPIRES_IN: 7d
+      NEXT_PUBLIC_APP_URL: https://gezma.ezyindustries.my.id
+      NEXT_PUBLIC_APP_NAME: GEZMA Agent
+      APP_URL: https://gezma.ezyindustries.my.id
+      NODE_ENV: production
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - default
+      - traefik-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.gezma.rule=Host(`gezma.ezyindustries.my.id`)"
+      - "traefik.http.routers.gezma.entrypoints=web"
+      - "traefik.http.routers.gezma-secure.rule=Host(`gezma.ezyindustries.my.id`)"
+      - "traefik.http.routers.gezma-secure.entrypoints=websecure"
+      - "traefik.http.routers.gezma-secure.tls.certresolver=letsencrypt"
+      - "traefik.http.services.gezma.loadbalancer.server.port=3000"
+      - "traefik.docker.network=traefik-network"
+
+networks:
+  traefik-network:
+    external: true
