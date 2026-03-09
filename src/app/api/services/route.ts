@@ -1,6 +1,20 @@
 import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
 
 export async function GET() {
+  try {
+    const [services, documents] = await Promise.all([
+      prisma.platformService.findMany({ orderBy: { order: 'asc' } }),
+      prisma.platformDocument.findMany({ orderBy: { name: 'asc' } }),
+    ]);
+
+    if (services.length > 0) {
+      return NextResponse.json({ services, documents });
+    }
+  } catch {
+    // fallback to mock data below
+  }
+
   return NextResponse.json({
     services: [
       {
@@ -10,11 +24,7 @@ export async function GET() {
         emoji: "\uD83C\uDFA7",
         color: "#2563EB",
         category: "support",
-        features: [
-          "Chat langsung 24/7",
-          "Respon cepat via WhatsApp",
-          "Tim support berpengalaman",
-        ],
+        features: ["Chat langsung 24/7", "Respon cepat via WhatsApp", "Tim support berpengalaman"],
         ctaText: "Hubungi Support",
         ctaLink: "#contact-section",
       },
@@ -25,11 +35,7 @@ export async function GET() {
         emoji: "\uD83D\uDEC2",
         color: "#059669",
         category: "dokumen",
-        features: [
-          "Tracking status real-time",
-          "Proses cepat & aman",
-          "Notifikasi otomatis",
-        ],
+        features: ["Tracking status real-time", "Proses cepat & aman", "Notifikasi otomatis"],
         ctaText: "Proses Visa",
         ctaLink: "/pilgrims",
       },
@@ -40,11 +46,7 @@ export async function GET() {
         emoji: "\uD83D\uDEE1\uFE0F",
         color: "#7C3AED",
         category: "asuransi",
-        features: [
-          "Coverage medis lengkap",
-          "Perlindungan perjalanan",
-          "Klaim mudah & cepat",
-        ],
+        features: ["Coverage medis lengkap", "Perlindungan perjalanan", "Klaim mudah & cepat"],
         ctaText: "Lihat Paket",
         ctaLink: "/packages",
       },
@@ -55,11 +57,7 @@ export async function GET() {
         emoji: "\uD83D\uDCD6",
         color: "#D97706",
         category: "edukasi",
-        features: [
-          "Materi lengkap & terstruktur",
-          "Video tutorial interaktif",
-          "Sertifikat kelulusan",
-        ],
+        features: ["Materi lengkap & terstruktur", "Video tutorial interaktif", "Sertifikat kelulusan"],
         ctaText: "Mulai Belajar",
         ctaLink: "/academy",
       },
@@ -70,11 +68,7 @@ export async function GET() {
         emoji: "\uD83D\uDCC1",
         color: "#DC2626",
         category: "dokumen",
-        features: [
-          "Upload & kelola dokumen digital",
-          "Template dokumen siap pakai",
-          "Penyimpanan aman & terenkripsi",
-        ],
+        features: ["Upload & kelola dokumen digital", "Template dokumen siap pakai", "Penyimpanan aman & terenkripsi"],
         ctaText: "Kelola Dokumen",
         ctaLink: "#download-dokumen-section",
       },
@@ -85,56 +79,17 @@ export async function GET() {
         emoji: "\uD83D\uDCB3",
         color: "#0891B2",
         category: "pembayaran",
-        features: [
-          "Transfer bank & e-wallet",
-          "Cicilan tanpa bunga",
-          "Invoice otomatis",
-        ],
+        features: ["Transfer bank & e-wallet", "Cicilan tanpa bunga", "Invoice otomatis"],
         ctaText: "Lihat Pembayaran",
         ctaLink: "/gezmapay",
       },
     ],
     documents: [
-      {
-        id: "doc-1",
-        name: "Template Surat Kuasa",
-        format: "PDF",
-        fileSize: "245 KB",
-        fileUrl: "/documents/surat-kuasa-template.pdf",
-        downloadCount: 128,
-      },
-      {
-        id: "doc-2",
-        name: "Checklist Perlengkapan Umrah",
-        format: "PDF",
-        fileSize: "180 KB",
-        fileUrl: "/documents/checklist-perlengkapan.pdf",
-        downloadCount: 256,
-      },
-      {
-        id: "doc-3",
-        name: "Panduan Visa Saudi Arabia",
-        format: "PDF",
-        fileSize: "520 KB",
-        fileUrl: "/documents/panduan-visa-saudi.pdf",
-        downloadCount: 342,
-      },
-      {
-        id: "doc-4",
-        name: "Template Laporan Keuangan",
-        format: "XLSX",
-        fileSize: "98 KB",
-        fileUrl: "/documents/laporan-keuangan-template.xlsx",
-        downloadCount: 87,
-      },
-      {
-        id: "doc-5",
-        name: "Kontrak Kerjasama Hotel",
-        format: "DOCX",
-        fileSize: "156 KB",
-        fileUrl: "/documents/kontrak-hotel-template.docx",
-        downloadCount: 64,
-      },
+      { id: "doc-1", name: "Template Surat Kuasa", format: "PDF", fileSize: "245 KB", fileUrl: "/documents/surat-kuasa-template.pdf", downloadCount: 128 },
+      { id: "doc-2", name: "Checklist Perlengkapan Umrah", format: "PDF", fileSize: "180 KB", fileUrl: "/documents/checklist-perlengkapan.pdf", downloadCount: 256 },
+      { id: "doc-3", name: "Panduan Visa Saudi Arabia", format: "PDF", fileSize: "520 KB", fileUrl: "/documents/panduan-visa-saudi.pdf", downloadCount: 342 },
+      { id: "doc-4", name: "Template Laporan Keuangan", format: "XLSX", fileSize: "98 KB", fileUrl: "/documents/laporan-keuangan-template.xlsx", downloadCount: 87 },
+      { id: "doc-5", name: "Kontrak Kerjasama Hotel", format: "DOCX", fileSize: "156 KB", fileUrl: "/documents/kontrak-hotel-template.docx", downloadCount: 64 },
     ],
   });
 }
