@@ -28,6 +28,15 @@ const NAV_ITEMS = [
   { label: 'Profil', emoji: '\u{1F464}', href: '/pilgrim/profile' },
 ];
 
+// Mobile bottom nav: show 5 primary items
+const MOBILE_NAV_ITEMS = [
+  NAV_ITEMS[0],  // Beranda
+  NAV_ITEMS[1],  // Perjalanan
+  NAV_ITEMS[3],  // Manasik
+  NAV_ITEMS[4],  // Doa
+  NAV_ITEMS[12], // Profil
+];
+
 function PilgrimLayoutInner({ children }: { children: React.ReactNode }) {
   const { c } = useTheme();
   const { isMobile } = useResponsive();
@@ -187,7 +196,7 @@ function PilgrimLayoutInner({ children }: { children: React.ReactNode }) {
       <main style={{
         flex: 1,
         padding: isMobile ? '16px' : '24px',
-        paddingBottom: isMobile ? '80px' : '24px',
+        paddingBottom: isMobile ? '120px' : '24px',
         maxWidth: '800px',
         width: '100%',
         margin: '0 auto',
@@ -201,14 +210,14 @@ function PilgrimLayoutInner({ children }: { children: React.ReactNode }) {
       {/* SOS Button */}
       <SOSButton />
 
-      {/* Mobile bottom nav */}
+      {/* Mobile bottom nav — 5 primary items */}
       {isMobile && (
         <nav style={{
           position: 'fixed',
           bottom: 0,
           left: 0,
           right: 0,
-          height: '64px',
+          height: '60px',
           backgroundColor: c.cardBg,
           borderTop: '1px solid ' + c.border,
           display: 'flex',
@@ -217,7 +226,7 @@ function PilgrimLayoutInner({ children }: { children: React.ReactNode }) {
           zIndex: 50,
           paddingBottom: 'env(safe-area-inset-bottom, 0px)',
         }}>
-          {NAV_ITEMS.map((item) => {
+          {MOBILE_NAV_ITEMS.map((item) => {
             const isActive = pathname === item.href;
             return (
               <a
@@ -229,15 +238,14 @@ function PilgrimLayoutInner({ children }: { children: React.ReactNode }) {
                   alignItems: 'center',
                   gap: '2px',
                   textDecoration: 'none',
-                  padding: '6px 12px',
+                  padding: '6px 0',
                   borderRadius: '8px',
-                  minWidth: '56px',
-                  backgroundColor: isActive ? PILGRIM_GREEN_LIGHT : 'transparent',
+                  minWidth: '60px',
                   transition: 'all 0.15s',
                 }}
               >
                 <span style={{
-                  fontSize: '20px',
+                  fontSize: '22px',
                   filter: isActive ? 'none' : 'grayscale(0.5)',
                 }}>
                   {item.emoji}
@@ -253,6 +261,56 @@ function PilgrimLayoutInner({ children }: { children: React.ReactNode }) {
             );
           })}
         </nav>
+      )}
+
+      {/* Mobile secondary nav — scrollable strip above bottom nav */}
+      {isMobile && (
+        <div style={{
+          position: 'fixed',
+          bottom: `calc(60px + env(safe-area-inset-bottom, 0px))`,
+          left: 0,
+          right: 0,
+          height: '44px',
+          backgroundColor: c.cardBg,
+          borderTop: '1px solid ' + c.border,
+          display: 'flex',
+          alignItems: 'center',
+          overflowX: 'auto',
+          zIndex: 49,
+          paddingLeft: '8px',
+          paddingRight: '8px',
+          gap: '4px',
+          scrollbarWidth: 'none',
+        }}>
+          {NAV_ITEMS.filter(item => !MOBILE_NAV_ITEMS.includes(item)).map((item) => {
+            const isActive = pathname === item.href;
+            return (
+              <a
+                key={item.href}
+                href={item.href}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  textDecoration: 'none',
+                  padding: '6px 12px',
+                  borderRadius: '20px',
+                  whiteSpace: 'nowrap',
+                  flexShrink: 0,
+                  fontSize: '12px',
+                  fontWeight: isActive ? 600 : 400,
+                  color: isActive ? PILGRIM_GREEN : c.textMuted,
+                  backgroundColor: isActive ? PILGRIM_GREEN_LIGHT : c.pageBg,
+                  border: `1px solid ${isActive ? PILGRIM_GREEN : c.border}`,
+                  transition: 'all 0.15s',
+                }}
+              >
+                <span style={{ fontSize: '14px' }}>{item.emoji}</span>
+                {item.label}
+              </a>
+            );
+          })}
+        </div>
       )}
     </div>
   );

@@ -57,7 +57,7 @@ export default function PilgrimPaymentsPage() {
         </div>
 
         {/* Summary cards */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr 1fr', gap: '10px' }}>
           <div style={{ textAlign: 'center', padding: '12px', backgroundColor: c.pageBg, borderRadius: '10px' }}>
             <p style={{ fontSize: '11px', color: c.textMuted, margin: '0 0 4px 0', fontWeight: 500 }}>Total Paket</p>
             <p style={{ fontSize: isMobile ? '13px' : '15px', fontWeight: 700, color: c.textPrimary, margin: 0 }}>
