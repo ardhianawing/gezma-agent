@@ -1264,7 +1264,7 @@ model PlatformService {
   id          String   @id @default(uuid())
   title       String
   description String
-  emoji       String   @default("\u{1F4E6}")
+  emoji       String   @default("📦")
   color       String   @default("#2563EB")
   category    String   // legal, visa, dokumen, support, asuransi, komunitas
   features    String[] @default([])
