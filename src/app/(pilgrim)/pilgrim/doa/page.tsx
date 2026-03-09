@@ -73,6 +73,7 @@ export default function DoaPage() {
     border: '1px solid ' + c.border,
     borderRadius: '16px',
     padding: '20px',
+    overflow: 'hidden',
   };
 
   if (isLoading) {
@@ -484,12 +485,15 @@ export default function DoaPage() {
                     fontSize: '16px',
                     color: c.textSecondary,
                     margin: '4px 0 0 0',
-                    direction: 'rtl',
+                    textAlign: 'right',
                     fontFamily: '"Amiri", "Traditional Arabic", serif',
                     lineHeight: 1.8,
-                    whiteSpace: 'nowrap',
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical',
                     overflow: 'hidden',
-                    textOverflow: 'ellipsis',
+                    maxWidth: '100%',
+                    wordBreak: 'break-word',
                   }}>
                     {doa.arabic}
                   </p>
