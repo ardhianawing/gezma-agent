@@ -894,31 +894,7 @@ export default function TripDetailPage() {
         </div>
       )}
 
-      {/* Floating SOS Button */}
-      <a
-        href="tel:997"
-        style={{
-          position: 'fixed',
-          bottom: isMobile ? '80px' : '32px',
-          right: '24px',
-          width: '56px',
-          height: '56px',
-          borderRadius: '50%',
-          backgroundColor: '#DC2626',
-          color: 'white',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: '14px',
-          fontWeight: 800,
-          textDecoration: 'none',
-          boxShadow: '0 4px 20px rgba(220, 38, 38, 0.4)',
-          zIndex: 40,
-          letterSpacing: '0.05em',
-        }}
-      >
-        SOS
-      </a>
+      {/* SOS button handled by layout */}
     </div>
   );
 }

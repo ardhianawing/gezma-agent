@@ -66,36 +66,33 @@ export default function SOSButton() {
   if (state === 'idle') {
     return (
       <>
-        <style>{`
-          @keyframes sosPulse {
-            0% { box-shadow: 0 0 0 0 rgba(220,38,38,0.5); }
-            70% { box-shadow: 0 0 0 12px rgba(220,38,38,0); }
-            100% { box-shadow: 0 0 0 0 rgba(220,38,38,0); }
-          }
-        `}</style>
+        {/* SOS button - no pulse animation to avoid distraction */}
         <button
           onClick={() => setState('picker')}
           aria-label="Tombol SOS darurat"
           style={{
             position: 'fixed',
-            bottom: '80px',
-            right: '16px',
-            width: '56px',
-            height: '56px',
+            bottom: '130px',
+            right: '12px',
+            width: '40px',
+            height: '40px',
             borderRadius: '50%',
             backgroundColor: RED,
             color: '#FFFFFF',
             border: 'none',
-            fontSize: '16px',
+            fontSize: '11px',
             fontWeight: 800,
             cursor: 'pointer',
             zIndex: 100,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            animation: 'sosPulse 2s infinite',
+            opacity: 0.7,
+            transition: 'opacity 0.2s',
             letterSpacing: '0.05em',
           }}
+          onMouseEnter={(e) => { (e.target as HTMLButtonElement).style.opacity = '1'; }}
+          onMouseLeave={(e) => { (e.target as HTMLButtonElement).style.opacity = '0.7'; }}
         >
           SOS
         </button>
