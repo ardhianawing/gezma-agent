@@ -15,6 +15,35 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [isDemoLoading, setIsDemoLoading] = useState(false);
+
+  const handleDemoLogin = async () => {
+    setIsDemoLoading(true);
+    setError('');
+    setEmail('owner@gezma.id');
+    setPassword('password123');
+
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: 'owner@gezma.id', password: 'password123' }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || 'Gagal login demo. Pastikan database sudah di-seed.');
+        setIsDemoLoading(false);
+        return;
+      }
+
+      window.location.href = '/dashboard';
+    } catch {
+      setError('Terjadi kesalahan. Silakan coba lagi.');
+      setIsDemoLoading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -429,6 +458,56 @@ export default function LoginPage() {
                 </>
               ) : (
                 'Masuk ke Dashboard'
+              )}
+            </button>
+
+            {/* Divider */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                marginTop: '20px',
+              }}
+            >
+              <div style={{ flex: 1, height: '1px', background: '#E2E8F0' }} />
+              <span style={{ fontSize: '12px', color: '#94A3B8', fontWeight: '500' }}>atau</span>
+              <div style={{ flex: 1, height: '1px', background: '#E2E8F0' }} />
+            </div>
+
+            {/* Demo Login Button */}
+            <button
+              type="button"
+              onClick={handleDemoLogin}
+              disabled={isLoading || isDemoLoading}
+              style={{
+                width: '100%',
+                height: '48px',
+                marginTop: '16px',
+                borderRadius: '12px',
+                border: '1.5px solid #E2E8F0',
+                background: isLoading || isDemoLoading ? '#F1F5F9' : '#FFFFFF',
+                color: isLoading || isDemoLoading ? '#94A3B8' : '#475569',
+                fontSize: '14px',
+                fontWeight: '600',
+                cursor: isLoading || isDemoLoading ? 'not-allowed' : 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                transition: 'all 0.2s ease',
+              }}
+            >
+              {isDemoLoading ? (
+                <>
+                  <Loader2 style={{ width: '16px', height: '16px', animation: 'spin 1s linear infinite' }} />
+                  Masuk Demo...
+                </>
+              ) : (
+                <>
+                  <span style={{ fontSize: '16px' }}>🎯</span>
+                  Coba Demo Gratis
+                </>
               )}
             </button>
           </form>
