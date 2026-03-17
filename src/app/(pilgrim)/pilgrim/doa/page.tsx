@@ -159,10 +159,16 @@ export default function DoaPage() {
               onClick={() => toggleFavorite(selectedDoa.id)}
               style={{
                 padding: '8px',
+                minWidth: '44px',
+                minHeight: '44px',
                 backgroundColor: 'transparent',
                 border: 'none',
                 cursor: 'pointer',
                 fontSize: '24px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
               }}
             >
               {isFav ? '❤️' : '🤍'}
@@ -268,20 +274,22 @@ export default function DoaPage() {
         </div>
 
         {/* Navigation */}
-        <div style={{ display: 'flex', gap: '12px' }}>
+        <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: '10px' }}>
           <button
             onClick={() => { if (hasPrev) setSelectedDoa(doas[currentIndex - 1]); }}
             disabled={!hasPrev}
             style={{
               flex: 1,
-              padding: '12px',
-              fontSize: '13px',
+              padding: '14px',
+              minHeight: '44px',
+              fontSize: '14px',
               fontWeight: 600,
               color: hasPrev ? c.textSecondary : c.textLight,
               backgroundColor: c.cardBg,
               border: '1px solid ' + c.border,
               borderRadius: '10px',
               cursor: hasPrev ? 'pointer' : 'not-allowed',
+              boxSizing: 'border-box',
             }}
           >
             {'\u2190'} {t.common.previous}
@@ -291,14 +299,16 @@ export default function DoaPage() {
             disabled={!hasNext}
             style={{
               flex: 1,
-              padding: '12px',
-              fontSize: '13px',
+              padding: '14px',
+              minHeight: '44px',
+              fontSize: '14px',
               fontWeight: 600,
               color: hasNext ? c.textSecondary : c.textLight,
               backgroundColor: c.cardBg,
               border: '1px solid ' + c.border,
               borderRadius: '10px',
               cursor: hasNext ? 'pointer' : 'not-allowed',
+              boxSizing: 'border-box',
             }}
           >
             {t.common.next} {'\u2192'}
@@ -365,7 +375,8 @@ export default function DoaPage() {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px',
-                padding: '8px 16px',
+                padding: isMobile ? '10px 16px' : '8px 16px',
+                minHeight: '44px',
                 borderRadius: '20px',
                 border: isActive ? 'none' : '1px solid ' + c.border,
                 backgroundColor: isActive ? cat.color : c.cardBg,
@@ -375,6 +386,7 @@ export default function DoaPage() {
                 cursor: 'pointer',
                 whiteSpace: 'nowrap',
                 flexShrink: 0,
+                boxSizing: 'border-box',
               }}
             >
               <span>{cat.icon}</span>
@@ -470,12 +482,17 @@ export default function DoaPage() {
                     <button
                       onClick={(e) => toggleFavorite(doa.id, e)}
                       style={{
-                        padding: '4px',
+                        padding: '8px',
+                        minWidth: '44px',
+                        minHeight: '44px',
                         backgroundColor: 'transparent',
                         border: 'none',
                         cursor: 'pointer',
                         fontSize: '16px',
                         flexShrink: 0,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
                       }}
                     >
                       {isFav ? '❤️' : '🤍'}

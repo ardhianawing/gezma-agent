@@ -284,6 +284,7 @@ export default function TripDetailPage() {
           gap: '8px',
           width: '100%',
           padding: '12px',
+          minHeight: '44px',
           fontSize: '14px',
           fontWeight: 600,
           color: GREEN,
@@ -292,6 +293,7 @@ export default function TripDetailPage() {
           borderRadius: '10px',
           cursor: shareLoading ? 'not-allowed' : 'pointer',
           opacity: shareLoading ? 0.7 : 1,
+          boxSizing: 'border-box',
         }}
       >
         {shareLoading ? t.pilgrimTrip.shareLoading : '\u{1F517} ' + t.pilgrimTrip.shareBtn}
@@ -554,14 +556,17 @@ export default function TripDetailPage() {
           <div style={{
             display: 'flex',
             gap: '10px',
+            width: isMobile ? '100%' : 'auto',
           }}>
             <a
               href={`tel:${trip.muthawwifPhone}`}
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
+                justifyContent: 'center',
                 gap: '6px',
-                padding: '10px 18px',
+                padding: '12px 18px',
+                minHeight: '44px',
                 borderRadius: '10px',
                 backgroundColor: GREEN,
                 color: 'white',
@@ -569,6 +574,8 @@ export default function TripDetailPage() {
                 fontSize: '13px',
                 fontWeight: 600,
                 transition: 'background-color 0.15s',
+                flex: isMobile ? 1 : 'none',
+                boxSizing: 'border-box',
               }}
             >
               &#128222; {t.pilgrimTrip.callBtn}
@@ -580,8 +587,10 @@ export default function TripDetailPage() {
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
+                justifyContent: 'center',
                 gap: '6px',
-                padding: '10px 18px',
+                padding: '12px 18px',
+                minHeight: '44px',
                 borderRadius: '10px',
                 backgroundColor: WA_GREEN,
                 color: 'white',
@@ -589,6 +598,8 @@ export default function TripDetailPage() {
                 fontSize: '13px',
                 fontWeight: 600,
                 transition: 'background-color 0.15s',
+                flex: isMobile ? 1 : 'none',
+                boxSizing: 'border-box',
               }}
             >
               &#128172; {t.pilgrimTrip.waBtn}
@@ -709,16 +720,18 @@ export default function TripDetailPage() {
               display: 'flex',
               alignItems: 'center',
               gap: '10px',
-              padding: '12px 16px',
+              padding: isMobile ? '14px 16px' : '12px 16px',
+              minHeight: '48px',
               borderRadius: '10px',
               backgroundColor: '#FEF2F2',
               textDecoration: 'none',
               transition: 'background-color 0.15s',
+              boxSizing: 'border-box',
             }}
           >
-            <span style={{ fontSize: '18px' }}>{'\u{1F4DE}'}</span>
-            <div>
-              <p style={{ fontSize: '14px', fontWeight: 600, color: '#DC2626', margin: '0 0 2px 0' }}>
+            <span style={{ fontSize: '22px', flexShrink: 0 }}>{'\u{1F4DE}'}</span>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={{ fontSize: '15px', fontWeight: 600, color: '#DC2626', margin: '0 0 2px 0' }}>
                 {t.pilgrimTrip.sosSaudi}
               </p>
               <p style={{ fontSize: '12px', color: '#991B1B', margin: 0 }}>
@@ -734,19 +747,21 @@ export default function TripDetailPage() {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '10px',
-                padding: '12px 16px',
+                padding: isMobile ? '14px 16px' : '12px 16px',
+                minHeight: '48px',
                 borderRadius: '10px',
                 backgroundColor: GREEN_LIGHT,
                 textDecoration: 'none',
                 transition: 'background-color 0.15s',
+                boxSizing: 'border-box',
               }}
             >
-              <span style={{ fontSize: '18px' }}>{'\u{1F4DE}'}</span>
-              <div>
-                <p style={{ fontSize: '14px', fontWeight: 600, color: GREEN_DARK, margin: '0 0 2px 0' }}>
+              <span style={{ fontSize: '22px', flexShrink: 0 }}>{'\u{1F4DE}'}</span>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <p style={{ fontSize: '15px', fontWeight: 600, color: GREEN_DARK, margin: '0 0 2px 0' }}>
                   {t.pilgrimTrip.sosGuide}
                 </p>
-                <p style={{ fontSize: '12px', color: GREEN, margin: 0 }}>
+                <p style={{ fontSize: '12px', color: GREEN, margin: 0, wordBreak: 'break-word' as const }}>
                   {trip.muthawwifName} - {trip.muthawwifPhone}
                 </p>
               </div>
@@ -798,8 +813,8 @@ export default function TripDetailPage() {
                   key={item.day}
                   style={{
                     display: 'flex',
-                    gap: '16px',
-                    paddingBottom: isLast ? 0 : '24px',
+                    gap: isMobile ? '12px' : '16px',
+                    paddingBottom: isLast ? 0 : (isMobile ? '18px' : '24px'),
                     position: 'relative',
                   }}
                 >

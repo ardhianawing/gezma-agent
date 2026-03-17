@@ -296,6 +296,7 @@ export default function ManasikPage() {
           style={{
             width: '100%',
             padding: '14px',
+            minHeight: '48px',
             fontSize: '15px',
             fontWeight: 600,
             color: isCompleted ? GREEN : '#FFFFFF',
@@ -303,26 +304,29 @@ export default function ManasikPage() {
             border: isCompleted ? '2px solid ' + GREEN : 'none',
             borderRadius: '12px',
             cursor: 'pointer',
+            boxSizing: 'border-box',
           }}
         >
           {isCompleted ? '\u2705 ' + t.manasik.markUndone : '\u2610 ' + t.manasik.markDone}
         </button>
 
         {/* Navigation */}
-        <div style={{ display: 'flex', gap: '12px' }}>
+        <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: '10px' }}>
           <button
             onClick={goToPrev}
             disabled={!hasPrev}
             style={{
               flex: 1,
-              padding: '12px',
-              fontSize: '13px',
+              padding: '14px',
+              minHeight: '44px',
+              fontSize: '14px',
               fontWeight: 600,
               color: hasPrev ? c.textSecondary : c.textLight,
               backgroundColor: c.cardBg,
               border: '1px solid ' + c.border,
               borderRadius: '10px',
               cursor: hasPrev ? 'pointer' : 'not-allowed',
+              boxSizing: 'border-box',
             }}
           >
             {'\u2190'} {t.common.previous}
@@ -332,14 +336,16 @@ export default function ManasikPage() {
             disabled={!hasNext}
             style={{
               flex: 1,
-              padding: '12px',
-              fontSize: '13px',
+              padding: '14px',
+              minHeight: '44px',
+              fontSize: '14px',
               fontWeight: 600,
               color: hasNext ? c.textSecondary : c.textLight,
               backgroundColor: c.cardBg,
               border: '1px solid ' + c.border,
               borderRadius: '10px',
               cursor: hasNext ? 'pointer' : 'not-allowed',
+              boxSizing: 'border-box',
             }}
           >
             {t.common.next} {'\u2192'}
@@ -471,7 +477,8 @@ export default function ManasikPage() {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px',
-                padding: '8px 16px',
+                padding: isMobile ? '10px 16px' : '8px 16px',
+                minHeight: '44px',
                 borderRadius: '20px',
                 border: isActive ? 'none' : '1px solid ' + c.border,
                 backgroundColor: isActive ? cat.color : c.cardBg,
@@ -481,6 +488,7 @@ export default function ManasikPage() {
                 cursor: 'pointer',
                 whiteSpace: 'nowrap',
                 flexShrink: 0,
+                boxSizing: 'border-box',
               }}
             >
               <span>{cat.icon}</span>

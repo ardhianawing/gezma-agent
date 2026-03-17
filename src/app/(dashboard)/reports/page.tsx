@@ -160,6 +160,7 @@ export default function ReportsPage() {
 
   const tabStyle = (isActive: boolean): React.CSSProperties => ({
     padding: isMobile ? '10px 14px' : '10px 20px',
+    minHeight: '44px',
     fontSize: '14px',
     fontWeight: isActive ? 600 : 400,
     color: isActive ? c.primary : c.textMuted,
@@ -168,6 +169,7 @@ export default function ReportsPage() {
     borderBottom: isActive ? `2px solid ${c.primary}` : '2px solid transparent',
     cursor: 'pointer',
     whiteSpace: 'nowrap',
+    flexShrink: 0,
   });
 
   const cardStyle: React.CSSProperties = {
@@ -177,16 +179,18 @@ export default function ReportsPage() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '16px' : '24px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: isMobile ? 'stretch' : 'flex-start', flexWrap: 'wrap', gap: '12px', flexDirection: isMobile ? 'column' : 'row' }}>
         <PageHeader title={t.reports.title} description={t.reports.description} />
         <button
           onClick={handleExportCSV}
           style={{
             display: 'inline-flex', alignItems: 'center', gap: '8px',
-            padding: '10px 16px', borderRadius: '10px',
+            padding: '10px 16px', minHeight: '44px', borderRadius: '10px',
             backgroundColor: c.cardBg, color: c.textSecondary,
             border: `1px solid ${c.border}`, fontSize: '14px',
             fontWeight: 500, cursor: 'pointer',
+            width: isMobile ? '100%' : 'auto',
+            justifyContent: 'center',
           }}
         >
           <Download style={{ width: '16px', height: '16px' }} />
@@ -198,6 +202,7 @@ export default function ReportsPage() {
       <div style={{
         display: 'flex', gap: '0', overflowX: 'auto',
         borderBottom: `1px solid ${c.border}`,
+        WebkitOverflowScrolling: 'touch' as const,
       }}>
         {TABS.map(tab => (
           <button key={tab.key} onClick={() => setActiveTab(tab.key)} style={tabStyle(activeTab === tab.key)}>
@@ -212,12 +217,12 @@ export default function ReportsPage() {
           backgroundColor: c.cardBg, borderRadius: '12px',
           border: `1px solid ${c.border}`, padding: isMobile ? '12px' : '16px',
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', alignItems: isMobile ? 'stretch' : 'center', gap: '12px', flexWrap: 'wrap', flexDirection: isMobile ? 'column' : 'row' }}>
             <button
               onClick={() => setCompareEnabled(!compareEnabled)}
               style={{
-                display: 'inline-flex', alignItems: 'center', gap: '6px',
-                padding: '8px 14px', borderRadius: '8px',
+                display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
+                padding: '10px 14px', minHeight: '44px', borderRadius: '8px',
                 border: compareEnabled ? `2px solid ${c.primary}` : `1px solid ${c.border}`,
                 backgroundColor: compareEnabled ? c.primaryLight : 'transparent',
                 color: compareEnabled ? c.primary : c.textSecondary,
@@ -229,29 +234,31 @@ export default function ReportsPage() {
             </button>
             {compareEnabled && (
               <>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <div style={{ display: 'flex', alignItems: isMobile ? 'stretch' : 'center', gap: '6px', flexDirection: isMobile ? 'column' : 'row', flex: isMobile ? 1 : undefined }}>
                   <label style={{ fontSize: '12px', color: c.textMuted }}>{t.reports.compareFrom}</label>
                   <input
                     type="date"
                     value={compareFrom}
                     onChange={e => setCompareFrom(e.target.value)}
                     style={{
-                      padding: '6px 10px', fontSize: '13px', borderRadius: '6px',
+                      padding: '8px 10px', minHeight: '46px', fontSize: '13px', borderRadius: '6px',
                       border: `1px solid ${c.border}`, backgroundColor: c.inputBg,
                       color: c.textPrimary, outline: 'none',
+                      boxSizing: 'border-box' as const, width: isMobile ? '100%' : undefined,
                     }}
                   />
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <div style={{ display: 'flex', alignItems: isMobile ? 'stretch' : 'center', gap: '6px', flexDirection: isMobile ? 'column' : 'row', flex: isMobile ? 1 : undefined }}>
                   <label style={{ fontSize: '12px', color: c.textMuted }}>{t.reports.compareTo}</label>
                   <input
                     type="date"
                     value={compareTo}
                     onChange={e => setCompareTo(e.target.value)}
                     style={{
-                      padding: '6px 10px', fontSize: '13px', borderRadius: '6px',
+                      padding: '8px 10px', minHeight: '46px', fontSize: '13px', borderRadius: '6px',
                       border: `1px solid ${c.border}`, backgroundColor: c.inputBg,
                       color: c.textPrimary, outline: 'none',
+                      boxSizing: 'border-box' as const, width: isMobile ? '100%' : undefined,
                     }}
                   />
                 </div>
@@ -614,8 +621,8 @@ function FunnelTab({ data, c }: { data: ConversionReport; c: ReturnType<typeof u
         {data.funnel.map((step, i) => {
           const widthPct = data.total > 0 ? Math.max(5, (step.count / data.total) * 100) : 5;
           return (
-            <div key={step.step} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <span style={{ fontSize: '13px', color: c.textMuted, width: '80px', flexShrink: 0, textAlign: 'right' }}>
+            <div key={step.step} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontSize: '12px', color: c.textMuted, width: '70px', flexShrink: 0, textAlign: 'right' }}>
                 {step.label}
               </span>
               <div style={{ flex: 1, position: 'relative' }}>

@@ -577,13 +577,15 @@ export default function ProfilePage() {
               alignItems: 'center',
               justifyContent: 'center',
               gap: '6px',
-              padding: '10px',
+              padding: '12px',
+              minHeight: '44px',
               backgroundColor: '#25D366',
               color: '#FFFFFF',
               borderRadius: '10px',
               textDecoration: 'none',
               fontSize: '13px',
               fontWeight: 600,
+              boxSizing: 'border-box',
             }}
           >
             {'\u{1F4AC}'} {t.pilgrimPortal.agencyWa}
@@ -596,7 +598,8 @@ export default function ProfilePage() {
               alignItems: 'center',
               justifyContent: 'center',
               gap: '6px',
-              padding: '10px',
+              padding: '12px',
+              minHeight: '44px',
               backgroundColor: c.pageBg,
               color: c.textPrimary,
               border: '1px solid ' + c.border,
@@ -604,6 +607,7 @@ export default function ProfilePage() {
               textDecoration: 'none',
               fontSize: '13px',
               fontWeight: 600,
+              boxSizing: 'border-box',
             }}
           >
             {'\u{1F4DE}'} {t.pilgrimPortal.agencyPhone}
@@ -799,8 +803,13 @@ export default function ProfilePage() {
                       backgroundColor: 'transparent',
                       border: 'none',
                       cursor: 'pointer',
-                      padding: '0 2px',
+                      padding: '4px 6px',
+                      minWidth: '44px',
+                      minHeight: '44px',
                       lineHeight: 1,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
                     }}
                   >
                     {'\u{2B50}'}

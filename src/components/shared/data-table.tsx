@@ -96,9 +96,81 @@ export function DataTable<T>({
           description={emptyDescription}
           action={emptyAction}
         />
+      ) : isMobile ? (
+        /* Mobile: Card layout */
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1px', backgroundColor: c.borderLight }}>
+          {data.map((row, index) => {
+            const customRowStyle = rowStyle ? rowStyle(row) : undefined;
+            return (
+              <div
+                key={keyExtractor(row)}
+                onClick={onRowClick ? () => onRowClick(row) : undefined}
+                style={{
+                  backgroundColor: customRowStyle?.backgroundColor || c.cardBg,
+                  padding: '16px',
+                  cursor: onRowClick ? 'pointer' : 'default',
+                  transition: 'background 150ms ease',
+                  position: 'relative',
+                  ...customRowStyle,
+                }}
+              >
+                {columns.map((col) => {
+                  if (col.key === 'select') {
+                    return (
+                      <div
+                        key={col.key}
+                        style={{ position: 'absolute', top: '16px', right: '16px' }}
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        {col.render(row, index)}
+                      </div>
+                    );
+                  }
+                  return null;
+                })}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', position: 'relative' }}>
+                  {columns.filter((col) => col.key !== 'select' && col.key !== 'actions').map((col) => (
+                    <div key={col.key} style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                      {col.header && (
+                        <span style={{
+                          fontSize: '11px',
+                          fontWeight: '600',
+                          color: c.textMuted,
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.05em',
+                        }}>
+                          {col.header}
+                        </span>
+                      )}
+                      <div style={{ fontSize: '14px', color: c.textSecondary }}>
+                        {col.render(row, index)}
+                      </div>
+                    </div>
+                  ))}
+                  {/* Actions row */}
+                  {columns.filter((col) => col.key === 'actions').map((col) => (
+                    <div
+                      key={col.key}
+                      style={{
+                        display: 'flex',
+                        gap: '8px',
+                        paddingTop: '8px',
+                        borderTop: `1px solid ${c.borderLight}`,
+                        marginTop: '4px',
+                      }}
+                    >
+                      {col.render(row, index)}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
       ) : (
+        /* Tablet/Desktop: Table layout */
         <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: isMobile ? '600px' : 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ backgroundColor: c.cardBgHover, borderBottom: `1px solid ${c.border}` }}>
                 {visibleColumns.map((col) => (
@@ -106,7 +178,7 @@ export function DataTable<T>({
                     key={col.key}
                     style={{
                       textAlign: 'left',
-                      padding: isMobile ? '12px 16px' : '16px 24px',
+                      padding: '16px 24px',
                       fontSize: '12px',
                       fontWeight: '600',
                       color: c.textSecondary,
@@ -146,7 +218,7 @@ export function DataTable<T>({
                     <td
                       key={col.key}
                       style={{
-                        padding: isMobile ? '12px 16px' : '16px 24px',
+                        padding: '16px 24px',
                         fontSize: '14px',
                         color: c.textSecondary,
                         width: col.width,

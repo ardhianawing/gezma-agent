@@ -343,7 +343,7 @@ export default function DashboardPage() {
                 <Trophy style={{ width: '20px', height: '20px', color: '#FDE68A' }} />
                 <h3 style={{ fontSize: '16px', fontWeight: '600', color: 'white', margin: 0 }}>{t.dashboard.gamificationTitle}</h3>
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: isMobile ? '12px' : '16px' }}>
                 {[
                   { icon: Star, label: t.dashboard.gamificationPoints, value: gamification.totalPoints, color: '#FDE68A' },
                   { icon: TrendingUp, label: t.dashboard.gamificationLevel, value: gamification.level, color: '#93C5FD' },
@@ -352,11 +352,11 @@ export default function DashboardPage() {
                 ].map(item => {
                   const Icon = item.icon;
                   return (
-                    <div key={item.label} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                      <Icon style={{ width: '18px', height: '18px', color: item.color, flexShrink: 0 }} />
-                      <div>
-                        <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.7)', margin: 0 }}>{item.label}</p>
-                        <p style={{ fontSize: '20px', fontWeight: '700', color: 'white', margin: 0 }}>{item.value}</p>
+                    <div key={item.label} style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '8px' : '10px' }}>
+                      <Icon style={{ width: isMobile ? '16px' : '18px', height: isMobile ? '16px' : '18px', color: item.color, flexShrink: 0 }} />
+                      <div style={{ minWidth: 0 }}>
+                        <p style={{ fontSize: isMobile ? '10px' : '11px', color: 'rgba(255,255,255,0.7)', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.label}</p>
+                        <p style={{ fontSize: isMobile ? '18px' : '20px', fontWeight: '700', color: 'white', margin: 0 }}>{item.value}</p>
                       </div>
                     </div>
                   );
@@ -370,12 +370,12 @@ export default function DashboardPage() {
                 backgroundColor: c.cardBg,
                 borderRadius: '12px',
                 border: `1px solid ${c.border}`,
-                padding: isMobile ? '20px' : '24px',
+                padding: isMobile ? '16px' : '24px',
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: isMobile ? '12px' : '16px' }}>
                 <Trophy style={{ width: '18px', height: '18px', color: '#8B5CF6' }} />
-                <h3 style={{ fontSize: '16px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>{t.dashboard.leaderboardTitle}</h3>
+                <h3 style={{ fontSize: isMobile ? '14px' : '16px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>{t.dashboard.leaderboardTitle}</h3>
               </div>
               {leaderboardMini.length === 0 ? (
                 <EmptyState icon={Trophy} title={t.dashboard.leaderboardEmpty} />
@@ -521,7 +521,7 @@ export default function DashboardPage() {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', width: '100%' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '16px' : '24px', width: '100%' }}>
       {/* ONBOARDING TOUR */}
       {showOnboarding && (
         <OnboardingTour steps={ONBOARDING_STEPS} onComplete={handleOnboardingComplete} />
@@ -530,7 +530,7 @@ export default function DashboardPage() {
       {/* HEADER */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px' }}>
         <div>
-          <h1 style={{ fontSize: '28px', fontWeight: '700', color: c.textPrimary, margin: 0 }}>
+          <h1 style={{ fontSize: isMobile ? '22px' : '28px', fontWeight: '700', color: c.textPrimary, margin: 0 }}>
             {t.dashboard.title}
           </h1>
           <p style={{ fontSize: '14px', color: c.textMuted, marginTop: '4px' }}>
@@ -543,29 +543,29 @@ export default function DashboardPage() {
               onClick={resetLayout}
               style={{
                 display: 'inline-flex', alignItems: 'center', gap: '6px',
-                padding: '8px 14px', borderRadius: '8px',
+                padding: isMobile ? '8px 10px' : '8px 14px', borderRadius: '8px',
                 border: `1px solid ${c.border}`, backgroundColor: c.cardBg,
                 color: c.textSecondary, fontSize: '13px', fontWeight: 500,
-                cursor: 'pointer',
+                cursor: 'pointer', minHeight: '44px',
               }}
             >
               <RotateCcw style={{ width: '14px', height: '14px' }} />
-              {t.dashboard.resetDefault}
+              {isMobile ? '' : t.dashboard.resetDefault}
             </button>
           )}
           <button
             onClick={() => setEditMode(!editMode)}
             style={{
               display: 'inline-flex', alignItems: 'center', gap: '6px',
-              padding: '8px 14px', borderRadius: '8px',
+              padding: isMobile ? '8px 10px' : '8px 14px', borderRadius: '8px',
               border: editMode ? `2px solid ${c.primary}` : `1px solid ${c.border}`,
               backgroundColor: editMode ? c.primaryLight : c.cardBg,
               color: editMode ? c.primary : c.textSecondary,
-              fontSize: '13px', fontWeight: 500, cursor: 'pointer',
+              fontSize: '13px', fontWeight: 500, cursor: 'pointer', minHeight: '44px',
             }}
           >
             <Settings2 style={{ width: '14px', height: '14px' }} />
-            {editMode ? t.dashboard.doneWidget : t.dashboard.editWidget}
+            {isMobile ? (editMode ? t.dashboard.doneWidget : '') : (editMode ? t.dashboard.doneWidget : t.dashboard.editWidget)}
           </button>
         </div>
       </div>
@@ -627,23 +627,24 @@ export default function DashboardPage() {
                 transition: 'all 0.2s ease',
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: visible ? '12px' : 0 }}>
-                <GripVertical style={{ width: '18px', height: '18px', color: c.textMuted, cursor: 'grab', flexShrink: 0 }} />
-                <span style={{ flex: 1, fontSize: '14px', fontWeight: 600, color: c.textPrimary }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '8px' : '12px', marginBottom: visible ? '12px' : 0 }}>
+                <GripVertical style={{ width: '18px', height: '18px', color: c.textMuted, cursor: 'grab', flexShrink: 0, touchAction: 'none' }} />
+                <span style={{ flex: 1, fontSize: isMobile ? '13px' : '14px', fontWeight: 600, color: c.textPrimary }}>
                   {widgetLabel(wl.key)}
                 </span>
                 <button
                   onClick={() => toggleWidgetVisibility(wl.key)}
                   style={{
                     display: 'inline-flex', alignItems: 'center', gap: '4px',
-                    padding: '6px 12px', borderRadius: '6px',
+                    padding: isMobile ? '8px 10px' : '6px 12px', borderRadius: '6px',
                     border: `1px solid ${c.border}`, backgroundColor: 'transparent',
                     color: visible ? c.success : c.textMuted, fontSize: '12px',
                     fontWeight: 500, cursor: 'pointer',
+                    minHeight: '44px',
                   }}
                 >
                   {visible ? <Eye style={{ width: '14px', height: '14px' }} /> : <EyeOff style={{ width: '14px', height: '14px' }} />}
-                  {visible ? t.dashboard.widgetVisible : t.dashboard.widgetHidden}
+                  {isMobile ? '' : (visible ? t.dashboard.widgetVisible : t.dashboard.widgetHidden)}
                 </button>
               </div>
               {visible && renderWidget(wl.key)}

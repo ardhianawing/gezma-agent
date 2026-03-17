@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useTheme } from '@/lib/theme';
@@ -28,13 +28,179 @@ const NAV_ITEMS = [
   { label: 'Profil', emoji: '\u{1F464}', href: '/pilgrim/profile' },
 ];
 
-const MOBILE_NAV_ITEMS = [
+
+// Items shown as icons in the primary bottom bar (4 items + More)
+const MOBILE_PRIMARY_ITEMS = [
   NAV_ITEMS[0],  // Beranda
   NAV_ITEMS[1],  // Perjalanan
   NAV_ITEMS[3],  // Manasik
   NAV_ITEMS[4],  // Doa
-  NAV_ITEMS[12], // Profil
 ];
+
+// Items shown in the "More" expandable menu
+const MOBILE_MORE_ITEMS = NAV_ITEMS.filter(item => !MOBILE_PRIMARY_ITEMS.includes(item));
+
+function MobileLayout({ c, data, pathname, children }: {
+  c: ReturnType<typeof useTheme>['c'];
+  data: { pilgrim: { name: string } };
+  pathname: string;
+  children: React.ReactNode;
+}) {
+  const [showMore, setShowMore] = useState(false);
+
+  // Close "More" menu when navigating
+  useEffect(() => {
+    setShowMore(false);
+  }, [pathname]);
+
+  const isMoreActive = MOBILE_MORE_ITEMS.some(item => pathname === item.href);
+
+  return (
+    <div style={{ minHeight: '100vh', backgroundColor: c.pageBg, display: 'flex', flexDirection: 'column' }}>
+      {/* Mobile header */}
+      <header style={{
+        backgroundColor: c.cardBg, borderBottom: '1px solid ' + c.border,
+        padding: '0 16px', height: '52px',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        position: 'sticky', top: 0, zIndex: 50,
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <Image src="/logo-light.png" alt="GEZMA" width={24} height={24} style={{ objectFit: 'contain' }} />
+          <span style={{ fontWeight: 700, fontSize: '15px', color: PILGRIM_GREEN }}>GEZMA Pilgrim</span>
+        </div>
+        <span style={{ fontSize: '13px', color: c.textMuted, fontWeight: 500 }}>
+          {data.pilgrim.name.split(' ')[0]}
+        </span>
+      </header>
+
+      {/* Main content */}
+      <main style={{
+        flex: 1, padding: '16px',
+        paddingBottom: '76px',
+        maxWidth: '800px', width: '100%',
+        margin: '0 auto', boxSizing: 'border-box',
+      }}>
+        {children}
+      </main>
+
+      <SOSButton />
+
+      {/* "More" overlay menu */}
+      {showMore && (
+        <>
+          {/* Backdrop */}
+          <div
+            onClick={() => setShowMore(false)}
+            style={{
+              position: 'fixed', inset: 0, zIndex: 48,
+              backgroundColor: 'rgba(0,0,0,0.3)',
+            }}
+          />
+          {/* Menu panel */}
+          <div style={{
+            position: 'fixed',
+            bottom: `calc(60px + env(safe-area-inset-bottom, 0px))`,
+            left: '8px', right: '8px',
+            backgroundColor: c.cardBg,
+            borderRadius: '16px 16px 0 0',
+            border: `1px solid ${c.border}`,
+            borderBottom: 'none',
+            boxShadow: '0 -4px 20px rgba(0,0,0,0.1)',
+            zIndex: 51,
+            padding: '12px 8px',
+            display: 'grid',
+            gridTemplateColumns: 'repeat(4, 1fr)',
+            gap: '4px',
+          }}>
+            {MOBILE_MORE_ITEMS.map((item) => {
+              const isActive = pathname === item.href;
+              return (
+                <a
+                  key={item.href}
+                  href={item.href}
+                  style={{
+                    display: 'flex', flexDirection: 'column', alignItems: 'center',
+                    gap: '4px', textDecoration: 'none', padding: '10px 4px',
+                    borderRadius: '12px', transition: 'all 0.15s',
+                    backgroundColor: isActive ? PILGRIM_GREEN_LIGHT : 'transparent',
+                    minHeight: '44px',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <span style={{ fontSize: '20px' }}>{item.emoji}</span>
+                  <span style={{
+                    fontSize: '11px', fontWeight: isActive ? 600 : 400,
+                    color: isActive ? PILGRIM_GREEN : c.textMuted,
+                    textAlign: 'center', lineHeight: '1.2',
+                  }}>
+                    {item.label}
+                  </span>
+                </a>
+              );
+            })}
+          </div>
+        </>
+      )}
+
+      {/* Single bottom nav — 4 primary items + More */}
+      <nav style={{
+        position: 'fixed', bottom: 0, left: 0, right: 0, height: '60px',
+        backgroundColor: c.cardBg, borderTop: '1px solid ' + c.border,
+        display: 'flex', alignItems: 'center', justifyContent: 'space-around',
+        zIndex: 50, paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+      }}>
+        {MOBILE_PRIMARY_ITEMS.map((item) => {
+          const isActive = pathname === item.href;
+          return (
+            <a
+              key={item.href}
+              href={item.href}
+              style={{
+                display: 'flex', flexDirection: 'column', alignItems: 'center',
+                gap: '2px', textDecoration: 'none', padding: '6px 0',
+                borderRadius: '8px', minWidth: '52px', minHeight: '44px',
+                justifyContent: 'center', transition: 'all 0.15s',
+              }}
+            >
+              <span style={{ fontSize: '22px', filter: isActive ? 'none' : 'grayscale(0.5)' }}>
+                {item.emoji}
+              </span>
+              <span style={{ fontSize: '10px', fontWeight: isActive ? 600 : 400, color: isActive ? PILGRIM_GREEN : c.textMuted }}>
+                {item.label}
+              </span>
+            </a>
+          );
+        })}
+
+        {/* More button */}
+        <button
+          onClick={() => setShowMore(!showMore)}
+          style={{
+            display: 'flex', flexDirection: 'column', alignItems: 'center',
+            gap: '2px', padding: '6px 0', border: 'none',
+            backgroundColor: 'transparent', cursor: 'pointer',
+            borderRadius: '8px', minWidth: '52px', minHeight: '44px',
+            justifyContent: 'center', transition: 'all 0.15s',
+          }}
+        >
+          <span style={{
+            fontSize: '22px',
+            filter: (showMore || isMoreActive) ? 'none' : 'grayscale(0.5)',
+          }}>
+            {showMore ? '\u2716\uFE0F' : '\u2699\uFE0F'}
+          </span>
+          <span style={{
+            fontSize: '10px',
+            fontWeight: (showMore || isMoreActive) ? 600 : 400,
+            color: (showMore || isMoreActive) ? PILGRIM_GREEN : c.textMuted,
+          }}>
+            Lainnya
+          </span>
+        </button>
+      </nav>
+    </div>
+  );
+}
 
 function PilgrimLayoutInner({ children }: { children: React.ReactNode }) {
   const { c } = useTheme();
@@ -246,101 +412,15 @@ function PilgrimLayoutInner({ children }: { children: React.ReactNode }) {
     );
   }
 
-  // Mobile
+  // Mobile — single bottom nav bar with "More" menu
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: c.pageBg, display: 'flex', flexDirection: 'column' }}>
-      {/* Mobile header */}
-      <header style={{
-        backgroundColor: c.cardBg, borderBottom: '1px solid ' + c.border,
-        padding: '0 16px', height: '52px',
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        position: 'sticky', top: 0, zIndex: 50,
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <Image src="/logo-light.png" alt="GEZMA" width={24} height={24} style={{ objectFit: 'contain' }} />
-          <span style={{ fontWeight: 700, fontSize: '15px', color: PILGRIM_GREEN }}>GEZMA Pilgrim</span>
-        </div>
-        <span style={{ fontSize: '13px', color: c.textMuted, fontWeight: 500 }}>
-          {data.pilgrim.name.split(' ')[0]}
-        </span>
-      </header>
-
-      {/* Main content */}
-      <main style={{
-        flex: 1, padding: '16px',
-        paddingBottom: '120px',
-        maxWidth: '800px', width: '100%',
-        margin: '0 auto', boxSizing: 'border-box',
-      }}>
-        <PilgrimErrorBoundary>{children}</PilgrimErrorBoundary>
-      </main>
-
-      <SOSButton />
-
-      {/* Mobile bottom nav — 5 primary items */}
-      <nav style={{
-        position: 'fixed', bottom: 0, left: 0, right: 0, height: '60px',
-        backgroundColor: c.cardBg, borderTop: '1px solid ' + c.border,
-        display: 'flex', alignItems: 'center', justifyContent: 'space-around',
-        zIndex: 50, paddingBottom: 'env(safe-area-inset-bottom, 0px)',
-      }}>
-        {MOBILE_NAV_ITEMS.map((item) => {
-          const isActive = pathname === item.href;
-          return (
-            <a
-              key={item.href}
-              href={item.href}
-              style={{
-                display: 'flex', flexDirection: 'column', alignItems: 'center',
-                gap: '2px', textDecoration: 'none', padding: '6px 0',
-                borderRadius: '8px', minWidth: '60px', transition: 'all 0.15s',
-              }}
-            >
-              <span style={{ fontSize: '22px', filter: isActive ? 'none' : 'grayscale(0.5)' }}>
-                {item.emoji}
-              </span>
-              <span style={{ fontSize: '10px', fontWeight: isActive ? 600 : 400, color: isActive ? PILGRIM_GREEN : c.textMuted }}>
-                {item.label}
-              </span>
-            </a>
-          );
-        })}
-      </nav>
-
-      {/* Mobile secondary nav — scrollable strip */}
-      <div style={{
-        position: 'fixed',
-        bottom: `calc(60px + env(safe-area-inset-bottom, 0px))`,
-        left: 0, right: 0, height: '44px',
-        backgroundColor: c.cardBg, borderTop: '1px solid ' + c.border,
-        display: 'flex', alignItems: 'center', overflowX: 'auto',
-        zIndex: 49, paddingLeft: '8px', paddingRight: '8px',
-        gap: '4px', scrollbarWidth: 'none',
-      }}>
-        {NAV_ITEMS.filter(item => !MOBILE_NAV_ITEMS.includes(item)).map((item) => {
-          const isActive = pathname === item.href;
-          return (
-            <a
-              key={item.href}
-              href={item.href}
-              style={{
-                display: 'flex', alignItems: 'center', gap: '4px',
-                textDecoration: 'none', padding: '6px 12px', borderRadius: '20px',
-                whiteSpace: 'nowrap', flexShrink: 0, fontSize: '12px',
-                fontWeight: isActive ? 600 : 400,
-                color: isActive ? PILGRIM_GREEN : c.textMuted,
-                backgroundColor: isActive ? PILGRIM_GREEN_LIGHT : c.pageBg,
-                border: `1px solid ${isActive ? PILGRIM_GREEN : c.border}`,
-                transition: 'all 0.15s',
-              }}
-            >
-              <span style={{ fontSize: '14px' }}>{item.emoji}</span>
-              {item.label}
-            </a>
-          );
-        })}
-      </div>
-    </div>
+    <MobileLayout
+      c={c}
+      data={data}
+      pathname={pathname}
+    >
+      <PilgrimErrorBoundary>{children}</PilgrimErrorBoundary>
+    </MobileLayout>
   );
 }
 

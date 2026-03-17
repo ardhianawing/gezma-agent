@@ -168,7 +168,7 @@ export function Header({ onMenuClick, showMenuButton = false }: HeaderProps) {
             <button
               onClick={onMenuClick}
               style={{
-                padding: '10px',
+                padding: '12px',
                 borderRadius: '12px',
                 border: 'none',
                 backgroundColor: c.cardBgHover,
@@ -177,6 +177,8 @@ export function Header({ onMenuClick, showMenuButton = false }: HeaderProps) {
                 alignItems: 'center',
                 justifyContent: 'center',
                 flexShrink: 0,
+                minWidth: '44px',
+                minHeight: '44px',
               }}
             >
               <Menu style={{ width: '20px', height: '20px', color: c.textMuted }} />
@@ -229,7 +231,7 @@ export function Header({ onMenuClick, showMenuButton = false }: HeaderProps) {
             <button
               onClick={() => setShowCommandPalette(true)}
               style={{
-                padding: '10px',
+                padding: '12px',
                 borderRadius: '12px',
                 border: 'none',
                 backgroundColor: 'transparent',
@@ -237,6 +239,8 @@ export function Header({ onMenuClick, showMenuButton = false }: HeaderProps) {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
+                minWidth: '44px',
+                minHeight: '44px',
               }}
             >
               <Search style={{ width: '20px', height: '20px', color: c.textMuted }} />
@@ -258,12 +262,17 @@ export function Header({ onMenuClick, showMenuButton = false }: HeaderProps) {
               onClick={handleBellClick}
               style={{
                 position: 'relative',
-                padding: '10px',
+                padding: '12px',
                 borderRadius: '12px',
                 border: 'none',
                 backgroundColor: showNotifs ? c.cardBgHover : 'transparent',
                 cursor: 'pointer',
                 transition: 'background-color 0.2s',
+                minWidth: '44px',
+                minHeight: '44px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
             >
               <Bell style={{ width: '20px', height: '20px', color: c.textMuted }} />
@@ -285,12 +294,24 @@ export function Header({ onMenuClick, showMenuButton = false }: HeaderProps) {
             {/* Notification Dropdown */}
             {showNotifs && (
               <div
-                style={{
+                style={isMobile ? {
+                  position: 'fixed',
+                  left: '16px',
+                  right: '16px',
+                  top: '72px',
+                  maxHeight: '400px',
+                  overflowY: 'auto',
+                  backgroundColor: c.cardBg,
+                  borderRadius: '12px',
+                  border: `1px solid ${c.border}`,
+                  boxShadow: '0 10px 40px rgba(0,0,0,0.12)',
+                  zIndex: 50,
+                } : {
                   position: 'absolute',
                   right: 0,
                   top: '100%',
                   marginTop: '8px',
-                  width: isMobile ? '300px' : '360px',
+                  width: '360px',
                   maxHeight: '400px',
                   overflowY: 'auto',
                   backgroundColor: c.cardBg,
@@ -382,6 +403,9 @@ export function Header({ onMenuClick, showMenuButton = false }: HeaderProps) {
                 backgroundColor: showUserMenu ? c.cardBgHover : 'transparent',
                 cursor: 'pointer',
                 transition: 'background-color 0.2s',
+                minWidth: '44px',
+                minHeight: '44px',
+                justifyContent: 'center',
               }}
             >
               <div

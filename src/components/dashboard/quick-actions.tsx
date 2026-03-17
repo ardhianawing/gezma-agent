@@ -62,8 +62,8 @@ export function QuickActions() {
     },
   ];
 
-  // Responsive grid columns - use auto-fill for better tablet support
-  const gridColumns = isMobile ? '1fr' : 'repeat(auto-fill, minmax(280px, 1fr))';
+  // Responsive grid columns - 2 cols on mobile, auto-fill for tablet/desktop
+  const gridColumns = isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fill, minmax(280px, 1fr))';
 
   return (
     <div
@@ -97,14 +97,16 @@ export function QuickActions() {
               <div
                 style={{
                   display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  padding: isMobile ? '14px' : '16px',
+                  flexDirection: isMobile ? 'column' : 'row',
+                  alignItems: isMobile ? 'center' : 'center',
+                  gap: isMobile ? '8px' : '12px',
+                  padding: isMobile ? '14px 10px' : '16px',
                   backgroundColor: c.cardBgHover,
                   borderRadius: '8px',
                   border: `1px solid ${c.border}`,
                   cursor: 'pointer',
                   transition: 'all 0.2s ease',
+                  minHeight: '44px',
                 }}
               >
                 <div
@@ -121,13 +123,15 @@ export function QuickActions() {
                 >
                   <action.icon style={{ width: isMobile ? '18px' : '20px', height: isMobile ? '18px' : '20px', color: action.color }} />
                 </div>
-                <div style={{ minWidth: 0 }}>
-                  <p style={{ fontSize: '14px', fontWeight: '500', color: c.textPrimary, margin: 0 }}>
+                <div style={{ minWidth: 0, textAlign: isMobile ? 'center' : 'left', overflow: 'hidden', width: isMobile ? '100%' : undefined }}>
+                  <p style={{ fontSize: isMobile ? '12px' : '14px', fontWeight: '500', color: c.textPrimary, margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     {action.title}
                   </p>
-                  <p style={{ fontSize: '13px', color: c.textMuted, margin: '2px 0 0 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    {action.description}
-                  </p>
+                  {!isMobile && (
+                    <p style={{ fontSize: '13px', color: c.textMuted, margin: '2px 0 0 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {action.description}
+                    </p>
+                  )}
                 </div>
               </div>
             </Link>

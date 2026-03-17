@@ -156,17 +156,19 @@ export default function EmergencyContactsPage() {
             flex: 1,
             minWidth: '140px',
             padding: '12px 16px',
+            minHeight: '48px',
             borderRadius: '12px',
             border: 'none',
             backgroundColor: GREEN,
             color: '#FFFFFF',
-            fontSize: '13px',
+            fontSize: '14px',
             fontWeight: 600,
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             gap: '6px',
+            boxSizing: 'border-box',
           }}
         >
           {'\u{1F4CD}'} Bagikan Lokasi
@@ -177,17 +179,19 @@ export default function EmergencyContactsPage() {
             flex: 1,
             minWidth: '140px',
             padding: '12px 16px',
+            minHeight: '48px',
             borderRadius: '12px',
             border: '1px solid ' + GREEN,
             backgroundColor: GREEN_LIGHT,
             color: GREEN,
-            fontSize: '13px',
+            fontSize: '14px',
             fontWeight: 600,
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             gap: '6px',
+            boxSizing: 'border-box',
           }}
         >
           {'\u{1F4BE}'} Simpan Semua Kontak
@@ -244,17 +248,19 @@ export default function EmergencyContactsPage() {
                   display: 'flex',
                   alignItems: 'center',
                   gap: '12px',
-                  padding: '12px',
+                  padding: isMobile ? '14px' : '12px',
+                  minHeight: '56px',
                   backgroundColor: c.pageBg,
                   borderRadius: '10px',
                   border: '1px solid ' + c.borderLight,
                   textDecoration: 'none',
                   transition: 'all 0.15s',
+                  boxSizing: 'border-box',
                 }}
               >
                 <span style={{
-                  width: '40px',
-                  height: '40px',
+                  width: '44px',
+                  height: '44px',
                   borderRadius: '10px',
                   backgroundColor: GREEN_LIGHT,
                   display: 'flex',
@@ -284,7 +290,7 @@ export default function EmergencyContactsPage() {
                     </p>
                   )}
                   <p style={{
-                    fontSize: '15px',
+                    fontSize: '16px',
                     fontWeight: 700,
                     color: GREEN,
                     margin: 0,
@@ -293,14 +299,14 @@ export default function EmergencyContactsPage() {
                   </p>
                 </div>
                 <span style={{
-                  width: '36px',
-                  height: '36px',
+                  width: '44px',
+                  height: '44px',
                   borderRadius: '50%',
                   backgroundColor: GREEN,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: '16px',
+                  fontSize: '18px',
                   flexShrink: 0,
                   color: '#FFFFFF',
                 }}>

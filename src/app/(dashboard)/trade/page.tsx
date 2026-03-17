@@ -339,7 +339,8 @@ export default function TradePage() {
               alert(t.trade.contactAlert);
             }}
             style={{
-              padding: '8px 20px',
+              padding: '10px 20px',
+              minHeight: '44px',
               fontSize: '13px',
               fontWeight: '600',
               borderRadius: '10px',
@@ -427,6 +428,7 @@ export default function TradePage() {
               onClick={() => setActiveTab(tab.key)}
               style={{
                 padding: '12px 24px',
+                minHeight: '44px',
                 fontSize: '14px',
                 fontWeight: isActive ? '700' : '500',
                 color: isActive ? c.primary : c.textMuted,
@@ -478,7 +480,8 @@ export default function TradePage() {
                       display: 'flex',
                       alignItems: 'center',
                       gap: '6px',
-                      padding: '8px 16px',
+                      padding: '10px 16px',
+                      minHeight: '44px',
                       borderRadius: '20px',
                       border: isActive ? '1px solid ' + cat.color : '1px solid ' + c.border,
                       backgroundColor: isActive ? cat.color + '15' : c.cardBg,

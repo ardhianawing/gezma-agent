@@ -331,12 +331,14 @@ export default function GalleryPage() {
                   <span style={{ fontSize: '10px', color: c.textLight }}>
                     {new Date(photo.uploadedAt).toLocaleDateString('id-ID')}
                   </span>
-                  <div style={{ display: 'flex', gap: '8px' }}>
+                  <div style={{ display: 'flex', gap: '4px' }}>
                     <button
                       onClick={() => handleDownload(photo)}
                       style={{
                         fontSize: '11px', fontWeight: 600, color: GREEN,
-                        backgroundColor: 'transparent', border: 'none', cursor: 'pointer', padding: '2px 4px',
+                        backgroundColor: 'transparent', border: 'none', cursor: 'pointer',
+                        padding: '8px 6px', minHeight: '36px',
+                        display: 'flex', alignItems: 'center',
                       }}
                     >
                       {t.common.download}
@@ -346,8 +348,10 @@ export default function GalleryPage() {
                       disabled={deletingId === photo.id}
                       style={{
                         fontSize: '11px', fontWeight: 600, color: RED,
-                        backgroundColor: 'transparent', border: 'none', cursor: 'pointer', padding: '2px 4px',
+                        backgroundColor: 'transparent', border: 'none', cursor: 'pointer',
+                        padding: '8px 6px', minHeight: '36px',
                         opacity: deletingId === photo.id ? 0.5 : 1,
+                        display: 'flex', alignItems: 'center',
                       }}
                     >
                       {t.common.delete}

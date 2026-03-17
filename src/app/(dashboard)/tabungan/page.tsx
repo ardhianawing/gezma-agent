@@ -204,6 +204,7 @@ export default function TabunganPage() {
                 onClick={() => setShowCreateForm(true)}
                 style={{
                   padding: '12px 28px',
+                  minHeight: '48px',
                   borderRadius: '12px',
                   border: 'none',
                   backgroundColor: c.primary,
@@ -235,13 +236,14 @@ export default function TabunganPage() {
                     style={{
                       width: '100%',
                       padding: '10px 14px',
+                      minHeight: '46px',
                       borderRadius: '10px',
                       border: '1px solid ' + c.border,
                       backgroundColor: c.inputBg,
                       color: c.textPrimary,
                       fontSize: '14px',
                       outline: 'none',
-                      boxSizing: 'border-box',
+                      boxSizing: 'border-box' as const,
                     }}
                     onFocus={(e) => { e.target.style.borderColor = c.primary; }}
                     onBlur={(e) => { e.target.style.borderColor = c.border; }}
@@ -259,13 +261,14 @@ export default function TabunganPage() {
                     style={{
                       width: '100%',
                       padding: '10px 14px',
+                      minHeight: '46px',
                       borderRadius: '10px',
                       border: '1px solid ' + c.border,
                       backgroundColor: c.inputBg,
                       color: c.textPrimary,
                       fontSize: '14px',
                       outline: 'none',
-                      boxSizing: 'border-box',
+                      boxSizing: 'border-box' as const,
                     }}
                     onFocus={(e) => { e.target.style.borderColor = c.primary; }}
                     onBlur={(e) => { e.target.style.borderColor = c.border; }}
@@ -282,13 +285,14 @@ export default function TabunganPage() {
                     style={{
                       width: '100%',
                       padding: '10px 14px',
+                      minHeight: '46px',
                       borderRadius: '10px',
                       border: '1px solid ' + c.border,
                       backgroundColor: c.inputBg,
                       color: c.textPrimary,
                       fontSize: '14px',
                       outline: 'none',
-                      boxSizing: 'border-box',
+                      boxSizing: 'border-box' as const,
                     }}
                     onFocus={(e) => { e.target.style.borderColor = c.primary; }}
                     onBlur={(e) => { e.target.style.borderColor = c.border; }}
@@ -306,13 +310,14 @@ export default function TabunganPage() {
                     style={{
                       width: '100%',
                       padding: '10px 14px',
+                      minHeight: '46px',
                       borderRadius: '10px',
                       border: '1px solid ' + c.border,
                       backgroundColor: c.inputBg,
                       color: c.textPrimary,
                       fontSize: '14px',
                       outline: 'none',
-                      boxSizing: 'border-box',
+                      boxSizing: 'border-box' as const,
                     }}
                     onFocus={(e) => { e.target.style.borderColor = c.primary; }}
                     onBlur={(e) => { e.target.style.borderColor = c.border; }}
@@ -324,6 +329,7 @@ export default function TabunganPage() {
                     style={{
                       flex: 1,
                       padding: '12px',
+                      minHeight: '48px',
                       borderRadius: '10px',
                       border: '1px solid ' + c.border,
                       backgroundColor: c.cardBg,
@@ -341,6 +347,7 @@ export default function TabunganPage() {
                     style={{
                       flex: 1,
                       padding: '12px',
+                      minHeight: '48px',
                       borderRadius: '10px',
                       border: 'none',
                       backgroundColor: c.primary,
@@ -483,13 +490,14 @@ export default function TabunganPage() {
                   style={{
                     width: '100%',
                     padding: '10px 14px',
+                    minHeight: '46px',
                     borderRadius: '10px',
                     border: '1px solid ' + c.border,
                     backgroundColor: c.inputBg,
                     color: c.textPrimary,
                     fontSize: '14px',
                     outline: 'none',
-                    boxSizing: 'border-box',
+                    boxSizing: 'border-box' as const,
                   }}
                   onFocus={(e) => { e.target.style.borderColor = c.primary; }}
                   onBlur={(e) => { e.target.style.borderColor = c.border; }}
@@ -505,6 +513,7 @@ export default function TabunganPage() {
                   style={{
                     width: '100%',
                     padding: '10px 14px',
+                    minHeight: '46px',
                     borderRadius: '10px',
                     border: '1px solid ' + c.border,
                     backgroundColor: c.inputBg,
@@ -512,7 +521,7 @@ export default function TabunganPage() {
                     fontSize: '14px',
                     cursor: 'pointer',
                     outline: 'none',
-                    boxSizing: 'border-box',
+                    boxSizing: 'border-box' as const,
                   }}
                 >
                   <option value="transfer">{t.tabungan.depositMethodTransfer}</option>
@@ -532,13 +541,14 @@ export default function TabunganPage() {
                   style={{
                     width: '100%',
                     padding: '10px 14px',
+                    minHeight: '46px',
                     borderRadius: '10px',
                     border: '1px solid ' + c.border,
                     backgroundColor: c.inputBg,
                     color: c.textPrimary,
                     fontSize: '14px',
                     outline: 'none',
-                    boxSizing: 'border-box',
+                    boxSizing: 'border-box' as const,
                   }}
                   onFocus={(e) => { e.target.style.borderColor = c.primary; }}
                   onBlur={(e) => { e.target.style.borderColor = c.border; }}
@@ -551,8 +561,10 @@ export default function TabunganPage() {
               style={{
                 marginTop: '16px',
                 padding: '12px 28px',
+                minHeight: '48px',
                 borderRadius: '12px',
                 border: 'none',
+                width: isMobile ? '100%' : 'auto',
                 backgroundColor: (!depositForm.amount || parseFloat(depositForm.amount) <= 0) ? c.border : c.primary,
                 color: '#fff',
                 fontSize: '14px',

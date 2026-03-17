@@ -186,13 +186,14 @@ export default function NewsPage() {
             style={{
               width: '100%',
               padding: '10px 12px 10px 40px',
+              minHeight: '46px',
               borderRadius: '10px',
               border: `1px solid ${c.border}`,
               backgroundColor: c.inputBg,
               color: c.textPrimary,
               fontSize: '14px',
               outline: 'none',
-              boxSizing: 'border-box',
+              boxSizing: 'border-box' as const,
             }}
           />
         </div>
@@ -205,6 +206,7 @@ export default function NewsPage() {
             overflowX: 'auto',
             flex: 1,
             paddingBottom: '4px',
+            WebkitOverflowScrolling: 'touch' as const,
           }}
         >
           {newsCategories.map((cat) => {
@@ -214,7 +216,8 @@ export default function NewsPage() {
                 key={cat.id}
                 onClick={() => setActiveCategory(cat.id)}
                 style={{
-                  padding: '8px 16px',
+                  padding: '10px 16px',
+                  minHeight: '44px',
                   borderRadius: '20px',
                   border: `1px solid ${isActive ? cat.color : c.border}`,
                   backgroundColor: isActive ? cat.color : c.cardBg,
@@ -223,6 +226,7 @@ export default function NewsPage() {
                   fontWeight: isActive ? 600 : 400,
                   cursor: 'pointer',
                   whiteSpace: 'nowrap',
+                  flexShrink: 0,
                   transition: 'all 0.2s ease',
                 }}
               >

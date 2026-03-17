@@ -279,6 +279,7 @@ export default function PayLaterPage() {
                   style={{
                     flex: 1,
                     padding: '10px',
+                    minHeight: '44px',
                     borderRadius: '10px',
                     border: calcTenor === tenor ? '2px solid ' + c.primary : '1px solid ' + c.border,
                     backgroundColor: calcTenor === tenor ? c.primary + '12' : c.pageBg,
@@ -341,6 +342,7 @@ export default function PayLaterPage() {
         onClick={() => setShowForm(!showForm)}
         style={{
           padding: '14px',
+          minHeight: '48px',
           borderRadius: '12px',
           border: showForm ? '1px solid ' + c.border : 'none',
           backgroundColor: showForm ? c.cardBg : c.primary,
@@ -349,6 +351,7 @@ export default function PayLaterPage() {
           fontWeight: 600,
           cursor: 'pointer',
           transition: 'all 0.15s ease',
+          width: '100%',
         }}
       >
         {showForm ? t.common.cancel : t.payLater.applyBtn}
@@ -386,13 +389,14 @@ export default function PayLaterPage() {
                 style={{
                   width: '100%',
                   padding: '10px 14px',
+                  minHeight: '46px',
                   borderRadius: '10px',
                   border: '1px solid ' + c.border,
                   backgroundColor: c.inputBg,
                   color: c.textPrimary,
                   fontSize: '14px',
                   outline: 'none',
-                  boxSizing: 'border-box',
+                  boxSizing: 'border-box' as const,
                 }}
                 onFocus={(e) => { e.target.style.borderColor = c.primary; }}
                 onBlur={(e) => { e.target.style.borderColor = c.border; }}
@@ -410,13 +414,14 @@ export default function PayLaterPage() {
                 style={{
                   width: '100%',
                   padding: '10px 14px',
+                  minHeight: '46px',
                   borderRadius: '10px',
                   border: '1px solid ' + c.border,
                   backgroundColor: c.inputBg,
                   color: c.textPrimary,
                   fontSize: '14px',
                   outline: 'none',
-                  boxSizing: 'border-box',
+                  boxSizing: 'border-box' as const,
                 }}
                 onFocus={(e) => { e.target.style.borderColor = c.primary; }}
                 onBlur={(e) => { e.target.style.borderColor = c.border; }}
@@ -434,13 +439,14 @@ export default function PayLaterPage() {
                 style={{
                   width: '100%',
                   padding: '10px 14px',
+                  minHeight: '46px',
                   borderRadius: '10px',
                   border: '1px solid ' + c.border,
                   backgroundColor: c.inputBg,
                   color: c.textPrimary,
                   fontSize: '14px',
                   outline: 'none',
-                  boxSizing: 'border-box',
+                  boxSizing: 'border-box' as const,
                 }}
                 onFocus={(e) => { e.target.style.borderColor = c.primary; }}
                 onBlur={(e) => { e.target.style.borderColor = c.border; }}
@@ -456,6 +462,7 @@ export default function PayLaterPage() {
                 style={{
                   width: '100%',
                   padding: '10px 14px',
+                  minHeight: '46px',
                   borderRadius: '10px',
                   border: '1px solid ' + c.border,
                   backgroundColor: c.inputBg,
@@ -463,7 +470,7 @@ export default function PayLaterPage() {
                   fontSize: '14px',
                   cursor: 'pointer',
                   outline: 'none',
-                  boxSizing: 'border-box',
+                  boxSizing: 'border-box' as const,
                 }}
               >
                 <option value="3">{t.payLater.tenor3}</option>
@@ -481,6 +488,7 @@ export default function PayLaterPage() {
                 style={{
                   width: '100%',
                   padding: '10px 14px',
+                  minHeight: '46px',
                   borderRadius: '10px',
                   border: '1px solid ' + c.border,
                   backgroundColor: c.inputBg,
@@ -488,7 +496,7 @@ export default function PayLaterPage() {
                   fontSize: '14px',
                   cursor: 'pointer',
                   outline: 'none',
-                  boxSizing: 'border-box',
+                  boxSizing: 'border-box' as const,
                 }}
               >
                 <option value="murabahah">Murabahah</option>
@@ -522,6 +530,7 @@ export default function PayLaterPage() {
             style={{
               marginTop: '16px',
               padding: '12px 28px',
+              minHeight: '48px',
               borderRadius: '12px',
               border: 'none',
               backgroundColor: (!form.pilgrimName || !form.pilgrimPhone || !form.totalAmount) ? c.border : c.primary,
@@ -531,6 +540,7 @@ export default function PayLaterPage() {
               cursor: (!form.pilgrimName || !form.pilgrimPhone || !form.totalAmount) ? 'not-allowed' : 'pointer',
               transition: 'background-color 0.15s ease',
               opacity: formLoading ? 0.7 : 1,
+              width: isMobile ? '100%' : 'auto',
             }}
           >
             {formLoading ? t.payLater.formLoading : t.payLater.formSubmit}

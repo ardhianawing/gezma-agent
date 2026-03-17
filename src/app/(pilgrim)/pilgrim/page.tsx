@@ -132,70 +132,202 @@ export default function PilgrimDashboardPage() {
       {/* Status progress card */}
       <div style={cardStyle}>
         <h2 style={sectionTitleStyle}>{t.pilgrimPortal.statusTitle}</h2>
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0',
-          overflowX: 'auto',
-          paddingBottom: '4px',
-        }}>
-          {STATUS_STEPS.map((step, i) => {
-            const isCompleted = i <= currentStepIndex;
-            const isCurrent = i === currentStepIndex;
-            return (
-              <div key={step.key} style={{
+
+        {isMobile ? (
+          /* Mobile: Compact progress bar with current step highlighted */
+          <div>
+            {/* Progress bar */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '3px',
+              marginBottom: '12px',
+            }}>
+              {STATUS_STEPS.map((step, i) => {
+                const isCompleted = i <= currentStepIndex;
+                return (
+                  <div key={step.key} style={{
+                    flex: 1,
+                    height: '6px',
+                    borderRadius: '3px',
+                    backgroundColor: isCompleted ? PILGRIM_GREEN : c.borderLight,
+                    transition: 'background-color 0.3s',
+                  }} />
+                );
+              })}
+            </div>
+            {/* Current step label */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              padding: '10px 14px',
+              backgroundColor: PILGRIM_GREEN_LIGHT,
+              borderRadius: '10px',
+              marginBottom: '10px',
+            }}>
+              <div style={{
+                width: '32px',
+                height: '32px',
+                borderRadius: '50%',
+                backgroundColor: PILGRIM_GREEN,
                 display: 'flex',
                 alignItems: 'center',
-                flex: i < STATUS_STEPS.length - 1 ? 1 : 'none',
-                minWidth: 0,
+                justifyContent: 'center',
+                fontSize: '14px',
+                fontWeight: 700,
+                color: '#FFFFFF',
+                flexShrink: 0,
               }}>
-                <div style={{
+                {currentStepIndex + 1}
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <p style={{
+                  fontSize: '14px',
+                  fontWeight: 700,
+                  color: PILGRIM_GREEN,
+                  margin: '0 0 2px 0',
+                }}>
+                  {STATUS_STEPS[currentStepIndex]?.label}
+                </p>
+                <p style={{
+                  fontSize: '12px',
+                  color: c.textMuted,
+                  margin: 0,
+                }}>
+                  {currentStepIndex + 1}/{STATUS_STEPS.length}
+                </p>
+              </div>
+            </div>
+            {/* Vertical step list */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
+              {STATUS_STEPS.map((step, i) => {
+                const isCompleted = i <= currentStepIndex;
+                const isCurrent = i === currentStepIndex;
+                const isLast = i === STATUS_STEPS.length - 1;
+                return (
+                  <div key={step.key} style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: '10px',
+                    position: 'relative',
+                  }}>
+                    {/* Vertical line + dot */}
+                    <div style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      width: '24px',
+                      flexShrink: 0,
+                    }}>
+                      <div style={{
+                        width: isCurrent ? '22px' : '18px',
+                        height: isCurrent ? '22px' : '18px',
+                        borderRadius: '50%',
+                        backgroundColor: isCompleted ? PILGRIM_GREEN : c.borderLight,
+                        border: isCurrent ? '3px solid ' + PILGRIM_GREEN : 'none',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '10px',
+                        fontWeight: 700,
+                        color: isCompleted ? '#FFFFFF' : c.textLight,
+                        flexShrink: 0,
+                        boxSizing: 'border-box',
+                        zIndex: 1,
+                      }}>
+                        {isCompleted ? '\u{2713}' : ''}
+                      </div>
+                      {!isLast && (
+                        <div style={{
+                          width: '2px',
+                          height: '16px',
+                          backgroundColor: i < currentStepIndex ? PILGRIM_GREEN : c.borderLight,
+                        }} />
+                      )}
+                    </div>
+                    {/* Label */}
+                    <span style={{
+                      fontSize: '13px',
+                      color: isCurrent ? PILGRIM_GREEN : isCompleted ? c.textPrimary : c.textLight,
+                      fontWeight: isCurrent ? 700 : isCompleted ? 500 : 400,
+                      paddingTop: '0px',
+                      lineHeight: '18px',
+                    }}>
+                      {step.label}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ) : (
+          /* Desktop: Horizontal stepper */
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0',
+            overflowX: 'auto',
+            paddingBottom: '4px',
+          }}>
+            {STATUS_STEPS.map((step, i) => {
+              const isCompleted = i <= currentStepIndex;
+              const isCurrent = i === currentStepIndex;
+              return (
+                <div key={step.key} style={{
                   display: 'flex',
-                  flexDirection: 'column',
                   alignItems: 'center',
-                  minWidth: isMobile ? '36px' : '48px',
+                  flex: i < STATUS_STEPS.length - 1 ? 1 : 'none',
+                  minWidth: 0,
                 }}>
                   <div style={{
-                    width: isMobile ? '24px' : '28px',
-                    height: isMobile ? '24px' : '28px',
-                    borderRadius: '50%',
-                    backgroundColor: isCompleted ? PILGRIM_GREEN : c.borderLight,
-                    border: isCurrent ? '3px solid ' + PILGRIM_GREEN : 'none',
                     display: 'flex',
+                    flexDirection: 'column',
                     alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: isMobile ? '11px' : '12px',
-                    fontWeight: 700,
-                    color: isCompleted ? '#FFFFFF' : c.textLight,
-                    flexShrink: 0,
-                    boxSizing: 'border-box',
+                    minWidth: '48px',
                   }}>
-                    {isCompleted ? '\u{2713}' : i + 1}
+                    <div style={{
+                      width: '28px',
+                      height: '28px',
+                      borderRadius: '50%',
+                      backgroundColor: isCompleted ? PILGRIM_GREEN : c.borderLight,
+                      border: isCurrent ? '3px solid ' + PILGRIM_GREEN : 'none',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '12px',
+                      fontWeight: 700,
+                      color: isCompleted ? '#FFFFFF' : c.textLight,
+                      flexShrink: 0,
+                      boxSizing: 'border-box',
+                    }}>
+                      {isCompleted ? '\u{2713}' : i + 1}
+                    </div>
+                    <span style={{
+                      fontSize: '10px',
+                      color: isCompleted ? PILGRIM_GREEN : c.textLight,
+                      fontWeight: isCurrent ? 700 : 400,
+                      marginTop: '4px',
+                      textAlign: 'center',
+                      whiteSpace: 'nowrap',
+                    }}>
+                      {step.label}
+                    </span>
                   </div>
-                  <span style={{
-                    fontSize: isMobile ? '8px' : '10px',
-                    color: isCompleted ? PILGRIM_GREEN : c.textLight,
-                    fontWeight: isCurrent ? 700 : 400,
-                    marginTop: '4px',
-                    textAlign: 'center',
-                    whiteSpace: 'nowrap',
-                  }}>
-                    {step.label}
-                  </span>
+                  {i < STATUS_STEPS.length - 1 && (
+                    <div style={{
+                      flex: 1,
+                      height: '2px',
+                      backgroundColor: i < currentStepIndex ? PILGRIM_GREEN : c.borderLight,
+                      marginTop: '-16px',
+                      minWidth: '8px',
+                    }} />
+                  )}
                 </div>
-                {i < STATUS_STEPS.length - 1 && (
-                  <div style={{
-                    flex: 1,
-                    height: '2px',
-                    backgroundColor: i < currentStepIndex ? PILGRIM_GREEN : c.borderLight,
-                    marginTop: '-16px',
-                    minWidth: '8px',
-                  }} />
-                )}
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* Quick info cards */}
@@ -232,6 +364,9 @@ export default function PilgrimDashboardPage() {
               fontWeight: 600,
               margin: 0,
               lineHeight: 1.3,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: isMobile ? 'nowrap' : 'normal',
             }}>
               {item.value}
             </p>
@@ -252,21 +387,21 @@ export default function PilgrimDashboardPage() {
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '14px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '13px', color: c.textMuted }}>{t.pilgrimPortal.paymentTotal}</span>
-            <span style={{ fontSize: '14px', fontWeight: 600, color: c.textPrimary }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px' }}>
+            <span style={{ fontSize: '13px', color: c.textMuted, flexShrink: 0 }}>{t.pilgrimPortal.paymentTotal}</span>
+            <span style={{ fontSize: isMobile ? '13px' : '14px', fontWeight: 600, color: c.textPrimary, textAlign: 'right' as const, wordBreak: 'break-word' as const }}>
               {formatCurrency(totalPackagePrice)}
             </span>
           </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '13px', color: c.textMuted }}>{t.pilgrimPortal.paymentPaid}</span>
-            <span style={{ fontSize: '14px', fontWeight: 600, color: '#16A34A' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px' }}>
+            <span style={{ fontSize: '13px', color: c.textMuted, flexShrink: 0 }}>{t.pilgrimPortal.paymentPaid}</span>
+            <span style={{ fontSize: isMobile ? '13px' : '14px', fontWeight: 600, color: '#16A34A', textAlign: 'right' as const, wordBreak: 'break-word' as const }}>
               {formatCurrency(totalPaid)}
             </span>
           </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '13px', color: c.textMuted }}>{t.pilgrimPortal.paymentRemaining}</span>
-            <span style={{ fontSize: '14px', fontWeight: 600, color: remainingBalance > 0 ? '#DC2626' : '#16A34A' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px' }}>
+            <span style={{ fontSize: '13px', color: c.textMuted, flexShrink: 0 }}>{t.pilgrimPortal.paymentRemaining}</span>
+            <span style={{ fontSize: isMobile ? '13px' : '14px', fontWeight: 600, color: remainingBalance > 0 ? '#DC2626' : '#16A34A', textAlign: 'right' as const, wordBreak: 'break-word' as const }}>
               {formatCurrency(remainingBalance)}
             </span>
           </div>
@@ -410,13 +545,15 @@ export default function PilgrimDashboardPage() {
               alignItems: 'center',
               justifyContent: 'center',
               gap: '6px',
-              padding: '10px',
+              padding: '12px',
+              minHeight: '44px',
               backgroundColor: '#25D366',
               color: '#FFFFFF',
               borderRadius: '10px',
               textDecoration: 'none',
               fontSize: '13px',
               fontWeight: 600,
+              boxSizing: 'border-box',
             }}
           >
             {t.pilgrimPortal.agencyWa}
@@ -429,7 +566,8 @@ export default function PilgrimDashboardPage() {
               alignItems: 'center',
               justifyContent: 'center',
               gap: '6px',
-              padding: '10px',
+              padding: '12px',
+              minHeight: '44px',
               backgroundColor: c.pageBg,
               color: c.textPrimary,
               border: '1px solid ' + c.border,
@@ -437,6 +575,7 @@ export default function PilgrimDashboardPage() {
               textDecoration: 'none',
               fontSize: '13px',
               fontWeight: 600,
+              boxSizing: 'border-box',
             }}
           >
             {t.pilgrimPortal.agencyPhone}
@@ -508,13 +647,17 @@ export default function PilgrimDashboardPage() {
             target="_blank"
             rel="noopener noreferrer"
             style={{
-              padding: '8px 14px',
+              padding: '10px 14px',
+              minHeight: '44px',
               backgroundColor: '#25D366',
               color: '#FFFFFF',
               borderRadius: '8px',
               textDecoration: 'none',
-              fontSize: '12px',
+              fontSize: '13px',
               fontWeight: 600,
+              display: 'flex',
+              alignItems: 'center',
+              boxSizing: 'border-box',
             }}
           >
             {t.pilgrimPortal.guideChat}

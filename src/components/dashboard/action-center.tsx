@@ -139,6 +139,7 @@ export function ActionCenter() {
                     borderLeft: `4px solid ${priorityColors[alert.priority]}`,
                     cursor: 'pointer',
                     transition: 'all 0.2s ease',
+                    minHeight: '44px',
                   }}
                 >
                   {/* Icon */}

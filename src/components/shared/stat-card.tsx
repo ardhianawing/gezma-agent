@@ -3,6 +3,7 @@
 import { LucideIcon, TrendingUp, TrendingDown } from 'lucide-react';
 import Link from 'next/link';
 import { useTheme } from '@/lib/theme';
+import { useResponsive } from '@/lib/hooks/use-responsive';
 
 interface StatCardProps {
   title: string;
@@ -31,50 +32,52 @@ export function StatCard({
   href
 }: StatCardProps) {
   const { c } = useTheme();
+  const { isMobile } = useResponsive();
 
   const content = (
     <div
       style={{
         backgroundColor: c.cardBg,
         borderRadius: '12px',
-        padding: '20px',
+        padding: isMobile ? '14px' : '20px',
         border: `1px solid ${c.border}`,
         display: 'flex',
         flexDirection: 'column',
-        gap: '8px',
-        minHeight: '130px',
+        gap: isMobile ? '6px' : '8px',
+        minHeight: isMobile ? '100px' : '130px',
         position: 'relative',
         cursor: href ? 'pointer' : 'default',
         transition: 'all 0.3s ease',
         overflow: 'hidden',
       }}
     >
-      {/* Icon - posisi absolute di kanan atas */}
+      {/* Icon - posisi absolute di kanan atas, smaller on mobile */}
       {Icon && (
         <div
           style={{
             position: 'absolute',
-            right: '16px',
-            top: '16px',
-            width: '40px',
-            height: '40px',
+            right: isMobile ? '12px' : '16px',
+            top: isMobile ? '12px' : '16px',
+            width: isMobile ? '32px' : '40px',
+            height: isMobile ? '32px' : '40px',
             borderRadius: '50%',
             backgroundColor: iconBgColor || c.primaryLight,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             flexShrink: 0,
+            opacity: isMobile ? 0.7 : 1,
           }}
         >
-          <Icon style={{ width: '20px', height: '20px', color: iconColor || c.primary }} />
+          <Icon style={{ width: isMobile ? '16px' : '20px', height: isMobile ? '16px' : '20px', color: iconColor || c.primary }} />
         </div>
       )}
 
       {/* Content */}
-      <div style={{ paddingRight: '50px', minWidth: 0 }}>
+      <div style={{ paddingRight: isMobile ? '40px' : '50px', minWidth: 0 }}>
         <p
           style={{
-            fontSize: '12px',
+            fontSize: isMobile ? '11px' : '12px',
             fontWeight: '500',
             color: c.textMuted,
             textTransform: 'uppercase',
@@ -86,10 +89,10 @@ export function StatCard({
         </p>
         <p
           style={{
-            fontSize: '24px',
+            fontSize: isMobile ? '20px' : '24px',
             fontWeight: '700',
             color: c.textPrimary,
-            margin: '8px 0',
+            margin: isMobile ? '4px 0' : '8px 0',
             whiteSpace: 'nowrap',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
@@ -98,7 +101,7 @@ export function StatCard({
           {value}
         </p>
         {description && (
-          <p style={{ fontSize: '14px', color: c.textMuted, margin: 0 }}>
+          <p style={{ fontSize: isMobile ? '13px' : '14px', color: c.textMuted, margin: 0 }}>
             {description}
           </p>
         )}
@@ -109,7 +112,7 @@ export function StatCard({
         {trend ? (
           <span
             style={{
-              fontSize: '14px',
+              fontSize: isMobile ? '12px' : '14px',
               color: trend.isPositive ? c.success : c.error,
               display: 'flex',
               alignItems: 'center',
@@ -117,14 +120,14 @@ export function StatCard({
             }}
           >
             {trend.isPositive ? (
-              <TrendingUp style={{ width: '16px', height: '16px' }} />
+              <TrendingUp style={{ width: isMobile ? '14px' : '16px', height: isMobile ? '14px' : '16px' }} />
             ) : (
-              <TrendingDown style={{ width: '16px', height: '16px' }} />
+              <TrendingDown style={{ width: isMobile ? '14px' : '16px', height: isMobile ? '14px' : '16px' }} />
             )}
             {trend.isPositive ? '+' : ''}{trend.value}% {trendLabel}
           </span>
         ) : (
-          <div style={{ height: '20px' }} />
+          <div style={{ height: isMobile ? '12px' : '20px' }} />
         )}
       </div>
     </div>

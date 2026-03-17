@@ -201,6 +201,7 @@ export default function GezmaPayPage() {
           onClick={() => setShowTopupModal(true)}
           style={{
             padding: '12px 28px',
+            minHeight: '44px',
             borderRadius: '12px',
             border: '2px solid rgba(255,255,255,0.3)',
             backgroundColor: 'rgba(255,255,255,0.15)',
@@ -210,6 +211,7 @@ export default function GezmaPayPage() {
             cursor: 'pointer',
             backdropFilter: 'blur(4px)',
             transition: 'all 0.2s ease',
+            width: isMobile ? '100%' : 'auto',
           }}
           onMouseEnter={(e) => {
             (e.target as HTMLButtonElement).style.backgroundColor = 'rgba(255,255,255,0.25)';
@@ -338,7 +340,8 @@ export default function GezmaPayPage() {
               onClick={() => handlePageChange(pagination.page - 1)}
               disabled={pagination.page <= 1}
               style={{
-                padding: '8px 14px',
+                padding: '10px 14px',
+                minHeight: '44px',
                 borderRadius: '8px',
                 border: '1px solid ' + c.border,
                 backgroundColor: pagination.page <= 1 ? c.pageBg : c.cardBg,
@@ -358,7 +361,8 @@ export default function GezmaPayPage() {
               onClick={() => handlePageChange(pagination.page + 1)}
               disabled={pagination.page >= pagination.totalPages}
               style={{
-                padding: '8px 14px',
+                padding: '10px 14px',
+                minHeight: '44px',
                 borderRadius: '8px',
                 border: '1px solid ' + c.border,
                 backgroundColor: pagination.page >= pagination.totalPages ? c.pageBg : c.cardBg,
@@ -389,7 +393,7 @@ export default function GezmaPayPage() {
             alignItems: 'center',
             justifyContent: 'center',
             zIndex: 1000,
-            padding: '20px',
+            padding: isMobile ? '0' : '20px',
           }}
           onClick={() => setShowTopupModal(false)}
         >
@@ -397,11 +401,14 @@ export default function GezmaPayPage() {
             onClick={(e) => e.stopPropagation()}
             style={{
               backgroundColor: c.cardBg,
-              borderRadius: '20px',
+              borderRadius: isMobile ? '0' : '20px',
               padding: isMobile ? '20px' : '28px',
               width: '100%',
-              maxWidth: '440px',
-              border: '1px solid ' + c.border,
+              maxWidth: isMobile ? '100%' : '440px',
+              maxHeight: isMobile ? '100%' : '90vh',
+              height: isMobile ? '100%' : 'auto',
+              overflow: 'auto',
+              border: isMobile ? 'none' : '1px solid ' + c.border,
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
@@ -416,7 +423,12 @@ export default function GezmaPayPage() {
                   fontSize: '20px',
                   color: c.textMuted,
                   cursor: 'pointer',
-                  padding: '4px',
+                  padding: '10px',
+                  minWidth: '44px',
+                  minHeight: '44px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
                 }}
               >
                 {'\u2715'}
@@ -438,6 +450,7 @@ export default function GezmaPayPage() {
                   onClick={() => setTopupAmount(String(preset.value))}
                   style={{
                     padding: '12px',
+                    minHeight: '46px',
                     borderRadius: '10px',
                     border: topupAmount === String(preset.value)
                       ? '2px solid ' + c.primary
@@ -468,13 +481,14 @@ export default function GezmaPayPage() {
                 style={{
                   width: '100%',
                   padding: '12px 14px',
+                  minHeight: '46px',
                   borderRadius: '10px',
                   border: '1px solid ' + c.border,
                   backgroundColor: c.inputBg,
                   color: c.textPrimary,
                   fontSize: '15px',
                   outline: 'none',
-                  boxSizing: 'border-box',
+                  boxSizing: 'border-box' as const,
                 }}
                 onFocus={(e) => { e.target.style.borderColor = c.primary; }}
                 onBlur={(e) => { e.target.style.borderColor = c.border; }}

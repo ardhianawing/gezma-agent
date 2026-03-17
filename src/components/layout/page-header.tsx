@@ -49,7 +49,13 @@ export function PageHeader({ title, description, actions }: PageHeaderProps) {
         )}
       </div>
       {actions && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <div style={{
+          display: 'flex',
+          alignItems: isMobile ? 'stretch' : 'center',
+          flexDirection: isMobile ? 'column' : 'row',
+          gap: '8px',
+          width: isMobile ? '100%' : 'auto',
+        }}>
           {actions}
         </div>
       )}

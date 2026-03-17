@@ -181,6 +181,7 @@ export default function UsersPage() {
               backgroundColor: c.primary,
               color: 'white',
               padding: '10px 16px',
+              minHeight: '44px',
               borderRadius: '8px',
               border: 'none',
               fontWeight: '500',
@@ -237,7 +238,8 @@ export default function UsersPage() {
                         <button
                           onClick={() => handleToggleActive(user)}
                           style={{
-                            padding: '4px 12px',
+                            padding: '8px 12px',
+                            minHeight: '36px',
                             borderRadius: '12px',
                             border: 'none',
                             fontSize: '12px',
@@ -255,7 +257,7 @@ export default function UsersPage() {
                           <button
                             onClick={() => openEdit(user)}
                             aria-label="Edit"
-                            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', color: c.textSecondary }}
+                            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '10px', minWidth: '44px', minHeight: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: c.textSecondary }}
                           >
                             <Edit2 style={{ width: '16px', height: '16px' }} />
                           </button>
@@ -263,7 +265,7 @@ export default function UsersPage() {
                             <button
                               onClick={() => setDeleteTarget({id: user.id, name: user.name})}
                               aria-label="Hapus"
-                              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', color: '#dc2626' }}
+                              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '10px', minWidth: '44px', minHeight: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#dc2626' }}
                             >
                               <Trash2 style={{ width: '16px', height: '16px' }} />
                             </button>
@@ -285,7 +287,7 @@ export default function UsersPage() {
           onClick={() => setShowPermissions(!showPermissions)}
           style={{
             width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            padding: '16px 20px', background: 'none', border: 'none', cursor: 'pointer', color: c.textPrimary,
+            padding: '16px 20px', minHeight: '56px', background: 'none', border: 'none', cursor: 'pointer', color: c.textPrimary,
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -346,7 +348,7 @@ export default function UsersPage() {
             alignItems: 'center',
             justifyContent: 'center',
             zIndex: 50,
-            padding: '16px',
+            padding: isMobile ? '0' : '16px',
           }}
           onClick={(e) => { if (e.target === e.currentTarget) setShowModal(false); }}
         >
@@ -355,11 +357,12 @@ export default function UsersPage() {
             aria-modal="true"
             style={{
               backgroundColor: c.cardBg,
-              borderRadius: '16px',
-              padding: '24px',
+              borderRadius: isMobile ? '0' : '16px',
+              padding: isMobile ? '20px' : '24px',
               width: '100%',
-              maxWidth: '480px',
-              maxHeight: '90vh',
+              maxWidth: isMobile ? '100%' : '480px',
+              maxHeight: isMobile ? '100%' : '90vh',
+              height: isMobile ? '100%' : 'auto',
               overflow: 'auto',
             }}
           >
@@ -367,7 +370,7 @@ export default function UsersPage() {
               <h2 style={{ fontSize: '18px', fontWeight: '700', color: c.textPrimary, margin: 0 }}>
                 {editingId ? `${t.common.edit} User` : `${t.common.add} User`}
               </h2>
-              <button onClick={() => setShowModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}>
+              <button onClick={() => setShowModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '10px', minWidth: '44px', minHeight: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <X style={{ width: '20px', height: '20px', color: c.textSecondary }} />
               </button>
             </div>
@@ -385,7 +388,7 @@ export default function UsersPage() {
                   type="text"
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: `1px solid ${c.border}`, fontSize: '14px', backgroundColor: c.cardBg, color: c.textPrimary, boxSizing: 'border-box' }}
+                  style={{ width: '100%', padding: '10px 12px', minHeight: '46px', borderRadius: '8px', border: `1px solid ${c.border}`, fontSize: '14px', backgroundColor: c.cardBg, color: c.textPrimary, boxSizing: 'border-box' as const }}
                 />
               </div>
               <div>
@@ -395,7 +398,7 @@ export default function UsersPage() {
                   value={form.email}
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
                   disabled={!!editingId}
-                  style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: `1px solid ${c.border}`, fontSize: '14px', backgroundColor: editingId ? c.cardBgHover : c.cardBg, color: c.textPrimary, boxSizing: 'border-box' }}
+                  style={{ width: '100%', padding: '10px 12px', minHeight: '46px', borderRadius: '8px', border: `1px solid ${c.border}`, fontSize: '14px', backgroundColor: editingId ? c.cardBgHover : c.cardBg, color: c.textPrimary, boxSizing: 'border-box' as const }}
                 />
               </div>
               {!editingId && (
@@ -406,7 +409,7 @@ export default function UsersPage() {
                     value={form.password}
                     onChange={(e) => setForm({ ...form, password: e.target.value })}
                     placeholder="Min. 8 karakter"
-                    style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: `1px solid ${c.border}`, fontSize: '14px', backgroundColor: c.cardBg, color: c.textPrimary, boxSizing: 'border-box' }}
+                    style={{ width: '100%', padding: '10px 12px', minHeight: '46px', borderRadius: '8px', border: `1px solid ${c.border}`, fontSize: '14px', backgroundColor: c.cardBg, color: c.textPrimary, boxSizing: 'border-box' as const }}
                   />
                 </div>
               )}
@@ -415,7 +418,7 @@ export default function UsersPage() {
                 <select
                   value={form.role}
                   onChange={(e) => setForm({ ...form, role: e.target.value })}
-                  style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: `1px solid ${c.border}`, fontSize: '14px', backgroundColor: c.cardBg, color: c.textPrimary, boxSizing: 'border-box' }}
+                  style={{ width: '100%', padding: '10px 12px', minHeight: '46px', borderRadius: '8px', border: `1px solid ${c.border}`, fontSize: '14px', backgroundColor: c.cardBg, color: c.textPrimary, boxSizing: 'border-box' as const }}
                 >
                   {ROLES.map((r) => <option key={r} value={r}>{r}</option>)}
                 </select>
@@ -427,7 +430,7 @@ export default function UsersPage() {
                   value={form.position}
                   onChange={(e) => setForm({ ...form, position: e.target.value })}
                   placeholder="e.g. Admin Operasional"
-                  style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: `1px solid ${c.border}`, fontSize: '14px', backgroundColor: c.cardBg, color: c.textPrimary, boxSizing: 'border-box' }}
+                  style={{ width: '100%', padding: '10px 12px', minHeight: '46px', borderRadius: '8px', border: `1px solid ${c.border}`, fontSize: '14px', backgroundColor: c.cardBg, color: c.textPrimary, boxSizing: 'border-box' as const }}
                 />
               </div>
               <div>
@@ -436,22 +439,22 @@ export default function UsersPage() {
                   type="text"
                   value={form.phone}
                   onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                  style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: `1px solid ${c.border}`, fontSize: '14px', backgroundColor: c.cardBg, color: c.textPrimary, boxSizing: 'border-box' }}
+                  style={{ width: '100%', padding: '10px 12px', minHeight: '46px', borderRadius: '8px', border: `1px solid ${c.border}`, fontSize: '14px', backgroundColor: c.cardBg, color: c.textPrimary, boxSizing: 'border-box' as const }}
                 />
               </div>
             </div>
 
-            <div style={{ display: 'flex', gap: '12px', marginTop: '24px', justifyContent: 'flex-end' }}>
+            <div style={{ display: 'flex', gap: '12px', marginTop: '24px', justifyContent: isMobile ? 'stretch' : 'flex-end', flexDirection: isMobile ? 'column-reverse' : 'row' }}>
               <button
                 onClick={() => setShowModal(false)}
-                style={{ padding: '10px 20px', borderRadius: '8px', border: `1px solid ${c.border}`, backgroundColor: 'transparent', color: c.textPrimary, fontWeight: '500', cursor: 'pointer', fontSize: '14px' }}
+                style={{ padding: '10px 20px', minHeight: '44px', borderRadius: '8px', border: `1px solid ${c.border}`, backgroundColor: 'transparent', color: c.textPrimary, fontWeight: '500', cursor: 'pointer', fontSize: '14px' }}
               >
                 {t.common.cancel}
               </button>
               <button
                 onClick={handleSave}
                 disabled={saving}
-                style={{ padding: '10px 20px', borderRadius: '8px', border: 'none', backgroundColor: c.primary, color: 'white', fontWeight: '500', cursor: saving ? 'not-allowed' : 'pointer', fontSize: '14px', opacity: saving ? 0.7 : 1 }}
+                style={{ padding: '10px 20px', minHeight: '44px', borderRadius: '8px', border: 'none', backgroundColor: c.primary, color: 'white', fontWeight: '500', cursor: saving ? 'not-allowed' : 'pointer', fontSize: '14px', opacity: saving ? 0.7 : 1 }}
               >
                 {saving ? (
                   <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>

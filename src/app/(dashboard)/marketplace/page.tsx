@@ -212,7 +212,8 @@ function MarketCard({
               alert(t.marketplace.orderAlert);
             }}
             style={{
-              padding: '8px 20px',
+              padding: '10px 20px',
+              minHeight: '44px',
               borderRadius: '10px',
               border: 'none',
               backgroundColor: c.primary,
@@ -313,7 +314,8 @@ export default function MarketplacePage() {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px',
-                padding: '8px 16px',
+                padding: '10px 16px',
+                minHeight: '44px',
                 borderRadius: '24px',
                 border: isActive ? '2px solid ' + c.primary : '1px solid ' + c.border,
                 backgroundColor: isActive ? c.primaryLight : c.cardBg,
@@ -374,6 +376,7 @@ export default function MarketplacePage() {
             style={{
               width: '100%',
               padding: '10px 12px 10px 38px',
+              minHeight: '46px',
               borderRadius: '10px',
               border: '1px solid ' + c.border,
               backgroundColor: c.cardBg,
@@ -395,6 +398,7 @@ export default function MarketplacePage() {
           onChange={(e) => setSortBy(e.target.value as SortBy)}
           style={{
             padding: '10px 14px',
+            minHeight: '46px',
             borderRadius: '10px',
             border: '1px solid ' + c.border,
             backgroundColor: c.cardBg,
@@ -402,7 +406,9 @@ export default function MarketplacePage() {
             fontSize: '14px',
             cursor: 'pointer',
             outline: 'none',
-            minWidth: '170px',
+            minWidth: isMobile ? undefined : '170px',
+            width: isMobile ? '100%' : undefined,
+            boxSizing: 'border-box' as const,
           }}
         >
           <option value="popular">{t.marketplace.sortPopular}</option>
@@ -426,14 +432,15 @@ export default function MarketplacePage() {
           }}
         >
           {/* City Filter */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
             <span style={{ fontSize: '13px', color: c.textSecondary, fontWeight: 500 }}>{t.marketplace.filterCity}</span>
             {(['all', 'Makkah', 'Madinah'] as CityFilter[]).map((city) => (
               <button
                 key={city}
                 onClick={() => setCityFilter(city)}
                 style={{
-                  padding: '5px 12px',
+                  padding: '8px 12px',
+                  minHeight: '44px',
                   borderRadius: '8px',
                   border: cityFilter === city ? '1.5px solid ' + c.primary : '1px solid ' + c.border,
                   backgroundColor: cityFilter === city ? c.primaryLight : 'transparent',
@@ -450,14 +457,15 @@ export default function MarketplacePage() {
           </div>
 
           {/* Min Rating Filter */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
             <span style={{ fontSize: '13px', color: c.textSecondary, fontWeight: 500 }}>{t.marketplace.filterRating}</span>
             {([0, 3, 4, 5] as MinRating[]).map((r) => (
               <button
                 key={r}
                 onClick={() => setMinRating(r)}
                 style={{
-                  padding: '5px 12px',
+                  padding: '8px 12px',
+                  minHeight: '44px',
                   borderRadius: '8px',
                   border: minRating === r ? '1.5px solid ' + c.primary : '1px solid ' + c.border,
                   backgroundColor: minRating === r ? c.primaryLight : 'transparent',

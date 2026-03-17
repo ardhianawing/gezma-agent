@@ -293,12 +293,14 @@ export default function CurrencyConverterPage() {
               onClick={() => handleQuickConvert(sar)}
               style={{
                 padding: '12px 8px',
+                minHeight: '44px',
                 backgroundColor: c.pageBg,
                 border: '1px solid ' + c.borderLight,
                 borderRadius: '10px',
                 cursor: 'pointer',
                 textAlign: 'center',
                 transition: 'all 0.15s',
+                boxSizing: 'border-box',
               }}
             >
               <p style={{

@@ -100,7 +100,7 @@ export default function PilgrimPaymentsPage() {
               const typeColor = TYPE_COLORS[pay.type] || TYPE_COLORS[pay.type.toLowerCase()] || { bg: '#F3F4F6', text: '#6B7280' };
               return (
                 <div key={pay.id} style={{
-                  display: 'flex', gap: '14px', alignItems: 'flex-start',
+                  display: 'flex', gap: isMobile ? '10px' : '14px', alignItems: 'flex-start',
                 }}>
                   {/* Timeline dot + line */}
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '20px', flexShrink: 0 }}>
@@ -115,10 +115,14 @@ export default function PilgrimPaymentsPage() {
                   {/* Content */}
                   <div style={{
                     flex: 1, paddingBottom: i < payments.length - 1 ? '16px' : '0',
-                    display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start',
-                    flexWrap: 'wrap', gap: '8px',
+                    display: 'flex',
+                    flexDirection: isMobile ? 'column' : 'row',
+                    justifyContent: 'space-between',
+                    alignItems: isMobile ? 'flex-start' : 'flex-start',
+                    gap: isMobile ? '4px' : '8px',
+                    minWidth: 0,
                   }}>
-                    <div>
+                    <div style={{ minWidth: 0 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
                         <span style={{
                           fontSize: '11px', fontWeight: 600,
@@ -135,7 +139,12 @@ export default function PilgrimPaymentsPage() {
                         {pay.method}
                       </p>
                     </div>
-                    <span style={{ fontSize: '15px', fontWeight: 700, color: '#16A34A' }}>
+                    <span style={{
+                      fontSize: isMobile ? '16px' : '15px',
+                      fontWeight: 700,
+                      color: '#16A34A',
+                      flexShrink: 0,
+                    }}>
                       {formatCurrency(pay.amount)}
                     </span>
                   </div>

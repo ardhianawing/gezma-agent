@@ -81,6 +81,7 @@ export default function BrandingSettingsPage() {
   const inputStyle = {
     width: '100%',
     padding: '10px 14px',
+    minHeight: '46px',
     borderRadius: '8px',
     border: `1px solid ${c.border}`,
     backgroundColor: c.inputBg,
@@ -146,7 +147,7 @@ export default function BrandingSettingsPage() {
                   type="color"
                   value={primaryColor}
                   onChange={e => setPrimaryColor(e.target.value)}
-                  style={{ width: '48px', height: '40px', border: 'none', borderRadius: '8px', cursor: 'pointer', padding: 0 }}
+                  style={{ width: '48px', height: '46px', border: 'none', borderRadius: '8px', cursor: 'pointer', padding: 0 }}
                 />
                 <input
                   type="text"
@@ -163,7 +164,7 @@ export default function BrandingSettingsPage() {
                   type="color"
                   value={secondaryColor || '#666666'}
                   onChange={e => setSecondaryColor(e.target.value)}
-                  style={{ width: '48px', height: '40px', border: 'none', borderRadius: '8px', cursor: 'pointer', padding: 0 }}
+                  style={{ width: '48px', height: '46px', border: 'none', borderRadius: '8px', cursor: 'pointer', padding: 0 }}
                 />
                 <input
                   type="text"
@@ -269,11 +270,12 @@ export default function BrandingSettingsPage() {
           </div>
 
           {/* Actions */}
-          <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', paddingTop: '8px' }}>
+          <div style={{ display: 'flex', gap: '12px', justifyContent: isMobile ? 'stretch' : 'flex-end', paddingTop: '8px', flexDirection: isMobile ? 'column' : 'row' }}>
             <button
               onClick={handleReset}
               style={{
                 padding: '10px 20px',
+                minHeight: '44px',
                 borderRadius: '8px',
                 border: `1px solid ${c.border}`,
                 backgroundColor: 'transparent',
@@ -294,6 +296,7 @@ export default function BrandingSettingsPage() {
               disabled={saving}
               style={{
                 padding: '10px 24px',
+                minHeight: '44px',
                 borderRadius: '8px',
                 border: 'none',
                 backgroundColor: primaryColor,

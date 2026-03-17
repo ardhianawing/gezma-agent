@@ -212,11 +212,13 @@ export default function PilgrimDocumentsPage() {
                   disabled={isUploading}
                   style={{
                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
-                    padding: '10px', borderRadius: '10px', border: 'none',
+                    padding: '12px', minHeight: '44px', borderRadius: '10px', border: 'none',
                     backgroundColor: doc.status === 'missing' ? PILGRIM_GREEN : c.pageBg,
                     color: doc.status === 'missing' ? '#FFFFFF' : c.textSecondary,
-                    fontSize: '13px', fontWeight: 600, cursor: isUploading ? 'not-allowed' : 'pointer',
+                    fontSize: '14px', fontWeight: 600, cursor: isUploading ? 'not-allowed' : 'pointer',
                     opacity: isUploading ? 0.7 : 1,
+                    width: '100%',
+                    boxSizing: 'border-box',
                   }}
                 >
                   {isUploading ? 'Mengunggah...' : doc.status === 'missing' ? 'Unggah Dokumen' : 'Unggah Ulang'}

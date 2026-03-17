@@ -127,6 +127,7 @@ export default function ForumPage() {
           onClick={() => setShowCreateForm(!showCreateForm)}
           style={{
             padding: '10px 20px',
+            minHeight: '44px',
             backgroundColor: c.primary,
             color: '#fff',
             border: 'none',
@@ -134,6 +135,7 @@ export default function ForumPage() {
             fontWeight: 600,
             fontSize: 14,
             cursor: 'pointer',
+            width: isMobile ? '100%' : 'auto',
           }}
         >
           {showCreateForm ? `✕ ${t.common.cancel}` : t.forum.createThread}
@@ -163,13 +165,14 @@ export default function ForumPage() {
             style={{
               width: '100%',
               padding: '10px 14px',
+              minHeight: '46px',
               borderRadius: 8,
               border: '1px solid ' + c.border,
               backgroundColor: c.inputBg,
               color: c.textPrimary,
               fontSize: 14,
               outline: 'none',
-              boxSizing: 'border-box',
+              boxSizing: 'border-box' as const,
             }}
           />
           <textarea
@@ -190,18 +193,21 @@ export default function ForumPage() {
               resize: 'vertical',
             }}
           />
-          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', flexDirection: isMobile ? 'column' : 'row' }}>
             <select
               value={newCategory}
               onChange={(e) => setNewCategory(e.target.value)}
               style={{
                 padding: '10px 14px',
+                minHeight: '46px',
                 borderRadius: 8,
                 border: '1px solid ' + c.border,
                 backgroundColor: c.inputBg,
                 color: c.textPrimary,
                 fontSize: 14,
                 outline: 'none',
+                boxSizing: 'border-box' as const,
+                width: isMobile ? '100%' : undefined,
               }}
             >
               {forumCategories.filter(cat => cat.key !== 'all').map(cat => (
@@ -215,15 +221,17 @@ export default function ForumPage() {
               onChange={(e) => setNewTags(e.target.value)}
               style={{
                 flex: 1,
-                minWidth: 150,
+                minWidth: isMobile ? undefined : 150,
                 padding: '10px 14px',
+                minHeight: '46px',
                 borderRadius: 8,
                 border: '1px solid ' + c.border,
                 backgroundColor: c.inputBg,
                 color: c.textPrimary,
                 fontSize: 14,
                 outline: 'none',
-                boxSizing: 'border-box',
+                boxSizing: 'border-box' as const,
+                width: isMobile ? '100%' : undefined,
               }}
             />
           </div>
@@ -263,6 +271,7 @@ export default function ForumPage() {
             }}
             style={{
               padding: '10px 24px',
+              minHeight: '44px',
               backgroundColor: creating || !newTitle.trim() || !newContent.trim() ? c.textLight : c.primary,
               color: '#fff',
               border: 'none',
@@ -270,7 +279,8 @@ export default function ForumPage() {
               fontWeight: 600,
               fontSize: 14,
               cursor: creating || !newTitle.trim() || !newContent.trim() ? 'not-allowed' : 'pointer',
-              alignSelf: 'flex-end',
+              alignSelf: isMobile ? 'stretch' : 'flex-end',
+              width: isMobile ? '100%' : undefined,
             }}
           >
             {creating ? t.forum.createLoading : t.forum.createSubmit}
@@ -282,9 +292,12 @@ export default function ForumPage() {
       <div
         style={{
           display: 'flex',
-          flexWrap: 'wrap',
+          flexWrap: isMobile ? 'nowrap' : 'wrap',
           gap: 8,
           marginBottom: 16,
+          overflowX: isMobile ? 'auto' : undefined,
+          WebkitOverflowScrolling: 'touch' as const,
+          paddingBottom: isMobile ? '4px' : undefined,
         }}
       >
         {forumCategories.map((cat) => {
@@ -297,9 +310,12 @@ export default function ForumPage() {
                 display: 'flex',
                 alignItems: 'center',
                 gap: 6,
-                padding: '6px 14px',
+                padding: '8px 14px',
+                minHeight: '44px',
                 borderRadius: 20,
                 border: `1px solid ${isActive ? cat.color : c.borderLight}`,
+                whiteSpace: 'nowrap' as const,
+                flexShrink: 0,
                 backgroundColor: isActive ? cat.color + '18' : c.cardBg,
                 color: isActive ? cat.color : c.textSecondary,
                 fontWeight: isActive ? 600 : 400,
@@ -333,13 +349,13 @@ export default function ForumPage() {
       <div
         style={{
           display: 'flex',
-          flexWrap: 'wrap',
+          flexDirection: isMobile ? 'column' : 'row',
           gap: 12,
-          alignItems: 'center',
+          alignItems: isMobile ? 'stretch' : 'center',
           marginBottom: 16,
         }}
       >
-        <div style={{ flex: 1, minWidth: 200 }}>
+        <div style={{ flex: 1, minWidth: isMobile ? undefined : 200 }}>
           <input
             type="text"
             placeholder={t.forum.searchPlaceholder}
@@ -348,23 +364,26 @@ export default function ForumPage() {
             style={{
               width: '100%',
               padding: '9px 14px',
+              minHeight: '46px',
               borderRadius: 8,
               border: `1px solid ${c.borderLight}`,
               backgroundColor: c.cardBg,
               color: c.textPrimary,
               fontSize: 14,
               outline: 'none',
-              boxSizing: 'border-box',
+              boxSizing: 'border-box' as const,
             }}
           />
         </div>
-        <div style={{ display: 'flex', gap: 0, borderRadius: 8, overflow: 'hidden', border: `1px solid ${c.borderLight}` }}>
+        <div style={{ display: 'flex', gap: 0, borderRadius: 8, overflow: 'hidden', border: `1px solid ${c.borderLight}`, flexShrink: 0 }}>
           {sortTabs.map((tab) => (
             <button
               key={tab.key}
               onClick={() => setSortBy(tab.key)}
               style={{
-                padding: '8px 16px',
+                padding: '10px 16px',
+                minHeight: '44px',
+                flex: isMobile ? 1 : undefined,
                 border: 'none',
                 backgroundColor: sortBy === tab.key ? c.primary : c.cardBg,
                 color: sortBy === tab.key ? '#fff' : c.textSecondary,
@@ -449,8 +468,8 @@ export default function ForumPage() {
             <button
               key={idx}
               style={{
-                width: 32,
-                height: 32,
+                width: 44,
+                height: 44,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',

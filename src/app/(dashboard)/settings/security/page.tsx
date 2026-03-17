@@ -130,7 +130,8 @@ export default function SecuritySettingsPage() {
 
   const inputStyle: React.CSSProperties = {
     width: '100%',
-    height: '40px',
+    height: '46px',
+    minHeight: '46px',
     padding: '0 40px 0 12px',
     fontSize: '14px',
     border: `1px solid ${c.border}`,
@@ -192,7 +193,7 @@ export default function SecuritySettingsPage() {
                 <button
                   type="button"
                   onClick={() => setShowCurrentPw(!showCurrentPw)}
-                  style={{ position: 'absolute', right: '8px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}
+                  style={{ position: 'absolute', right: '4px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', padding: '10px', minWidth: '44px', minHeight: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                 >
                   {showCurrentPw
                     ? <EyeOff style={{ width: '16px', height: '16px', color: c.textMuted }} />
@@ -215,7 +216,7 @@ export default function SecuritySettingsPage() {
                 <button
                   type="button"
                   onClick={() => setShowNewPw(!showNewPw)}
-                  style={{ position: 'absolute', right: '8px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}
+                  style={{ position: 'absolute', right: '4px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', padding: '10px', minWidth: '44px', minHeight: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                 >
                   {showNewPw
                     ? <EyeOff style={{ width: '16px', height: '16px', color: c.textMuted }} />
@@ -252,6 +253,7 @@ export default function SecuritySettingsPage() {
               style={{
                 width: '100%',
                 padding: '10px',
+                minHeight: '48px',
                 borderRadius: '8px',
                 border: 'none',
                 backgroundColor: c.primary,
@@ -408,7 +410,8 @@ export default function SecuritySettingsPage() {
                 onClick={() => fetchHistory(pagination.page - 1)}
                 disabled={pagination.page <= 1}
                 style={{
-                  padding: '6px 12px',
+                  padding: '8px 12px',
+                  minHeight: '44px',
                   borderRadius: '6px',
                   border: `1px solid ${c.border}`,
                   backgroundColor: c.cardBg,
@@ -431,7 +434,8 @@ export default function SecuritySettingsPage() {
                 onClick={() => fetchHistory(pagination.page + 1)}
                 disabled={pagination.page >= pagination.totalPages}
                 style={{
-                  padding: '6px 12px',
+                  padding: '8px 12px',
+                  minHeight: '44px',
                   borderRadius: '6px',
                   border: `1px solid ${c.border}`,
                   backgroundColor: c.cardBg,

@@ -83,6 +83,9 @@ function PilgrimsPageContent() {
   // Kanban drag state
   const [draggedPilgrim, setDraggedPilgrim] = useState<string | null>(null);
 
+  // Mobile kanban active status tab
+  const [kanbanActiveStatus, setKanbanActiveStatus] = useState<string>('lead');
+
   // Import modal
   const [showImportModal, setShowImportModal] = useState(false);
 
@@ -443,25 +446,31 @@ function PilgrimsPageContent() {
   ];
 
   const actionBtnStyle: React.CSSProperties = {
-    padding: '8px',
+    padding: isMobile ? '12px' : '8px',
     border: 'none',
     backgroundColor: 'transparent',
     borderRadius: '6px',
     cursor: 'pointer',
     color: c.textLight,
+    minWidth: '44px',
+    minHeight: '44px',
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
   };
 
   const bulkBarBtnStyle: React.CSSProperties = {
     display: 'inline-flex',
     alignItems: 'center',
     gap: '6px',
-    padding: '8px 14px',
+    padding: '12px 16px',
     fontSize: '13px',
     fontWeight: '500',
     borderRadius: '8px',
     border: 'none',
     cursor: 'pointer',
     whiteSpace: 'nowrap',
+    minHeight: '44px',
   };
 
   return (
@@ -569,7 +578,7 @@ function PilgrimsPageContent() {
             onClick={() => setViewMode('list')}
             title="List View"
             style={{
-              padding: '8px',
+              padding: '12px',
               borderRadius: '6px',
               border: 'none',
               backgroundColor: viewMode === 'list' ? c.primary : 'transparent',
@@ -578,6 +587,8 @@ function PilgrimsPageContent() {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
+              minWidth: '44px',
+              minHeight: '44px',
             }}
           >
             <List style={{ width: '18px', height: '18px' }} />
@@ -586,7 +597,7 @@ function PilgrimsPageContent() {
             onClick={() => setViewMode('kanban')}
             title="Kanban View"
             style={{
-              padding: '8px',
+              padding: '12px',
               borderRadius: '6px',
               border: 'none',
               backgroundColor: viewMode === 'kanban' ? c.primary : 'transparent',
@@ -595,6 +606,8 @@ function PilgrimsPageContent() {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
+              minWidth: '44px',
+              minHeight: '44px',
             }}
           >
             <LayoutGrid style={{ width: '18px', height: '18px' }} />
@@ -629,108 +642,220 @@ function PilgrimsPageContent() {
 
       {/* Kanban View */}
       {viewMode === 'kanban' && (
-        <div style={{ overflowX: 'auto', paddingBottom: '16px' }}>
-          <div style={{ display: 'flex', gap: '12px', minWidth: 'max-content' }}>
-            {STATUS_OPTIONS.map((statusOpt) => {
-              const columnPilgrims = pilgrims.filter((p) => p.status === statusOpt.value);
-              const statusColors: Record<string, string> = {
-                lead: '#6B7280',
-                dp: '#F59E0B',
-                lunas: '#10B981',
-                dokumen: '#3B82F6',
-                visa: '#8B5CF6',
-                ready: '#06B6D4',
-                departed: '#EC4899',
-                completed: '#22C55E',
-              };
-              const dotColor = statusColors[statusOpt.value] || c.textMuted;
+        isMobile ? (
+          /* Mobile: Single column with status tabs */
+          <div>
+            {/* Status tabs - horizontally scrollable */}
+            <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', marginBottom: '12px' }}>
+              <div style={{ display: 'flex', gap: '6px', padding: '2px', minWidth: 'max-content' }}>
+                {STATUS_OPTIONS.map((statusOpt) => {
+                  const count = pilgrims.filter((p) => p.status === statusOpt.value).length;
+                  const isActive = kanbanActiveStatus === statusOpt.value;
+                  const statusColors: Record<string, string> = {
+                    lead: '#6B7280', dp: '#F59E0B', lunas: '#10B981', dokumen: '#3B82F6',
+                    visa: '#8B5CF6', ready: '#06B6D4', departed: '#EC4899', completed: '#22C55E',
+                  };
+                  const dotColor = statusColors[statusOpt.value] || c.textMuted;
 
-              return (
-                <div
-                  key={statusOpt.value}
-                  onDragOver={(e) => { e.preventDefault(); e.currentTarget.style.backgroundColor = c.primaryLight || '#EFF6FF'; }}
-                  onDragLeave={(e) => { e.currentTarget.style.backgroundColor = c.pageBg; }}
-                  onDrop={(e) => { e.preventDefault(); e.currentTarget.style.backgroundColor = c.pageBg; handleKanbanDrop(statusOpt.value); }}
-                  style={{
-                    minWidth: '220px',
-                    width: '220px',
-                    backgroundColor: c.pageBg,
-                    borderRadius: '12px',
-                    border: `1px solid ${c.border}`,
-                    padding: '12px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '8px',
-                    transition: 'background-color 0.15s',
-                  }}
-                >
-                  {/* Column header */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                    <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: dotColor, flexShrink: 0 }} />
-                    <span style={{ fontSize: '13px', fontWeight: '600', color: c.textPrimary }}>{statusOpt.label}</span>
-                    <span style={{
-                      marginLeft: 'auto',
-                      fontSize: '11px',
-                      fontWeight: '600',
+                  return (
+                    <button
+                      key={statusOpt.value}
+                      onClick={() => setKanbanActiveStatus(statusOpt.value)}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        padding: '10px 14px',
+                        minHeight: '44px',
+                        fontSize: '13px',
+                        fontWeight: isActive ? '600' : '500',
+                        color: isActive ? 'white' : c.textSecondary,
+                        backgroundColor: isActive ? dotColor : c.cardBg,
+                        border: `1px solid ${isActive ? dotColor : c.border}`,
+                        borderRadius: '9999px',
+                        cursor: 'pointer',
+                        whiteSpace: 'nowrap',
+                        transition: 'all 0.15s',
+                      }}
+                    >
+                      <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: isActive ? 'white' : dotColor, flexShrink: 0 }} />
+                      {statusOpt.label}
+                      <span style={{
+                        fontSize: '11px',
+                        fontWeight: '600',
+                        backgroundColor: isActive ? 'rgba(255,255,255,0.25)' : c.pageBg,
+                        color: isActive ? 'white' : c.textMuted,
+                        padding: '2px 8px',
+                        borderRadius: '10px',
+                      }}>
+                        {count}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Cards for active status */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {loading ? (
+                <div style={{ padding: '32px', textAlign: 'center', fontSize: '13px', color: c.textMuted }}>Memuat...</div>
+              ) : (() => {
+                const activePilgrims = pilgrims.filter((p) => p.status === kanbanActiveStatus);
+                if (activePilgrims.length === 0) {
+                  return (
+                    <div style={{
+                      padding: '32px 16px',
+                      textAlign: 'center',
+                      fontSize: '13px',
                       color: c.textMuted,
-                      backgroundColor: c.cardBg,
-                      padding: '2px 8px',
-                      borderRadius: '10px',
+                      border: `2px dashed ${c.border}`,
+                      borderRadius: '12px',
+                      backgroundColor: c.pageBg,
                     }}>
-                      {columnPilgrims.length}
-                    </span>
-                  </div>
-
-                  {/* Pilgrim cards */}
-                  {loading ? (
-                    <div style={{ padding: '16px', textAlign: 'center', fontSize: '12px', color: c.textMuted }}>...</div>
-                  ) : columnPilgrims.length === 0 ? (
-                    <div style={{ padding: '24px 8px', textAlign: 'center', fontSize: '12px', color: c.textMuted, border: `2px dashed ${c.border}`, borderRadius: '8px' }}>
-                      Kosong
+                      Tidak ada jemaah dengan status ini
                     </div>
-                  ) : (
-                    columnPilgrims.map((pilgrim) => (
-                      <div
-                        key={pilgrim.id}
-                        draggable
-                        onDragStart={() => setDraggedPilgrim(pilgrim.id)}
-                        onDragEnd={() => setDraggedPilgrim(null)}
-                        onClick={() => window.location.href = `/pilgrims/${pilgrim.id}`}
-                        style={{
-                          backgroundColor: c.cardBg,
-                          borderRadius: '10px',
-                          border: `1px solid ${draggedPilgrim === pilgrim.id ? c.primary : c.border}`,
-                          padding: '12px',
-                          cursor: 'grab',
-                          opacity: draggedPilgrim === pilgrim.id ? 0.5 : 1,
-                          transition: 'border-color 0.15s, opacity 0.15s',
-                        }}
-                      >
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                          <div style={{
-                            width: '28px', height: '28px', borderRadius: '50%',
-                            backgroundColor: c.primary, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            color: 'white', fontSize: '11px', fontWeight: '600', flexShrink: 0,
-                          }}>
-                            {pilgrim.name.split(' ').map((n) => n[0]).join('').slice(0, 2)}
-                          </div>
-                          <div style={{ minWidth: 0 }}>
-                            <div style={{ fontSize: '13px', fontWeight: '500', color: c.textPrimary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                              {pilgrim.name}
-                            </div>
-                          </div>
+                  );
+                }
+                return activePilgrims.map((pilgrim) => (
+                  <div
+                    key={pilgrim.id}
+                    onClick={() => window.location.href = `/pilgrims/${pilgrim.id}`}
+                    style={{
+                      backgroundColor: c.cardBg,
+                      borderRadius: '12px',
+                      border: `1px solid ${c.border}`,
+                      padding: '14px',
+                      cursor: 'pointer',
+                      transition: 'border-color 0.15s',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
+                      <div style={{
+                        width: '36px', height: '36px', borderRadius: '50%',
+                        backgroundColor: c.primary, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        color: 'white', fontSize: '13px', fontWeight: '600', flexShrink: 0,
+                      }}>
+                        {pilgrim.name.split(' ').map((n) => n[0]).join('').slice(0, 2)}
+                      </div>
+                      <div style={{ minWidth: 0, flex: 1 }}>
+                        <div style={{ fontSize: '14px', fontWeight: '500', color: c.textPrimary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {pilgrim.name}
                         </div>
-                        <div style={{ fontSize: '11px', color: c.textMuted, fontFamily: 'monospace' }}>
-                          {pilgrim.nik.length > 12 ? pilgrim.nik.slice(0, 12) + '...' : pilgrim.nik}
+                        <div style={{ fontSize: '12px', color: c.textMuted, fontFamily: 'monospace' }}>
+                          {pilgrim.nik}
                         </div>
                       </div>
-                    ))
-                  )}
-                </div>
-              );
-            })}
+                    </div>
+                    {pilgrim.phone && (
+                      <div style={{ fontSize: '12px', color: c.textMuted, marginTop: '4px' }}>
+                        {pilgrim.phone}
+                      </div>
+                    )}
+                  </div>
+                ));
+              })()}
+            </div>
           </div>
-        </div>
+        ) : (
+          /* Tablet/Desktop: Horizontal kanban columns */
+          <div style={{ overflowX: 'auto', paddingBottom: '16px' }}>
+            <div style={{ display: 'flex', gap: '12px', minWidth: 'max-content' }}>
+              {STATUS_OPTIONS.map((statusOpt) => {
+                const columnPilgrims = pilgrims.filter((p) => p.status === statusOpt.value);
+                const statusColors: Record<string, string> = {
+                  lead: '#6B7280', dp: '#F59E0B', lunas: '#10B981', dokumen: '#3B82F6',
+                  visa: '#8B5CF6', ready: '#06B6D4', departed: '#EC4899', completed: '#22C55E',
+                };
+                const dotColor = statusColors[statusOpt.value] || c.textMuted;
+
+                return (
+                  <div
+                    key={statusOpt.value}
+                    onDragOver={(e) => { e.preventDefault(); e.currentTarget.style.backgroundColor = c.primaryLight || '#EFF6FF'; }}
+                    onDragLeave={(e) => { e.currentTarget.style.backgroundColor = c.pageBg; }}
+                    onDrop={(e) => { e.preventDefault(); e.currentTarget.style.backgroundColor = c.pageBg; handleKanbanDrop(statusOpt.value); }}
+                    style={{
+                      minWidth: '220px',
+                      width: '220px',
+                      backgroundColor: c.pageBg,
+                      borderRadius: '12px',
+                      border: `1px solid ${c.border}`,
+                      padding: '12px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '8px',
+                      transition: 'background-color 0.15s',
+                    }}
+                  >
+                    {/* Column header */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                      <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: dotColor, flexShrink: 0 }} />
+                      <span style={{ fontSize: '13px', fontWeight: '600', color: c.textPrimary }}>{statusOpt.label}</span>
+                      <span style={{
+                        marginLeft: 'auto',
+                        fontSize: '11px',
+                        fontWeight: '600',
+                        color: c.textMuted,
+                        backgroundColor: c.cardBg,
+                        padding: '2px 8px',
+                        borderRadius: '10px',
+                      }}>
+                        {columnPilgrims.length}
+                      </span>
+                    </div>
+
+                    {/* Pilgrim cards */}
+                    {loading ? (
+                      <div style={{ padding: '16px', textAlign: 'center', fontSize: '12px', color: c.textMuted }}>...</div>
+                    ) : columnPilgrims.length === 0 ? (
+                      <div style={{ padding: '24px 8px', textAlign: 'center', fontSize: '12px', color: c.textMuted, border: `2px dashed ${c.border}`, borderRadius: '8px' }}>
+                        Kosong
+                      </div>
+                    ) : (
+                      columnPilgrims.map((pilgrim) => (
+                        <div
+                          key={pilgrim.id}
+                          draggable
+                          onDragStart={() => setDraggedPilgrim(pilgrim.id)}
+                          onDragEnd={() => setDraggedPilgrim(null)}
+                          onClick={() => window.location.href = `/pilgrims/${pilgrim.id}`}
+                          style={{
+                            backgroundColor: c.cardBg,
+                            borderRadius: '10px',
+                            border: `1px solid ${draggedPilgrim === pilgrim.id ? c.primary : c.border}`,
+                            padding: '12px',
+                            cursor: 'grab',
+                            opacity: draggedPilgrim === pilgrim.id ? 0.5 : 1,
+                            transition: 'border-color 0.15s, opacity 0.15s',
+                          }}
+                        >
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                            <div style={{
+                              width: '28px', height: '28px', borderRadius: '50%',
+                              backgroundColor: c.primary, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              color: 'white', fontSize: '11px', fontWeight: '600', flexShrink: 0,
+                            }}>
+                              {pilgrim.name.split(' ').map((n) => n[0]).join('').slice(0, 2)}
+                            </div>
+                            <div style={{ minWidth: 0 }}>
+                              <div style={{ fontSize: '13px', fontWeight: '500', color: c.textPrimary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                {pilgrim.name}
+                              </div>
+                            </div>
+                          </div>
+                          <div style={{ fontSize: '11px', color: c.textMuted, fontFamily: 'monospace' }}>
+                            {pilgrim.nik.length > 12 ? pilgrim.nik.slice(0, 12) + '...' : pilgrim.nik}
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )
       )}
 
       {/* Table */}

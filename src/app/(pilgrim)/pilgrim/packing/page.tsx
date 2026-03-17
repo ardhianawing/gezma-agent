@@ -220,6 +220,7 @@ export default function PackingChecklistPage() {
           gap: '8px',
           width: '100%',
           padding: '12px',
+          minHeight: '44px',
           fontSize: '14px',
           fontWeight: 600,
           color: GREEN,
@@ -228,6 +229,7 @@ export default function PackingChecklistPage() {
           borderRadius: '10px',
           cursor: 'pointer',
           marginBottom: '16px',
+          boxSizing: 'border-box',
         }}
       >
         {'\u{1F5A8}\u{FE0F}'} Cetak Checklist
@@ -288,12 +290,14 @@ export default function PackingChecklistPage() {
                       display: 'flex',
                       alignItems: 'center',
                       gap: '10px',
-                      padding: '8px 10px',
+                      padding: isMobile ? '10px 12px' : '8px 10px',
+                      minHeight: '44px',
                       borderRadius: '8px',
                       backgroundColor: isChecked ? GREEN_LIGHT : c.pageBg,
                       border: '1px solid ' + (isChecked ? GREEN : c.borderLight),
                       cursor: 'pointer',
                       transition: 'all 0.15s',
+                      boxSizing: 'border-box',
                     }}
                   >
                     <input
@@ -349,7 +353,8 @@ export default function PackingChecklistPage() {
               <button
                 onClick={() => addCustomItem(cat.name)}
                 style={{
-                  padding: '8px 14px',
+                  padding: '10px 14px',
+                  minHeight: '44px',
                   fontSize: '13px',
                   fontWeight: 600,
                   color: '#FFFFFF',
@@ -358,6 +363,7 @@ export default function PackingChecklistPage() {
                   borderRadius: '8px',
                   cursor: 'pointer',
                   whiteSpace: 'nowrap',
+                  boxSizing: 'border-box',
                 }}
               >
                 Tambah
