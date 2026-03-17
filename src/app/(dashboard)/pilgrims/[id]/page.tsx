@@ -88,12 +88,12 @@ export default function PilgrimDetailPage() {
       });
       if (res.ok) {
         setPilgrim((prev) => prev ? { ...prev, tripId: newTripId as string | undefined } : prev);
-        addToast({ type: 'success', title: t.common.success + ' ' diubah' });
+        addToast({ type: 'success', title: t.common.success + ' diubah' });
       } else {
-        addToast({ type: 'error', title: t.common.error + ' ' mengubah trip' });
+        addToast({ type: 'error', title: t.common.error + ' mengubah trip' });
       }
     } catch {
-      addToast({ type: 'error', title: t.common.error + ' ' mengubah trip' });
+      addToast({ type: 'error', title: t.common.error + ' mengubah trip' });
     } finally {
       setSavingTrip(false);
     }
@@ -145,12 +145,12 @@ export default function PilgrimDetailPage() {
         const newNote = await res.json();
         setInternalNotes((prev) => [newNote, ...prev]);
         setNoteContent('');
-        addToast({ type: 'success', title: t.common.success + ' ' ditambahkan' });
+        addToast({ type: 'success', title: t.common.success + ' ditambahkan' });
       } else {
-        addToast({ type: 'error', title: t.common.error + ' ' menambahkan catatan' });
+        addToast({ type: 'error', title: t.common.error + ' menambahkan catatan' });
       }
     } catch {
-      addToast({ type: 'error', title: t.common.error + ' ' menambahkan catatan' });
+      addToast({ type: 'error', title: t.common.error + ' menambahkan catatan' });
     } finally {
       setSavingNote(false);
     }
@@ -161,12 +161,12 @@ export default function PilgrimDetailPage() {
       const res = await fetch(`/api/pilgrims/${id}/notes/${noteId}`, { method: 'DELETE' });
       if (res.ok) {
         setInternalNotes((prev) => prev.filter((n) => n.id !== noteId));
-        addToast({ type: 'success', title: t.common.success + ' ' dihapus' });
+        addToast({ type: 'success', title: t.common.success + ' dihapus' });
       } else {
-        addToast({ type: 'error', title: t.common.error + ' ' menghapus catatan' });
+        addToast({ type: 'error', title: t.common.error + ' menghapus catatan' });
       }
     } catch {
-      addToast({ type: 'error', title: t.common.error + ' ' menghapus catatan' });
+      addToast({ type: 'error', title: t.common.error + ' menghapus catatan' });
     }
   }
 
@@ -200,7 +200,7 @@ export default function PilgrimDetailPage() {
         }),
       });
       if (!res.ok) {
-        addToast({ type: 'error', title: t.common.error + ' ' menyimpan pembayaran' });
+        addToast({ type: 'error', title: t.common.error + ' menyimpan pembayaran' });
         return;
       }
       const newPayment = await res.json();
@@ -217,9 +217,9 @@ export default function PilgrimDetailPage() {
       );
       setShowPayment(false);
       setPaymentForm({ amount: '', type: 'dp', method: 'transfer', date: new Date().toISOString().split('T')[0], notes: '' });
-      addToast({ type: 'success', title: t.common.success + ' ' disimpan' });
+      addToast({ type: 'success', title: t.common.success + ' disimpan' });
     } catch {
-      addToast({ type: 'error', title: t.common.error + ' ' menyimpan pembayaran' });
+      addToast({ type: 'error', title: t.common.error + ' menyimpan pembayaran' });
     } finally {
       setSavingPayment(false);
     }
@@ -234,18 +234,18 @@ export default function PilgrimDetailPage() {
         body: JSON.stringify({ status: newStatus }),
       });
       if (!res.ok) {
-        addToast({ type: 'error', title: t.common.error + ' ' mengubah status' });
+        addToast({ type: 'error', title: t.common.error + ' mengubah status' });
         return;
       }
       setPilgrim((prev) => prev ? { ...prev, status: newStatus as PilgrimStatus } : prev);
-      addToast({ type: 'success', title: t.common.success + ' ' diubah' });
+      addToast({ type: 'success', title: t.common.success + ' diubah' });
       // Refresh status history after change
       fetch(`/api/pilgrims/${id}/history`)
         .then((r) => r.json())
         .then((json) => setStatusHistory(json.data || []))
         .catch(() => {});
     } catch {
-      addToast({ type: 'error', title: t.common.error + ' ' mengubah status' });
+      addToast({ type: 'error', title: t.common.error + ' mengubah status' });
     }
   }
 
@@ -254,7 +254,7 @@ export default function PilgrimDetailPage() {
     try {
       const res = await fetch(`/api/pilgrims/${id}/payments/${deletePayment.id}`, { method: 'DELETE' });
       if (!res.ok) {
-        addToast({ type: 'error', title: t.common.error + ' ' menghapus pembayaran' });
+        addToast({ type: 'error', title: t.common.error + ' menghapus pembayaran' });
         return;
       }
       setPilgrim((prev) =>
@@ -267,9 +267,9 @@ export default function PilgrimDetailPage() {
             }
           : prev
       );
-      addToast({ type: 'success', title: t.common.success + ' ' dihapus' });
+      addToast({ type: 'success', title: t.common.success + ' dihapus' });
     } catch {
-      addToast({ type: 'error', title: t.common.error + ' ' menghapus pembayaran' });
+      addToast({ type: 'error', title: t.common.error + ' menghapus pembayaran' });
     } finally {
       setDeletePayment(null);
     }
@@ -281,7 +281,7 @@ export default function PilgrimDetailPage() {
     try {
       const res = await fetch(`/api/pilgrims/${id}/invoice`);
       if (!res.ok) {
-        addToast({ type: 'error', title: t.common.error + ' ' mengunduh kwitansi' });
+        addToast({ type: 'error', title: t.common.error + ' mengunduh kwitansi' });
         return;
       }
       const blob = await res.blob();
@@ -292,7 +292,7 @@ export default function PilgrimDetailPage() {
       a.click();
       URL.revokeObjectURL(url);
     } catch {
-      addToast({ type: 'error', title: t.common.error + ' ' mengunduh kwitansi' });
+      addToast({ type: 'error', title: t.common.error + ' mengunduh kwitansi' });
     } finally {
       setDownloadingInvoice(false);
     }
@@ -307,10 +307,10 @@ export default function PilgrimDetailPage() {
         const json = await res.json();
         setQrData(json.data);
       } else {
-        addToast({ type: 'error', title: t.common.error + ' ' generate QR code' });
+        addToast({ type: 'error', title: t.common.error + ' generate QR code' });
       }
     } catch {
-      addToast({ type: 'error', title: t.common.error + ' ' generate QR code' });
+      addToast({ type: 'error', title: t.common.error + ' generate QR code' });
     } finally {
       setLoadingQr(false);
     }

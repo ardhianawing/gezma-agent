@@ -4,8 +4,8 @@ import { useState, useEffect, useMemo, CSSProperties } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
-import {
 import { useLanguage } from '@/lib/i18n';
+import {
   ArrowLeft,
   MessageCircle,
   Send,

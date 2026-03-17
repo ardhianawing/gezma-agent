@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react';
 import { PageHeader } from '@/components/layout/page-header';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
-import {
 import { useLanguage } from '@/lib/i18n';
+import {
   Shield,
   Lock,
   Eye,

@@ -6,8 +6,8 @@ import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
 import { PageHeader } from '@/components/layout/page-header';
 import { BackButton } from '@/components/shared/back-button';
-import {
 import { useLanguage } from '@/lib/i18n';
+import {
   ChevronRight,
   Wifi,
   WifiOff,

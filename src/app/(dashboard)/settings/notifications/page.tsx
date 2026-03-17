@@ -7,8 +7,8 @@ import { useResponsive } from '@/lib/hooks/use-responsive';
 import { useToast } from '@/components/ui/toast';
 import { Bell, ArrowLeft, Save, Loader2 } from 'lucide-react';
 import Link from 'next/link';
-import {
 import { useLanguage } from '@/lib/i18n';
+import {
   NOTIFICATION_CATEGORIES,
   NOTIFICATION_CHANNELS,
   type NotificationPreferences,

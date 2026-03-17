@@ -43,40 +43,7 @@ interface MenuItem {
   icon: LucideIcon;
 }
 
-// === OPERASIONAL ===
-const menuItems: MenuItem[] = [
-  { label: 'Dasbor', href: '/dashboard', icon: LayoutDashboard },
-  { label: 'Jamaah', href: '/pilgrims', icon: Users },
-  { label: 'Paket', href: '/packages', icon: Package },
-  { label: 'Perjalanan', href: '/trips', icon: Plane },
-  { label: 'Tugas', href: '/tasks', icon: CheckSquare },
-  { label: 'Notifikasi', href: '/notifications', icon: Bell },
-  { label: 'Dokumen', href: '/documents', icon: FileText },
-  { label: 'Laporan', href: '/reports', icon: BarChart3 },
-  { label: 'Aktivitas', href: '/activities', icon: Clock },
-  { label: 'Gamifikasi', href: '/gamification', icon: Trophy },
-  { label: 'Blockchain', href: '/blockchain', icon: Shield },
-  { label: 'Agensi', href: '/agency', icon: Building2 },
-];
-
-// === PLATFORM ===
-const platformItems: MenuItem[] = [
-  { label: 'Marketplace', href: '/marketplace', icon: ShoppingBag },
-  { label: 'Trade Centre', href: '/trade', icon: Globe },
-  { label: 'Forum', href: '/forum', icon: MessageSquare },
-  { label: 'Berita', href: '/news', icon: Newspaper },
-  { label: 'Akademi', href: '/academy', icon: GraduationCap },
-  { label: 'Layanan', href: '/services', icon: HeadphonesIcon },
-  { label: 'GezmaPay', href: '/gezmapay', icon: Wallet },
-  { label: 'Tabungan', href: '/tabungan', icon: Banknote },
-  { label: 'PayLater', href: '/paylater', icon: CreditCard },
-];
-
-// === LAINNYA ===
-const settingsItems: MenuItem[] = [
-  { label: 'Pengaturan', href: '/settings', icon: Settings },
-  { label: 'Pusat Bantuan', href: '/help', icon: HelpCircle },
-];
+// Menu items are defined inside the component to access translations
 
 interface SidebarProps {
   isOpen?: boolean;
@@ -90,6 +57,41 @@ export function Sidebar({ isOpen, onClose, isOverlay = false }: SidebarProps) {
   const { theme, c } = useTheme();
   const { user, logout } = useAuth();
   const { branding } = useBranding();
+
+  // === OPERASIONAL ===
+  const menuItems: MenuItem[] = [
+    { label: t.nav.dashboard, href: '/dashboard', icon: LayoutDashboard },
+    { label: t.nav.pilgrims, href: '/pilgrims', icon: Users },
+    { label: t.nav.packages, href: '/packages', icon: Package },
+    { label: t.nav.trips, href: '/trips', icon: Plane },
+    { label: t.nav.tasks, href: '/tasks', icon: CheckSquare },
+    { label: t.nav.notifications, href: '/notifications', icon: Bell },
+    { label: t.nav.documents, href: '/documents', icon: FileText },
+    { label: t.nav.reports, href: '/reports', icon: BarChart3 },
+    { label: t.nav.activities, href: '/activities', icon: Clock },
+    { label: t.nav.gamification, href: '/gamification', icon: Trophy },
+    { label: t.nav.blockchain, href: '/blockchain', icon: Shield },
+    { label: t.nav.agency, href: '/agency', icon: Building2 },
+  ];
+
+  // === PLATFORM ===
+  const platformItems: MenuItem[] = [
+    { label: t.nav.marketplace, href: '/marketplace', icon: ShoppingBag },
+    { label: t.nav.tradeCentre, href: '/trade', icon: Globe },
+    { label: t.nav.forum, href: '/forum', icon: MessageSquare },
+    { label: t.nav.news, href: '/news', icon: Newspaper },
+    { label: t.nav.academy, href: '/academy', icon: GraduationCap },
+    { label: t.nav.services, href: '/services', icon: HeadphonesIcon },
+    { label: t.nav.gezmaPay, href: '/gezmapay', icon: Wallet },
+    { label: t.nav.tabungan, href: '/tabungan', icon: Banknote },
+    { label: t.nav.payLater, href: '/paylater', icon: CreditCard },
+  ];
+
+  // === LAINNYA ===
+  const settingsItems: MenuItem[] = [
+    { label: t.nav.settings, href: '/settings', icon: Settings },
+    { label: t.nav.helpCenter, href: '/help', icon: HelpCircle },
+  ];
 
   const isActive = (href: string) => {
     if (href === '/') {
@@ -249,7 +251,7 @@ export function Sidebar({ isOpen, onClose, isOverlay = false }: SidebarProps) {
                 marginBottom: '8px',
               }}
             >
-              Platform
+              {t.nav.platform}
             </p>
             <nav style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
               {platformItems.map(renderMenuItem)}
@@ -272,7 +274,7 @@ export function Sidebar({ isOpen, onClose, isOverlay = false }: SidebarProps) {
                 marginBottom: '8px',
               }}
             >
-              Operasional
+              {t.nav.operational}
             </p>
             <nav style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
               {menuItems.map(renderMenuItem)}
@@ -295,7 +297,7 @@ export function Sidebar({ isOpen, onClose, isOverlay = false }: SidebarProps) {
                 marginBottom: '8px',
               }}
             >
-              Lainnya
+              {t.nav.other}
             </p>
             <nav style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
               {settingsItems.map(renderMenuItem)}
