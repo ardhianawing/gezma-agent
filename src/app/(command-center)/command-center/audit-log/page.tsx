@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Search, ScrollText, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
+import { useLanguage } from '@/lib/i18n';
 
 const cc = {
   primary: '#2563EB',
@@ -43,6 +44,7 @@ interface Pagination {
 }
 
 export default function AuditLogPage() {
+  const { t } = useLanguage();
   const [logs, setLogs] = useState<AuditLog[]>([]);
   const [pagination, setPagination] = useState<Pagination>({ page: 1, limit: 50, total: 0, totalPages: 0 });
   const [loading, setLoading] = useState(true);
@@ -142,7 +144,7 @@ export default function AuditLogPage() {
           />
           <input
             type="text"
-            placeholder="Cari aktivitas..."
+            placeholder={t.activities.searchPlaceholder}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             style={{
@@ -199,13 +201,13 @@ export default function AuditLogPage() {
                 margin: '0 auto',
               }}
             />
-            <p style={{ color: cc.textMuted, fontSize: '14px', marginTop: '12px' }}>Memuat data...</p>
+            <p style={{ color: cc.textMuted, fontSize: '14px', marginTop: '12px' }}>{t.common.loadingData}</p>
             <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
           </div>
         ) : logs.length === 0 ? (
           <div style={{ padding: '60px 20px', textAlign: 'center' }}>
             <ScrollText style={{ width: '48px', height: '48px', color: cc.border, margin: '0 auto' }} />
-            <p style={{ color: cc.textMuted, fontSize: '14px', marginTop: '12px' }}>Tidak ada log aktivitas ditemukan.</p>
+            <p style={{ color: cc.textMuted, fontSize: '14px', marginTop: '12px' }}>{t.common.noData}</p>
           </div>
         ) : (
           <div style={{ overflowX: 'auto' }}>

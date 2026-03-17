@@ -3,9 +3,11 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Shield, LogIn, Loader2 } from 'lucide-react';
+import { useLanguage } from '@/lib/i18n';
 
 export default function CCLoginPage() {
   const router = useRouter();
+  const { t } = useLanguage();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -27,10 +29,10 @@ export default function CCLoginPage() {
         router.push('/command-center');
       } else {
         const data = await res.json();
-        setError(data.error || 'Login gagal');
+        setError(data.error || t.commandCenter.loginErrorDefault);
       }
     } catch {
-      setError('Terjadi kesalahan jaringan');
+      setError(t.commandCenter.loginErrorNetwork);
     } finally {
       setLoading(false);
     }
@@ -155,7 +157,7 @@ export default function CCLoginPage() {
             ) : (
               <LogIn style={{ width: '18px', height: '18px' }} />
             )}
-            {loading ? 'Signing in...' : 'Sign In'}
+            {loading ? 'Signing in...' : t.common.submit}
           </button>
         </form>
       </div>

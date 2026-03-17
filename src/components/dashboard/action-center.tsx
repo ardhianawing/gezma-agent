@@ -62,6 +62,7 @@ export function ActionCenter() {
 
   return (
     <div
+      data-tour="action-center"
       style={{
         backgroundColor: c.cardBg,
         borderRadius: '12px',

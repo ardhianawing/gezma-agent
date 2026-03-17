@@ -15,6 +15,7 @@ import { TripCapacityChart } from '@/components/dashboard/trip-capacity-chart';
 import { OnboardingTour } from '@/components/shared/onboarding-tour';
 import { useAuth } from '@/lib/auth';
 import { StatsSkeleton, TableSkeleton } from '@/components/shared/loading-skeleton';
+import { useLanguage } from '@/lib/i18n';
 
 interface Activity {
   id: string;
@@ -116,17 +117,25 @@ function timeAgo(timestamp: string): string {
   return `${diffDays}d ago`;
 }
 
-const ONBOARDING_STEPS = [
-  { target: 'sidebar', title: 'Menu Navigasi', description: 'Akses semua fitur dari sidebar ini' },
-  { target: 'search', title: 'Pencarian', description: 'Cari jamaah, paket, atau perjalanan dengan cepat' },
-  { target: 'notifications', title: 'Notifikasi', description: 'Pantau aktivitas terbaru agensi Anda' },
-  { target: 'dashboard-stats', title: 'Dashboard', description: 'Lihat ringkasan data agensi Anda di sini' },
-];
+// Onboarding steps are defined inside the component to access translations
 
 export default function DashboardPage() {
   const { c } = useTheme();
   const { isMobile, isTablet } = useResponsive();
   const { user, refreshUser } = useAuth();
+  const { t } = useLanguage();
+
+  const ONBOARDING_STEPS = [
+    { target: 'dashboard-stats', title: t.onboarding.step1Title, description: t.onboarding.step1Desc },
+    { target: 'sidebar', title: t.onboarding.step2Title, description: t.onboarding.step2Desc },
+    { target: 'search', title: t.onboarding.step3Title, description: t.onboarding.step3Desc },
+    { target: 'notifications', title: t.onboarding.step4Title, description: t.onboarding.step4Desc },
+    { target: 'quick-actions', title: t.onboarding.step5Title, description: t.onboarding.step5Desc },
+    { target: 'action-center', title: t.onboarding.step6Title, description: t.onboarding.step6Desc },
+    { target: 'gezma-banner', title: t.onboarding.step7Title, description: t.onboarding.step7Desc },
+    { target: 'chat-widget', title: t.onboarding.step8Title, description: t.onboarding.step8Desc },
+  ];
+
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -249,7 +258,14 @@ export default function DashboardPage() {
     return w ? w.visible : true;
   };
 
-  const widgetLabel = (key: WidgetKey) => ALL_WIDGETS.find(w => w.key === key)?.label || key;
+  const widgetLabelMap: Record<WidgetKey, string> = {
+    stats: t.dashboard.widgetStats,
+    actions: t.dashboard.widgetActions,
+    charts: t.dashboard.widgetCharts,
+    gamification: t.dashboard.widgetGamification,
+    trips_activity: t.dashboard.widgetTripsActivity,
+  };
+  const widgetLabel = (key: WidgetKey) => widgetLabelMap[key] || key;
 
   const renderWidget = (key: WidgetKey) => {
     switch (key) {
@@ -265,10 +281,10 @@ export default function DashboardPage() {
               transition: 'opacity 0.2s',
             }}
           >
-            <StatCard title="Total Jemaah" value={totalJemaah} icon={Users} iconColor="#3B82F6" iconBgColor="#3B82F615" href="/pilgrims" />
-            <StatCard title="Paket Aktif" value={activePackages} icon={Package} iconColor="#10B981" iconBgColor="#10B98115" href="/packages" />
-            <StatCard title="Trip Aktif" value={activeTripsCount} icon={Plane} iconColor="#F59E0B" iconBgColor="#F59E0B15" href="/trips" />
-            <StatCard title="Dokumen Pending" value={docsIncomplete} icon={FileText} iconColor="#EF4444" iconBgColor="#EF444415" href="/pilgrims?filter=missing_docs" />
+            <StatCard title={t.dashboard.totalPilgrims} value={totalJemaah} icon={Users} iconColor="#3B82F6" iconBgColor="#3B82F615" href="/pilgrims" />
+            <StatCard title={t.dashboard.activePackages} value={activePackages} icon={Package} iconColor="#10B981" iconBgColor="#10B98115" href="/packages" />
+            <StatCard title={t.dashboard.activeTrips} value={activeTripsCount} icon={Plane} iconColor="#F59E0B" iconBgColor="#F59E0B15" href="/trips" />
+            <StatCard title={t.dashboard.pendingDocs} value={docsIncomplete} icon={FileText} iconColor="#EF4444" iconBgColor="#EF444415" href="/pilgrims?filter=missing_docs" />
           </div>
         );
 
@@ -325,14 +341,14 @@ export default function DashboardPage() {
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
                 <Trophy style={{ width: '20px', height: '20px', color: '#FDE68A' }} />
-                <h3 style={{ fontSize: '16px', fontWeight: '600', color: 'white', margin: 0 }}>Gamifikasi</h3>
+                <h3 style={{ fontSize: '16px', fontWeight: '600', color: 'white', margin: 0 }}>{t.dashboard.gamificationTitle}</h3>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
                 {[
-                  { icon: Star, label: 'Poin', value: gamification.totalPoints, color: '#FDE68A' },
-                  { icon: TrendingUp, label: 'Level', value: gamification.level, color: '#93C5FD' },
-                  { icon: Medal, label: 'Badge', value: gamification.badgeCount, color: '#6EE7B7' },
-                  { icon: Trophy, label: 'Rank', value: `#${gamification.rank}`, color: '#FCA5A5' },
+                  { icon: Star, label: t.dashboard.gamificationPoints, value: gamification.totalPoints, color: '#FDE68A' },
+                  { icon: TrendingUp, label: t.dashboard.gamificationLevel, value: gamification.level, color: '#93C5FD' },
+                  { icon: Medal, label: t.dashboard.gamificationBadge, value: gamification.badgeCount, color: '#6EE7B7' },
+                  { icon: Trophy, label: t.dashboard.gamificationRank, value: `#${gamification.rank}`, color: '#FCA5A5' },
                 ].map(item => {
                   const Icon = item.icon;
                   return (
@@ -359,10 +375,10 @@ export default function DashboardPage() {
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
                 <Trophy style={{ width: '18px', height: '18px', color: '#8B5CF6' }} />
-                <h3 style={{ fontSize: '16px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>Top 5 Bulan Ini</h3>
+                <h3 style={{ fontSize: '16px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>{t.dashboard.leaderboardTitle}</h3>
               </div>
               {leaderboardMini.length === 0 ? (
-                <EmptyState icon={Trophy} title="Belum ada data" />
+                <EmptyState icon={Trophy} title={t.dashboard.leaderboardEmpty} />
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   {leaderboardMini.map(entry => (
@@ -413,12 +429,12 @@ export default function DashboardPage() {
               >
                 <Calendar style={{ width: '18px', height: '18px', color: c.textMuted }} />
                 <h2 style={{ fontSize: isMobile ? '16px' : '18px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>
-                  Upcoming Departures
+                  {t.dashboard.upcomingDepartures}
                 </h2>
               </div>
               <div style={{ padding: isMobile ? '16px' : '24px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {upcomingTrips.length === 0 ? (
-                  <EmptyState icon={Calendar} title="Belum ada trip mendatang" />
+                  <EmptyState icon={Calendar} title={t.dashboard.noTrips} />
                 ) : (
                   upcomingTrips.map((trip) => {
                     const status = statusMap[trip.status] || { bg: '#F3F4F6', text: '#6B7280', label: trip.status };
@@ -440,7 +456,7 @@ export default function DashboardPage() {
                             </span>
                             <span style={{ fontSize: '12px', color: c.textMuted, display: 'flex', alignItems: 'center', gap: '4px' }}>
                               <Users style={{ width: '12px', height: '12px' }} />
-                              {trip.registeredCount} jemaah
+                              {trip.registeredCount} {t.common.pilgrims}
                             </span>
                           </div>
                         </div>
@@ -471,14 +487,14 @@ export default function DashboardPage() {
               >
                 <Clock style={{ width: '18px', height: '18px', color: c.textMuted }} />
                 <h2 style={{ fontSize: isMobile ? '16px' : '18px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>
-                  Recent Activity
+                  {t.dashboard.recentActivity}
                 </h2>
               </div>
               <div style={{ padding: isMobile ? '16px' : '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 {activitiesLoading ? (
                   <TableSkeleton rows={4} columns={3} />
                 ) : activities.length === 0 ? (
-                  <EmptyState icon={Clock} title="Belum ada aktivitas" />
+                  <EmptyState icon={Clock} title={t.dashboard.noActivity} />
                 ) : (
                   activities.slice(0, 6).map((activity) => {
                     const dotColor = activityIconColors[activity.type] || c.textMuted;
@@ -515,10 +531,10 @@ export default function DashboardPage() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px' }}>
         <div>
           <h1 style={{ fontSize: '28px', fontWeight: '700', color: c.textPrimary, margin: 0 }}>
-            Dashboard
+            {t.dashboard.title}
           </h1>
           <p style={{ fontSize: '14px', color: c.textMuted, marginTop: '4px' }}>
-            Selamat datang kembali! Berikut ringkasan operasional Anda hari ini.
+            {t.dashboard.subtitle}
           </p>
         </div>
         <div style={{ display: 'flex', gap: '8px' }}>
@@ -534,7 +550,7 @@ export default function DashboardPage() {
               }}
             >
               <RotateCcw style={{ width: '14px', height: '14px' }} />
-              Reset ke Default
+              {t.dashboard.resetDefault}
             </button>
           )}
           <button
@@ -549,13 +565,14 @@ export default function DashboardPage() {
             }}
           >
             <Settings2 style={{ width: '14px', height: '14px' }} />
-            {editMode ? 'Selesai' : 'Atur Widget'}
+            {editMode ? t.dashboard.doneWidget : t.dashboard.editWidget}
           </button>
         </div>
       </div>
 
       {/* GEZMA BANNER */}
       <div
+        data-tour="gezma-banner"
         style={{
           background: 'linear-gradient(135deg, #1E40AF 0%, #3B82F6 100%)',
           borderRadius: isMobile ? '12px' : '16px',
@@ -574,7 +591,7 @@ export default function DashboardPage() {
             textTransform: 'uppercase',
           }}
         >
-          GEZMA (Gerakan Generasi Z & Milenial)
+          {t.dashboard.bannerTitle}
         </h2>
         <p
           style={{
@@ -585,8 +602,7 @@ export default function DashboardPage() {
             fontWeight: '500',
           }}
         >
-          Ekosistem pembinaan bagi anggota Ashpirasi, menyiapkan generasi penerus yang siap
-          menerima tongkat estafet perjuangan menuju Indonesia Emas 2030.
+          {t.dashboard.bannerDescription}
         </p>
       </div>
 
@@ -627,7 +643,7 @@ export default function DashboardPage() {
                   }}
                 >
                   {visible ? <Eye style={{ width: '14px', height: '14px' }} /> : <EyeOff style={{ width: '14px', height: '14px' }} />}
-                  {visible ? 'Tampil' : 'Tersembunyi'}
+                  {visible ? t.dashboard.widgetVisible : t.dashboard.widgetHidden}
                 </button>
               </div>
               {visible && renderWidget(wl.key)}

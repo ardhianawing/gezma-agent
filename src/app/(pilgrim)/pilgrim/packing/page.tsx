@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
 import { useToast } from '@/components/ui/toast';
+import { useLanguage } from '@/lib/i18n';
 
 const GREEN = '#059669';
 const GREEN_LIGHT = '#ECFDF5';
@@ -14,6 +15,7 @@ const STORAGE_KEY = 'gezma_packing';
 interface PackingCategory {
   name: string;
   emoji: string;
+  labelKey: string;
   items: string[];
 }
 
@@ -21,36 +23,43 @@ const DEFAULT_CATEGORIES: PackingCategory[] = [
   {
     name: 'Dokumen',
     emoji: '\u{1F4C4}',
+    labelKey: 'documents' as const,
     items: ['Paspor', 'KTP', 'Buku Nikah', 'Foto 4x6', 'Surat Keterangan Sehat', 'Kartu Vaksin'],
   },
   {
     name: 'Pakaian Ihram',
     emoji: '\u{1F54B}',
+    labelKey: 'ihram' as const,
     items: ['Kain Ihram (2 set)', 'Sabuk Ihram', 'Sandal Ihram'],
   },
   {
     name: 'Obat-obatan',
     emoji: '\u{1F48A}',
+    labelKey: 'medicine' as const,
     items: ['Obat Pribadi', 'Paracetamol', 'Obat Maag', 'Minyak Angin', 'Masker', 'Hand Sanitizer'],
   },
   {
     name: 'Toiletries',
     emoji: '\u{1F9F4}',
+    labelKey: 'toiletries' as const,
     items: ['Sabun', 'Sampo', 'Sikat Gigi', 'Pasta Gigi', 'Handuk', 'Tisu'],
   },
   {
     name: 'Elektronik',
     emoji: '\u{1F50C}',
+    labelKey: 'electronics' as const,
     items: ['Charger HP', 'Power Bank', 'Adaptor Colokan (Type G)', 'Kabel USB'],
   },
   {
     name: 'Perlengkapan Ibadah',
     emoji: '\u{1F932}',
+    labelKey: 'worship' as const,
     items: ['Sajadah Travel', 'Mukenah/Sarung', 'Al-Quran Mini', 'Tasbih', 'Buku Doa'],
   },
   {
     name: 'Lain-lain',
     emoji: '\u{1F9F3}',
+    labelKey: 'other' as const,
     items: ['Koper', 'Tas Kecil', 'Uang SAR', 'Kacamata Hitam', 'Payung Lipat'],
   },
 ];
@@ -68,6 +77,7 @@ export default function PackingChecklistPage() {
   const { c } = useTheme();
   const { isMobile } = useResponsive();
   const { addToast } = useToast();
+  const { t } = useLanguage();
   const [state, setState] = useState<PackingState>({ checked: {}, customItems: {} });
   const [newItemInputs, setNewItemInputs] = useState<Record<string, string>>({});
   const [loaded, setLoaded] = useState(false);
@@ -252,7 +262,7 @@ export default function PackingChecklistPage() {
                 alignItems: 'center',
                 gap: '8px',
               }}>
-                {cat.emoji} {cat.name}
+                {cat.emoji} {t.packing[cat.labelKey as keyof typeof t.packing] || cat.name}
               </h3>
               <span style={{
                 fontSize: '12px',

@@ -4,6 +4,7 @@ import { useState, useEffect, use } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Building2, Users, DollarSign, Plane, Package, CheckCircle, XCircle } from 'lucide-react';
 import { DetailSkeleton } from '@/components/shared/loading-skeleton';
+import { useLanguage } from '@/lib/i18n';
 
 const cc = {
   primary: '#2563EB',
@@ -44,6 +45,7 @@ interface AgencyDetail {
 
 export default function CCAgencyDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
+  const { t } = useLanguage();
   const [agency, setAgency] = useState<AgencyDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
@@ -72,7 +74,7 @@ export default function CCAgencyDetailPage({ params }: { params: Promise<{ id: s
         setMessage(`Status diubah ke ${ppiuStatus}`);
       }
     } catch {
-      setMessage('Gagal mengubah status');
+      setMessage(t.common.error);
     } finally {
       setActionLoading(false);
     }
@@ -83,7 +85,7 @@ export default function CCAgencyDetailPage({ params }: { params: Promise<{ id: s
   }
 
   if (!agency) {
-    return <p style={{ color: cc.error }}>Agency tidak ditemukan.</p>;
+    return <p style={{ color: cc.error }}>{t.common.noData}</p>;
   }
 
   const status = statusColors[agency.ppiuStatus] || statusColors.pending;
@@ -136,7 +138,7 @@ export default function CCAgencyDetailPage({ params }: { params: Promise<{ id: s
       <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '16px' }}>
         {/* Agency Info */}
         <div style={{ backgroundColor: cc.cardBg, borderRadius: '12px', border: `1px solid ${cc.border}`, padding: '24px' }}>
-          <h2 style={{ fontSize: '18px', fontWeight: '600', color: cc.textPrimary, margin: '0 0 16px 0' }}>Informasi Agensi</h2>
+          <h2 style={{ fontSize: '18px', fontWeight: '600', color: cc.textPrimary, margin: '0 0 16px 0' }}>{t.commandCenter.agenciesTitle}</h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             {[
               { label: 'Email', value: agency.email },
@@ -156,7 +158,7 @@ export default function CCAgencyDetailPage({ params }: { params: Promise<{ id: s
 
         {/* Actions */}
         <div style={{ backgroundColor: cc.cardBg, borderRadius: '12px', border: `1px solid ${cc.border}`, padding: '24px' }}>
-          <h2 style={{ fontSize: '18px', fontWeight: '600', color: cc.textPrimary, margin: '0 0 16px 0' }}>Aksi</h2>
+          <h2 style={{ fontSize: '18px', fontWeight: '600', color: cc.textPrimary, margin: '0 0 16px 0' }}>{t.common.actions}</h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             <button onClick={() => updateStatus('active')} disabled={actionLoading || agency.ppiuStatus === 'active'} style={{ padding: '10px', borderRadius: '8px', border: 'none', backgroundColor: '#DCFCE7', color: '#15803D', fontSize: '14px', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', opacity: agency.ppiuStatus === 'active' ? 0.5 : 1 }}>
               <CheckCircle style={{ width: '16px', height: '16px' }} /> Approve (Active)

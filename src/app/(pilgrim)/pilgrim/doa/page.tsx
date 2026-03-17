@@ -5,6 +5,7 @@ import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
 import { doaCategories, DoaCategory } from '@/data/mock-doa';
 import type { Doa } from '@/data/mock-doa';
+import { useLanguage } from '@/lib/i18n';
 
 const GREEN = '#059669';
 const GREEN_LIGHT = '#ECFDF5';
@@ -13,6 +14,7 @@ const GREEN_DARK = '#047857';
 export default function DoaPage() {
   const { c } = useTheme();
   const { isMobile } = useResponsive();
+  const { t } = useLanguage();
   const [activeCategory, setActiveCategory] = useState<DoaCategory>('all');
   const [selectedDoa, setSelectedDoa] = useState<Doa | null>(null);
   const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set());
@@ -86,7 +88,7 @@ export default function DoaPage() {
         color: c.textMuted,
         fontSize: '15px',
       }}>
-        Memuat panduan doa...
+        {t.common.loadingData}
       </div>
     );
   }
@@ -119,7 +121,7 @@ export default function DoaPage() {
             alignSelf: 'flex-start',
           }}
         >
-          ← Kembali
+          {'\u2190'} {t.common.back}
         </button>
 
         <div style={cardStyle}>
@@ -282,7 +284,7 @@ export default function DoaPage() {
               cursor: hasPrev ? 'pointer' : 'not-allowed',
             }}
           >
-            ← Sebelumnya
+            {'\u2190'} {t.common.previous}
           </button>
           <button
             onClick={() => { if (hasNext) setSelectedDoa(doas[currentIndex + 1]); }}
@@ -299,7 +301,7 @@ export default function DoaPage() {
               cursor: hasNext ? 'pointer' : 'not-allowed',
             }}
           >
-            Selanjutnya →
+            {t.common.next} {'\u2192'}
           </button>
         </div>
       </div>
@@ -317,10 +319,10 @@ export default function DoaPage() {
           color: c.textPrimary,
           margin: '0 0 4px 0',
         }}>
-          🤲 Panduan Doa
+          {'\u{1F932}'} {t.doa.title}
         </h1>
         <p style={{ fontSize: '14px', color: c.textMuted, margin: 0 }}>
-          Kumpulan doa untuk ibadah umrah dan harian
+          {t.doa.title}
         </p>
       </div>
 
@@ -329,7 +331,7 @@ export default function DoaPage() {
         type="text"
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
-        placeholder="Cari doa..."
+        placeholder={t.doa.searchPlaceholder}
         style={{
           width: '100%',
           padding: '12px 16px',
@@ -539,7 +541,7 @@ export default function DoaPage() {
         <div style={{ textAlign: 'center', padding: '40px 20px', color: c.textMuted }}>
           <span style={{ fontSize: '48px', display: 'block', marginBottom: '12px' }}>🤲</span>
           <p style={{ fontSize: '14px', margin: 0 }}>
-            {searchQuery ? 'Doa tidak ditemukan' : 'Tidak ada doa di kategori ini'}
+            {searchQuery ? t.common.noData : t.common.noData}
           </p>
         </div>
       )}

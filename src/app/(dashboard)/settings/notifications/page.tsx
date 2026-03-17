@@ -8,6 +8,7 @@ import { useToast } from '@/components/ui/toast';
 import { Bell, ArrowLeft, Save, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import {
+import { useLanguage } from '@/lib/i18n';
   NOTIFICATION_CATEGORIES,
   NOTIFICATION_CHANNELS,
   type NotificationPreferences,
@@ -16,6 +17,7 @@ import {
 export default function NotificationPreferencesPage() {
   const { c } = useTheme();
   const { isMobile } = useResponsive();
+  const { t } = useLanguage();
   const [prefs, setPrefs] = useState<NotificationPreferences | null>(null);
   const [loading, setLoading] = useState(true);
   const { addToast } = useToast();
@@ -53,11 +55,11 @@ export default function NotificationPreferencesPage() {
         body: JSON.stringify(prefs),
       });
       if (res.ok) {
-        setMessage({ type: 'success', text: 'Preferensi berhasil disimpan' });
-        addToast({ type: 'success', title: 'Preferensi berhasil disimpan' });
+        setMessage({ type: 'success', text: t.settings.notifPrefSuccess });
+        addToast({ type: 'success', title: t.settings.notifPrefSuccess });
       } else {
-        setMessage({ type: 'error', text: 'Gagal menyimpan preferensi' });
-        addToast({ type: 'error', title: 'Gagal menyimpan preferensi' });
+        setMessage({ type: 'error', text: t.settings.notifPrefError });
+        addToast({ type: 'error', title: t.settings.notifPrefError });
       }
     } catch {
       setMessage({ type: 'error', text: 'Terjadi kesalahan' });
@@ -79,8 +81,8 @@ export default function NotificationPreferencesPage() {
           </button>
         </Link>
         <PageHeader
-          title="Preferensi Notifikasi"
-          description="Atur notifikasi yang ingin Anda terima"
+          title={t.settings.notifications}
+          description={t.settings.notificationsDesc}
         />
       </div>
 
@@ -91,9 +93,9 @@ export default function NotificationPreferencesPage() {
         overflow: 'hidden',
       }}>
         {loading ? (
-          <div style={{ padding: '40px', textAlign: 'center', color: c.textSecondary }}>Memuat preferensi...</div>
+          <div style={{ padding: '40px', textAlign: 'center', color: c.textSecondary }}>{t.common.loading}</div>
         ) : !prefs ? (
-          <div style={{ padding: '40px', textAlign: 'center', color: c.textSecondary }}>Gagal memuat preferensi</div>
+          <div style={{ padding: '40px', textAlign: 'center', color: c.textSecondary }}>{t.common.error}</div>
         ) : (
           <>
             {/* Header Row */}
@@ -203,7 +205,7 @@ export default function NotificationPreferencesPage() {
             ) : (
               <Save style={{ width: '16px', height: '16px' }} />
             )}
-            {saving ? 'Menyimpan...' : 'Simpan Preferensi'}
+            {saving ? 'Menyimpan...' : t.common.save}
           </button>
           {message && (
             <span style={{

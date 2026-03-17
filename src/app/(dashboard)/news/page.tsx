@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
 import { PageHeader } from '@/components/layout/page-header';
+import { useLanguage } from '@/lib/i18n';
 import {
   newsCategories,
   type NewsArticle,
@@ -49,12 +50,12 @@ function timeAgo(dateStr: string): string {
   const diffHours = Math.floor(diffMs / 3600000);
   const diffDays = Math.floor(diffMs / 86400000);
 
-  if (diffMins < 1) return 'Baru saja';
-  if (diffMins < 60) return `${diffMins} menit lalu`;
-  if (diffHours < 24) return `${diffHours} jam lalu`;
-  if (diffDays < 7) return `${diffDays} hari lalu`;
-  if (diffDays < 30) return `${Math.floor(diffDays / 7)} minggu lalu`;
-  return `${Math.floor(diffDays / 30)} bulan lalu`;
+  if (diffMins < 1) return 'just now';
+  if (diffMins < 60) return `${diffMins} minutes ago`;
+  if (diffHours < 24) return `${diffHours} hours ago`;
+  if (diffDays < 7) return `${diffDays} days ago`;
+  if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
+  return `${Math.floor(diffDays / 30)} months ago`;
 }
 
 function getCategoryLabel(category: string): string {
@@ -73,6 +74,7 @@ const pulseKeyframes = `
 export default function NewsPage() {
   const { c } = useTheme();
   const { isMobile, isTablet } = useResponsive();
+  const { t } = useLanguage();
   const [activeCategory, setActiveCategory] = useState<NewsCategory>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [articles, setArticles] = useState<NewsArticle[]>([]);
@@ -118,8 +120,8 @@ export default function NewsPage() {
       <style dangerouslySetInnerHTML={{ __html: pulseKeyframes }} />
 
       <PageHeader
-        title="Berita"
-        description="Informasi terkini seputar umrah, regulasi Saudi, dan update GEZMA"
+        title={t.news.title}
+        description={t.news.description}
       />
 
       {/* Featured Section - only show when no filter/search active */}
@@ -137,6 +139,7 @@ export default function NewsPage() {
             isMain
             c={c}
             isMobile={isMobile}
+            t={t}
           />
           {/* Side Featured */}
           {sideFeatured && (
@@ -145,6 +148,7 @@ export default function NewsPage() {
               isMain={false}
               c={c}
               isMobile={isMobile}
+              t={t}
             />
           )}
         </div>
@@ -176,7 +180,7 @@ export default function NewsPage() {
           </span>
           <input
             type="text"
-            placeholder="Cari berita..."
+            placeholder={t.news.searchPlaceholder}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             style={{
@@ -231,10 +235,10 @@ export default function NewsPage() {
 
       {/* Results count */}
       <div style={{ color: c.textMuted, fontSize: '13px' }}>
-        {displayArticles.length} artikel ditemukan
+        {displayArticles.length} {t.news.articlesFound}
         {activeCategory !== 'all' &&
-          ` dalam kategori ${newsCategories.find((c) => c.id === activeCategory)?.label}`}
-        {searchQuery && ` untuk "${searchQuery}"`}
+          ` ${t.news.inCategory} ${newsCategories.find((c) => c.id === activeCategory)?.label}`}
+        {searchQuery && ` ${t.common.for} "${searchQuery}"`}
       </div>
 
       {/* Article List */}
@@ -248,10 +252,10 @@ export default function NewsPage() {
         >
           <div style={{ fontSize: '48px', marginBottom: '16px' }}>📭</div>
           <div style={{ fontSize: '16px', fontWeight: 500 }}>
-            Tidak ada artikel ditemukan
+            {t.news.emptyTitle}
           </div>
           <div style={{ fontSize: '14px', marginTop: '8px' }}>
-            Coba ubah filter atau kata kunci pencarian
+            {t.news.emptyDesc}
           </div>
         </div>
       ) : (
@@ -271,6 +275,7 @@ export default function NewsPage() {
               key={article.id}
               article={article}
               c={c}
+              t={t}
             />
           ))}
         </div>
@@ -285,11 +290,13 @@ function FeaturedCard({
   isMain,
   c,
   isMobile,
+  t,
 }: {
   article: NewsArticle;
   isMain: boolean;
   c: ReturnType<typeof useTheme>['c'];
   isMobile: boolean;
+  t: ReturnType<typeof useLanguage>['t'];
 }) {
   const catColor = categoryColorMap[article.category] || '#6B7280';
 
@@ -356,7 +363,7 @@ function FeaturedCard({
               animation: 'pulse-red 1.5s ease-in-out infinite',
             }}
           >
-            BREAKING
+            {t.news.badgeBreaking}
           </span>
         )}
 
@@ -378,7 +385,7 @@ function FeaturedCard({
               gap: '4px',
             }}
           >
-            ✓ Official
+            ✓ {t.news.badgeOfficial}
           </span>
         )}
       </div>
@@ -453,7 +460,7 @@ function FeaturedCard({
                 fontSize: '11px',
               }}
             >
-              {article.readTime} mnt baca
+              {article.readTime} {t.news.readTime}
             </span>
           </div>
         </div>
@@ -466,9 +473,11 @@ function FeaturedCard({
 function ArticleCard({
   article,
   c,
+  t,
 }: {
   article: NewsArticle;
   c: ReturnType<typeof useTheme>['c'];
+  t: ReturnType<typeof useLanguage>['t'];
 }) {
   const catColor = categoryColorMap[article.category] || '#6B7280';
 
@@ -573,7 +582,7 @@ function ArticleCard({
                   animation: 'pulse-red 1.5s ease-in-out infinite',
                 }}
               >
-                BREAKING
+                {t.news.badgeBreaking}
               </span>
             )}
 
@@ -592,7 +601,7 @@ function ArticleCard({
                   gap: '3px',
                 }}
               >
-                ✓ Official
+                ✓ {t.news.badgeOfficial}
               </span>
             )}
           </div>
@@ -659,7 +668,7 @@ function ArticleCard({
               fontSize: '11px',
             }}
           >
-            {article.readTime} mnt
+            {article.readTime} {t.news.readTime}
           </span>
         </div>
       </div>

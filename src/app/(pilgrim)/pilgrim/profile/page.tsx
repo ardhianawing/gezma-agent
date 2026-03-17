@@ -6,6 +6,7 @@ import { useResponsive } from '@/lib/hooks/use-responsive';
 import { usePilgrim } from '@/lib/contexts/pilgrim-context';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/components/ui/toast';
+import { useLanguage } from '@/lib/i18n';
 
 const GREEN = '#059669';
 const GREEN_LIGHT = '#ECFDF5';
@@ -20,17 +21,7 @@ function formatDate(dateStr: string): string {
   });
 }
 
-function getDocStatusInfo(status: string): { bg: string; text: string; label: string } {
-  switch (status) {
-    case 'verified':
-      return { bg: '#F0FDF4', text: '#16A34A', label: 'Terverifikasi' };
-    case 'uploaded':
-      return { bg: '#FFFBEB', text: '#D97706', label: 'Diunggah' };
-    case 'missing':
-    default:
-      return { bg: '#FEF2F2', text: '#DC2626', label: 'Belum Ada' };
-  }
-}
+// getDocStatusInfo is defined inside the component to access translations
 
 export default function ProfilePage() {
   const { c } = useTheme();
@@ -38,6 +29,19 @@ export default function ProfilePage() {
   const { data, logout, refreshData } = usePilgrim();
   const router = useRouter();
   const { addToast } = useToast();
+  const { t } = useLanguage();
+
+  function getDocStatusInfo(status: string): { bg: string; text: string; label: string } {
+    switch (status) {
+      case 'verified':
+        return { bg: '#F0FDF4', text: '#16A34A', label: t.pilgrimDocs.statusVerified };
+      case 'uploaded':
+        return { bg: '#FFFBEB', text: '#D97706', label: t.pilgrimDocs.statusUploaded };
+      case 'missing':
+      default:
+        return { bg: '#FEF2F2', text: '#DC2626', label: t.pilgrimDocs.statusMissing };
+    }
+  }
 
   // Profile edit state
   const [editMode, setEditMode] = useState(false);
@@ -326,7 +330,7 @@ export default function ProfilePage() {
                 cursor: 'pointer',
               }}
             >
-              Edit Profil
+              {t.common.edit}
             </button>
           )}
         </div>
@@ -375,7 +379,7 @@ export default function ProfilePage() {
                   cursor: 'pointer',
                 }}
               >
-                Batal
+                {t.common.cancel}
               </button>
               <button
                 onClick={handleSaveProfile}
@@ -393,7 +397,7 @@ export default function ProfilePage() {
                   opacity: editSaving ? 0.7 : 1,
                 }}
               >
-                {editSaving ? 'Menyimpan...' : 'Simpan'}
+                {editSaving ? t.common.saving : t.common.save}
               </button>
             </div>
           </div>
@@ -538,7 +542,7 @@ export default function ProfilePage() {
 
       {/* Travel Agent */}
       <div style={cardStyle}>
-        <h2 style={sectionTitleStyle}>🏢 Travel Agent</h2>
+        <h2 style={sectionTitleStyle}>{'\u{1F3E2}'} {t.pilgrimPortal.agencyTitle}</h2>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '14px' }}>
           <span style={{
             width: '44px',
@@ -582,7 +586,7 @@ export default function ProfilePage() {
               fontWeight: 600,
             }}
           >
-            💬 WhatsApp
+            {'\u{1F4AC}'} {t.pilgrimPortal.agencyWa}
           </a>
           <a
             href={'tel:' + agency.phone}
@@ -602,7 +606,7 @@ export default function ProfilePage() {
               fontWeight: 600,
             }}
           >
-            📞 Telepon
+            {'\u{1F4DE}'} {t.pilgrimPortal.agencyPhone}
           </a>
         </div>
       </div>
@@ -870,7 +874,7 @@ export default function ProfilePage() {
           marginTop: '8px',
         }}
       >
-        Keluar dari Portal
+        {t.common.signOut}
       </button>
 
       {/* App info */}
@@ -880,7 +884,7 @@ export default function ProfilePage() {
         textAlign: 'center',
         margin: '16px 0 0 0',
       }}>
-        GEZMA Pilgrim v1.0 — Portal Jemaah Umrah
+        {t.pilgrimPortal.brand} v1.0 — {t.pilgrimPortal.subtitle}
       </p>
     </div>
   );

@@ -6,6 +6,7 @@ import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
 import { useToast } from '@/components/ui/toast';
 import {
+import { useLanguage } from '@/lib/i18n';
   ArrowLeft,
   MessageCircle,
   Save,
@@ -79,6 +80,7 @@ export default function WhatsAppSettingsPage() {
   const { c } = useTheme();
   const { isMobile } = useResponsive();
   const { addToast } = useToast();
+  const { t } = useLanguage();
 
   // Config state
   const [config, setConfig] = useState<WAConfig>({
@@ -123,7 +125,7 @@ export default function WhatsAppSettingsPage() {
       const json = await res.json();
       if (json.data) setConfig(json.data);
     } catch {
-      addToast({ type: 'error', title: 'Gagal memuat konfigurasi WhatsApp' });
+      addToast({ type: 'error', title: t.common.error });
     } finally {
       setLoading(false);
     }
@@ -135,7 +137,7 @@ export default function WhatsAppSettingsPage() {
       const json = await res.json();
       if (json.data) setTemplates(json.data);
     } catch {
-      addToast({ type: 'error', title: 'Gagal memuat template WhatsApp' });
+      addToast({ type: 'error', title: t.common.error });
     }
   }
 
@@ -155,15 +157,15 @@ export default function WhatsAppSettingsPage() {
       });
       const json = await res.json();
       if (!res.ok) {
-        setSaveMessage({ type: 'error', text: json.error || 'Gagal menyimpan' });
+        setSaveMessage({ type: 'error', text: json.error || t.common.error });
       } else {
         setConfig(json.data);
-        setSaveMessage({ type: 'success', text: 'Konfigurasi berhasil disimpan' });
-        addToast({ type: 'success', title: 'Konfigurasi berhasil disimpan' });
+        setSaveMessage({ type: 'success', text: t.common.success });
+        addToast({ type: 'success', title: t.common.success });
       }
     } catch {
-      setSaveMessage({ type: 'error', text: 'Terjadi kesalahan' });
-      addToast({ type: 'error', title: 'Gagal menyimpan konfigurasi' });
+      setSaveMessage({ type: 'error', text: t.common.errorGeneric });
+      addToast({ type: 'error', title: t.common.error });
     } finally {
       setSaving(false);
     }
@@ -182,8 +184,8 @@ export default function WhatsAppSettingsPage() {
         }
       }
     } catch {
-      setTestResult({ success: false, message: 'Gagal menguji koneksi' });
-      addToast({ type: 'error', title: 'Gagal menguji koneksi' });
+      setTestResult({ success: false, message: t.common.error });
+      addToast({ type: 'error', title: t.common.error });
     } finally {
       setTesting(false);
     }
@@ -201,18 +203,18 @@ export default function WhatsAppSettingsPage() {
       });
       const json = await res.json();
       if (!res.ok) {
-        setQuickResult({ type: 'error', text: json.error || 'Gagal mengirim' });
+        setQuickResult({ type: 'error', text: json.error || t.common.error });
       } else if (json.data?.status === 'failed') {
-        setQuickResult({ type: 'error', text: json.data.error || 'Gagal mengirim pesan' });
+        setQuickResult({ type: 'error', text: json.data.error || t.common.error });
       } else {
-        setQuickResult({ type: 'success', text: 'Pesan berhasil dikirim!' });
-        addToast({ type: 'success', title: 'Pesan berhasil dikirim' });
+        setQuickResult({ type: 'success', text: t.common.success });
+        addToast({ type: 'success', title: t.common.success });
         setQuickPhone('');
         setQuickMessage('');
       }
     } catch {
-      setQuickResult({ type: 'error', text: 'Terjadi kesalahan' });
-      addToast({ type: 'error', title: 'Gagal mengirim pesan' });
+      setQuickResult({ type: 'error', text: t.common.errorGeneric });
+      addToast({ type: 'error', title: t.common.error });
     } finally {
       setQuickSending(false);
     }
@@ -531,7 +533,7 @@ export default function WhatsAppSettingsPage() {
                 ) : (
                   <Save size={16} />
                 )}
-                {saving ? 'Menyimpan...' : 'Simpan'}
+                {saving ? 'Menyimpan...' : t.common.save}
               </button>
             </div>
 

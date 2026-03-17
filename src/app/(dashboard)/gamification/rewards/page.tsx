@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { PageHeader } from '@/components/layout/page-header';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
+import { useLanguage } from '@/lib/i18n';
 
 interface Reward {
   id: number;
@@ -34,6 +35,7 @@ const CATEGORY_COLORS: Record<string, string> = {
 export default function RewardsPage() {
   const { c } = useTheme();
   const { isMobile, isTablet } = useResponsive();
+  const { t } = useLanguage();
   const [userPoints, setUserPoints] = useState<number>(0);
   const [loading, setLoading] = useState(true);
 
@@ -50,14 +52,14 @@ export default function RewardsPage() {
   if (loading) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
-        <p style={{ color: c.textMuted }}>Memuat data rewards...</p>
+        <p style={{ color: c.textMuted }}>{t.common.loadingData}</p>
       </div>
     );
   }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', width: '100%' }}>
-      <PageHeader title="Rewards" description="Tukarkan poin Anda dengan hadiah menarik" />
+      <PageHeader title={t.gamification.rewardsTitle} description={t.gamification.rewardsSubtitle} />
 
       {/* Points Balance Card */}
       <div
@@ -168,7 +170,7 @@ export default function RewardsPage() {
                   transition: 'opacity 0.2s',
                 }}
               >
-                Tukarkan
+                {t.gamification.rewardsTitle}
               </button>
             </div>
           );

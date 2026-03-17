@@ -8,6 +8,7 @@ import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
 import { TripForm } from '@/components/trips/trip-form';
 import type { TripFormData } from '@/lib/validations/trip';
+import { useLanguage } from '@/lib/i18n';
 
 interface PackageOption {
   id: string;
@@ -19,6 +20,7 @@ export default function NewTripPage() {
   const router = useRouter();
   const { c } = useTheme();
   const { isMobile } = useResponsive();
+  const { t } = useLanguage();
   const [packages, setPackages] = useState<PackageOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -38,7 +40,7 @@ export default function NewTripPage() {
           }))
         );
       } catch {
-        setError('Gagal memuat data paket');
+        setError(t.trips.loadPackagesError);
       } finally {
         setLoading(false);
       }
@@ -58,19 +60,19 @@ export default function NewTripPage() {
 
       if (!res.ok) {
         const body = await res.json();
-        throw new Error(body.error || 'Gagal membuat trip');
+        throw new Error(body.error || t.trips.createError);
       }
 
       router.push('/trips');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Gagal membuat trip');
+      setError(err instanceof Error ? err.message : t.trips.createError);
     } finally {
       setSaving(false);
     }
   };
 
   if (loading) {
-    return <div style={{ padding: '40px', textAlign: 'center', color: c.textMuted }}>Memuat data...</div>;
+    return <div style={{ padding: '40px', textAlign: 'center', color: c.textMuted }}>{t.common.loadingData}</div>;
   }
 
   return (

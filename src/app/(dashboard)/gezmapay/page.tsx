@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { PageHeader } from '@/components/layout/page-header';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
+import { useLanguage } from '@/lib/i18n';
 
 interface Transaction {
   id: string;
@@ -26,12 +27,7 @@ interface Pagination {
   totalPages: number;
 }
 
-const PRESET_AMOUNTS = [
-  { label: '100rb', value: 100000 },
-  { label: '500rb', value: 500000 },
-  { label: '1jt', value: 1000000 },
-  { label: '5jt', value: 5000000 },
-];
+// PRESET_AMOUNTS moved inside component for i18n
 
 function formatCurrency(amount: number): string {
   return new Intl.NumberFormat('id-ID', {
@@ -67,22 +63,32 @@ function getTransactionIcon(type: string): { icon: string; color: string } {
   }
 }
 
-function getStatusBadge(status: string, c: Record<string, string>): { bg: string; text: string; label: string } {
-  switch (status) {
-    case 'completed':
-      return { bg: '#dcfce7', text: '#166534', label: 'Selesai' };
-    case 'pending':
-      return { bg: '#fef9c3', text: '#854d0e', label: 'Menunggu' };
-    case 'failed':
-      return { bg: '#fecaca', text: '#991b1b', label: 'Gagal' };
-    default:
-      return { bg: c.borderLight, text: c.textMuted, label: status };
-  }
-}
+// getStatusBadge moved inside component for i18n
 
 export default function GezmaPayPage() {
   const { c } = useTheme();
   const { isMobile, isTablet } = useResponsive();
+  const { t } = useLanguage();
+
+  const PRESET_AMOUNTS = [
+    { label: t.gezmaPay.preset100k, value: 100000 },
+    { label: t.gezmaPay.preset500k, value: 500000 },
+    { label: t.gezmaPay.preset1m, value: 1000000 },
+    { label: t.gezmaPay.preset5m, value: 5000000 },
+  ];
+
+  function getStatusBadge(status: string): { bg: string; text: string; label: string } {
+    switch (status) {
+      case 'completed':
+        return { bg: '#dcfce7', text: '#166534', label: t.gezmaPay.statusCompleted };
+      case 'pending':
+        return { bg: '#fef9c3', text: '#854d0e', label: t.gezmaPay.statusPending };
+      case 'failed':
+        return { bg: '#fecaca', text: '#991b1b', label: t.gezmaPay.statusFailed };
+      default:
+        return { bg: c.borderLight, text: c.textMuted, label: status };
+    }
+  }
 
   const [wallet, setWallet] = useState<Wallet>({ balance: 0, currency: 'IDR' });
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -145,8 +151,8 @@ export default function GezmaPayPage() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
       <PageHeader
-        title="GezmaPay"
-        description="Dompet digital untuk transaksi umrah"
+        title={t.gezmaPay.title}
+        description={t.gezmaPay.description}
       />
 
       {/* Wallet Balance Card */}
@@ -183,7 +189,7 @@ export default function GezmaPayPage() {
           }}
         />
         <p style={{ fontSize: '14px', opacity: 0.85, margin: '0 0 8px', fontWeight: 500 }}>
-          Saldo GezmaPay
+          {t.gezmaPay.balance}
         </p>
         <p style={{ fontSize: isMobile ? '28px' : '36px', fontWeight: 700, margin: '0 0 4px' }}>
           {formatCurrency(wallet.balance)}
@@ -212,7 +218,7 @@ export default function GezmaPayPage() {
             (e.target as HTMLButtonElement).style.backgroundColor = 'rgba(255,255,255,0.15)';
           }}
         >
-          + Top Up Saldo
+          {t.gezmaPay.topUp}
         </button>
       </div>
 
@@ -226,28 +232,28 @@ export default function GezmaPayPage() {
         }}
       >
         <h2 style={{ fontSize: '18px', fontWeight: 700, color: c.textPrimary, margin: '0 0 16px' }}>
-          Riwayat Transaksi
+          {t.gezmaPay.txHistory}
         </h2>
 
         {loading ? (
           <div style={{ textAlign: 'center', padding: '40px 0' }}>
-            <p style={{ fontSize: '14px', color: c.textMuted }}>Memuat data...</p>
+            <p style={{ fontSize: '14px', color: c.textMuted }}>{t.common.loadingData}</p>
           </div>
         ) : transactions.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '40px 0' }}>
             <div style={{ fontSize: '40px', marginBottom: '12px' }}>{'\uD83D\uDCB3'}</div>
             <p style={{ fontSize: '15px', fontWeight: 600, color: c.textPrimary, margin: '0 0 4px' }}>
-              Belum ada transaksi
+              {t.gezmaPay.emptyTitle}
             </p>
             <p style={{ fontSize: '13px', color: c.textMuted, margin: 0 }}>
-              Mulai dengan top up saldo GezmaPay Anda
+              {t.gezmaPay.emptyDesc}
             </p>
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             {transactions.map((tx) => {
               const txIcon = getTransactionIcon(tx.type);
-              const statusBadge = getStatusBadge(tx.status, c as unknown as Record<string, string>);
+              const statusBadge = getStatusBadge(tx.status);
               const isPositive = tx.type === 'topup' || tx.type === 'refund';
 
               return (
@@ -343,10 +349,10 @@ export default function GezmaPayPage() {
                 opacity: pagination.page <= 1 ? 0.5 : 1,
               }}
             >
-              Sebelumnya
+              {t.common.previous}
             </button>
             <span style={{ fontSize: '13px', color: c.textSecondary, fontWeight: 500 }}>
-              Halaman {pagination.page} dari {pagination.totalPages}
+              {t.common.pageOf.replace('{page}', String(pagination.page)).replace('{total}', String(pagination.totalPages))}
             </span>
             <button
               onClick={() => handlePageChange(pagination.page + 1)}
@@ -363,7 +369,7 @@ export default function GezmaPayPage() {
                 opacity: pagination.page >= pagination.totalPages ? 0.5 : 1,
               }}
             >
-              Selanjutnya
+              {t.common.next}
             </button>
           </div>
         )}
@@ -400,7 +406,7 @@ export default function GezmaPayPage() {
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
               <h3 style={{ fontSize: '18px', fontWeight: 700, color: c.textPrimary, margin: 0 }}>
-                Top Up Saldo
+                {t.gezmaPay.topUpTitle}
               </h3>
               <button
                 onClick={() => setShowTopupModal(false)}
@@ -452,11 +458,11 @@ export default function GezmaPayPage() {
             {/* Custom Amount Input */}
             <div style={{ marginBottom: '20px' }}>
               <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: c.textSecondary, marginBottom: '6px' }}>
-                Atau masukkan nominal
+                {t.gezmaPay.topUpCustomLabel}
               </label>
               <input
                 type="number"
-                placeholder="Masukkan jumlah top up"
+                placeholder={t.gezmaPay.topUpCustomPlaceholder}
                 value={topupAmount}
                 onChange={(e) => setTopupAmount(e.target.value)}
                 style={{
@@ -486,7 +492,7 @@ export default function GezmaPayPage() {
                 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: '13px', color: c.textMuted }}>Jumlah top up</span>
+                  <span style={{ fontSize: '13px', color: c.textMuted }}>{t.gezmaPay.topUpAmountLabel}</span>
                   <span style={{ fontSize: '16px', fontWeight: 700, color: c.primary }}>
                     {formatCurrency(parseFloat(topupAmount))}
                   </span>
@@ -511,7 +517,7 @@ export default function GezmaPayPage() {
                 opacity: topupLoading ? 0.7 : 1,
               }}
             >
-              {topupLoading ? 'Memproses...' : 'Top Up Sekarang'}
+              {topupLoading ? t.gezmaPay.topUpLoading : t.gezmaPay.topUpBtn}
             </button>
           </div>
         </div>

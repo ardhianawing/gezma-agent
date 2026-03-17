@@ -5,9 +5,11 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowLeft, Loader2, Mail, CheckCircle2 } from 'lucide-react';
 import { useResponsive } from '@/lib/hooks/use-responsive';
+import { useLanguage } from '@/lib/i18n';
 
 export default function ForgotPasswordPage() {
   const { isMobile } = useResponsive();
+  const { t } = useLanguage();
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [sent, setSent] = useState(false);
@@ -27,12 +29,12 @@ export default function ForgotPasswordPage() {
 
       if (!res.ok) {
         const data = await res.json();
-        setError(data.error || 'Terjadi kesalahan');
+        setError(data.error || t.common.error);
       } else {
         setSent(true);
       }
     } catch {
-      setError('Terjadi kesalahan. Silakan coba lagi.');
+      setError(t.common.errorGeneric);
     } finally {
       setIsLoading(false);
     }
@@ -54,7 +56,7 @@ export default function ForgotPasswordPage() {
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '36px', justifyContent: isMobile ? 'center' : undefined }}>
           <Image src="/logo-light.png" alt="GEZMA" width={36} height={36} style={{ objectFit: 'contain' }} />
           <span style={{ fontSize: '18px', fontWeight: '700', color: '#1E293B', letterSpacing: '-0.5px' }}>
-            GEZMA Agent
+            {t.auth.brandName}
           </span>
         </div>
 
@@ -76,10 +78,10 @@ export default function ForgotPasswordPage() {
               <CheckCircle2 style={{ width: '32px', height: '32px', color: '#16A34A' }} />
             </div>
             <h2 style={{ fontSize: '22px', fontWeight: '700', color: '#1E293B', margin: '0 0 8px 0' }}>
-              Email Terkirim
+              {t.auth.forgotSuccessTitle}
             </h2>
             <p style={{ fontSize: '14px', color: '#64748B', margin: '0 0 24px 0', lineHeight: '1.6' }}>
-              Jika email <strong>{email}</strong> terdaftar di sistem kami, Anda akan menerima instruksi untuk mereset password.
+              {t.auth.forgotSuccessMessage.replace('{email}', email)}
             </p>
             <Link
               href="/login"
@@ -94,17 +96,17 @@ export default function ForgotPasswordPage() {
               }}
             >
               <ArrowLeft style={{ width: '16px', height: '16px' }} />
-              Kembali ke Login
+              {t.auth.forgotBackToLogin}
             </Link>
           </div>
         ) : (
           /* Form state */
           <>
             <h2 style={{ fontSize: '22px', fontWeight: '700', color: '#1E293B', margin: '0 0 6px 0' }}>
-              Lupa Password
+              {t.auth.forgotTitle}
             </h2>
             <p style={{ fontSize: '14px', color: '#64748B', margin: '0 0 24px 0' }}>
-              Masukkan email Anda dan kami akan mengirimkan instruksi untuk mereset password
+              {t.auth.forgotSubtitle}
             </p>
 
             {error && (
@@ -130,7 +132,7 @@ export default function ForgotPasswordPage() {
                   htmlFor="email"
                   style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#334155', marginBottom: '6px' }}
                 >
-                  Alamat Email
+                  {t.auth.emailLabel}
                 </label>
                 <div style={{ position: 'relative' }}>
                   <Mail
@@ -148,7 +150,7 @@ export default function ForgotPasswordPage() {
                   <input
                     id="email"
                     type="email"
-                    placeholder="ahmad@barokahtravel.com"
+                    placeholder={t.auth.emailPlaceholder}
                     value={email}
                     onChange={(e) => { setEmail(e.target.value); setError(''); }}
                     required
@@ -190,10 +192,10 @@ export default function ForgotPasswordPage() {
                 {isLoading ? (
                   <>
                     <Loader2 style={{ width: '18px', height: '18px', animation: 'spin 1s linear infinite' }} />
-                    Mengirim...
+                    {t.auth.forgotSubmitLoading}
                   </>
                 ) : (
-                  'Kirim Instruksi Reset'
+                  t.auth.forgotSubmit
                 )}
               </button>
             </form>
@@ -204,7 +206,7 @@ export default function ForgotPasswordPage() {
                 style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: '#D32F2F', fontWeight: '600', textDecoration: 'none' }}
               >
                 <ArrowLeft style={{ width: '14px', height: '14px' }} />
-                Kembali ke Login
+                {t.auth.forgotBackToLogin}
               </Link>
             </p>
           </>

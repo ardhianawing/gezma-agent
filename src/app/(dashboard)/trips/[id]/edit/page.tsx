@@ -9,6 +9,7 @@ import { useResponsive } from '@/lib/hooks/use-responsive';
 import { TripForm } from '@/components/trips/trip-form';
 import type { TripFormData } from '@/lib/validations/trip';
 import type { Trip } from '@/types/trip';
+import { useLanguage } from '@/lib/i18n';
 
 interface PackageOption {
   id: string;
@@ -21,6 +22,7 @@ export default function EditTripPage() {
   const router = useRouter();
   const { c } = useTheme();
   const { isMobile } = useResponsive();
+  const { t } = useLanguage();
   const id = params.id as string;
 
   const [trip, setTrip] = useState<Trip | null>(null);
@@ -37,8 +39,8 @@ export default function EditTripPage() {
           fetch('/api/packages?isActive=true'),
         ]);
 
-        if (!tripRes.ok) throw new Error('Trip tidak ditemukan');
-        if (!pkgRes.ok) throw new Error('Gagal memuat paket');
+        if (!tripRes.ok) throw new Error(t.common.noData);
+        if (!pkgRes.ok) throw new Error(t.common.error);
 
         const tripData = await tripRes.json();
         const pkgJson = await pkgRes.json();
@@ -52,7 +54,7 @@ export default function EditTripPage() {
           }))
         );
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Gagal memuat data');
+        setError(err instanceof Error ? err.message : t.common.error);
       } finally {
         setLoading(false);
       }
@@ -72,19 +74,19 @@ export default function EditTripPage() {
 
       if (!res.ok) {
         const body = await res.json();
-        throw new Error(body.error || 'Gagal mengupdate trip');
+        throw new Error(body.error || t.common.error);
       }
 
       router.push(`/trips/${id}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Gagal mengupdate trip');
+      setError(err instanceof Error ? err.message : t.common.error);
     } finally {
       setSaving(false);
     }
   };
 
   if (loading) {
-    return <div style={{ padding: '40px', textAlign: 'center', color: c.textMuted }}>Memuat data...</div>;
+    return <div style={{ padding: '40px', textAlign: 'center', color: c.textMuted }}>{t.common.loadingData}</div>;
   }
 
   if (!trip) {
@@ -99,7 +101,7 @@ export default function EditTripPage() {
       >
         <div style={{ textAlign: 'center' }}>
           <p style={{ fontSize: '18px', fontWeight: '600', color: c.textPrimary }}>
-            {error || 'Trip tidak ditemukan'}
+            {error || t.common.noData}
           </p>
           <Link href="/trips" style={{ textDecoration: 'none' }}>
             <button

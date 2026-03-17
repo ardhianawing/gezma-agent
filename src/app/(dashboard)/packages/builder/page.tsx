@@ -6,6 +6,7 @@ import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
 import { PageHeader } from '@/components/layout/page-header';
 import { Plane, Building2, FileCheck, ChevronLeft, ChevronRight, Check, ShoppingCart } from 'lucide-react';
+import { useLanguage } from '@/lib/i18n';
 
 interface BuilderOption {
   id: string;
@@ -69,6 +70,7 @@ function formatCurrency(amount: number): string {
 export default function PackageBuilderPage() {
   const { c } = useTheme();
   const { isMobile } = useResponsive();
+  const { t } = useLanguage();
   const router = useRouter();
 
   const [currentStep, setCurrentStep] = useState(0);
@@ -120,8 +122,8 @@ export default function PackageBuilderPage() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '16px' : '24px' }}>
       <PageHeader
-        title="Builder Paket Modular"
-        description="Buat paket umrah custom dengan memilih komponen secara modular"
+        title={t.packages.newPackage}
+        description={t.packages.buildNew}
       />
 
       {/* Step indicator */}

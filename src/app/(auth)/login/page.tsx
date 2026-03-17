@@ -6,10 +6,12 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Eye, EyeOff, Loader2, Check } from 'lucide-react';
 import { useResponsive } from '@/lib/hooks/use-responsive';
+import { useLanguage } from '@/lib/i18n';
 
 export default function LoginPage() {
   const router = useRouter();
   const { isMobile, isTablet } = useResponsive();
+  const { t } = useLanguage();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -33,14 +35,14 @@ export default function LoginPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || 'Gagal login demo. Pastikan database sudah di-seed.');
+        setError(data.error || t.auth.loginErrorDemo);
         setIsDemoLoading(false);
         return;
       }
 
       window.location.href = '/dashboard';
     } catch {
-      setError('Terjadi kesalahan. Silakan coba lagi.');
+      setError(t.common.errorGeneric);
       setIsDemoLoading(false);
     }
   };
@@ -60,7 +62,7 @@ export default function LoginPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || 'Email atau password salah');
+        setError(data.error || t.auth.loginErrorDefault);
         setIsLoading(false);
         return;
       }
@@ -68,7 +70,7 @@ export default function LoginPage() {
       // Redirect — don't reset loading so UI stays in loading state during navigation
       window.location.href = '/dashboard';
     } catch {
-      setError('Terjadi kesalahan. Silakan coba lagi.');
+      setError(t.common.errorGeneric);
       setIsLoading(false);
     }
   };
@@ -127,7 +129,7 @@ export default function LoginPage() {
             style={{ objectFit: 'contain' }}
           />
           <span style={{ color: 'white', fontSize: '20px', fontWeight: '700', letterSpacing: '-0.5px' }}>
-            GEZMA Agent
+            {t.auth.brandName}
           </span>
         </div>
 
@@ -144,7 +146,7 @@ export default function LoginPage() {
             }}
           >
             <span style={{ color: '#FCA5A5', fontSize: '13px', fontWeight: '600' }}>
-              Platform PPIU Modern
+              {t.auth.platformBadge}
             </span>
           </div>
           <h1
@@ -157,8 +159,8 @@ export default function LoginPage() {
               letterSpacing: '-0.5px',
             }}
           >
-            Kelola perjalanan Umrah dengan lebih{' '}
-            <span style={{ color: '#FCA5A5' }}>profesional</span>
+            {t.auth.loginHeadline}{' '}
+            <span style={{ color: '#FCA5A5' }}>{t.auth.loginHeadlineAccent}</span>
           </h1>
           <p
             style={{
@@ -168,15 +170,15 @@ export default function LoginPage() {
               margin: 0,
             }}
           >
-            Satu platform untuk mengelola jemaah, dokumen, paket, dan keberangkatan.
+            {t.auth.loginDescription}
           </p>
 
           {/* Feature list */}
           <div style={{ marginTop: '32px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
             {[
-              'Manajemen jemaah & dokumen terpusat',
-              'Tracking pembayaran real-time',
-              'Laporan operasional otomatis',
+              t.auth.loginFeature1,
+              t.auth.loginFeature2,
+              t.auth.loginFeature3,
             ].map((feature) => (
               <div key={feature} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <div
@@ -203,7 +205,7 @@ export default function LoginPage() {
         {/* Footer */}
         <div style={{ position: 'relative', zIndex: 1 }}>
           <p style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.35)', margin: 0 }}>
-            &copy; 2026 GEZMA Technology. All rights reserved.
+            &copy; {t.auth.copyright}
           </p>
         </div>
       </div>
@@ -240,10 +242,10 @@ export default function LoginPage() {
                 style={{ objectFit: 'contain', marginBottom: '12px' }}
               />
               <span style={{ fontSize: '20px', fontWeight: '700', color: '#1E293B', letterSpacing: '-0.5px' }}>
-                GEZMA Agent
+                {t.auth.brandName}
               </span>
               <p style={{ fontSize: '13px', color: '#94A3B8', margin: '6px 0 0 0' }}>
-                Platform PPIU Modern
+                {t.auth.platformBadge}
               </p>
             </div>
           )}
@@ -258,7 +260,7 @@ export default function LoginPage() {
               style={{ objectFit: 'contain' }}
             />
             <span style={{ fontSize: '18px', fontWeight: '700', color: '#1E293B', letterSpacing: '-0.5px' }}>
-              GEZMA Agent
+              {t.auth.brandName}
             </span>
           </div>
           )}
@@ -274,10 +276,10 @@ export default function LoginPage() {
                 letterSpacing: '-0.5px',
               }}
             >
-              Selamat Datang
+              {t.auth.welcomeTitle}
             </h2>
             <p style={{ fontSize: isMobile ? '13px' : '14px', color: '#64748B', margin: 0 }}>
-              Masukkan email dan password untuk mengakses dashboard
+              {t.auth.loginSubtitle}
             </p>
           </div>
 
@@ -322,12 +324,12 @@ export default function LoginPage() {
                   htmlFor="email"
                   style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#334155', marginBottom: '6px' }}
                 >
-                  Alamat Email
+                  {t.auth.emailLabel}
                 </label>
                 <input
                   id="email"
                   type="email"
-                  placeholder="ahmad@barokahtravel.com"
+                  placeholder={t.auth.emailPlaceholder}
                   value={email}
                   onChange={(e) => { setEmail(e.target.value); setError(''); }}
                   required
@@ -363,20 +365,20 @@ export default function LoginPage() {
                     htmlFor="password"
                     style={{ fontSize: '13px', fontWeight: '600', color: '#334155' }}
                   >
-                    Password
+                    {t.auth.passwordLabel}
                   </label>
                   <Link
                     href="/forgot-password"
                     style={{ fontSize: '12px', fontWeight: '600', color: '#D32F2F', textDecoration: 'none' }}
                   >
-                    Lupa password?
+                    {t.auth.forgotPassword}
                   </Link>
                 </div>
                 <div style={{ position: 'relative' }}>
                   <input
                     id="password"
                     type={showPassword ? 'text' : 'password'}
-                    placeholder="Masukkan password"
+                    placeholder={t.auth.passwordPlaceholder}
                     value={password}
                     onChange={(e) => { setPassword(e.target.value); setError(''); }}
                     required
@@ -454,10 +456,10 @@ export default function LoginPage() {
               {isLoading ? (
                 <>
                   <Loader2 style={{ width: '18px', height: '18px', animation: 'spin 1s linear infinite' }} />
-                  Masuk...
+                  {t.auth.loginLoading}
                 </>
               ) : (
-                'Masuk ke Dashboard'
+                t.auth.loginButton
               )}
             </button>
 
@@ -471,7 +473,7 @@ export default function LoginPage() {
               }}
             >
               <div style={{ flex: 1, height: '1px', background: '#E2E8F0' }} />
-              <span style={{ fontSize: '12px', color: '#94A3B8', fontWeight: '500' }}>atau</span>
+              <span style={{ fontSize: '12px', color: '#94A3B8', fontWeight: '500' }}>{t.common.or}</span>
               <div style={{ flex: 1, height: '1px', background: '#E2E8F0' }} />
             </div>
 
@@ -501,12 +503,12 @@ export default function LoginPage() {
               {isDemoLoading ? (
                 <>
                   <Loader2 style={{ width: '16px', height: '16px', animation: 'spin 1s linear infinite' }} />
-                  Masuk Demo...
+                  {t.auth.demoLoading}
                 </>
               ) : (
                 <>
                   <span style={{ fontSize: '16px' }}>🎯</span>
-                  Coba Demo Gratis
+                  {t.auth.demoButton}
                 </>
               )}
             </button>
@@ -521,12 +523,12 @@ export default function LoginPage() {
               marginTop: isMobile ? '24px' : '28px',
             }}
           >
-            Belum punya akun?{' '}
+            {t.auth.registerPrompt}{' '}
             <Link
               href="/register"
               style={{ color: '#D32F2F', fontWeight: '600', textDecoration: 'none' }}
             >
-              Daftar Agency
+              {t.auth.registerLink}
             </Link>
           </p>
 

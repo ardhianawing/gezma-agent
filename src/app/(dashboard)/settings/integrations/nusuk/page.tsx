@@ -7,6 +7,7 @@ import { PageHeader } from '@/components/layout/page-header';
 import { BackButton } from '@/components/shared/back-button';
 import { useToast } from '@/components/ui/toast';
 import {
+import { useLanguage } from '@/lib/i18n';
   Eye,
   EyeOff,
   RefreshCw,
@@ -27,6 +28,7 @@ export default function NusukIntegrationPage() {
   const { c } = useTheme();
   const { isMobile } = useResponsive();
   const { addToast } = useToast();
+  const { t } = useLanguage();
 
   const [config, setConfig] = useState<NusukConfigData>({
     isEnabled: false,
@@ -82,8 +84,8 @@ export default function NusukIntegrationPage() {
         setSaveMessage({ type: 'error', text: json.error || 'Gagal menyimpan konfigurasi' });
       } else {
         setConfig(json.data);
-        setSaveMessage({ type: 'success', text: 'Konfigurasi berhasil disimpan' });
-        addToast({ type: 'success', title: 'Konfigurasi berhasil disimpan' });
+        setSaveMessage({ type: 'success', text: t.common.success });
+        addToast({ type: 'success', title: t.common.success });
       }
     } catch {
       setSaveMessage({ type: 'error', text: 'Terjadi kesalahan jaringan' });
@@ -203,7 +205,7 @@ export default function NusukIntegrationPage() {
         <BackButton href="/settings/integrations" />
         <PageHeader
           title="Nusuk API"
-          description="Konfigurasi integrasi dengan platform Nusuk Saudi Arabia"
+          description={t.settings.generalDesc}
         />
       </div>
 
@@ -317,7 +319,7 @@ export default function NusukIntegrationPage() {
             >
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
                 {saving && <Loader2 style={{ width: '16px', height: '16px', animation: 'spin 1s linear infinite' }} />}
-                {saving ? 'Menyimpan...' : 'Simpan Konfigurasi'}
+                {saving ? 'Menyimpan...' : t.common.save}
               </span>
             </button>
 

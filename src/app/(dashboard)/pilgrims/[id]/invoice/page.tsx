@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
 import {
+import { useLanguage } from '@/lib/i18n';
   ArrowLeft,
   Plus,
   X,
@@ -87,6 +88,7 @@ export default function PilgrimInvoicePage() {
   const pilgrimId = params.id as string;
   const { c } = useTheme();
   const { isMobile } = useResponsive();
+  const { t } = useLanguage();
 
   const [pilgrim, setPilgrim] = useState<PilgrimInfo | null>(null);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
@@ -127,7 +129,7 @@ export default function PilgrimInvoicePage() {
           setFormAmount(String(p.remainingBalance));
         }
       } else {
-        setError('Jemaah tidak ditemukan');
+        setError(t.common.noData);
       }
 
       if (invoicesRes.ok) {
@@ -135,7 +137,7 @@ export default function PilgrimInvoicePage() {
         setInvoices(iData.data || []);
       }
     } catch {
-      setError('Gagal memuat data');
+      setError(t.common.error);
     } finally {
       setLoading(false);
     }
@@ -167,14 +169,14 @@ export default function PilgrimInvoicePage() {
       });
       const data = await res.json();
       if (!res.ok) {
-        setError(data.error || 'Gagal membuat invoice');
+        setError(data.error || t.common.error);
       } else {
         setInvoices((prev) => [data, ...prev]);
         setShowForm(false);
         setFormAmount('');
       }
     } catch {
-      setError('Terjadi kesalahan');
+      setError(t.common.errorGeneric);
     } finally {
       setCreating(false);
     }
@@ -192,10 +194,10 @@ export default function PilgrimInvoicePage() {
           prev.map((inv) => (inv.id === invoiceId ? { ...inv, status: 'cancelled' as const } : inv))
         );
       } else {
-        setError(data.error || 'Gagal membatalkan invoice');
+        setError(data.error || t.common.error);
       }
     } catch {
-      setError('Terjadi kesalahan');
+      setError(t.common.errorGeneric);
     } finally {
       setCancelling(null);
     }

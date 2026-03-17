@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
+import { useLanguage } from '@/lib/i18n';
 
 const GREEN = '#059669';
 const GREEN_LIGHT = '#ECFDF5';
@@ -24,6 +25,7 @@ const QUICK_AMOUNTS = [100, 500, 1000, 2000, 5000];
 export default function CurrencyConverterPage() {
   const { c } = useTheme();
   const { isMobile } = useResponsive();
+  const { t } = useLanguage();
   const [rate, setRate] = useState(DEFAULT_RATE);
   const [sarValue, setSarValue] = useState('');
   const [idrValue, setIdrValue] = useState('');
@@ -169,7 +171,7 @@ export default function CurrencyConverterPage() {
                 padding: '4px 10px',
               }}
             >
-              Simpan
+              {t.common.save}
             </button>
           )}
         </div>

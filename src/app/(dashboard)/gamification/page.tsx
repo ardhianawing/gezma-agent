@@ -6,6 +6,7 @@ import { Trophy, Star, Medal, TrendingUp, ChevronLeft, ChevronRight } from 'luci
 import { EmptyState } from '@/components/shared/empty-state';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
+import { useLanguage } from '@/lib/i18n';
 
 interface GamificationStats {
   totalPoints: number;
@@ -45,6 +46,7 @@ interface PointEvent {
 export default function GamificationPage() {
   const { c } = useTheme();
   const { isMobile, isTablet } = useResponsive();
+  const { t } = useLanguage();
   const [stats, setStats] = useState<GamificationStats | null>(null);
   const [badges, setBadges] = useState<Badge[]>([]);
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
@@ -83,16 +85,16 @@ export default function GamificationPage() {
   if (loading) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
-        <p style={{ color: c.textMuted }}>Memuat data gamifikasi...</p>
+        <p style={{ color: c.textMuted }}>{t.common.loadingData}</p>
       </div>
     );
   }
 
   const statCards = [
-    { label: 'Total Poin', value: stats?.totalPoints ?? 0, icon: Star, color: '#F59E0B' },
-    { label: 'Level', value: stats?.level ?? 1, icon: TrendingUp, color: '#3B82F6' },
-    { label: 'Badge', value: stats?.badgeCount ?? 0, icon: Medal, color: '#10B981' },
-    { label: 'Rank', value: `#${stats?.rank ?? '-'}`, icon: Trophy, color: '#8B5CF6' },
+    { label: t.gamification.statPoints, value: stats?.totalPoints ?? 0, icon: Star, color: '#F59E0B' },
+    { label: t.gamification.statLevel, value: stats?.level ?? 1, icon: TrendingUp, color: '#3B82F6' },
+    { label: t.gamification.statBadge, value: stats?.badgeCount ?? 0, icon: Medal, color: '#10B981' },
+    { label: t.gamification.statRank, value: `#${stats?.rank ?? '-'}`, icon: Trophy, color: '#8B5CF6' },
   ];
 
   return (
@@ -100,10 +102,10 @@ export default function GamificationPage() {
       {/* Header */}
       <div>
         <h1 style={{ fontSize: '28px', fontWeight: '700', color: c.textPrimary, margin: 0 }}>
-          Gamifikasi
+          {t.gamification.title}
         </h1>
         <p style={{ fontSize: '14px', color: c.textMuted, marginTop: '4px' }}>
-          Kumpulkan poin, raih badge, dan bersaing di leaderboard!
+          {t.gamification.subtitle}
         </p>
       </div>
 
@@ -188,10 +190,10 @@ export default function GamificationPage() {
           </div>
           <div style={{ flex: 1 }}>
             <p style={{ fontSize: '16px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>
-              Tukarkan Poin
+              {t.gamification.rewardsTitle}
             </p>
             <p style={{ fontSize: '13px', color: c.textMuted, margin: '4px 0 0 0' }}>
-              Lihat hadiah yang bisa Anda tukarkan →
+              {t.gamification.rewardsSubtitle} →
             </p>
           </div>
         </div>
@@ -217,7 +219,7 @@ export default function GamificationPage() {
           <div style={{ padding: '20px', borderBottom: `1px solid ${c.borderLight}` }}>
             <h2 style={{ fontSize: '18px', fontWeight: '600', color: c.textPrimary, margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Medal style={{ width: '20px', height: '20px', color: '#F59E0B' }} />
-              Badge Collection
+              {t.gamification.badgeCollection}
             </h2>
           </div>
           <div
@@ -269,12 +271,12 @@ export default function GamificationPage() {
           <div style={{ padding: '20px', borderBottom: `1px solid ${c.borderLight}` }}>
             <h2 style={{ fontSize: '18px', fontWeight: '600', color: c.textPrimary, margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Trophy style={{ width: '20px', height: '20px', color: '#8B5CF6' }} />
-              Leaderboard Bulan Ini
+              {t.gamification.leaderboard}
             </h2>
           </div>
           <div style={{ padding: '20px' }}>
             {leaderboard.length === 0 ? (
-              <EmptyState icon={Trophy} title="Belum ada data leaderboard" />
+              <EmptyState icon={Trophy} title={t.gamification.leaderboardEmpty} />
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 {leaderboard.map(entry => {
@@ -315,12 +317,12 @@ export default function GamificationPage() {
                           {entry.agencyName}
                         </p>
                         <p style={{ fontSize: '12px', color: c.textMuted, margin: '2px 0 0 0' }}>
-                          {entry.pilgrimCount} jemaah
+                          {entry.pilgrimCount} {t.common.pilgrims}
                         </p>
                       </div>
                       <div style={{ textAlign: 'right', flexShrink: 0 }}>
                         <p style={{ fontSize: '14px', fontWeight: '700', color: '#F59E0B', margin: 0 }}>
-                          {entry.totalPoints.toLocaleString('id-ID')} pts
+                          {entry.totalPoints.toLocaleString('id-ID')} {t.gamification.pts}
                         </p>
                       </div>
                     </div>
@@ -344,12 +346,12 @@ export default function GamificationPage() {
         <div style={{ padding: '20px', borderBottom: `1px solid ${c.borderLight}` }}>
           <h2 style={{ fontSize: '18px', fontWeight: '600', color: c.textPrimary, margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
             <Star style={{ width: '20px', height: '20px', color: '#F59E0B' }} />
-            Riwayat Poin
+            {t.gamification.history}
           </h2>
         </div>
         <div style={{ padding: '20px' }}>
           {history.length === 0 ? (
-            <EmptyState icon={Star} title="Belum ada riwayat poin" description="Mulai kelola jemaah untuk mendapatkan poin!" />
+            <EmptyState icon={Star} title={t.gamification.historyEmptyTitle} description={t.gamification.historyEmptyDesc} />
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {history.map(event => (

@@ -14,10 +14,12 @@ import {
 } from 'lucide-react';
 import { useState, useMemo } from 'react';
 import { helpFAQs, helpCategories } from '@/data/mock-help';
+import { useLanguage } from '@/lib/i18n';
 
 export default function HelpPage() {
   const { c } = useTheme();
   const { isMobile } = useResponsive();
+  const { t } = useLanguage();
   const [openIndex, setOpenIndex] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
@@ -53,16 +55,16 @@ export default function HelpPage() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '16px' : '24px' }}>
       <PageHeader
-        title="Pusat Bantuan"
-        description="Temukan jawaban untuk pertanyaan umum atau hubungi tim support kami"
+        title={t.help.title}
+        description={t.help.description}
       />
 
       {/* Contact Cards */}
       <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: '16px' }}>
         {[
-          { icon: Mail, label: 'Email', value: 'support@gezma.id', color: '#3B82F6', bg: '#DBEAFE' },
-          { icon: Phone, label: 'Telepon', value: '(021) 1234-5678', color: '#10B981', bg: '#D1FAE5' },
-          { icon: MessageSquare, label: 'WhatsApp', value: '+62 812-3456-7890', color: '#22C55E', bg: '#DCFCE7' },
+          { icon: Mail, label: t.help.contactEmail, value: 'support@gezma.id', color: '#3B82F6', bg: '#DBEAFE' },
+          { icon: Phone, label: t.help.contactPhone, value: '(021) 1234-5678', color: '#10B981', bg: '#D1FAE5' },
+          { icon: MessageSquare, label: t.help.contactWhatsApp, value: '+62 812-3456-7890', color: '#22C55E', bg: '#DCFCE7' },
         ].map((item) => {
           const Icon = item.icon;
           return (
@@ -110,7 +112,7 @@ export default function HelpPage() {
         <Search style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', width: '18px', height: '18px', color: c.textMuted }} />
         <input
           type="text"
-          placeholder="Cari pertanyaan..."
+          placeholder={t.help.searchPlaceholder}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           style={{
@@ -185,9 +187,9 @@ export default function HelpPage() {
         <div style={{ padding: isMobile ? '16px' : '20px', borderBottom: `1px solid ${c.borderLight}` }}>
           <h3 style={{ fontSize: '16px', fontWeight: '600', color: c.textPrimary, margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
             <BookOpen style={{ width: '18px', height: '18px', color: c.textMuted }} />
-            Pertanyaan Umum (FAQ)
+            {t.help.faqTitle}
             <span style={{ fontSize: '13px', fontWeight: '400', color: c.textMuted }}>
-              {filteredFAQs.length} pertanyaan
+              {t.help.faqCount.replace('{count}', String(filteredFAQs.length))}
             </span>
           </h3>
         </div>
@@ -195,7 +197,7 @@ export default function HelpPage() {
           <div style={{ padding: '40px 20px', textAlign: 'center' }}>
             <HelpCircle style={{ width: '32px', height: '32px', color: c.textLight, margin: '0 auto 8px' }} />
             <p style={{ fontSize: '14px', color: c.textMuted, margin: 0 }}>
-              Tidak ditemukan FAQ yang cocok dengan pencarian Anda.
+              {t.help.faqEmpty}
             </p>
           </div>
         ) : (

@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
+import { useLanguage } from '@/lib/i18n';
 import {
   forumCategories,
   ForumCategory,
@@ -25,12 +26,12 @@ function timeAgo(dateStr: string): string {
   const diffHour = Math.floor(diffMs / 3600000);
   const diffDay = Math.floor(diffMs / 86400000);
 
-  if (diffMin < 1) return 'baru saja';
-  if (diffMin < 60) return `${diffMin} menit lalu`;
-  if (diffHour < 24) return `${diffHour} jam lalu`;
-  if (diffDay < 7) return `${diffDay} hari lalu`;
-  if (diffDay < 30) return `${Math.floor(diffDay / 7)} minggu lalu`;
-  return `${Math.floor(diffDay / 30)} bulan lalu`;
+  if (diffMin < 1) return 'just now';
+  if (diffMin < 60) return `${diffMin} minutes ago`;
+  if (diffHour < 24) return `${diffHour} hours ago`;
+  if (diffDay < 7) return `${diffDay} days ago`;
+  if (diffDay < 30) return `${Math.floor(diffDay / 7)} weeks ago`;
+  return `${Math.floor(diffDay / 30)} months ago`;
 }
 
 function getCategoryInfo(key: string) {
@@ -40,6 +41,7 @@ function getCategoryInfo(key: string) {
 export default function ForumPage() {
   const { c } = useTheme();
   const { isMobile } = useResponsive();
+  const { t } = useLanguage();
 
   const [activeCategory, setActiveCategory] = useState<ForumCategory>('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -93,9 +95,9 @@ export default function ForumPage() {
   }, [fetchThreads]);
 
   const sortTabs: { key: SortBy; label: string }[] = [
-    { key: 'terbaru', label: 'Terbaru' },
-    { key: 'terpanas', label: 'Terpanas' },
-    { key: 'top', label: 'Top' },
+    { key: 'terbaru', label: t.forum.sortLatest },
+    { key: 'terpanas', label: t.forum.sortHot },
+    { key: 'top', label: t.forum.sortTop },
   ];
 
   return (
@@ -113,11 +115,11 @@ export default function ForumPage() {
       >
         <div>
           <h1 style={{ fontSize: isMobile ? 22 : 26, fontWeight: 700, color: c.textPrimary, margin: 0 }}>
-            Forum Komunitas
+            {t.forum.title}
           </h1>
           <div style={{ display: 'flex', gap: 16, marginTop: 6, fontSize: 13, color: c.textMuted }}>
             <span>
-              <span style={{ fontWeight: 600, color: c.textSecondary }}>{totalThreads.toLocaleString('id-ID')}</span> thread
+              <span style={{ fontWeight: 600, color: c.textSecondary }}>{totalThreads.toLocaleString()}</span> {t.forum.threadCount}
             </span>
           </div>
         </div>
@@ -134,7 +136,7 @@ export default function ForumPage() {
             cursor: 'pointer',
           }}
         >
-          {showCreateForm ? '✕ Batal' : '+ Buat Thread'}
+          {showCreateForm ? `✕ ${t.common.cancel}` : t.forum.createThread}
         </button>
       </div>
 
@@ -152,10 +154,10 @@ export default function ForumPage() {
             gap: '14px',
           }}
         >
-          <h3 style={{ fontSize: '16px', fontWeight: 600, color: c.textPrimary, margin: 0 }}>Buat Thread Baru</h3>
+          <h3 style={{ fontSize: '16px', fontWeight: 600, color: c.textPrimary, margin: 0 }}>{t.forum.createTitle}</h3>
           <input
             type="text"
-            placeholder="Judul thread..."
+            placeholder={t.forum.createTitlePlaceholder}
             value={newTitle}
             onChange={(e) => setNewTitle(e.target.value)}
             style={{
@@ -171,7 +173,7 @@ export default function ForumPage() {
             }}
           />
           <textarea
-            placeholder="Isi thread..."
+            placeholder={t.forum.createContentPlaceholder}
             value={newContent}
             onChange={(e) => setNewContent(e.target.value)}
             rows={5}
@@ -208,7 +210,7 @@ export default function ForumPage() {
             </select>
             <input
               type="text"
-              placeholder="Tags (pisahkan koma)"
+              placeholder={t.forum.createTagsPlaceholder}
               value={newTags}
               onChange={(e) => setNewTags(e.target.value)}
               style={{
@@ -246,7 +248,7 @@ export default function ForumPage() {
                 });
                 if (!res.ok) {
                   const json = await res.json();
-                  throw new Error(json.error || 'Gagal membuat thread');
+                  throw new Error(json.error || t.forum.createError);
                 }
                 setNewTitle('');
                 setNewContent('');
@@ -254,7 +256,7 @@ export default function ForumPage() {
                 setShowCreateForm(false);
                 fetchThreads();
               } catch (err) {
-                setCreateError(err instanceof Error ? err.message : 'Gagal membuat thread');
+                setCreateError(err instanceof Error ? err.message : t.forum.createError);
               } finally {
                 setCreating(false);
               }
@@ -271,7 +273,7 @@ export default function ForumPage() {
               alignSelf: 'flex-end',
             }}
           >
-            {creating ? 'Membuat...' : 'Kirim Thread'}
+            {creating ? t.forum.createLoading : t.forum.createSubmit}
           </button>
         </div>
       )}
@@ -340,7 +342,7 @@ export default function ForumPage() {
         <div style={{ flex: 1, minWidth: 200 }}>
           <input
             type="text"
-            placeholder="Cari thread, tag, atau author..."
+            placeholder={t.forum.searchPlaceholder}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             style={{
@@ -402,22 +404,22 @@ export default function ForumPage() {
               letterSpacing: 0.5,
             }}
           >
-            <div style={{ flex: 1 }}>Thread</div>
-            <div style={{ width: 80, textAlign: 'center' }}>Balas</div>
-            <div style={{ width: 80, textAlign: 'center' }}>Lihat</div>
-            <div style={{ width: 100, textAlign: 'right' }}>Terakhir</div>
+            <div style={{ flex: 1 }}>{t.forum.tableThread}</div>
+            <div style={{ width: 80, textAlign: 'center' }}>{t.forum.tableReplies}</div>
+            <div style={{ width: 80, textAlign: 'center' }}>{t.forum.tableViews}</div>
+            <div style={{ width: 100, textAlign: 'right' }}>{t.forum.tableLast}</div>
           </div>
         )}
 
         {/* Thread Rows */}
         {loading && (
           <div style={{ padding: 40, textAlign: 'center', color: c.textMuted, fontSize: 14 }}>
-            Memuat thread...
+            {t.common.loading}
           </div>
         )}
         {!loading && threads.length === 0 && (
           <div style={{ padding: 40, textAlign: 'center', color: c.textMuted, fontSize: 14 }}>
-            Tidak ada thread ditemukan.
+            {t.forum.empty}
           </div>
         )}
         {!loading && threads.map((thread) => (
@@ -439,8 +441,8 @@ export default function ForumPage() {
         }}
       >
         <span>
-          Menampilkan <strong style={{ color: c.textSecondary }}>1-{threads.length}</strong> dari{' '}
-          <strong style={{ color: c.textSecondary }}>{totalThreads}</strong> thread
+          {t.common.showing} <strong style={{ color: c.textSecondary }}>1-{threads.length}</strong> {t.common.of}{' '}
+          <strong style={{ color: c.textSecondary }}>{totalThreads}</strong> {t.forum.threadCount}
         </span>
         <div style={{ display: 'flex', gap: 4 }}>
           {[1, 2, 3, '...', 32].map((page, idx) => (
@@ -592,9 +594,9 @@ function ThreadRow({
           {/* Inline stats */}
           <div style={{ display: 'flex', gap: 12, marginTop: 4, fontSize: 11, color: c.textMuted }}>
             <span style={{ color: thread.replyCount > 20 ? c.error : c.textMuted, fontWeight: thread.replyCount > 20 ? 600 : 400 }}>
-              {thread.replyCount} balas
+              {thread.replyCount} {t.forum.replyUnit}
             </span>
-            <span>{thread.viewCount.toLocaleString('id-ID')} lihat</span>
+            <span>{thread.viewCount.toLocaleString()} {t.forum.viewUnit}</span>
             <span>{timeAgo(thread.lastReplyAt)}</span>
           </div>
         </div>

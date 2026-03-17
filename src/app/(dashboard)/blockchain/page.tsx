@@ -7,6 +7,7 @@ import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
 import { useToast } from '@/components/ui/toast';
 import { TableSkeleton, StatsSkeleton } from '@/components/shared/loading-skeleton';
+import { useLanguage } from '@/lib/i18n';
 
 interface Certificate {
   id: string;
@@ -38,6 +39,7 @@ export default function BlockchainPage() {
   const { c } = useTheme();
   const { isMobile, isTablet } = useResponsive();
   const { addToast } = useToast();
+  const { t } = useLanguage();
 
   const [certificates, setCertificates] = useState<Certificate[]>([]);
   const [stats, setStats] = useState<Stats>({ total: 0, verified: 0, revoked: 0 });
@@ -94,7 +96,7 @@ export default function BlockchainPage() {
 
   const handleIssueCertificate = async () => {
     if (!selectedPilgrimId) {
-      setIssueError('Pilih jamaah terlebih dahulu');
+      setIssueError(t.blockchain.modalIssueError);
       return;
     }
     setIssuing(true);
@@ -107,16 +109,16 @@ export default function BlockchainPage() {
       });
       const json = await res.json();
       if (!res.ok) {
-        setIssueError(json.error || 'Gagal menerbitkan sertifikat');
+        setIssueError(json.error || t.blockchain.errorIssue);
         return;
       }
       setShowIssueModal(false);
-      addToast({ type: 'success', title: 'Sertifikat berhasil diterbitkan' });
+      addToast({ type: 'success', title: t.blockchain.successIssue });
       setPage(1);
       fetchCertificates(1);
     } catch {
-      setIssueError('Terjadi kesalahan jaringan');
-      addToast({ type: 'error', title: 'Terjadi kesalahan jaringan' });
+      setIssueError(t.common.errorNetwork);
+      addToast({ type: 'error', title: t.common.errorNetwork });
     } finally {
       setIssuing(false);
     }
@@ -146,10 +148,10 @@ export default function BlockchainPage() {
       if (res.ok) {
         setShowRevokeConfirm(false);
         setShowDetailModal(false);
-        addToast({ type: 'success', title: 'Sertifikat berhasil dicabut' });
+        addToast({ type: 'success', title: t.blockchain.successRevoke });
         fetchCertificates(page);
       } else {
-        addToast({ type: 'error', title: 'Gagal mencabut sertifikat' });
+        addToast({ type: 'error', title: t.blockchain.errorRevoke });
       }
     } catch {
       addToast({ type: 'error', title: 'Gagal mencabut sertifikat' });
@@ -197,9 +199,9 @@ export default function BlockchainPage() {
   };
 
   const statusLabel = (status: string) => {
-    if (status === 'verified') return 'Terverifikasi';
-    if (status === 'revoked') return 'Dicabut';
-    return 'Pending';
+    if (status === 'verified') return t.blockchain.statusVerified;
+    if (status === 'revoked') return t.blockchain.statusRevoked;
+    return t.blockchain.statusPending;
   };
 
   const StatusIcon = ({ status }: { status: string }) => {
@@ -230,10 +232,10 @@ export default function BlockchainPage() {
       }}>
         <div>
           <h1 style={{ fontSize: isMobile ? '20px' : '24px', fontWeight: '700', color: c.textPrimary, margin: 0 }}>
-            Blockchain Verification
+            {t.blockchain.title}
           </h1>
           <p style={{ fontSize: '14px', color: c.textMuted, margin: '4px 0 0 0' }}>
-            Kelola sertifikat blockchain untuk jamaah Anda
+            {t.blockchain.subtitle}
           </p>
         </div>
         <button
@@ -253,7 +255,7 @@ export default function BlockchainPage() {
           }}
         >
           <Plus style={{ width: '18px', height: '18px' }} />
-          Terbitkan Sertifikat
+          {t.blockchain.issueCert}
         </button>
       </div>
 
@@ -265,9 +267,9 @@ export default function BlockchainPage() {
         marginBottom: '24px',
       }}>
         {[
-          { label: 'Total Diterbitkan', value: stats.total, color: c.primary, icon: Shield },
-          { label: 'Terverifikasi', value: stats.verified, color: '#16a34a', icon: CheckCircle2 },
-          { label: 'Dicabut', value: stats.revoked, color: '#dc2626', icon: XCircle },
+          { label: t.blockchain.statTotal, value: stats.total, color: c.primary, icon: Shield },
+          { label: t.blockchain.statVerified, value: stats.verified, color: '#16a34a', icon: CheckCircle2 },
+          { label: t.blockchain.statRevoked, value: stats.revoked, color: '#dc2626', icon: XCircle },
         ].map((stat) => (
           <div key={stat.label} style={{
             backgroundColor: c.cardBg,
@@ -310,7 +312,7 @@ export default function BlockchainPage() {
           /* Mobile: Card layout */
           <div style={{ padding: '12px' }}>
             {certificates.length === 0 ? (
-              <EmptyState icon={Shield} title="Belum ada sertifikat" />
+              <EmptyState icon={Shield} title={t.blockchain.empty} />
             ) : (
               certificates.map((cert) => (
                 <div
@@ -347,7 +349,7 @@ export default function BlockchainPage() {
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ backgroundColor: c.cardBgHover }}>
-                  {['Jamaah', 'No. Sertifikat', 'TX Hash', 'Status', 'Tanggal', 'Aksi'].map((header) => (
+                  {[t.blockchain.tablePilgrim, t.blockchain.tableCertNo, t.blockchain.tableTxHash, t.blockchain.tableStatus, t.blockchain.tableDate, t.blockchain.tableAction].map((header) => (
                     <th key={header} style={{
                       padding: '12px 16px',
                       textAlign: 'left',
@@ -367,7 +369,7 @@ export default function BlockchainPage() {
                 {certificates.length === 0 ? (
                   <tr>
                     <td colSpan={6}>
-                      <EmptyState icon={Shield} title="Belum ada sertifikat" />
+                      <EmptyState icon={Shield} title={t.blockchain.empty} />
                     </td>
                   </tr>
                 ) : (
@@ -417,7 +419,7 @@ export default function BlockchainPage() {
                           }}
                         >
                           <Eye style={{ width: '14px', height: '14px' }} />
-                          Detail
+                          {t.common.detail}
                         </button>
                       </td>
                     </tr>
@@ -451,10 +453,10 @@ export default function BlockchainPage() {
                 cursor: page === 1 ? 'not-allowed' : 'pointer',
               }}
             >
-              Sebelumnya
+              {t.common.previous}
             </button>
             <span style={{ fontSize: '13px', color: c.textMuted }}>
-              Halaman {page} dari {totalPages}
+              {t.common.pageOf.replace('{page}', String(page)).replace('{total}', String(totalPages))}
             </span>
             <button
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
@@ -469,7 +471,7 @@ export default function BlockchainPage() {
                 cursor: page === totalPages ? 'not-allowed' : 'pointer',
               }}
             >
-              Selanjutnya
+              {t.common.next}
             </button>
           </div>
         )}
@@ -498,7 +500,7 @@ export default function BlockchainPage() {
           }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
               <h2 style={{ fontSize: '18px', fontWeight: '700', color: c.textPrimary, margin: 0 }}>
-                Terbitkan Sertifikat
+                {t.blockchain.modalIssueTitle}
               </h2>
               <button
                 onClick={() => setShowIssueModal(false)}
@@ -509,7 +511,7 @@ export default function BlockchainPage() {
             </div>
 
             <p style={{ fontSize: '14px', color: c.textSecondary, margin: '0 0 16px 0' }}>
-              Pilih jamaah untuk diterbitkan sertifikat blockchain
+              {t.blockchain.modalIssueDesc}
             </p>
 
             <select
@@ -527,7 +529,7 @@ export default function BlockchainPage() {
                 outline: 'none',
               }}
             >
-              <option value="">-- Pilih Jamaah --</option>
+              <option value="">{t.blockchain.modalIssueSelect}</option>
               {pilgrims.map((p) => (
                 <option key={p.id} value={p.id}>
                   {p.name} ({p.nik})
@@ -563,7 +565,7 @@ export default function BlockchainPage() {
                   cursor: 'pointer',
                 }}
               >
-                Batal
+                {t.common.cancel}
               </button>
               <button
                 onClick={handleIssueCertificate}
@@ -582,7 +584,7 @@ export default function BlockchainPage() {
               >
                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
                   {issuing && <Loader2 style={{ width: '16px', height: '16px', animation: 'spin 1s linear infinite' }} />}
-                  {issuing ? 'Memproses...' : 'Terbitkan'}
+                  {issuing ? t.blockchain.modalIssueLoading : t.blockchain.modalIssueBtn}
                 </span>
               </button>
             </div>
@@ -615,7 +617,7 @@ export default function BlockchainPage() {
           }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
               <h2 style={{ fontSize: '18px', fontWeight: '700', color: c.textPrimary, margin: 0 }}>
-                Detail Sertifikat
+                {t.blockchain.modalDetailTitle}
               </h2>
               <button
                 onClick={() => setShowDetailModal(false)}
@@ -626,7 +628,7 @@ export default function BlockchainPage() {
             </div>
 
             {detailLoading ? (
-              <p style={{ textAlign: 'center', color: c.textMuted, fontSize: '14px' }}>Memuat...</p>
+              <p style={{ textAlign: 'center', color: c.textMuted, fontSize: '14px' }}>{t.blockchain.modalDetailLoading}</p>
             ) : (
               <>
                 {/* Status */}
@@ -645,12 +647,12 @@ export default function BlockchainPage() {
                   marginBottom: '16px',
                 }}>
                   {[
-                    { label: 'No. Sertifikat', value: selectedCert.certificateNumber },
-                    { label: 'Jamaah', value: selectedCert.pilgrim.name },
-                    { label: 'NIK', value: selectedCert.pilgrim.nik },
-                    { label: 'Agensi', value: selectedCert.agency.name },
-                    { label: 'Tanggal Terbit', value: formatDate(selectedCert.issuedAt) },
-                    { label: 'Tanggal Verifikasi', value: selectedCert.verifiedAt ? formatDate(selectedCert.verifiedAt) : '-' },
+                    { label: t.blockchain.detailCertNo, value: selectedCert.certificateNumber },
+                    { label: t.blockchain.detailPilgrim, value: selectedCert.pilgrim.name },
+                    { label: t.blockchain.detailNik, value: selectedCert.pilgrim.nik },
+                    { label: t.blockchain.detailAgency, value: selectedCert.agency.name },
+                    { label: t.blockchain.detailIssuedDate, value: formatDate(selectedCert.issuedAt) },
+                    { label: t.blockchain.detailVerifiedDate, value: selectedCert.verifiedAt ? formatDate(selectedCert.verifiedAt) : '-' },
                   ].map((item) => (
                     <div key={item.label} style={{
                       display: 'flex',
@@ -672,12 +674,12 @@ export default function BlockchainPage() {
                   marginBottom: '16px',
                 }}>
                   <p style={{ fontSize: '13px', fontWeight: '700', color: c.textPrimary, margin: '0 0 12px 0', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                    Blockchain Explorer
+                    {t.blockchain.detailExplorer}
                   </p>
 
                   {/* TX Hash */}
                   <div style={{ marginBottom: '12px' }}>
-                    <p style={{ fontSize: '12px', color: c.textMuted, margin: '0 0 4px 0' }}>Transaction Hash</p>
+                    <p style={{ fontSize: '12px', color: c.textMuted, margin: '0 0 4px 0' }}>{t.blockchain.detailTxHash}</p>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <code style={{
                         fontSize: '12px',
@@ -694,8 +696,8 @@ export default function BlockchainPage() {
                       </code>
                       <button
                         onClick={() => copyToClipboard(selectedCert.txHash)}
-                        title="Salin"
-                        aria-label="Salin"
+                        title={t.common.copy}
+                        aria-label={t.common.copy}
                         style={{
                           padding: '6px',
                           backgroundColor: 'transparent',
@@ -712,7 +714,7 @@ export default function BlockchainPage() {
 
                   {/* Block Number */}
                   <div style={{ marginBottom: '12px' }}>
-                    <p style={{ fontSize: '12px', color: c.textMuted, margin: '0 0 4px 0' }}>Block Number</p>
+                    <p style={{ fontSize: '12px', color: c.textMuted, margin: '0 0 4px 0' }}>{t.blockchain.detailBlockNumber}</p>
                     <p style={{ fontSize: '14px', fontWeight: '600', color: c.textPrimary, margin: 0, fontFamily: 'monospace' }}>
                       #{selectedCert.blockNumber.toLocaleString()}
                     </p>
@@ -721,7 +723,7 @@ export default function BlockchainPage() {
                   {/* Metadata */}
                   {selectedCert.metadata && (
                     <div>
-                      <p style={{ fontSize: '12px', color: c.textMuted, margin: '0 0 8px 0' }}>Metadata</p>
+                      <p style={{ fontSize: '12px', color: c.textMuted, margin: '0 0 8px 0' }}>{t.blockchain.detailMetadata}</p>
                       {Object.entries(selectedCert.metadata).map(([key, val]) => (
                         <div key={key} style={{
                           display: 'flex',
@@ -779,7 +781,7 @@ export default function BlockchainPage() {
                       }}
                     >
                       <XCircle style={{ width: '16px', height: '16px' }} />
-                      Cabut Sertifikat
+                      {t.blockchain.revokeBtn}
                     </button>
                   )}
                   <button
@@ -794,7 +796,7 @@ export default function BlockchainPage() {
                       cursor: 'pointer',
                     }}
                   >
-                    Tutup
+                    {t.common.close}
                   </button>
                 </div>
               </>
@@ -837,10 +839,10 @@ export default function BlockchainPage() {
               <AlertTriangle style={{ width: '28px', height: '28px', color: '#dc2626' }} />
             </div>
             <h3 style={{ fontSize: '16px', fontWeight: '700', color: c.textPrimary, margin: '0 0 8px 0' }}>
-              Cabut Sertifikat?
+              {t.blockchain.revokeTitle}
             </h3>
             <p style={{ fontSize: '14px', color: c.textMuted, margin: '0 0 20px 0' }}>
-              Tindakan ini tidak dapat dibatalkan. Sertifikat akan ditandai sebagai dicabut.
+              {t.blockchain.revokeDesc}
             </p>
             <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
               <button
@@ -855,7 +857,7 @@ export default function BlockchainPage() {
                   cursor: 'pointer',
                 }}
               >
-                Batal
+                {t.common.cancel}
               </button>
               <button
                 onClick={handleRevoke}
@@ -874,7 +876,7 @@ export default function BlockchainPage() {
               >
                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
                   {revoking && <Loader2 style={{ width: '16px', height: '16px', animation: 'spin 1s linear infinite' }} />}
-                  {revoking ? 'Memproses...' : 'Ya, Cabut'}
+                  {revoking ? t.common.processing : t.blockchain.revokeConfirm}
                 </span>
               </button>
             </div>

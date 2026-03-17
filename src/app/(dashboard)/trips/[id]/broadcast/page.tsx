@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
 import {
+import { useLanguage } from '@/lib/i18n';
   ArrowLeft,
   MessageCircle,
   Send,
@@ -90,6 +91,7 @@ export default function BroadcastPage() {
   const router = useRouter();
   const { c } = useTheme();
   const { isMobile } = useResponsive();
+  const { t } = useLanguage();
   const tripId = params.id as string;
 
   // State
@@ -287,10 +289,10 @@ export default function BroadcastPage() {
             </div>
             <div>
               <h1 style={{ fontSize: '22px', fontWeight: 700, color: c.textPrimary, margin: 0 }}>
-                Broadcast WhatsApp
+                {t.trips.title}
               </h1>
               <p style={{ fontSize: '13px', color: c.textMuted, margin: 0 }}>
-                Kirim pesan ke seluruh jamaah dalam perjalanan
+                {t.trips.description}
               </p>
             </div>
           </div>
@@ -337,7 +339,7 @@ export default function BroadcastPage() {
           {/* Template Selector */}
           <div style={cardStyle}>
             <h3 style={{ fontSize: '15px', fontWeight: 600, color: c.textPrimary, margin: '0 0 14px 0' }}>
-              Pilih Template Pesan
+              {t.common.select || "Select Template"}
             </h3>
 
             <div style={{ position: 'relative', marginBottom: '16px' }}>
@@ -542,7 +544,7 @@ export default function BroadcastPage() {
           <div style={cardStyle}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
               <h3 style={{ fontSize: '15px', fontWeight: 600, color: c.textPrimary, margin: 0 }}>
-                Daftar Penerima
+                {t.trips.title}
               </h3>
               <span style={{ fontSize: '12px', color: c.textMuted }}>
                 {selectedRecipients.length} / {recipients.length} dipilih

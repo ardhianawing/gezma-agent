@@ -10,6 +10,7 @@ import { ConfirmDialog } from '@/components/shared/confirm-dialog';
 import { useToast } from '@/components/ui/toast';
 import { formatDate, formatCurrency } from '@/lib/utils';
 import type { TripStatus, PilgrimStatus } from '@/types';
+import { useLanguage } from '@/lib/i18n';
 
 interface ManifestEntry {
   pilgrimId: string;
@@ -74,6 +75,7 @@ export default function TripDetailPage({ params }: { params: Promise<{ id: strin
   const { id } = use(params);
   const { c } = useTheme();
   const { isMobile } = useResponsive();
+  const { t } = useLanguage();
   const [trip, setTrip] = useState<TripDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -118,7 +120,7 @@ export default function TripDetailPage({ params }: { params: Promise<{ id: strin
         return res.json();
       })
       .then((data) => setTrip(data))
-      .catch(() => setError('Trip tidak ditemukan'))
+      .catch(() => setError(t.common.noData))
       .finally(() => setLoading(false));
   }, [id]);
 
@@ -220,7 +222,7 @@ export default function TripDetailPage({ params }: { params: Promise<{ id: strin
 
       if (!res.ok) {
         const data = await res.json();
-        addToast({ type: 'error', title: 'Gagal menambahkan jemaah', description: data.error });
+        addToast({ type: 'error', title: t.common.error + ' menambahkan jemaah', description: data.error });
         return;
       }
 
@@ -245,7 +247,7 @@ export default function TripDetailPage({ params }: { params: Promise<{ id: strin
 
       if (!res.ok) {
         const data = await res.json();
-        addToast({ type: 'error', title: 'Gagal menghapus jemaah', description: data.error });
+        addToast({ type: 'error', title: t.common.error + ' menghapus jemaah', description: data.error });
         return;
       }
 
@@ -272,7 +274,7 @@ export default function TripDetailPage({ params }: { params: Promise<{ id: strin
 
       if (!res.ok) {
         const data = await res.json();
-        addToast({ type: 'error', title: 'Gagal update room', description: data.error });
+        addToast({ type: 'error', title: t.common.error + ' update room', description: data.error });
         return;
       }
 
@@ -325,7 +327,7 @@ export default function TripDetailPage({ params }: { params: Promise<{ id: strin
   if (error || !trip) {
     return (
       <div style={{ padding: '24px', textAlign: 'center', color: c.textMuted }}>
-        {error || 'Trip tidak ditemukan'}
+        {error || t.common.noData}
       </div>
     );
   }

@@ -5,6 +5,7 @@ import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
 import { manasikCategories, ManasikCategory } from '@/data/mock-manasik';
 import type { ManasikLesson } from '@/data/mock-manasik';
+import { useLanguage } from '@/lib/i18n';
 
 const GREEN = '#059669';
 const GREEN_LIGHT = '#ECFDF5';
@@ -13,6 +14,7 @@ const GREEN_DARK = '#047857';
 export default function ManasikPage() {
   const { c } = useTheme();
   const { isMobile } = useResponsive();
+  const { t } = useLanguage();
   const [activeCategory, setActiveCategory] = useState<ManasikCategory>('all');
   const [selectedLesson, setSelectedLesson] = useState<ManasikLesson | null>(null);
   const [completedIds, setCompletedIds] = useState<Set<string>>(new Set());
@@ -94,7 +96,7 @@ export default function ManasikPage() {
         color: c.textMuted,
         fontSize: '15px',
       }}>
-        Memuat materi manasik...
+        {t.common.loadingData}
       </div>
     );
   }
@@ -127,7 +129,7 @@ export default function ManasikPage() {
             alignSelf: 'flex-start',
           }}
         >
-          ← Kembali ke Daftar
+          {'\u2190'} {t.manasik.backToList}
         </button>
 
         {/* Lesson content card */}
@@ -148,7 +150,7 @@ export default function ManasikPage() {
               {catInfo?.icon} {catInfo?.label}
             </span>
             <span style={{ fontSize: '12px', color: c.textMuted }}>
-              ⏱️ {selectedLesson.duration} menit
+              {'\u23F1\uFE0F'} {selectedLesson.duration} {t.manasik.labelMinutes}
             </span>
           </div>
 
@@ -270,7 +272,7 @@ export default function ManasikPage() {
               border: '1px solid ' + GREEN + '30',
             }}>
               <h3 style={{ fontSize: '14px', fontWeight: 600, color: GREEN_DARK, margin: '0 0 10px 0' }}>
-                💡 Tips Penting
+                {'\u{1F4A1}'} {t.manasik.tipsTitle}
               </h3>
               {selectedLesson.tips.map((tip, i) => (
                 <div key={i} style={{
@@ -303,7 +305,7 @@ export default function ManasikPage() {
             cursor: 'pointer',
           }}
         >
-          {isCompleted ? '✅ Sudah Selesai — Batal Tandai' : '☐ Tandai Selesai'}
+          {isCompleted ? '\u2705 ' + t.manasik.markUndone : '\u2610 ' + t.manasik.markDone}
         </button>
 
         {/* Navigation */}
@@ -323,7 +325,7 @@ export default function ManasikPage() {
               cursor: hasPrev ? 'pointer' : 'not-allowed',
             }}
           >
-            ← Sebelumnya
+            {'\u2190'} {t.common.previous}
           </button>
           <button
             onClick={goToNext}
@@ -340,7 +342,7 @@ export default function ManasikPage() {
               cursor: hasNext ? 'pointer' : 'not-allowed',
             }}
           >
-            Selanjutnya →
+            {t.common.next} {'\u2192'}
           </button>
         </div>
       </div>
@@ -358,10 +360,10 @@ export default function ManasikPage() {
           color: c.textPrimary,
           margin: '0 0 4px 0',
         }}>
-          📖 Manasik Digital
+          {'\u{1F4D6}'} {t.manasik.title}
         </h1>
         <p style={{ fontSize: '14px', color: c.textMuted, margin: 0 }}>
-          Panduan lengkap ibadah umrah
+          {t.manasik.subtitle}
         </p>
       </div>
 
@@ -401,21 +403,21 @@ export default function ManasikPage() {
               margin: '0 0 4px 0',
               lineHeight: 1.3,
             }}>
-              Baru! Manasik AR
+              {t.manasik.arTitle}
             </p>
             <p style={{
               fontSize: '13px',
               margin: '0 0 8px 0',
               opacity: 0.9,
             }}>
-              Belajar manasik dengan Augmented Reality
+              {t.manasik.arDesc}
             </p>
             <span style={{
               fontSize: '13px',
               fontWeight: 600,
               opacity: 0.95,
             }}>
-              {'Coba Sekarang \u2192'}
+              {t.manasik.arCta + ' \u2192'}
             </span>
           </div>
         </div>
@@ -429,7 +431,7 @@ export default function ManasikPage() {
         color: 'white',
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-          <span style={{ fontSize: '14px', fontWeight: 500 }}>Progress Belajar</span>
+          <span style={{ fontSize: '14px', fontWeight: 500 }}>{t.manasik.progressTitle}</span>
           <span style={{ fontSize: '14px', fontWeight: 700 }}>{completedCount}/{totalCount}</span>
         </div>
         <div style={{
@@ -447,7 +449,7 @@ export default function ManasikPage() {
           }} />
         </div>
         <p style={{ fontSize: '12px', opacity: 0.8, margin: '6px 0 0 0' }}>
-          {completedCount === 0 ? 'Mulai belajar sekarang!' : `${progressPercent}% materi selesai`}
+          {completedCount === 0 ? t.manasik.progressStart : t.manasik.progressPercent.replace('{percent}', String(progressPercent))}
         </p>
       </div>
 
@@ -545,7 +547,7 @@ export default function ManasikPage() {
                         backgroundColor: '#FEF2F2',
                         color: '#DC2626',
                       }}>
-                        Wajib
+                        {t.manasik.labelWajib}
                       </span>
                     )}
                   </div>
@@ -572,17 +574,17 @@ export default function ManasikPage() {
                   </p>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <span style={{ fontSize: '11px', color: c.textLight }}>
-                      ⏱️ {lesson.duration} menit
+                      {'\u23F1\uFE0F'} {lesson.duration} {t.manasik.labelMinutes}
                     </span>
                     {lesson.videoUrl && (
-                      <span style={{ fontSize: '11px', color: c.textLight }}>🎬 Video</span>
+                      <span style={{ fontSize: '11px', color: c.textLight }}>{'\u{1F3AC}'} {t.manasik.labelVideo}</span>
                     )}
                     <span style={{
                       fontSize: '11px',
                       fontWeight: 600,
                       color: isComplete ? GREEN : c.textLight,
                     }}>
-                      {isComplete ? '✅ Selesai' : '○ Belum'}
+                      {isComplete ? '\u2705 ' + t.manasik.labelDone : '\u25CB ' + t.manasik.labelNotDone}
                     </span>
                   </div>
                 </div>
@@ -599,7 +601,7 @@ export default function ManasikPage() {
           color: c.textMuted,
         }}>
           <span style={{ fontSize: '48px', display: 'block', marginBottom: '12px' }}>📚</span>
-          <p style={{ fontSize: '14px', margin: 0 }}>Tidak ada materi di kategori ini</p>
+          <p style={{ fontSize: '14px', margin: 0 }}>{t.manasik.empty}</p>
         </div>
       )}
     </div>

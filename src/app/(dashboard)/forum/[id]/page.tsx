@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { ArrowLeft, Clock, Eye, MessageSquare, Tag, CheckCircle2, Pin } from 'lucide-react';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
+import { useLanguage } from '@/lib/i18n';
 import { forumCategories } from '@/data/mock-forum';
 
 interface ThreadReply {
@@ -57,6 +58,7 @@ export default function ForumDetailPage({ params }: { params: Promise<{ id: stri
   const { id } = use(params);
   const { c } = useTheme();
   const { isMobile } = useResponsive();
+  const { t } = useLanguage();
   const [replyText, setReplyText] = useState('');
   const [thread, setThread] = useState<ThreadData | null>(null);
   const [replies, setReplies] = useState<ThreadReply[]>([]);
@@ -96,7 +98,7 @@ export default function ForumDetailPage({ params }: { params: Promise<{ id: stri
   if (loading) {
     return (
       <div style={{ padding: '60px 20px', textAlign: 'center' }}>
-        <p style={{ fontSize: '16px', color: c.textMuted }}>Memuat thread...</p>
+        <p style={{ fontSize: '16px', color: c.textMuted }}>{t.common.loading}</p>
       </div>
     );
   }
@@ -104,9 +106,9 @@ export default function ForumDetailPage({ params }: { params: Promise<{ id: stri
   if (!thread) {
     return (
       <div style={{ padding: '60px 20px', textAlign: 'center' }}>
-        <p style={{ fontSize: '16px', color: c.textMuted }}>Thread tidak ditemukan.</p>
+        <p style={{ fontSize: '16px', color: c.textMuted }}>{t.forum.empty}</p>
         <Link href="/forum" style={{ color: c.primary, textDecoration: 'none', fontSize: '14px' }}>
-          Kembali ke Forum
+          {t.common.back} {t.forum.title}
         </Link>
       </div>
     );
@@ -120,7 +122,7 @@ export default function ForumDetailPage({ params }: { params: Promise<{ id: stri
       {/* Back button */}
       <Link href="/forum" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '6px', color: c.textMuted, fontSize: '14px' }}>
         <ArrowLeft style={{ width: '18px', height: '18px' }} />
-        Kembali ke Forum
+        {t.common.back} {t.forum.title}
       </Link>
 
       {/* Thread */}
@@ -205,11 +207,11 @@ export default function ForumDetailPage({ params }: { params: Promise<{ id: stri
               </span>
               <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                 <Eye style={{ width: '13px', height: '13px' }} />
-                {thread.viewCount.toLocaleString()} views
+                {thread.viewCount.toLocaleString()} {t.forum.viewUnit}
               </span>
               <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                 <MessageSquare style={{ width: '13px', height: '13px' }} />
-                {thread.replyCount} replies
+                {thread.replyCount} {t.forum.replyUnit}
               </span>
             </div>
           </div>
@@ -245,7 +247,7 @@ export default function ForumDetailPage({ params }: { params: Promise<{ id: stri
       {/* Replies */}
       <div>
         <h2 style={{ fontSize: '18px', fontWeight: '600', color: c.textPrimary, margin: '0 0 16px 0' }}>
-          Balasan ({replies.length})
+          {t.forum.tableReplies} ({replies.length})
         </h2>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {replies.map((reply) => {
@@ -311,12 +313,12 @@ export default function ForumDetailPage({ params }: { params: Promise<{ id: stri
         }}
       >
         <h3 style={{ fontSize: '15px', fontWeight: '600', color: c.textPrimary, margin: '0 0 12px 0' }}>
-          Tulis Balasan
+          Write Reply
         </h3>
         <textarea
           value={replyText}
           onChange={(e) => setReplyText(e.target.value)}
-          placeholder="Tulis balasan Anda di sini..."
+          placeholder="Write your reply here..."
           style={{
             width: '100%',
             minHeight: '100px',
@@ -346,11 +348,11 @@ export default function ForumDetailPage({ params }: { params: Promise<{ id: stri
               opacity: 0.5,
             }}
           >
-            Kirim Balasan
+            {t.forum.createSubmit}
           </button>
         </div>
         <p style={{ fontSize: '12px', color: c.textMuted, margin: '8px 0 0 0' }}>
-          Fitur balasan akan tersedia dalam update selanjutnya.
+          Reply feature will be available in the next update.
         </p>
       </div>
     </div>

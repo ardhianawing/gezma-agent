@@ -8,6 +8,7 @@ import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
 import { useToast } from '@/components/ui/toast';
 import { ConfirmDialog } from '@/components/shared/confirm-dialog';
+import { useLanguage } from '@/lib/i18n';
 
 interface ScheduledReport {
   id: string;
@@ -28,6 +29,7 @@ const DAY_NAMES = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu
 export default function ScheduledReportsPage() {
   const { c } = useTheme();
   const { isMobile } = useResponsive();
+  const { t } = useLanguage();
   const router = useRouter();
 
   const [reports, setReports] = useState<ScheduledReport[]>([]);
@@ -189,7 +191,7 @@ export default function ScheduledReportsPage() {
           }}
         >
           <ArrowLeft style={{ width: '14px', height: '14px' }} />
-          Kembali
+          {t.common.back}
         </button>
         <div style={{ flex: 1 }}>
           <h1 style={{ fontSize: isMobile ? '20px' : '24px', fontWeight: 700, color: c.textPrimary, margin: 0 }}>
@@ -209,7 +211,7 @@ export default function ScheduledReportsPage() {
           }}
         >
           <Plus style={{ width: '16px', height: '16px' }} />
-          Tambah
+          {t.common.add}
         </button>
       </div>
 
@@ -232,7 +234,7 @@ export default function ScheduledReportsPage() {
           border: `1px solid ${c.border}`, padding: isMobile ? '16px' : '24px',
         }}>
           <h3 style={{ fontSize: '16px', fontWeight: 600, color: c.textPrimary, margin: '0 0 16px 0' }}>
-            {editingId ? 'Edit Laporan' : 'Tambah Laporan Baru'}
+            {editingId ? t.common.edit : t.common.add}
           </h3>
           <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '16px' }}>
             <div>
@@ -298,7 +300,7 @@ export default function ScheduledReportsPage() {
                 color: c.textSecondary, fontSize: '14px', fontWeight: 500, cursor: 'pointer',
               }}
             >
-              Batal
+              {t.common.cancel}
             </button>
             <button
               onClick={handleSubmit}
@@ -312,7 +314,7 @@ export default function ScheduledReportsPage() {
             >
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
                 {formLoading && <Loader2 style={{ width: '16px', height: '16px', animation: 'spin 1s linear infinite' }} />}
-                {formLoading ? 'Menyimpan...' : (editingId ? 'Perbarui' : 'Simpan')}
+                {formLoading ? t.common.saving : (editingId ? t.common.update : t.common.save)}
               </span>
             </button>
           </div>
@@ -321,12 +323,12 @@ export default function ScheduledReportsPage() {
 
       {/* List */}
       {loading ? (
-        <div style={{ padding: '40px', textAlign: 'center', color: c.textMuted }}>Memuat data...</div>
+        <div style={{ padding: '40px', textAlign: 'center', color: c.textMuted }}>{t.common.loadingData}</div>
       ) : reports.length === 0 ? (
         <div style={{
           backgroundColor: c.cardBg, borderRadius: '12px', border: `1px solid ${c.border}`,
         }}>
-          <EmptyState icon={FileText} title="Belum ada laporan terjadwal" />
+          <EmptyState icon={FileText} title={t.common.noData} />
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>

@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
 import { usePilgrim } from '@/lib/contexts/pilgrim-context';
+import { useLanguage } from '@/lib/i18n';
 
 const PILGRIM_GREEN = '#059669';
 const PILGRIM_GREEN_HOVER = '#047857';
@@ -16,6 +17,7 @@ export default function PilgrimLoginPage() {
   const { isMobile } = useResponsive();
   const { login } = usePilgrim();
   const router = useRouter();
+  const { t } = useLanguage();
 
   const [bookingCode, setBookingCode] = useState('');
   const [error, setError] = useState('');
@@ -31,7 +33,7 @@ export default function PilgrimLoginPage() {
     if (result.success) {
       router.replace('/pilgrim');
     } else {
-      setError(result.error || 'Gagal login demo.');
+      setError(result.error || t.pilgrimPortal.loginErrorDemo);
       setIsDemoLoading(false);
     }
   };
@@ -41,7 +43,7 @@ export default function PilgrimLoginPage() {
     setError('');
 
     if (!bookingCode.trim()) {
-      setError('Masukkan kode booking Anda');
+      setError(t.pilgrimPortal.loginErrorEmpty);
       return;
     }
 
@@ -51,7 +53,7 @@ export default function PilgrimLoginPage() {
     if (result.success) {
       router.replace('/pilgrim');
     } else {
-      setError(result.error || 'Kode booking tidak ditemukan. Periksa kembali kode Anda.');
+      setError(result.error || t.pilgrimPortal.loginErrorDefault);
       setIsSubmitting(false);
     }
   };
@@ -90,14 +92,14 @@ export default function PilgrimLoginPage() {
           margin: '0 0 4px 0',
           letterSpacing: '-0.02em',
         }}>
-          GEZMA Pilgrim
+          {t.pilgrimPortal.brand}
         </h1>
         <p style={{
           fontSize: '14px',
           color: c.textMuted,
           margin: '0 0 32px 0',
         }}>
-          Portal Jemaah Umrah
+          {t.pilgrimPortal.subtitle}
         </p>
 
         {/* Login card */}
@@ -115,7 +117,7 @@ export default function PilgrimLoginPage() {
             margin: '0 0 4px 0',
             textAlign: 'center',
           }}>
-            Masuk ke Portal
+            {t.pilgrimPortal.loginTitle}
           </h2>
           <p style={{
             fontSize: '13px',
@@ -123,7 +125,7 @@ export default function PilgrimLoginPage() {
             margin: '0 0 20px 0',
             textAlign: 'center',
           }}>
-            Gunakan kode booking dari travel agent Anda
+            {t.pilgrimPortal.loginDesc}
           </p>
 
           <form onSubmit={handleSubmit}>
@@ -134,7 +136,7 @@ export default function PilgrimLoginPage() {
               color: c.textSecondary,
               marginBottom: '6px',
             }}>
-              Kode Booking
+              {t.pilgrimPortal.bookingCodeLabel}
             </label>
             <input
               type="text"
@@ -143,7 +145,7 @@ export default function PilgrimLoginPage() {
                 setBookingCode(e.target.value.toUpperCase());
                 if (error) setError('');
               }}
-              placeholder="Contoh: UMR-2026-0001"
+              placeholder={t.pilgrimPortal.bookingCodePlaceholder}
               autoComplete="off"
               autoFocus
               style={{
@@ -213,14 +215,14 @@ export default function PilgrimLoginPage() {
                 }
               }}
             >
-              {isSubmitting ? 'Memverifikasi...' : 'Masuk'}
+              {isSubmitting ? t.pilgrimPortal.loginVerifying : t.pilgrimPortal.loginSubmit}
             </button>
           </form>
 
           {/* Divider */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', margin: '16px 0' }}>
             <div style={{ flex: 1, height: '1px', background: c.border }} />
-            <span style={{ fontSize: '12px', color: c.textMuted }}>atau</span>
+            <span style={{ fontSize: '12px', color: c.textMuted }}>{t.common.or}</span>
             <div style={{ flex: 1, height: '1px', background: c.border }} />
           </div>
 
@@ -243,7 +245,7 @@ export default function PilgrimLoginPage() {
               opacity: isSubmitting || isDemoLoading ? 0.6 : 1,
             }}
           >
-            {isDemoLoading ? 'Memverifikasi...' : 'Coba Demo (UMR-2026-DEMO)'}
+            {isDemoLoading ? t.pilgrimPortal.loginVerifying : t.pilgrimPortal.loginDemo}
           </button>
         </div>
 
@@ -255,7 +257,7 @@ export default function PilgrimLoginPage() {
           textAlign: 'center',
           lineHeight: 1.5,
         }}>
-          Hubungi travel agent Anda untuk mendapatkan kode booking
+          {t.pilgrimPortal.loginFooter}
         </p>
       </div>
     </div>

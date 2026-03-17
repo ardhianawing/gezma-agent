@@ -5,6 +5,7 @@ import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
 import { useToast } from '@/components/ui/toast';
 import { Mail, Save, ChevronLeft, ToggleLeft, ToggleRight, Loader2 } from 'lucide-react';
+import { useLanguage } from '@/lib/i18n';
 
 interface EmailTemplate {
   id: string;
@@ -53,6 +54,7 @@ const EVENT_CONFIG: Record<string, { label: string; description: string; default
 export default function EmailTemplatesPage() {
   const { c } = useTheme();
   const { isMobile } = useResponsive();
+  const { t } = useLanguage();
 
   const [templates, setTemplates] = useState<EmailTemplate[]>([]);
   const [loading, setLoading] = useState(true);
@@ -119,17 +121,17 @@ export default function EmailTemplatesPage() {
           }
           return [...prev, saved];
         });
-        setSaveSuccess('Template berhasil disimpan');
-        addToast({ type: 'success', title: 'Template berhasil disimpan' });
+        setSaveSuccess(t.common.success);
+        addToast({ type: 'success', title: t.common.success });
         setTimeout(() => {
           setEditingEvent(null);
           setSaveSuccess('');
         }, 1500);
       } else {
-        addToast({ type: 'error', title: 'Gagal menyimpan template' });
+        addToast({ type: 'error', title: t.common.error });
       }
     } catch {
-      addToast({ type: 'error', title: 'Gagal menyimpan template' });
+      addToast({ type: 'error', title: t.common.error });
     } finally {
       setSaving(false);
     }
@@ -343,7 +345,7 @@ export default function EmailTemplatesPage() {
               ) : (
                 <Save style={{ width: '16px', height: '16px' }} />
               )}
-              {saving ? 'Menyimpan...' : 'Simpan Template'}
+              {saving ? 'Menyimpan...' : t.common.save}
             </button>
           </div>
         </div>

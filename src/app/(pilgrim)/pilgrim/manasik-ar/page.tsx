@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
+import { useLanguage } from '@/lib/i18n';
 
 const GREEN = '#059669';
 const GREEN_DARK = '#047857';
@@ -39,6 +40,7 @@ const AR_FEATURES: ARFeature[] = [
 export default function ManasikARPage() {
   const { c } = useTheme();
   const { isMobile, isTablet } = useResponsive();
+  const { t } = useLanguage();
   const [email, setEmail] = useState('');
   const [hoveredFeature, setHoveredFeature] = useState<string | null>(null);
 
@@ -72,10 +74,10 @@ export default function ManasikARPage() {
           color: c.textPrimary,
           margin: '0 0 4px 0',
         }}>
-          {'\u{1F97D}'} Manasik AR
+          {'\u{1F97D}'} {t.manasik.arTitle}
         </h1>
         <p style={{ fontSize: '14px', color: c.textMuted, margin: 0 }}>
-          Belajar manasik dengan teknologi Augmented Reality
+          {t.manasik.arDesc}
         </p>
       </div>
 

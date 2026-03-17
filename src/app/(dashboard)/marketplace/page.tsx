@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { PageHeader } from '@/components/layout/page-header';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
+import { useLanguage } from '@/lib/i18n';
 import { marketCategories, MarketCategory, MarketItem } from '@/data/mock-marketplace';
 
 type SortBy = 'price_asc' | 'rating' | 'popular';
@@ -35,12 +36,14 @@ function MarketCard({
   isHovered,
   onHover,
   onLeave,
+  t,
 }: {
   item: MarketItem;
   c: Record<string, string>;
   isHovered: boolean;
   onHover: () => void;
   onLeave: () => void;
+  t: ReturnType<typeof useLanguage>['t'];
 }) {
   const badge = item.badge ? badgeColors[item.badge] : null;
   const detailEntries = Object.entries(item.details).slice(0, 3);
@@ -147,7 +150,7 @@ function MarketCard({
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px' }}>
           <StarRating rating={item.rating} />
           <span style={{ fontSize: '13px', fontWeight: 600, color: c.textPrimary }}>{item.rating}</span>
-          <span style={{ fontSize: '12px', color: c.textMuted }}>({item.reviewCount} ulasan)</span>
+          <span style={{ fontSize: '12px', color: c.textMuted }}>({item.reviewCount} {t.marketplace.reviews})</span>
         </div>
 
         {/* Tags */}
@@ -206,7 +209,7 @@ function MarketCard({
           <button
             onClick={(e) => {
               e.stopPropagation();
-              alert('Fitur pemesanan akan segera tersedia');
+              alert(t.marketplace.orderAlert);
             }}
             style={{
               padding: '8px 20px',
@@ -227,7 +230,7 @@ function MarketCard({
               (e.target as HTMLButtonElement).style.backgroundColor = c.primary;
             }}
           >
-            Pesan
+            {t.marketplace.orderBtn}
           </button>
         </div>
       </div>
@@ -238,6 +241,7 @@ function MarketCard({
 export default function MarketplacePage() {
   const { c } = useTheme();
   const { isMobile, isTablet } = useResponsive();
+  const { t } = useLanguage();
 
   const [activeCategory, setActiveCategory] = useState<MarketCategory>('hotel');
   const [searchQuery, setSearchQuery] = useState('');
@@ -281,8 +285,8 @@ export default function MarketplacePage() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
       <PageHeader
-        title="Marketplace"
-        description="Temukan layanan terbaik untuk kebutuhan umrah Anda"
+        title={t.marketplace.title}
+        description={t.marketplace.description}
       />
 
       {/* Category Tabs */}
@@ -364,7 +368,7 @@ export default function MarketplacePage() {
           </span>
           <input
             type="text"
-            placeholder="Cari layanan..."
+            placeholder={t.marketplace.searchPlaceholder}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             style={{
@@ -401,9 +405,9 @@ export default function MarketplacePage() {
             minWidth: '170px',
           }}
         >
-          <option value="popular">Terpopuler</option>
-          <option value="rating">Rating Tertinggi</option>
-          <option value="price_asc">Harga Terendah</option>
+          <option value="popular">{t.marketplace.sortPopular}</option>
+          <option value="rating">{t.marketplace.sortRating}</option>
+          <option value="price_asc">{t.marketplace.sortPrice}</option>
         </select>
       </div>
 
@@ -423,7 +427,7 @@ export default function MarketplacePage() {
         >
           {/* City Filter */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '13px', color: c.textSecondary, fontWeight: 500 }}>Kota:</span>
+            <span style={{ fontSize: '13px', color: c.textSecondary, fontWeight: 500 }}>{t.marketplace.filterCity}</span>
             {(['all', 'Makkah', 'Madinah'] as CityFilter[]).map((city) => (
               <button
                 key={city}
@@ -440,14 +444,14 @@ export default function MarketplacePage() {
                   transition: 'all 0.15s ease',
                 }}
               >
-                {city === 'all' ? 'Semua' : city}
+                {city === 'all' ? t.marketplace.filterCityAll : city}
               </button>
             ))}
           </div>
 
           {/* Min Rating Filter */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '13px', color: c.textSecondary, fontWeight: 500 }}>Min Rating:</span>
+            <span style={{ fontSize: '13px', color: c.textSecondary, fontWeight: 500 }}>{t.marketplace.filterRating}</span>
             {([0, 3, 4, 5] as MinRating[]).map((r) => (
               <button
                 key={r}
@@ -464,7 +468,7 @@ export default function MarketplacePage() {
                   transition: 'all 0.15s ease',
                 }}
               >
-                {r === 0 ? 'Semua' : `${r}\u2605+`}
+                {r === 0 ? t.marketplace.filterRatingAll : `${r}\u2605+`}
               </button>
             ))}
           </div>
@@ -473,10 +477,10 @@ export default function MarketplacePage() {
 
       {/* Results Count */}
       <div style={{ fontSize: '13px', color: c.textMuted }}>
-        Menampilkan <span style={{ fontWeight: 600, color: c.textSecondary }}>{filteredItems.length}</span> hasil
+        {t.common.showing} <span style={{ fontWeight: 600, color: c.textSecondary }}>{filteredItems.length}</span> {t.common.results}
         {searchQuery && (
           <span>
-            {' '}untuk &quot;<span style={{ fontWeight: 600, color: c.textSecondary }}>{searchQuery}</span>&quot;
+            {' '}{t.common.for} &quot;<span style={{ fontWeight: 600, color: c.textSecondary }}>{searchQuery}</span>&quot;
           </span>
         )}
       </div>
@@ -494,10 +498,7 @@ export default function MarketplacePage() {
         >
           <div style={{ fontSize: '48px', marginBottom: '12px' }}>{'\u23F3'}</div>
           <p style={{ fontSize: '16px', fontWeight: 600, color: c.textPrimary, margin: '0 0 4px' }}>
-            Memuat data...
-          </p>
-          <p style={{ fontSize: '14px', color: c.textMuted, margin: 0 }}>
-            Mohon tunggu sebentar
+            {t.common.loadingData}
           </p>
         </div>
       ) : filteredItems.length > 0 ? (
@@ -516,6 +517,7 @@ export default function MarketplacePage() {
               isHovered={hoveredCard === item.id}
               onHover={() => setHoveredCard(item.id)}
               onLeave={() => setHoveredCard(null)}
+              t={t}
             />
           ))}
         </div>
@@ -531,10 +533,10 @@ export default function MarketplacePage() {
         >
           <div style={{ fontSize: '48px', marginBottom: '12px' }}>{'\u{1F50D}'}</div>
           <p style={{ fontSize: '16px', fontWeight: 600, color: c.textPrimary, margin: '0 0 4px' }}>
-            Tidak ada hasil ditemukan
+            {t.marketplace.emptyTitle}
           </p>
           <p style={{ fontSize: '14px', color: c.textMuted, margin: 0 }}>
-            Coba ubah filter atau kata kunci pencarian Anda
+            {t.marketplace.emptyDesc}
           </p>
         </div>
       )}

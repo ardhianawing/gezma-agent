@@ -8,6 +8,7 @@ import { useResponsive } from '@/lib/hooks/use-responsive';
 import { useAuth } from '@/lib/auth';
 import { useToast } from '@/components/ui/toast';
 import { ConfirmDialog } from '@/components/shared/confirm-dialog';
+import { useLanguage } from '@/lib/i18n';
 
 interface Task {
   id: string;
@@ -27,22 +28,25 @@ interface TeamMember {
   name: string;
 }
 
-const STATUS_COLUMNS = [
-  { key: 'todo', label: 'Todo', color: '#6B7280' },
-  { key: 'in_progress', label: 'In Progress', color: '#F59E0B' },
-  { key: 'done', label: 'Done', color: '#10B981' },
-];
-
-const PRIORITY_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
-  low: { label: 'Low', color: '#6B7280', bg: '#F3F4F6' },
-  medium: { label: 'Medium', color: '#F59E0B', bg: '#FEF3C7' },
-  high: { label: 'High', color: '#EF4444', bg: '#FEE2E2' },
-};
+// STATUS_COLUMNS and PRIORITY_CONFIG moved inside component for i18n
 
 export default function TasksPage() {
   const { c } = useTheme();
   const { isMobile } = useResponsive();
   const { user: authUser } = useAuth();
+  const { t } = useLanguage();
+
+  const STATUS_COLUMNS = [
+    { key: 'todo', label: t.tasks.columnTodo, color: '#6B7280' },
+    { key: 'in_progress', label: t.tasks.columnInProgress, color: '#F59E0B' },
+    { key: 'done', label: t.tasks.columnDone, color: '#10B981' },
+  ];
+
+  const PRIORITY_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
+    low: { label: t.tasks.priorityLow, color: '#6B7280', bg: '#F3F4F6' },
+    medium: { label: t.tasks.priorityMedium, color: '#F59E0B', bg: '#FEF3C7' },
+    high: { label: t.tasks.priorityHigh, color: '#EF4444', bg: '#FEE2E2' },
+  };
 
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
@@ -127,10 +131,10 @@ export default function TasksPage() {
         setTasks((prev) => [newTask, ...prev]);
         setShowModal(false);
         setForm({ title: '', description: '', priority: 'medium', dueDate: '', assignedTo: '', assigneeName: '' });
-        addToast({ type: 'success', title: 'Task berhasil disimpan' });
+        addToast({ type: 'success', title: t.tasks.saveSuccess });
       }
     } catch {
-      addToast({ type: 'error', title: 'Gagal menyimpan task' });
+      addToast({ type: 'error', title: t.tasks.saveError });
     } finally {
       setSaving(false);
     }
@@ -157,10 +161,10 @@ export default function TasksPage() {
       const res = await fetch(`/api/tasks/${deleteTaskId}`, { method: 'DELETE' });
       if (res.ok) {
         setTasks((prev) => prev.filter((t) => t.id !== deleteTaskId));
-        addToast({ type: 'success', title: 'Task berhasil dihapus' });
+        addToast({ type: 'success', title: t.tasks.deleteSuccess });
       }
     } catch {
-      addToast({ type: 'error', title: 'Gagal menghapus task' });
+      addToast({ type: 'error', title: t.tasks.deleteError });
     } finally {
       setDeleteTaskId(null);
     }
@@ -196,10 +200,10 @@ export default function TasksPage() {
       <div style={{ display: 'flex', alignItems: isMobile ? 'stretch' : 'center', justifyContent: 'space-between', flexDirection: isMobile ? 'column' : 'row', gap: '16px' }}>
         <div>
           <h1 style={{ fontSize: isMobile ? '24px' : '28px', fontWeight: '700', color: c.textPrimary, margin: 0 }}>
-            Task Management
+            {t.tasks.title}
           </h1>
           <p style={{ fontSize: '14px', color: c.textMuted, marginTop: '4px' }}>
-            Kelola tugas tim dengan kanban board
+            {t.tasks.subtitle}
           </p>
         </div>
         <div style={{ display: 'flex', gap: '8px', flexDirection: isMobile ? 'column' : 'row' }}>
@@ -219,7 +223,7 @@ export default function TasksPage() {
               minWidth: '160px',
             }}
           >
-            <option value="">Semua Anggota</option>
+            <option value="">{t.tasks.filterAllMembers}</option>
             {teamMembers.map((m) => (
               <option key={m.id} value={m.id}>{m.name}</option>
             ))}
@@ -243,7 +247,7 @@ export default function TasksPage() {
             }}
           >
             <Plus style={{ width: '18px', height: '18px' }} />
-            Buat Task
+            {t.tasks.createTask}
           </button>
         </div>
       </div>
@@ -295,7 +299,7 @@ export default function TasksPage() {
                     <Loader2 style={{ width: '20px', height: '20px', animation: 'spin 1s linear infinite' }} />
                   </div>
                 ) : colTasks.length === 0 ? (
-                  <EmptyState icon={CheckSquare} title="Tidak ada task" />
+                  <EmptyState icon={CheckSquare} title={t.tasks.empty} />
                 ) : (
                   colTasks.map((task) => {
                     const priorityCfg = PRIORITY_CONFIG[task.priority] || PRIORITY_CONFIG.medium;
@@ -406,7 +410,7 @@ export default function TasksPage() {
           <div onClick={() => setShowModal(false)} style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)' }} />
           <div style={{ position: 'relative', width: '100%', maxWidth: '500px', margin: '0 16px', backgroundColor: c.cardBg, borderRadius: '16px', border: `1px solid ${c.border}`, padding: '28px' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
-              <h3 style={{ fontSize: '18px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>Buat Task Baru</h3>
+              <h3 style={{ fontSize: '18px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>{t.tasks.modalTitle}</h3>
               <button onClick={() => setShowModal(false)} style={{ padding: '4px', border: 'none', backgroundColor: 'transparent', cursor: 'pointer', color: c.textMuted, display: 'flex' }}>
                 <X style={{ width: '20px', height: '20px' }} />
               </button>
@@ -415,12 +419,12 @@ export default function TasksPage() {
             <form onSubmit={handleCreateTask} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               {/* Title */}
               <div>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: c.textMuted, marginBottom: '6px' }}>Judul *</label>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: c.textMuted, marginBottom: '6px' }}>{t.tasks.fieldTitle}</label>
                 <input
                   type="text"
                   value={form.title}
                   onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
-                  placeholder="Judul task"
+                  placeholder={t.tasks.fieldTitlePlaceholder}
                   required
                   style={{
                     width: '100%',
@@ -438,11 +442,11 @@ export default function TasksPage() {
 
               {/* Description */}
               <div>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: c.textMuted, marginBottom: '6px' }}>Deskripsi</label>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: c.textMuted, marginBottom: '6px' }}>{t.tasks.fieldDescription}</label>
                 <textarea
                   value={form.description}
                   onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
-                  placeholder="Deskripsi (opsional)"
+                  placeholder={t.tasks.fieldDescriptionPlaceholder}
                   rows={3}
                   style={{
                     width: '100%',
@@ -463,7 +467,7 @@ export default function TasksPage() {
               {/* Priority + Due Date */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: c.textMuted, marginBottom: '6px' }}>Prioritas</label>
+                  <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: c.textMuted, marginBottom: '6px' }}>{t.tasks.fieldPriority}</label>
                   <select
                     value={form.priority}
                     onChange={(e) => setForm((f) => ({ ...f, priority: e.target.value }))}
@@ -479,13 +483,13 @@ export default function TasksPage() {
                       cursor: 'pointer',
                     }}
                   >
-                    <option value="low">Low</option>
-                    <option value="medium">Medium</option>
-                    <option value="high">High</option>
+                    <option value="low">{t.tasks.priorityLow}</option>
+                    <option value="medium">{t.tasks.priorityMedium}</option>
+                    <option value="high">{t.tasks.priorityHigh}</option>
                   </select>
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: c.textMuted, marginBottom: '6px' }}>Tenggat</label>
+                  <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: c.textMuted, marginBottom: '6px' }}>{t.tasks.fieldDueDate}</label>
                   <input
                     type="date"
                     value={form.dueDate}
@@ -507,7 +511,7 @@ export default function TasksPage() {
 
               {/* Assignee */}
               <div>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: c.textMuted, marginBottom: '6px' }}>Ditugaskan ke</label>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: c.textMuted, marginBottom: '6px' }}>{t.tasks.fieldAssignee}</label>
                 <select
                   value={form.assignedTo}
                   onChange={(e) => handleAssigneeSelect(e.target.value)}
@@ -523,7 +527,7 @@ export default function TasksPage() {
                     cursor: 'pointer',
                   }}
                 >
-                  <option value="">-- Tidak ditugaskan --</option>
+                  <option value="">{t.tasks.fieldAssigneeNone}</option>
                   {teamMembers.map((m) => (
                     <option key={m.id} value={m.id}>{m.name}</option>
                   ))}
@@ -541,7 +545,7 @@ export default function TasksPage() {
                     borderRadius: '12px', cursor: 'pointer',
                   }}
                 >
-                  Batal
+                  {t.common.cancel}
                 </button>
                 <button
                   type="submit"
@@ -554,7 +558,7 @@ export default function TasksPage() {
                 >
                   <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
                     {saving && <Loader2 style={{ width: '16px', height: '16px', animation: 'spin 1s linear infinite' }} />}
-                    {saving ? 'Menyimpan...' : 'Buat Task'}
+                    {saving ? t.common.saving : t.tasks.createTask}
                   </span>
                 </button>
               </div>
@@ -567,9 +571,9 @@ export default function TasksPage() {
         open={!!deleteTaskId}
         onClose={() => setDeleteTaskId(null)}
         onConfirm={handleDeleteTask}
-        title="Hapus task ini?"
-        description="Task akan dihapus permanen."
-        confirmLabel="Hapus"
+        title={t.tasks.deleteConfirmTitle}
+        description={t.tasks.deleteConfirmDesc}
+        confirmLabel={t.common.delete}
         variant="destructive"
       />
 

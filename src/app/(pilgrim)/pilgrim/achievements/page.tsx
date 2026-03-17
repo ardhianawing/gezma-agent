@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
+import { useLanguage } from '@/lib/i18n';
 
 const PILGRIM_GREEN = '#059669';
 const PILGRIM_GREEN_LIGHT = '#ECFDF5';
@@ -44,6 +45,7 @@ function formatDate(dateStr: string): string {
 export default function PilgrimAchievementsPage() {
   const { c } = useTheme();
   const { isMobile } = useResponsive();
+  const { t } = useLanguage();
   const [stats, setStats] = useState<Stats | null>(null);
   const [badges, setBadges] = useState<Badge[]>([]);
   const [loading, setLoading] = useState(true);
@@ -64,7 +66,7 @@ export default function PilgrimAchievementsPage() {
   if (loading) {
     return (
       <div style={{ textAlign: 'center', padding: '60px 0', color: c.textMuted, fontSize: '14px' }}>
-        Memuat pencapaian...
+        {t.common.loadingData}
       </div>
     );
   }
@@ -94,7 +96,7 @@ export default function PilgrimAchievementsPage() {
         alignItems: 'center',
         gap: '10px',
       }}>
-        {'\u{1F3C6}'} Pencapaian
+        {'\u{1F3C6}'} {t.pilgrimPortal.achievementsTitle}
       </h1>
 
       {/* Stats bar */}

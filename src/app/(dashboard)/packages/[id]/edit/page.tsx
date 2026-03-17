@@ -9,6 +9,7 @@ import { PackageForm } from '@/components/packages/package-form';
 import type { PackageFormData } from '@/lib/validations/package';
 import type { Package } from '@/types/package';
 import { FormSkeleton } from '@/components/shared/loading-skeleton';
+import { useLanguage } from '@/lib/i18n';
 
 export default function EditPackagePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -16,6 +17,7 @@ export default function EditPackagePage({ params }: { params: Promise<{ id: stri
   const { c } = useTheme();
   const { isMobile } = useResponsive();
   const { addToast } = useToast();
+  const { t } = useLanguage();
   const [isLoading, setIsLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -26,13 +28,13 @@ export default function EditPackagePage({ params }: { params: Promise<{ id: stri
       try {
         const res = await fetch(`/api/packages/${id}`);
         if (!res.ok) {
-          setError('Gagal memuat data paket');
+          setError(t.common.error);
           return;
         }
         const data = await res.json();
         setInitialData(data);
       } catch {
-        setError('Terjadi kesalahan jaringan');
+        setError(t.common.errorNetwork);
       } finally {
         setIsFetching(false);
       }
@@ -53,17 +55,17 @@ export default function EditPackagePage({ params }: { params: Promise<{ id: stri
 
       if (!res.ok) {
         const body = await res.json();
-        const message = body.error || 'Gagal memperbarui paket';
+        const message = body.error || t.common.error;
         setError(message);
-        addToast({ type: 'error', title: 'Gagal memperbarui', description: message });
+        addToast({ type: 'error', title: t.common.error, description: message });
         return;
       }
 
-      addToast({ type: 'success', title: 'Paket berhasil diperbarui' });
+      addToast({ type: 'success', title: t.common.success });
       router.push(`/packages/${id}`);
     } catch {
-      setError('Terjadi kesalahan jaringan');
-      addToast({ type: 'error', title: 'Terjadi kesalahan jaringan' });
+      setError(t.common.errorNetwork);
+      addToast({ type: 'error', title: t.common.errorNetwork });
     } finally {
       setIsLoading(false);
     }

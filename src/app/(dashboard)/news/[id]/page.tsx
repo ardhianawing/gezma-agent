@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { ArrowLeft, Clock, Tag, User } from 'lucide-react';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
+import { useLanguage } from '@/lib/i18n';
 import { newsCategories, type NewsArticle } from '@/data/mock-news';
 
 // Generate full content for articles that have empty content
@@ -18,6 +19,7 @@ export default function NewsDetailPage({ params }: { params: Promise<{ id: strin
   const { id } = use(params);
   const { c } = useTheme();
   const { isMobile } = useResponsive();
+  const { t } = useLanguage();
   const [article, setArticle] = useState<NewsArticle | null>(null);
   const [relatedArticles, setRelatedArticles] = useState<NewsArticle[]>([]);
   const [loading, setLoading] = useState(true);
@@ -62,7 +64,7 @@ export default function NewsDetailPage({ params }: { params: Promise<{ id: strin
   if (loading) {
     return (
       <div style={{ padding: '60px 20px', textAlign: 'center' }}>
-        <p style={{ fontSize: '16px', color: c.textMuted }}>Memuat artikel...</p>
+        <p style={{ fontSize: '16px', color: c.textMuted }}>{t.common.loading}</p>
       </div>
     );
   }
@@ -70,9 +72,9 @@ export default function NewsDetailPage({ params }: { params: Promise<{ id: strin
   if (!article) {
     return (
       <div style={{ padding: '60px 20px', textAlign: 'center' }}>
-        <p style={{ fontSize: '16px', color: c.textMuted }}>Artikel tidak ditemukan.</p>
+        <p style={{ fontSize: '16px', color: c.textMuted }}>{t.news.emptyTitle}</p>
         <Link href="/news" style={{ color: c.primary, textDecoration: 'none', fontSize: '14px' }}>
-          Kembali ke Berita
+          {t.common.back} {t.news.title}
         </Link>
       </div>
     );
@@ -87,7 +89,7 @@ export default function NewsDetailPage({ params }: { params: Promise<{ id: strin
       {/* Back button */}
       <Link href="/news" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '6px', color: c.textMuted, fontSize: '14px' }}>
         <ArrowLeft style={{ width: '18px', height: '18px' }} />
-        Kembali ke Berita
+        {t.common.back} {t.news.title}
       </Link>
 
       {/* Article */}
@@ -136,7 +138,7 @@ export default function NewsDetailPage({ params }: { params: Promise<{ id: strin
               </span>
             </div>
             <span style={{ fontSize: '13px', color: c.textMuted }}>
-              {article.readTime} menit baca
+              {article.readTime} {t.news.readTime}
             </span>
           </div>
         </div>
@@ -172,7 +174,7 @@ export default function NewsDetailPage({ params }: { params: Promise<{ id: strin
       {relatedArticles.length > 0 && (
         <div>
           <h2 style={{ fontSize: '18px', fontWeight: '600', color: c.textPrimary, margin: '0 0 16px 0' }}>
-            Artikel Terkait
+            Related Articles
           </h2>
           <div
             style={{
@@ -207,7 +209,7 @@ export default function NewsDetailPage({ params }: { params: Promise<{ id: strin
                   </h3>
                   <p style={{ fontSize: '12px', color: c.textMuted, margin: 0 }}>
                     {new Date(related.publishedAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
-                    {' '}&middot; {related.readTime} menit baca
+                    {' '}&middot; {related.readTime} {t.news.readTime}
                   </p>
                 </div>
               </Link>

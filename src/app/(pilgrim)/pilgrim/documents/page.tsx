@@ -5,39 +5,45 @@ import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
 import { usePilgrim } from '@/lib/contexts/pilgrim-context';
 import { useToast } from '@/components/ui/toast';
+import { useLanguage } from '@/lib/i18n';
 
 const PILGRIM_GREEN = '#059669';
 
-const DOCUMENT_LABELS: Record<string, string> = {
-  ktp: 'KTP',
-  passport: 'Paspor',
-  photo: 'Pas Foto 4x6',
-  kk: 'Kartu Keluarga',
-  vaccine: 'Sertifikat Vaksin Meningitis',
-  akta: 'Akta Lahir / Ijazah',
-  book_nikah: 'Buku Nikah',
-  surat_mahram: 'Surat Mahram',
-};
+// DOCUMENT_LABELS are set inside the component using t
 
 const REQUIRED_DOCS = ['ktp', 'passport', 'photo', 'kk', 'vaccine', 'akta'];
 
-function getStatusStyle(status: string): { bg: string; text: string; label: string } {
-  switch (status) {
-    case 'verified':
-      return { bg: '#F0FDF4', text: '#16A34A', label: 'Terverifikasi' };
-    case 'uploaded':
-      return { bg: '#FFFBEB', text: '#D97706', label: 'Diunggah' };
-    case 'missing':
-    default:
-      return { bg: '#FEF2F2', text: '#DC2626', label: 'Belum Ada' };
-  }
-}
+// getStatusStyle is defined inside the component to access translations
 
 export default function PilgrimDocumentsPage() {
   const { c } = useTheme();
   const { isMobile } = useResponsive();
   const { data, refreshData } = usePilgrim();
   const { addToast } = useToast();
+  const { t } = useLanguage();
+
+  const DOCUMENT_LABELS: Record<string, string> = {
+    ktp: t.pilgrimDocs.ktp,
+    passport: t.pilgrimDocs.passport,
+    photo: t.pilgrimDocs.photo,
+    kk: t.pilgrimDocs.kk,
+    vaccine: t.pilgrimDocs.vaccine,
+    akta: t.pilgrimDocs.akta,
+    book_nikah: t.pilgrimDocs.bookNikah,
+    surat_mahram: t.pilgrimDocs.suratMahram,
+  };
+
+  function getStatusStyle(status: string): { bg: string; text: string; label: string } {
+    switch (status) {
+      case 'verified':
+        return { bg: '#F0FDF4', text: '#16A34A', label: t.pilgrimDocs.statusVerified };
+      case 'uploaded':
+        return { bg: '#FFFBEB', text: '#D97706', label: t.pilgrimDocs.statusUploaded };
+      case 'missing':
+      default:
+        return { bg: '#FEF2F2', text: '#DC2626', label: t.pilgrimDocs.statusMissing };
+    }
+  }
 
   const [uploading, setUploading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -125,7 +131,7 @@ export default function PilgrimDocumentsPage() {
         borderRadius: '12px', padding: '16px', marginBottom: '16px',
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-          <span style={{ fontSize: '13px', fontWeight: 600, color: c.textPrimary }}>Kelengkapan Dokumen</span>
+          <span style={{ fontSize: '13px', fontWeight: 600, color: c.textPrimary }}>{t.pilgrimPortal.docTitle}</span>
           <span style={{ fontSize: '13px', fontWeight: 600, color: PILGRIM_GREEN }}>{completedCount}/{documents.length}</span>
         </div>
         <div style={{ height: '8px', backgroundColor: c.borderLight, borderRadius: '4px', overflow: 'hidden' }}>

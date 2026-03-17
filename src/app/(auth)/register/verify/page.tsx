@@ -5,10 +5,12 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Mail, CheckCircle2, Loader2, ArrowRight } from 'lucide-react';
+import { useLanguage } from '@/lib/i18n';
 
 function VerifyEmailContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { t } = useLanguage();
   const code = searchParams.get('code');
   const [verifying, setVerifying] = useState(false);
   const [verified, setVerified] = useState(false);
@@ -24,7 +26,7 @@ function VerifyEmailContent() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || 'Verifikasi gagal');
+        setError(data.error || t.auth.verifyErrorDefault);
         setVerifying(false);
         return;
       }
@@ -37,7 +39,7 @@ function VerifyEmailContent() {
         window.location.href = '/dashboard';
       }, 1500);
     } catch {
-      setError('Terjadi kesalahan. Silakan coba lagi.');
+      setError(t.common.errorGeneric);
       setVerifying(false);
     }
   };
@@ -59,7 +61,7 @@ function VerifyEmailContent() {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', marginBottom: '40px' }}>
           <Image src="/logo-light.png" alt="GEZMA" width={36} height={36} style={{ objectFit: 'contain' }} />
           <span style={{ fontSize: '18px', fontWeight: '700', color: '#1E293B', letterSpacing: '-0.5px' }}>
-            GEZMA Agent
+            {t.auth.brandName}
           </span>
         </div>
 
@@ -91,10 +93,10 @@ function VerifyEmailContent() {
                 <CheckCircle2 style={{ width: '36px', height: '36px', color: '#16A34A' }} />
               </div>
               <h1 style={{ fontSize: '22px', fontWeight: '700', color: '#1E293B', margin: '0 0 8px 0' }}>
-                Akun Berhasil Diverifikasi!
+                {t.auth.verifySuccessTitle}
               </h1>
               <p style={{ fontSize: '14px', color: '#64748B', lineHeight: '1.6', margin: '0 0 28px 0' }}>
-                Akun Anda sudah aktif. Silakan login untuk mengakses dashboard.
+                {t.auth.verifySuccessMessage}
               </p>
               <button
                 onClick={() => router.push('/login')}
@@ -116,7 +118,7 @@ function VerifyEmailContent() {
                   transition: 'all 0.2s ease',
                 }}
               >
-                Masuk ke Dashboard
+                {t.auth.loginButton}
                 <ArrowRight style={{ width: '16px', height: '16px' }} />
               </button>
             </>
@@ -138,12 +140,12 @@ function VerifyEmailContent() {
                 <Mail style={{ width: '32px', height: '32px', color: '#D32F2F' }} />
               </div>
               <h1 style={{ fontSize: '22px', fontWeight: '700', color: '#1E293B', margin: '0 0 8px 0' }}>
-                Verifikasi Email
+                {t.auth.verifyTitle}
               </h1>
               <p style={{ fontSize: '14px', color: '#64748B', lineHeight: '1.6', margin: '0 0 24px 0' }}>
                 {code
-                  ? 'Klik tombol di bawah untuk memverifikasi akun Anda.'
-                  : 'Kami telah mengirimkan link verifikasi ke email Anda. Silakan buka email dan klik link tersebut untuk mengaktifkan akun.'}
+                  ? t.auth.verifyClickBelow
+                  : t.auth.verifyEmailSent}
               </p>
 
               {/* Error */}
@@ -193,12 +195,12 @@ function VerifyEmailContent() {
                   {verifying ? (
                     <>
                       <Loader2 style={{ width: '18px', height: '18px', animation: 'spin 1s linear infinite' }} />
-                      Memverifikasi...
+                      {t.auth.verifyButtonLoading}
                     </>
                   ) : (
                     <>
                       <CheckCircle2 style={{ width: '18px', height: '18px' }} />
-                      Verifikasi Akun Sekarang
+                      {t.auth.verifyButtonLabel}
                     </>
                   )}
                 </button>
@@ -216,7 +218,7 @@ function VerifyEmailContent() {
                     marginBottom: '20px',
                   }}
                 >
-                  Link verifikasi berlaku selama 24 jam. Cek juga folder spam jika tidak menemukan email.
+                  {t.auth.verifyInfoBox}
                 </div>
               )}
 
@@ -232,7 +234,7 @@ function VerifyEmailContent() {
                   textDecoration: 'none',
                 }}
               >
-                Kembali ke Login
+                {t.auth.forgotBackToLogin}
               </Link>
             </>
           )}
@@ -240,7 +242,7 @@ function VerifyEmailContent() {
 
         {/* Footer */}
         <p style={{ fontSize: '12px', color: '#94A3B8', marginTop: '24px' }}>
-          Butuh bantuan? Hubungi support@gezma.id
+          {t.auth.verifyNeedHelp}
         </p>
       </div>
 

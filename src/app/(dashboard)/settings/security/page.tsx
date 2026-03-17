@@ -5,6 +5,7 @@ import { PageHeader } from '@/components/layout/page-header';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
 import {
+import { useLanguage } from '@/lib/i18n';
   Shield,
   Lock,
   Eye,
@@ -56,6 +57,7 @@ function formatDateTime(dateStr: string): string {
 export default function SecuritySettingsPage() {
   const { c } = useTheme();
   const { isMobile } = useResponsive();
+  const { t } = useLanguage();
 
   // Password change
   const [currentPassword, setCurrentPassword] = useState('');
@@ -146,8 +148,8 @@ export default function SecuritySettingsPage() {
           <ChevronLeft style={{ width: '20px', height: '20px', color: c.textMuted }} />
         </Link>
         <PageHeader
-          title="Keamanan"
-          description="Kelola password dan pantau riwayat login akun Anda."
+          title={t.settings.security}
+          description={t.settings.securityDesc}
         />
       </div>
 
@@ -265,7 +267,7 @@ export default function SecuritySettingsPage() {
                   <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} />
                   Menyimpan...
                 </span>
-              ) : 'Ubah Password'}
+              ) : t.common.save}
             </button>
           </div>
         </div>

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Building2, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import { TableSkeleton } from '@/components/shared/loading-skeleton';
+import { useLanguage } from '@/lib/i18n';
 
 const cc = {
   primary: '#2563EB',
@@ -35,6 +36,7 @@ interface Agency {
 }
 
 export default function CCAgenciesPage() {
+  const { t } = useLanguage();
   const [agencies, setAgencies] = useState<Agency[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -85,7 +87,7 @@ export default function CCAgenciesPage() {
               type="text"
               value={search}
               onChange={e => setSearch(e.target.value)}
-              placeholder="Cari nama, email, PPIU..."
+              placeholder={t.common.search}
               style={{
                 width: '100%',
                 padding: '10px 14px 10px 36px',
@@ -115,7 +117,7 @@ export default function CCAgenciesPage() {
             cursor: 'pointer',
           }}
         >
-          <option value="">Semua Status</option>
+          <option value="">{t.common.all}</option>
           <option value="pending">Pending</option>
           <option value="active">Active</option>
           <option value="expiring">Expiring</option>
@@ -141,7 +143,7 @@ export default function CCAgenciesPage() {
               {loading ? (
                 <tr><td colSpan={8}><TableSkeleton rows={5} columns={6} /></td></tr>
               ) : agencies.length === 0 ? (
-                <tr><td colSpan={8} style={{ padding: '40px', textAlign: 'center', color: cc.textMuted }}>Tidak ada agensi.</td></tr>
+                <tr><td colSpan={8} style={{ padding: '40px', textAlign: 'center', color: cc.textMuted }}>{t.common.noData}</td></tr>
               ) : agencies.map(agency => {
                 const status = statusColors[agency.ppiuStatus] || statusColors.pending;
                 return (

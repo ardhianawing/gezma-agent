@@ -7,6 +7,7 @@ import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
 import { useToast } from '@/components/ui/toast';
 import {
+import { useLanguage } from '@/lib/i18n';
   ArrowLeft,
   RefreshCw,
   Lock,
@@ -120,6 +121,7 @@ export default function UmrahCashSettingsPage() {
   const { c } = useTheme();
   const { isMobile, isTablet } = useResponsive();
   const { addToast } = useToast();
+  const { t } = useLanguage();
 
   // State
   const [config, setConfig] = useState<UmrahCashConfig | null>(null);
@@ -171,8 +173,8 @@ export default function UmrahCashSettingsPage() {
       }
       if (txData.data) setTransactions(txData.data);
     } catch {
-      setMessage({ type: 'error', text: 'Gagal memuat data UmrahCash' });
-      addToast({ type: 'error', title: 'Gagal memuat data UmrahCash' });
+      setMessage({ type: 'error', text: t.common.error });
+      addToast({ type: 'error', title: t.common.error });
     } finally {
       setLoading(false);
     }
@@ -223,8 +225,8 @@ export default function UmrahCashSettingsPage() {
         addToast({ type: 'success', title: 'Pendaftaran berhasil dikirim' });
       }
     } catch {
-      setMessage({ type: 'error', text: 'Gagal mendaftar. Silakan coba lagi.' });
-      addToast({ type: 'error', title: 'Gagal mendaftar' });
+      setMessage({ type: 'error', text: t.common.errorGeneric });
+      addToast({ type: 'error', title: t.common.error });
     } finally {
       setRegisterLoading(false);
     }
@@ -248,8 +250,8 @@ export default function UmrahCashSettingsPage() {
         addToast({ type: 'success', title: 'Kurs berhasil dikunci' });
       }
     } catch {
-      setMessage({ type: 'error', text: 'Gagal mengunci kurs' });
-      addToast({ type: 'error', title: 'Gagal mengunci kurs' });
+      setMessage({ type: 'error', text: t.common.error });
+      addToast({ type: 'error', title: t.common.error });
     } finally {
       setLockLoading(false);
     }
@@ -292,8 +294,8 @@ export default function UmrahCashSettingsPage() {
         setRecipientAccount('');
       }
     } catch {
-      setMessage({ type: 'error', text: 'Gagal membuat transfer' });
-      addToast({ type: 'error', title: 'Gagal membuat transfer' });
+      setMessage({ type: 'error', text: t.common.error });
+      addToast({ type: 'error', title: t.common.error });
     } finally {
       setTransferLoading(false);
     }
@@ -368,7 +370,7 @@ export default function UmrahCashSettingsPage() {
           }}
         >
           <ArrowLeft style={{ width: '16px', height: '16px' }} />
-          Kembali ke Integrasi
+          {t.common.back}
         </Link>
         <PageHeader
           title="UmrahCash"

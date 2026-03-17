@@ -9,21 +9,25 @@ import {
   type TradeCategory,
   type TradeProduct,
 } from '@/data/mock-trade';
+import { useLanguage } from '@/lib/i18n';
 import { Search, Package, ShoppingBag, Factory, Globe, Star, MessageCircle, ChevronRight } from 'lucide-react';
 
 type TabType = 'katalog' | 'pengajuan';
 
-const curationSteps = [
-  { step: 1, label: 'Ajukan', description: 'Isi formulir pengajuan produk', emoji: '📝' },
-  { step: 2, label: 'Review', description: 'Tim kami review kelengkapan data', emoji: '🔍' },
-  { step: 3, label: 'Verifikasi', description: 'Verifikasi sertifikasi & kualitas', emoji: '✅' },
-  { step: 4, label: 'Kurasi', description: 'Kurasi oleh panel ahli ekspor', emoji: '🏆' },
-  { step: 5, label: 'Listing', description: 'Produk tayang di Trade Centre', emoji: '🚀' },
-];
+// curationSteps will be built inside component to use `t`
 
 export default function TradePage() {
   const { c } = useTheme();
   const { isMobile, isTablet } = useResponsive();
+  const { t } = useLanguage();
+
+  const curationSteps = [
+    { step: 1, label: t.trade.curationStep1, description: t.trade.curationStep1Desc, emoji: '📝' },
+    { step: 2, label: t.trade.curationStep2, description: t.trade.curationStep2Desc, emoji: '🔍' },
+    { step: 3, label: t.trade.curationStep3, description: t.trade.curationStep3Desc, emoji: '✅' },
+    { step: 4, label: t.trade.curationStep4, description: t.trade.curationStep4Desc, emoji: '🏆' },
+    { step: 5, label: t.trade.curationStep5, description: t.trade.curationStep5Desc, emoji: '🚀' },
+  ];
 
   const [activeTab, setActiveTab] = useState<TabType>('katalog');
   const [activeCategory, setActiveCategory] = useState<TradeCategory>('all');
@@ -88,10 +92,10 @@ export default function TradePage() {
   const filteredProducts = products;
 
   const stats = [
-    { label: 'Total Produk', value: apiStats.totalProducts, icon: Package, color: c.primary, bg: c.primaryLight },
-    { label: 'Listing Aktif', value: apiStats.activeListings, icon: ShoppingBag, color: c.success, bg: c.successLight },
-    { label: 'Produsen', value: apiStats.producers, icon: Factory, color: c.info, bg: c.infoLight },
-    { label: 'Negara Tujuan', value: apiStats.targetCountries, icon: Globe, color: c.warning, bg: c.warningLight },
+    { label: t.trade.statProducts, value: apiStats.totalProducts, icon: Package, color: c.primary, bg: c.primaryLight },
+    { label: t.trade.statListings, value: apiStats.activeListings, icon: ShoppingBag, color: c.success, bg: c.successLight },
+    { label: t.trade.statProducers, value: apiStats.producers, icon: Factory, color: c.info, bg: c.infoLight },
+    { label: t.trade.statCountries, value: apiStats.targetCountries, icon: Globe, color: c.warning, bg: c.warningLight },
   ];
 
   const getCategoryColor = (category: string): string => {
@@ -120,9 +124,9 @@ export default function TradePage() {
 
   const getStatusStyle = (status: string) => {
     switch (status) {
-      case 'active': return { color: c.success, bg: c.successLight, label: 'Aktif' };
-      case 'pending': return { color: c.warning, bg: c.warningLight, label: 'Menunggu Review' };
-      case 'rejected': return { color: c.error, bg: c.errorLight, label: 'Ditolak' };
+      case 'active': return { color: c.success, bg: c.successLight, label: t.trade.statusActive };
+      case 'pending': return { color: c.warning, bg: c.warningLight, label: t.trade.statusPending };
+      case 'rejected': return { color: c.error, bg: c.errorLight, label: t.trade.statusRejected };
       default: return { color: c.textMuted, bg: c.borderLight, label: status };
     }
   };
@@ -332,7 +336,7 @@ export default function TradePage() {
           <button
             onClick={(e) => {
               e.stopPropagation();
-              alert('Fitur ini akan segera tersedia');
+              alert(t.trade.contactAlert);
             }}
             style={{
               padding: '8px 20px',
@@ -347,7 +351,7 @@ export default function TradePage() {
               whiteSpace: 'nowrap',
             }}
           >
-            Hubungi
+            {t.trade.contactBtn}
           </button>
         </div>
       </div>
@@ -357,8 +361,8 @@ export default function TradePage() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '16px' : '24px' }}>
       <PageHeader
-        title="GEZMA Trade Centre"
-        description="Ekspor produk Nusantara ke dunia — difasilitasi & dikurasi"
+        title={t.trade.title}
+        description={t.trade.description}
       />
 
       {/* Stats Bar */}
@@ -413,8 +417,8 @@ export default function TradePage() {
         }}
       >
         {[
-          { key: 'katalog' as TabType, label: 'Katalog Produk' },
-          { key: 'pengajuan' as TabType, label: 'Pengajuan Saya' },
+          { key: 'katalog' as TabType, label: t.trade.tabCatalog },
+          { key: 'pengajuan' as TabType, label: t.trade.tabSubmissions },
         ].map((tab) => {
           const isActive = activeTab === tab.key;
           return (
@@ -509,7 +513,7 @@ export default function TradePage() {
               />
               <input
                 type="text"
-                placeholder="Cari produk, produsen, kota..."
+                placeholder={t.trade.searchPlaceholder}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 style={{
@@ -541,10 +545,10 @@ export default function TradePage() {
             >
               <div style={{ fontSize: '48px', marginBottom: '16px' }}>🔍</div>
               <div style={{ fontSize: '16px', fontWeight: '600', color: c.textPrimary, marginBottom: '8px' }}>
-                Produk Tidak Ditemukan
+                {t.trade.emptyTitle}
               </div>
               <div style={{ fontSize: '14px', color: c.textMuted }}>
-                Coba ubah filter atau kata kunci pencarian Anda
+                {t.trade.emptyDesc}
               </div>
             </div>
           ) : (
@@ -580,15 +584,14 @@ export default function TradePage() {
           >
             <div>
               <div style={{ fontSize: '20px', fontWeight: '700', color: c.textPrimary, marginBottom: '8px' }}>
-                Punya Produk Unggulan Indonesia?
+                {t.trade.ctaTitle}
               </div>
               <div style={{ fontSize: '14px', color: c.textSecondary, lineHeight: '1.6', maxWidth: '500px' }}>
-                Ajukan produk Anda ke GEZMA Trade Centre untuk dipasarkan ke pasar internasional.
-                Tim kami akan membantu proses kurasi dan fasilitasi ekspor.
+                {t.trade.ctaDesc}
               </div>
             </div>
             <button
-              onClick={() => alert('Fitur ini akan segera tersedia')}
+              onClick={() => alert(t.trade.contactAlert)}
               style={{
                 padding: '12px 28px',
                 fontSize: '14px',
@@ -603,7 +606,7 @@ export default function TradePage() {
                 flexShrink: 0,
               }}
             >
-              Ajukan Produk
+              {t.trade.ctaBtn}
             </button>
           </div>
 
@@ -617,7 +620,7 @@ export default function TradePage() {
             }}
           >
             <div style={{ fontSize: '16px', fontWeight: '700', color: c.textPrimary, marginBottom: '20px' }}>
-              Proses Kurasi Produk
+              {t.trade.curationTitle}
             </div>
             <div
               style={{
@@ -694,7 +697,7 @@ export default function TradePage() {
             }}
           >
             <div style={{ fontSize: '16px', fontWeight: '700', color: c.textPrimary, marginBottom: '20px' }}>
-              Produk Saya ({myProducts.length})
+              {t.trade.myProducts} ({myProducts.length})
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {myProducts.map((product) => {

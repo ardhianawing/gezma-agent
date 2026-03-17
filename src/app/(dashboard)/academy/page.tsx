@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Search, BookOpen, Award, GraduationCap, Clock, Users } from 'lucide-react';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
+import { useLanguage } from '@/lib/i18n';
 import { CardSkeleton } from '@/components/shared/loading-skeleton';
 import {
   categories,
@@ -46,6 +47,7 @@ export default function AcademyPage() {
   const { c } = useTheme();
   const { isMobile, isTablet } = useResponsive();
   const router = useRouter();
+  const { t } = useLanguage();
 
   const [activeCategory, setActiveCategory] = useState<CourseCategory>('all');
   const [activeLevel, setActiveLevel] = useState<CourseLevel>('all');
@@ -150,10 +152,10 @@ export default function AcademyPage() {
   };
 
   const getCtaLabel = (progress: CourseProgress | null) => {
-    if (!progress) return 'Daftar';
-    if (progress.percent > 0 && progress.status !== 'completed') return 'Lanjutkan';
-    if (progress.status === 'completed') return 'Lihat Ulang';
-    return 'Mulai Belajar';
+    if (!progress) return t.academy.register;
+    if (progress.percent > 0 && progress.status !== 'completed') return t.academy.continue;
+    if (progress.status === 'completed') return t.academy.review;
+    return t.academy.startLearning;
   };
 
   const handleCourseClick = (courseId: string) => {
@@ -161,10 +163,10 @@ export default function AcademyPage() {
   };
 
   const statItems = [
-    { label: 'Total Kursus', value: totalCourses, icon: BookOpen, color: c.primary },
-    { label: 'Terdaftar', value: enrolledCount, icon: Users, color: c.info },
-    { label: 'Lulus', value: completedCount, icon: GraduationCap, color: c.success },
-    { label: 'Sertifikat', value: completedCount, icon: Award, color: c.warning },
+    { label: t.academy.statCourses, value: totalCourses, icon: BookOpen, color: c.primary },
+    { label: t.academy.statEnrolled, value: enrolledCount, icon: Users, color: c.info },
+    { label: t.academy.statCompleted, value: completedCount, icon: GraduationCap, color: c.success },
+    { label: t.academy.statCertificates, value: completedCount, icon: Award, color: c.warning },
   ];
 
   return (
@@ -172,10 +174,10 @@ export default function AcademyPage() {
       {/* Header */}
       <div style={{ marginBottom: '24px' }}>
         <h1 style={{ fontSize: isMobile ? '22px' : '28px', fontWeight: 700, color: c.textPrimary, margin: 0 }}>
-          GEZMA Academy
+          {t.academy.title}
         </h1>
         <p style={{ fontSize: '14px', color: c.textMuted, margin: '4px 0 0 0' }}>
-          Tingkatkan kompetensi Anda dengan kursus berkualitas seputar haji, umrah, dan bisnis travel
+          {t.academy.description}
         </p>
       </div>
 
@@ -305,7 +307,7 @@ export default function AcademyPage() {
           />
           <input
             type="text"
-            placeholder="Cari kursus..."
+            placeholder={t.academy.searchPlaceholder}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             style={{
@@ -340,10 +342,10 @@ export default function AcademyPage() {
         >
           <div style={{ fontSize: '48px', marginBottom: '12px' }}>🔍</div>
           <h3 style={{ fontSize: '18px', fontWeight: 600, color: c.textPrimary, margin: '0 0 8px 0' }}>
-            Kursus tidak ditemukan
+            {t.academy.emptyTitle}
           </h3>
           <p style={{ fontSize: '14px', color: c.textMuted, margin: 0 }}>
-            Coba ubah filter atau kata kunci pencarian Anda
+            {t.academy.emptyDesc}
           </p>
         </div>
       ) : (
@@ -486,7 +488,7 @@ export default function AcademyPage() {
                   >
                     <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                       <BookOpen size={13} />
-                      {course.totalLessons} pelajaran
+                      {course.totalLessons} {t.academy.lessons}
                     </span>
                     <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                       <Clock size={13} />
@@ -506,7 +508,7 @@ export default function AcademyPage() {
                           marginBottom: '4px',
                         }}
                       >
-                        <span>Progress</span>
+                        <span>{t.academy.progress}</span>
                         <span style={{ fontWeight: 600, color: c.success }}>{progressPercent}%</span>
                       </div>
                       <div

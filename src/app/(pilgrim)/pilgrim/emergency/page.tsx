@@ -2,6 +2,7 @@
 
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
+import { useLanguage } from '@/lib/i18n';
 
 const GREEN = '#059669';
 const GREEN_LIGHT = '#ECFDF5';
@@ -87,6 +88,7 @@ const EMERGENCY_DATA: EmergencyContact[] = [
 export default function EmergencyContactsPage() {
   const { c } = useTheme();
   const { isMobile } = useResponsive();
+  const { t } = useLanguage();
 
   const handleShareLocation = () => {
     if (!navigator.geolocation) {

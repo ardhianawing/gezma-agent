@@ -6,11 +6,13 @@ import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
 import { useToast } from '@/components/ui/toast';
 import { useBranding } from '@/lib/contexts/branding-context';
+import { useLanguage } from '@/lib/i18n';
 
 export default function BrandingSettingsPage() {
   const { c } = useTheme();
   const { isMobile } = useResponsive();
   const { branding, refreshBranding } = useBranding();
+  const { t } = useLanguage();
 
   const [primaryColor, setPrimaryColor] = useState('#F60000');
   const [secondaryColor, setSecondaryColor] = useState('');
@@ -51,16 +53,16 @@ export default function BrandingSettingsPage() {
         }),
       });
       if (res.ok) {
-        setMessage('Branding berhasil disimpan!');
-        addToast({ type: 'success', title: 'Branding berhasil disimpan' });
+        setMessage(t.settings.brandingSaveSuccess);
+        addToast({ type: 'success', title: t.settings.brandingSaveSuccess });
         await refreshBranding();
       } else {
-        setMessage('Gagal menyimpan branding.');
-        addToast({ type: 'error', title: 'Gagal menyimpan branding' });
+        setMessage(t.settings.brandingSaveError);
+        addToast({ type: 'error', title: t.settings.brandingSaveError });
       }
     } catch {
-      setMessage('Terjadi kesalahan.');
-      addToast({ type: 'error', title: 'Terjadi kesalahan' });
+      setMessage(t.common.errorGeneric);
+      addToast({ type: 'error', title: t.common.errorGeneric });
     } finally {
       setSaving(false);
     }
@@ -119,13 +121,13 @@ export default function BrandingSettingsPage() {
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px' }}>
           <Palette style={{ width: '20px', height: '20px', color: c.primary }} />
-          <h2 style={{ fontSize: '18px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>Pengaturan Branding</h2>
+          <h2 style={{ fontSize: '18px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>{t.settings.branding}</h2>
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           {/* App Title */}
           <div>
-            <label style={labelStyle}>Nama Aplikasi</label>
+            <label style={labelStyle}>{t.settings.branding}</label>
             <input
               type="text"
               value={appTitle}
@@ -310,7 +312,7 @@ export default function BrandingSettingsPage() {
               ) : (
                 <Save style={{ width: '16px', height: '16px' }} />
               )}
-              {saving ? 'Menyimpan...' : 'Simpan'}
+              {saving ? 'Menyimpan...' : t.common.save}
             </button>
           </div>
 

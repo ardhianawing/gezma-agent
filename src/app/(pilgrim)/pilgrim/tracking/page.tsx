@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
+import { useLanguage } from '@/lib/i18n';
 
 const GREEN = '#059669';
 const GREEN_DARK = '#047857';
@@ -30,6 +31,7 @@ const MOCK_MEMBERS: GroupMember[] = [
 export default function TrackingPage() {
   const { c } = useTheme();
   const { isMobile, isTablet } = useResponsive();
+  const { t } = useLanguage();
   const [hoveredMember, setHoveredMember] = useState<string | null>(null);
 
   const cardStyle: React.CSSProperties = {

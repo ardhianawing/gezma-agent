@@ -5,6 +5,7 @@ import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
 import { Users, Search, Save, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 import { FormSkeleton } from '@/components/shared/loading-skeleton';
+import { useLanguage } from '@/lib/i18n';
 
 const PILGRIM_GREEN = '#059669';
 const PILGRIM_GREEN_LIGHT = '#ECFDF5';
@@ -35,6 +36,7 @@ interface MatchResult {
 export default function RoommatePage() {
   const { c } = useTheme();
   const { isMobile } = useResponsive();
+  const { t } = useLanguage();
 
   const [form, setForm] = useState<RoommatePreference>({
     gender: '',
@@ -308,7 +310,7 @@ export default function RoommatePage() {
           ) : (
             <Save style={{ width: '18px', height: '18px' }} />
           )}
-          {saving ? 'Menyimpan...' : 'Simpan Preferensi'}
+          {saving ? t.common.saving : t.common.save}
         </button>
       </div>
 
@@ -353,7 +355,7 @@ export default function RoommatePage() {
           ) : (
             <Search style={{ width: '18px', height: '18px' }} />
           )}
-          {matching ? 'Mencari...' : 'Cari Teman Sekamar'}
+          {matching ? t.common.processing : t.common.search}
         </button>
 
         {matchMessage && !matchResult && (

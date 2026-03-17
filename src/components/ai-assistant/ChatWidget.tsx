@@ -125,6 +125,7 @@ export default function ChatWidget() {
       {/* Floating Button */}
       {!isOpen && (
         <button
+          data-tour="chat-widget"
           onClick={() => setIsOpen(true)}
           style={{
             position: 'fixed',

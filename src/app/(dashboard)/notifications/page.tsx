@@ -6,6 +6,7 @@ import { EmptyState } from '@/components/shared/empty-state';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
 import { useToast } from '@/components/ui/toast';
+import { useLanguage } from '@/lib/i18n';
 
 interface NotificationItem {
   id: string;
@@ -46,17 +47,20 @@ const typeColors: Record<string, string> = {
   system: '#EF4444',
 };
 
-const typeLabels: Record<string, string> = {
-  task: 'Tugas',
-  payment: 'Pembayaran',
-  pilgrim: 'Jamaah',
-  trip: 'Perjalanan',
-  system: 'Sistem',
-};
+// typeLabels moved inside component for i18n
 
 export default function NotificationsPage() {
   const { c } = useTheme();
   const { isMobile } = useResponsive();
+  const { t } = useLanguage();
+
+  const typeLabels: Record<string, string> = {
+    task: t.notifications.typeTask,
+    payment: t.notifications.typePayment,
+    pilgrim: t.notifications.typePilgrim,
+    trip: t.notifications.typeTrip,
+    system: t.notifications.typeSystem,
+  };
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<'all' | 'unread'>('all');
@@ -96,7 +100,7 @@ export default function NotificationsPage() {
       await fetch('/api/notifications', { method: 'PATCH' });
       setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
       setUnreadCount(0);
-    } catch { addToast({ type: 'error', title: 'Terjadi kesalahan' }); }
+    } catch { addToast({ type: 'error', title: t.common.errorGeneric }); }
   }
 
   async function handleMarkRead(id: string) {
@@ -104,7 +108,7 @@ export default function NotificationsPage() {
       await fetch(`/api/notifications/${id}`, { method: 'PATCH' });
       setNotifications(prev => prev.map(n => n.id === id ? { ...n, isRead: true } : n));
       setUnreadCount(prev => Math.max(0, prev - 1));
-    } catch { addToast({ type: 'error', title: 'Terjadi kesalahan' }); }
+    } catch { addToast({ type: 'error', title: t.common.errorGeneric }); }
   }
 
   async function handleDelete(id: string) {
@@ -113,7 +117,7 @@ export default function NotificationsPage() {
       await fetch(`/api/notifications/${id}`, { method: 'DELETE' });
       setNotifications(prev => prev.filter(n => n.id !== id));
       if (wasUnread) setUnreadCount(prev => Math.max(0, prev - 1));
-    } catch { addToast({ type: 'error', title: 'Terjadi kesalahan' }); }
+    } catch { addToast({ type: 'error', title: t.common.errorGeneric }); }
   }
 
   const tabStyle = (active: boolean): React.CSSProperties => ({
@@ -140,10 +144,10 @@ export default function NotificationsPage() {
       }}>
         <div>
           <h1 style={{ fontSize: '24px', fontWeight: 700, color: c.textPrimary, margin: '0 0 4px 0' }}>
-            Notifikasi
+            {t.notifications.title}
           </h1>
           <p style={{ fontSize: '14px', color: c.textMuted, margin: 0 }}>
-            {unreadCount > 0 ? `${unreadCount} notifikasi belum dibaca` : 'Semua notifikasi sudah dibaca'}
+            {unreadCount > 0 ? t.notifications.unread.replace('{count}', String(unreadCount)) : t.notifications.allRead}
           </p>
         </div>
         {unreadCount > 0 && (
@@ -164,7 +168,7 @@ export default function NotificationsPage() {
             }}
           >
             <CheckCircle style={{ width: '14px', height: '14px' }} />
-            Tandai Semua Dibaca
+            {t.notifications.markAllRead}
           </button>
         )}
       </div>
@@ -172,10 +176,10 @@ export default function NotificationsPage() {
       {/* Tabs */}
       <div style={{ display: 'flex', gap: '8px' }}>
         <button style={tabStyle(tab === 'all')} onClick={() => setTab('all')}>
-          Semua
+          {t.notifications.tabAll}
         </button>
         <button style={tabStyle(tab === 'unread')} onClick={() => setTab('unread')}>
-          Belum Dibaca {unreadCount > 0 && `(${unreadCount})`}
+          {t.notifications.tabUnread} {unreadCount > 0 && `(${unreadCount})`}
         </button>
       </div>
 
@@ -188,12 +192,12 @@ export default function NotificationsPage() {
       }}>
         {loading ? (
           <div style={{ padding: '40px', textAlign: 'center', color: c.textMuted }}>
-            Memuat notifikasi...
+            {t.common.loading}
           </div>
         ) : notifications.length === 0 ? (
           <EmptyState
             icon={Bell}
-            title={tab === 'unread' ? 'Tidak ada notifikasi yang belum dibaca' : 'Belum ada notifikasi'}
+            title={tab === 'unread' ? t.notifications.emptyUnread : t.notifications.empty}
           />
         ) : (
           notifications.map((notif, i) => {
@@ -277,8 +281,8 @@ export default function NotificationsPage() {
                   {!notif.isRead && (
                     <button
                       onClick={() => handleMarkRead(notif.id)}
-                      title="Tandai dibaca"
-                      aria-label="Tandai dibaca"
+                      title={t.notifications.markRead}
+                      aria-label={t.notifications.markRead}
                       style={{
                         padding: '6px',
                         borderRadius: '8px',
@@ -292,8 +296,8 @@ export default function NotificationsPage() {
                   )}
                   <button
                     onClick={() => handleDelete(notif.id)}
-                    title="Hapus"
-                    aria-label="Hapus"
+                    title={t.common.delete}
+                    aria-label={t.common.delete}
                     style={{
                       padding: '6px',
                       borderRadius: '8px',
@@ -338,10 +342,10 @@ export default function NotificationsPage() {
             }}
           >
             <ChevronLeft style={{ width: '14px', height: '14px' }} />
-            Sebelumnya
+            {t.common.previous}
           </button>
           <span style={{ fontSize: '13px', color: c.textMuted, padding: '0 8px' }}>
-            Halaman {page} dari {totalPages}
+            {t.common.pageOf.replace('{page}', String(page)).replace('{total}', String(totalPages))}
           </span>
           <button
             disabled={page >= totalPages}
@@ -361,7 +365,7 @@ export default function NotificationsPage() {
               opacity: page >= totalPages ? 0.5 : 1,
             }}
           >
-            Selanjutnya
+            {t.common.next}
             <ChevronRight style={{ width: '14px', height: '14px' }} />
           </button>
         </div>

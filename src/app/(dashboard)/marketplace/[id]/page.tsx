@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { ArrowLeft, Star, ShoppingCart, MapPin, Tag } from 'lucide-react';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
+import { useLanguage } from '@/lib/i18n';
 import { marketCategories, MarketItem } from '@/data/mock-marketplace';
 
 const badgeColors: Record<string, { bg: string; text: string }> = {
@@ -18,6 +19,7 @@ export default function MarketplaceDetailPage({ params }: { params: Promise<{ id
   const { id } = use(params);
   const { c } = useTheme();
   const { isMobile } = useResponsive();
+  const { t } = useLanguage();
   const [ordered, setOrdered] = useState(false);
   const [item, setItem] = useState<MarketItem | null>(null);
   const [relatedItems, setRelatedItems] = useState<MarketItem[]>([]);
@@ -54,7 +56,7 @@ export default function MarketplaceDetailPage({ params }: { params: Promise<{ id
     return (
       <div style={{ padding: '60px 20px', textAlign: 'center' }}>
         <div style={{ fontSize: '48px', marginBottom: '12px' }}>{'\u23F3'}</div>
-        <p style={{ fontSize: '16px', color: c.textMuted }}>Memuat data...</p>
+        <p style={{ fontSize: '16px', color: c.textMuted }}>{t.common.loadingData}</p>
       </div>
     );
   }
@@ -62,9 +64,9 @@ export default function MarketplaceDetailPage({ params }: { params: Promise<{ id
   if (!item) {
     return (
       <div style={{ padding: '60px 20px', textAlign: 'center' }}>
-        <p style={{ fontSize: '16px', color: c.textMuted }}>Item tidak ditemukan.</p>
+        <p style={{ fontSize: '16px', color: c.textMuted }}>{t.marketplace.emptyTitle}</p>
         <Link href="/marketplace" style={{ color: c.primary, textDecoration: 'none', fontSize: '14px' }}>
-          Kembali ke Marketplace
+          {t.common.back} {t.marketplace.title}
         </Link>
       </div>
     );
@@ -82,7 +84,7 @@ export default function MarketplaceDetailPage({ params }: { params: Promise<{ id
       {/* Back button */}
       <Link href="/marketplace" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '6px', color: c.textMuted, fontSize: '14px' }}>
         <ArrowLeft style={{ width: '18px', height: '18px' }} />
-        Kembali ke Marketplace
+        {t.common.back} {t.marketplace.title}
       </Link>
 
       {/* Order toast */}
@@ -102,7 +104,7 @@ export default function MarketplaceDetailPage({ params }: { params: Promise<{ id
             boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
           }}
         >
-          Pesanan berhasil dikirim! Tim vendor akan menghubungi Anda.
+          {t.marketplace.orderAlert}
         </div>
       )}
 
@@ -176,7 +178,7 @@ export default function MarketplaceDetailPage({ params }: { params: Promise<{ id
               ))}
             </div>
             <span style={{ fontSize: '14px', fontWeight: '600', color: c.textPrimary }}>{item.rating}</span>
-            <span style={{ fontSize: '13px', color: c.textMuted }}>({item.reviewCount} reviews)</span>
+            <span style={{ fontSize: '13px', color: c.textMuted }}>({item.reviewCount} {t.marketplace.reviews})</span>
           </div>
 
           {/* Description */}
@@ -228,7 +230,7 @@ export default function MarketplaceDetailPage({ params }: { params: Promise<{ id
             }}
           >
             <div>
-              <p style={{ fontSize: '12px', color: c.textMuted, margin: 0 }}>Harga</p>
+              <p style={{ fontSize: '12px', color: c.textMuted, margin: 0 }}>{t.marketplace.sortPrice}</p>
               <p style={{ fontSize: '24px', fontWeight: '700', color: c.primary, margin: '2px 0 0 0' }}>
                 {item.price}
                 <span style={{ fontSize: '14px', fontWeight: '400', color: c.textMuted }}> {item.priceUnit}</span>
@@ -254,7 +256,7 @@ export default function MarketplaceDetailPage({ params }: { params: Promise<{ id
               }}
             >
               <ShoppingCart style={{ width: '18px', height: '18px' }} />
-              Pesan Sekarang
+              {t.marketplace.orderBtn}
             </button>
           </div>
         </div>
@@ -264,7 +266,7 @@ export default function MarketplaceDetailPage({ params }: { params: Promise<{ id
       {relatedItems.length > 0 && (
         <div>
           <h2 style={{ fontSize: '18px', fontWeight: '600', color: c.textPrimary, margin: '0 0 16px 0' }}>
-            Produk Terkait
+            Related Products
           </h2>
           <div
             style={{

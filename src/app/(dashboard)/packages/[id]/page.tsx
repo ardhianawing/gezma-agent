@@ -11,6 +11,7 @@ import { ConfirmDialog } from '@/components/shared/confirm-dialog';
 import { formatCurrency } from '@/lib/utils';
 import type { Package, ItineraryDay } from '@/types/package';
 import { DetailSkeleton } from '@/components/shared/loading-skeleton';
+import { useLanguage } from '@/lib/i18n';
 
 export default function PackageDetailPage() {
   const params = useParams();
@@ -18,6 +19,7 @@ export default function PackageDetailPage() {
   const id = params.id as string;
   const { c } = useTheme();
   const { isMobile } = useResponsive();
+  const { t } = useLanguage();
 
   const [pkg, setPkg] = useState<Package | null>(null);
   const [loading, setLoading] = useState(true);
@@ -46,14 +48,14 @@ export default function PackageDetailPage() {
     try {
       const res = await fetch(`/api/packages/${id}`, { method: 'DELETE' });
       if (res.ok) {
-        addToast({ type: 'success', title: 'Paket berhasil dihapus' });
+        addToast({ type: 'success', title: t.common.success });
         router.push('/packages');
       } else {
         const data = await res.json().catch(() => ({}));
-        addToast({ type: 'error', title: 'Gagal menghapus paket', description: data.error || 'Terjadi kesalahan' });
+        addToast({ type: 'error', title: t.common.error, description: data.error || 'Terjadi kesalahan' });
       }
     } catch {
-      addToast({ type: 'error', title: 'Terjadi kesalahan jaringan' });
+      addToast({ type: 'error', title: t.common.errorNetwork });
     }
     setDeleteTarget(false);
   };
@@ -66,13 +68,13 @@ export default function PackageDetailPage() {
       if (res.ok) {
         const newPkg = await res.json();
         router.push(`/packages/${newPkg.id}`);
-        addToast({ type: 'success', title: 'Paket berhasil diduplikasi' });
+        addToast({ type: 'success', title: t.common.success });
       } else {
         const data = await res.json().catch(() => ({}));
-        addToast({ type: 'error', title: 'Gagal menduplikasi paket', description: data.error });
+        addToast({ type: 'error', title: t.common.error, description: data.error });
       }
     } catch {
-      addToast({ type: 'error', title: 'Terjadi kesalahan jaringan' });
+      addToast({ type: 'error', title: t.common.errorNetwork });
     } finally {
       setDuplicating(false);
     }
@@ -95,10 +97,10 @@ export default function PackageDetailPage() {
         setTimeout(() => URL.revokeObjectURL(url), 100);
       } else {
         const data = await res.json().catch(() => ({}));
-        addToast({ type: 'error', title: 'Gagal membuat brosur', description: data.error });
+        addToast({ type: 'error', title: t.common.error, description: data.error });
       }
     } catch {
-      addToast({ type: 'error', title: 'Terjadi kesalahan jaringan' });
+      addToast({ type: 'error', title: t.common.errorNetwork });
     } finally {
       setGeneratingPdf(false);
     }
@@ -112,7 +114,7 @@ export default function PackageDetailPage() {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '400px' }}>
         <div style={{ textAlign: 'center' }}>
-          <p style={{ fontSize: '18px', fontWeight: '600', color: c.textPrimary }}>Paket tidak ditemukan</p>
+          <p style={{ fontSize: '18px', fontWeight: '600', color: c.textPrimary }}>{t.common.noData}</p>
           <Link href="/packages" style={{ textDecoration: 'none' }}>
             <button style={{
               display: 'inline-flex', alignItems: 'center', gap: '8px', marginTop: '16px',

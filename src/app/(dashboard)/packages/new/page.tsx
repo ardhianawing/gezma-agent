@@ -7,12 +7,14 @@ import { useResponsive } from '@/lib/hooks/use-responsive';
 import { useToast } from '@/components/ui/toast';
 import { PackageForm } from '@/components/packages/package-form';
 import type { PackageFormData } from '@/lib/validations/package';
+import { useLanguage } from '@/lib/i18n';
 
 export default function NewPackagePage() {
   const router = useRouter();
   const { c } = useTheme();
   const { isMobile } = useResponsive();
   const { addToast } = useToast();
+  const { t } = useLanguage();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -29,17 +31,17 @@ export default function NewPackagePage() {
 
       if (!res.ok) {
         const body = await res.json();
-        const message = body.error || 'Gagal menyimpan paket';
+        const message = body.error || t.packages.saveError;
         setError(message);
-        addToast({ type: 'error', title: 'Gagal menyimpan', description: message });
+        addToast({ type: 'error', title: t.common.error, description: message });
         return;
       }
 
-      addToast({ type: 'success', title: 'Paket berhasil dibuat' });
+      addToast({ type: 'success', title: t.packages.saveSuccess });
       router.push('/packages');
     } catch {
-      setError('Terjadi kesalahan jaringan');
-      addToast({ type: 'error', title: 'Terjadi kesalahan jaringan' });
+      setError(t.common.errorNetwork);
+      addToast({ type: 'error', title: t.common.errorNetwork });
     } finally {
       setIsLoading(false);
     }

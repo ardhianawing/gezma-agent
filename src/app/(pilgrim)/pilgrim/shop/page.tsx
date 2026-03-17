@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
 import { shopProducts, shopCategories, type ShopCategory } from '@/data/mock-shop';
+import { useLanguage } from '@/lib/i18n';
 
 const GREEN = '#059669';
 const GREEN_DARK = '#047857';
@@ -16,6 +17,7 @@ function formatRupiah(price: number): string {
 export default function ShopPage() {
   const { c } = useTheme();
   const { isMobile, isTablet } = useResponsive();
+  const { t } = useLanguage();
   const [activeCategory, setActiveCategory] = useState<ShopCategory>('semua');
   const [cartCount, setCartCount] = useState(0);
   const [hoveredProduct, setHoveredProduct] = useState<string | null>(null);
@@ -153,7 +155,7 @@ export default function ShopPage() {
         color: c.textMuted,
         margin: 0,
       }}>
-        Menampilkan {filteredProducts.length} produk
+        {t.common.showing} {filteredProducts.length} {t.common.results}
       </p>
 
       {/* Product Grid */}
@@ -286,7 +288,7 @@ export default function ShopPage() {
           color: c.textMuted,
         }}>
           <span style={{ fontSize: '48px', display: 'block', marginBottom: '12px' }}>{'\u{1F6D2}'}</span>
-          <p style={{ fontSize: '14px', margin: 0 }}>Tidak ada produk di kategori ini</p>
+          <p style={{ fontSize: '14px', margin: 0 }}>{t.common.noData}</p>
         </div>
       )}
     </div>

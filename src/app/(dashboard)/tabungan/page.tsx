@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { PageHeader } from '@/components/layout/page-header';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
+import { useLanguage } from '@/lib/i18n';
 
 interface Deposit {
   id: string;
@@ -43,22 +44,25 @@ function formatDate(dateStr: string): string {
   });
 }
 
-function getMethodLabel(method: string): string {
-  switch (method) {
-    case 'transfer':
-      return 'Transfer Bank';
-    case 'cash':
-      return 'Tunai';
-    case 'auto_debit':
-      return 'Auto Debit';
-    default:
-      return method;
-  }
-}
+// getMethodLabel moved inside component for i18n
 
 export default function TabunganPage() {
   const { c } = useTheme();
   const { isMobile, isTablet } = useResponsive();
+  const { t } = useLanguage();
+
+  function getMethodLabel(method: string): string {
+    switch (method) {
+      case 'transfer':
+        return t.tabungan.depositMethodTransfer;
+      case 'cash':
+        return t.tabungan.depositMethodCash;
+      case 'auto_debit':
+        return t.tabungan.depositMethodAutoDebit;
+      default:
+        return method;
+    }
+  }
 
   const [savings, setSavings] = useState<SavingsPlan | null>(null);
   const [loading, setLoading] = useState(true);
@@ -160,8 +164,8 @@ export default function TabunganPage() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
       <PageHeader
-        title="Tabungan Umrah"
-        description="Rencanakan tabungan umrah Anda"
+        title={t.tabungan.title}
+        description={t.tabungan.description}
       />
 
       {loading ? (
@@ -174,7 +178,7 @@ export default function TabunganPage() {
             border: '1px solid ' + c.border,
           }}
         >
-          <p style={{ fontSize: '14px', color: c.textMuted }}>Memuat data...</p>
+          <p style={{ fontSize: '14px', color: c.textMuted }}>{t.common.loadingData}</p>
         </div>
       ) : !savings ? (
         /* No Savings Plan */
@@ -191,10 +195,10 @@ export default function TabunganPage() {
             <>
               <div style={{ fontSize: '48px', marginBottom: '12px' }}>{'\uD83C\uDFAF'}</div>
               <p style={{ fontSize: '16px', fontWeight: 600, color: c.textPrimary, margin: '0 0 4px' }}>
-                Belum ada rencana tabungan
+                {t.tabungan.emptyTitle}
               </p>
               <p style={{ fontSize: '13px', color: c.textMuted, margin: '0 0 20px' }}>
-                Buat rencana tabungan umrah pertama Anda
+                {t.tabungan.emptyDesc}
               </p>
               <button
                 onClick={() => setShowCreateForm(true)}
@@ -210,24 +214,24 @@ export default function TabunganPage() {
                   transition: 'background-color 0.15s ease',
                 }}
               >
-                Buat Rencana Tabungan
+                {t.tabungan.createTitle}
               </button>
             </>
           ) : (
             <div style={{ textAlign: 'left', maxWidth: '500px', margin: '0 auto' }}>
               <h3 style={{ fontSize: '18px', fontWeight: 700, color: c.textPrimary, margin: '0 0 20px' }}>
-                Buat Rencana Tabungan
+                {t.tabungan.createTitle}
               </h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                 <div>
                   <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: c.textSecondary, marginBottom: '6px' }}>
-                    Nama Jamaah
+                    {t.tabungan.fieldName}
                   </label>
                   <input
                     type="text"
                     value={createForm.pilgrimName}
                     onChange={(e) => setCreateForm({ ...createForm, pilgrimName: e.target.value })}
-                    placeholder="Nama lengkap jamaah"
+                    placeholder={t.tabungan.fieldNamePlaceholder}
                     style={{
                       width: '100%',
                       padding: '10px 14px',
@@ -245,13 +249,13 @@ export default function TabunganPage() {
                 </div>
                 <div>
                   <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: c.textSecondary, marginBottom: '6px' }}>
-                    Target Tabungan
+                    {t.tabungan.fieldTarget}
                   </label>
                   <input
                     type="number"
                     value={createForm.targetAmount}
                     onChange={(e) => setCreateForm({ ...createForm, targetAmount: e.target.value })}
-                    placeholder="Contoh: 30000000"
+                    placeholder={t.tabungan.fieldTargetPlaceholder}
                     style={{
                       width: '100%',
                       padding: '10px 14px',
@@ -269,7 +273,7 @@ export default function TabunganPage() {
                 </div>
                 <div>
                   <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: c.textSecondary, marginBottom: '6px' }}>
-                    Target Tanggal
+                    {t.tabungan.fieldDate}
                   </label>
                   <input
                     type="date"
@@ -292,13 +296,13 @@ export default function TabunganPage() {
                 </div>
                 <div>
                   <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: c.textSecondary, marginBottom: '6px' }}>
-                    Nama Paket (opsional)
+                    {t.tabungan.fieldPackage}
                   </label>
                   <input
                     type="text"
                     value={createForm.packageName}
                     onChange={(e) => setCreateForm({ ...createForm, packageName: e.target.value })}
-                    placeholder="Contoh: Paket Reguler 9 Hari"
+                    placeholder={t.tabungan.fieldPackagePlaceholder}
                     style={{
                       width: '100%',
                       padding: '10px 14px',
@@ -329,7 +333,7 @@ export default function TabunganPage() {
                       cursor: 'pointer',
                     }}
                   >
-                    Batal
+                    {t.common.cancel}
                   </button>
                   <button
                     onClick={handleCreatePlan}
@@ -347,7 +351,7 @@ export default function TabunganPage() {
                       opacity: createLoading ? 0.7 : 1,
                     }}
                   >
-                    {createLoading ? 'Menyimpan...' : 'Simpan'}
+                    {createLoading ? t.common.saving : t.common.save}
                   </button>
                 </div>
               </div>
@@ -386,7 +390,7 @@ export default function TabunganPage() {
                   fontWeight: 600,
                 }}
               >
-                {savings.status === 'active' ? 'Aktif' : savings.status === 'completed' ? 'Tercapai' : 'Dibatalkan'}
+                {savings.status === 'active' ? t.tabungan.statusActive : savings.status === 'completed' ? t.tabungan.statusCompleted : t.tabungan.statusCancelled}
               </span>
             </div>
 
@@ -397,7 +401,7 @@ export default function TabunganPage() {
                   {formatCurrency(savings.currentAmount)}
                 </span>
                 <span style={{ fontSize: '13px', color: c.textMuted }}>
-                  dari {formatCurrency(savings.targetAmount)}
+                  {t.tabungan.progressFrom} {formatCurrency(savings.targetAmount)}
                 </span>
               </div>
               <div
@@ -426,7 +430,7 @@ export default function TabunganPage() {
                   {progressPercent.toFixed(1)}%
                 </span>
                 <span style={{ fontSize: '12px', color: c.textMuted }}>
-                  Target: {formatDate(savings.targetDate)}
+                  {t.tabungan.progressTarget} {formatDate(savings.targetDate)}
                 </span>
               </div>
             </div>
@@ -440,7 +444,7 @@ export default function TabunganPage() {
               }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '13px', color: c.textMuted }}>Sisa yang dibutuhkan</span>
+                <span style={{ fontSize: '13px', color: c.textMuted }}>{t.tabungan.progressRemaining}</span>
                 <span style={{ fontSize: '15px', fontWeight: 700, color: c.textPrimary }}>
                   {formatCurrency(Math.max(savings.targetAmount - savings.currentAmount, 0))}
                 </span>
@@ -458,7 +462,7 @@ export default function TabunganPage() {
             }}
           >
             <h3 style={{ fontSize: '16px', fontWeight: 700, color: c.textPrimary, margin: '0 0 16px' }}>
-              Setor Tabungan
+              {t.tabungan.depositTitle}
             </h3>
             <div
               style={{
@@ -469,13 +473,13 @@ export default function TabunganPage() {
             >
               <div>
                 <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: c.textSecondary, marginBottom: '6px' }}>
-                  Jumlah Setoran
+                  {t.tabungan.depositAmount}
                 </label>
                 <input
                   type="number"
                   value={depositForm.amount}
                   onChange={(e) => setDepositForm({ ...depositForm, amount: e.target.value })}
-                  placeholder="Masukkan jumlah"
+                  placeholder={t.tabungan.depositAmountPlaceholder}
                   style={{
                     width: '100%',
                     padding: '10px 14px',
@@ -493,7 +497,7 @@ export default function TabunganPage() {
               </div>
               <div>
                 <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: c.textSecondary, marginBottom: '6px' }}>
-                  Metode
+                  {t.tabungan.depositMethod}
                 </label>
                 <select
                   value={depositForm.method}
@@ -511,20 +515,20 @@ export default function TabunganPage() {
                     boxSizing: 'border-box',
                   }}
                 >
-                  <option value="transfer">Transfer Bank</option>
-                  <option value="cash">Tunai</option>
-                  <option value="auto_debit">Auto Debit</option>
+                  <option value="transfer">{t.tabungan.depositMethodTransfer}</option>
+                  <option value="cash">{t.tabungan.depositMethodCash}</option>
+                  <option value="auto_debit">{t.tabungan.depositMethodAutoDebit}</option>
                 </select>
               </div>
               <div>
                 <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: c.textSecondary, marginBottom: '6px' }}>
-                  Catatan (opsional)
+                  {t.tabungan.depositNotes}
                 </label>
                 <input
                   type="text"
                   value={depositForm.notes}
                   onChange={(e) => setDepositForm({ ...depositForm, notes: e.target.value })}
-                  placeholder="Catatan tambahan"
+                  placeholder={t.tabungan.depositNotesPlaceholder}
                   style={{
                     width: '100%',
                     padding: '10px 14px',
@@ -558,7 +562,7 @@ export default function TabunganPage() {
                 opacity: depositLoading ? 0.7 : 1,
               }}
             >
-              {depositLoading ? 'Memproses...' : 'Setor Sekarang'}
+              {depositLoading ? t.tabungan.depositLoading : t.tabungan.depositSubmit}
             </button>
           </div>
 
@@ -572,13 +576,13 @@ export default function TabunganPage() {
             }}
           >
             <h3 style={{ fontSize: '16px', fontWeight: 700, color: c.textPrimary, margin: '0 0 16px' }}>
-              Riwayat Setoran
+              {t.tabungan.historyTitle}
             </h3>
 
             {savings.deposits.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '30px 0' }}>
                 <p style={{ fontSize: '13px', color: c.textMuted, margin: 0 }}>
-                  Belum ada setoran
+                  {t.tabungan.historyEmpty}
                 </p>
               </div>
             ) : (
@@ -628,7 +632,7 @@ export default function TabunganPage() {
                           {deposit.notes ? ` - ${deposit.notes}` : ''}
                         </span>
                         <span style={{ fontSize: '12px', color: c.textSecondary }}>
-                          Saldo: {formatCurrency(deposit.balanceAfter)}
+                          {t.tabungan.historyBalance} {formatCurrency(deposit.balanceAfter)}
                         </span>
                       </div>
                     </div>

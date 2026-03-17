@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { ArrowLeft, BookOpen, Clock, CheckCircle, Circle, ChevronDown, ChevronUp, User, Award, FileQuestion, Star, Trash2, Send, Loader2 } from 'lucide-react';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
+import { useLanguage } from '@/lib/i18n';
 import { useToast } from '@/components/ui/toast';
 import { ConfirmDialog } from '@/components/shared/confirm-dialog';
 import { levels, categories } from '@/data/mock-academy';
@@ -74,6 +75,7 @@ function renderMarkdown(md: string): string {
 export default function CourseDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { c } = useTheme();
   const { isMobile } = useResponsive();
+  const { t } = useLanguage();
   const router = useRouter();
 
   const [courseId, setCourseId] = useState<string>('');
@@ -219,14 +221,14 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
       });
       const data = await res.json();
       if (res.ok) {
-        setReviewMessage({ type: 'success', text: 'Ulasan berhasil dikirim' });
+        setReviewMessage({ type: 'success', text: t.common.success });
         setReviewComment('');
         fetchReviews();
       } else {
-        setReviewMessage({ type: 'error', text: data.error || 'Gagal mengirim ulasan' });
+        setReviewMessage({ type: 'error', text: data.error || t.common.errorGeneric });
       }
     } catch {
-      setReviewMessage({ type: 'error', text: 'Terjadi kesalahan' });
+      setReviewMessage({ type: 'error', text: t.common.errorGeneric });
     } finally {
       setSubmittingReview(false);
     }
@@ -237,13 +239,13 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
     try {
       const res = await fetch(`/api/academy/${courseId}/reviews/${deleteReviewTarget}`, { method: 'DELETE' });
       if (res.ok) {
-        addToast({ type: 'success', title: 'Ulasan berhasil dihapus' });
+        addToast({ type: 'success', title: t.common.success });
         fetchReviews();
       } else {
-        addToast({ type: 'error', title: 'Gagal menghapus ulasan' });
+        addToast({ type: 'error', title: t.common.errorGeneric });
       }
     } catch {
-      addToast({ type: 'error', title: 'Terjadi kesalahan' });
+      addToast({ type: 'error', title: t.common.errorGeneric });
     }
     setDeleteReviewTarget(null);
   };
@@ -281,7 +283,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
     return (
       <div style={{ padding: isMobile ? '16px' : '24px', maxWidth: '900px', margin: '0 auto' }}>
         <div style={{ textAlign: 'center', padding: '60px 20px', color: c.textMuted }}>
-          Memuat kursus...
+          {t.common.loading}
         </div>
       </div>
     );
@@ -293,7 +295,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
         <div style={{ textAlign: 'center', padding: '60px 20px' }}>
           <div style={{ fontSize: '48px', marginBottom: '12px' }}>404</div>
           <h3 style={{ fontSize: '18px', fontWeight: 600, color: c.textPrimary, margin: '0 0 8px 0' }}>
-            Kursus tidak ditemukan
+            {t.academy.emptyTitle}
           </h3>
           <button
             onClick={() => router.push('/academy')}
@@ -303,7 +305,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
               fontSize: '14px', fontWeight: 600, cursor: 'pointer',
             }}
           >
-            Kembali ke Academy
+            {t.common.back} {t.academy.title}
           </button>
         </div>
       </div>
@@ -324,7 +326,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
         }}
       >
         <ArrowLeft size={16} />
-        Kembali
+        {t.common.back}
       </button>
 
       {/* Course Header */}
@@ -380,7 +382,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
           </span>
           <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
             <BookOpen size={14} />
-            {course.totalLessons} pelajaran
+            {course.totalLessons} {t.academy.lessons}
           </span>
           <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
             <Clock size={14} />
@@ -389,7 +391,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
           {avgRating > 0 && (
             <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
               <Star size={14} color="#F59E0B" />
-              {avgRating} ({totalReviews} ulasan)
+              {avgRating} ({totalReviews} reviews)
             </span>
           )}
         </div>
@@ -400,7 +402,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
             display: 'flex', justifyContent: 'space-between', fontSize: '12px',
             color: c.textMuted, marginBottom: '6px',
           }}>
-            <span>Progress Belajar</span>
+            <span>{t.academy.progress}</span>
             <span style={{ fontWeight: 600, color: progressPercent >= 100 ? c.success : c.primary }}>
               {progressPercent}%
               {course.progress && ` (${course.progress.completedLessons}/${course.progress.totalLessons})`}
@@ -419,7 +421,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
               display: 'flex', alignItems: 'center', gap: '4px',
             }}>
               <CheckCircle size={14} />
-              Kursus selesai!
+              Course completed!
             </div>
           )}
         </div>
@@ -437,7 +439,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
               }}
             >
               <FileQuestion size={16} />
-              {quizPassed ? 'Lihat Quiz' : 'Mulai Quiz'}
+              {quizPassed ? `${t.common.view} Quiz` : `${t.academy.startLearning} Quiz`}
               {quizBestScore !== null && (
                 <span style={{ fontSize: '12px', opacity: 0.8 }}>(Skor terbaik: {quizBestScore}%)</span>
               )}
@@ -456,7 +458,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
               }}
             >
               <Award size={16} />
-              Unduh Sertifikat
+              {t.common.download} Certificate
             </button>
           )}
         </div>
@@ -465,7 +467,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
       {/* Lesson List */}
       <div style={{ marginBottom: '24px' }}>
         <h2 style={{ fontSize: '18px', fontWeight: 700, color: c.textPrimary, margin: '0 0 16px 0' }}>
-          Daftar Pelajaran
+          Lessons
         </h2>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -532,7 +534,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
                   <div style={{ padding: '0 16px 16px 16px', borderTop: '1px solid ' + c.borderLight }}>
                     {isLoadingContent ? (
                       <div style={{ padding: '20px', textAlign: 'center', color: c.textMuted, fontSize: '13px' }}>
-                        Memuat materi...
+                        {t.common.loading}
                       </div>
                     ) : content ? (
                       <>
@@ -570,7 +572,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
                             }}
                           >
                             <CheckCircle size={16} />
-                            {isMarking ? 'Menyimpan...' : 'Selesai'}
+                            {isMarking ? t.common.saving : t.status.completed}
                           </button>
                         )}
                         {completed && (
@@ -581,13 +583,13 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
                             fontSize: '14px', fontWeight: 600,
                           }}>
                             <CheckCircle size={16} />
-                            Sudah diselesaikan
+                            {t.status.completed}
                           </div>
                         )}
                       </>
                     ) : (
                       <div style={{ padding: '20px', textAlign: 'center', color: c.textMuted, fontSize: '13px' }}>
-                        Gagal memuat materi
+                        {t.common.errorGeneric}
                       </div>
                     )}
                   </div>
@@ -601,7 +603,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
       {/* Reviews Section */}
       <div style={{ marginBottom: '24px' }}>
         <h2 style={{ fontSize: '18px', fontWeight: 700, color: c.textPrimary, margin: '0 0 16px 0' }}>
-          Ulasan ({totalReviews})
+          {t.academy.review} ({totalReviews})
         </h2>
 
         {/* Average Rating */}
@@ -616,7 +618,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
               <div style={{ display: 'flex', gap: '2px', justifyContent: 'center' }}>
                 {renderStars(Math.round(avgRating))}
               </div>
-              <div style={{ fontSize: '12px', color: c.textMuted, marginTop: '2px' }}>{totalReviews} ulasan</div>
+              <div style={{ fontSize: '12px', color: c.textMuted, marginTop: '2px' }}>{totalReviews} reviews</div>
             </div>
           </div>
         )}
@@ -627,7 +629,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
           borderRadius: '12px', padding: '16px', marginBottom: '16px',
         }}>
           <h3 style={{ fontSize: '14px', fontWeight: 600, color: c.textPrimary, margin: '0 0 12px 0' }}>
-            Tulis Ulasan
+            Write {t.academy.review}
           </h3>
           <div style={{ display: 'flex', gap: '2px', marginBottom: '12px' }}>
             {renderStars(reviewRating, true, setReviewRating)}
@@ -635,7 +637,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
           <textarea
             value={reviewComment}
             onChange={e => setReviewComment(e.target.value)}
-            placeholder="Tulis komentar Anda (opsional)..."
+            placeholder="Write your comment (optional)..."
             style={{
               width: '100%', minHeight: '80px', padding: '10px 12px',
               fontSize: '14px', border: `1px solid ${c.border}`, borderRadius: '8px',
@@ -668,7 +670,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
             ) : (
               <Send size={14} />
             )}
-            {submittingReview ? 'Mengirim...' : 'Kirim Ulasan'}
+            {submittingReview ? t.common.sending : `${t.common.submit} ${t.academy.review}`}
           </button>
         </div>
 
@@ -679,7 +681,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
               backgroundColor: c.cardBg, border: '1px solid ' + c.borderLight,
               borderRadius: '12px', padding: '24px', textAlign: 'center',
             }}>
-              <p style={{ fontSize: '14px', color: c.textMuted, margin: 0 }}>Belum ada ulasan</p>
+              <p style={{ fontSize: '14px', color: c.textMuted, margin: 0 }}>{t.common.noData}</p>
             </div>
           ) : reviews.map(review => (
             <div key={review.id} style={{
@@ -708,7 +710,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
                       display: 'inline-flex', padding: '4px', border: 'none',
                       backgroundColor: 'transparent', cursor: 'pointer', color: c.error,
                     }}
-                    title="Hapus ulasan"
+                    title={t.common.delete}
                   >
                     <Trash2 size={14} />
                   </button>
@@ -722,9 +724,9 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
         open={!!deleteReviewTarget}
         onClose={() => setDeleteReviewTarget(null)}
         onConfirm={handleDeleteReview}
-        title="Hapus ulasan Anda?"
-        description="Ulasan akan dihapus permanen."
-        confirmLabel="Hapus"
+        title={`${t.common.delete} review?`}
+        description="This review will be permanently deleted."
+        confirmLabel={t.common.delete}
         variant="destructive"
       />
     </div>

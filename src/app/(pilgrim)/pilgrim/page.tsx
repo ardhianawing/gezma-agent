@@ -5,20 +5,12 @@ import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
 import { usePilgrim } from '@/lib/contexts/pilgrim-context';
 import { PrayerTimesWidget } from '@/components/pilgrim/prayer-times-widget';
+import { useLanguage } from '@/lib/i18n';
 
 const PILGRIM_GREEN = '#059669';
 const PILGRIM_GREEN_LIGHT = '#ECFDF5';
 
-const STATUS_STEPS = [
-  { key: 'lead', label: 'Pendaftaran' },
-  { key: 'dp', label: 'DP' },
-  { key: 'lunas', label: 'Lunas' },
-  { key: 'dokumen', label: 'Dokumen' },
-  { key: 'visa', label: 'Visa' },
-  { key: 'ready', label: 'Siap' },
-  { key: 'departed', label: 'Berangkat' },
-  { key: 'completed', label: 'Selesai' },
-];
+// STATUS_STEPS labels are set inside component using t
 
 function formatCurrency(amount: number): string {
   return 'Rp ' + new Intl.NumberFormat('id-ID').format(amount);
@@ -29,15 +21,15 @@ function formatDate(dateStr: string): string {
   return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
 }
 
-function getDocStatusColor(status: string, c: ReturnType<typeof useTheme>['c']): { bg: string; text: string; label: string } {
+function getDocStatusColor(status: string, labels: { verified: string; uploaded: string; missing: string }): { bg: string; text: string; label: string } {
   switch (status) {
     case 'verified':
-      return { bg: '#F0FDF4', text: '#16A34A', label: 'Terverifikasi' };
+      return { bg: '#F0FDF4', text: '#16A34A', label: labels.verified };
     case 'uploaded':
-      return { bg: '#FFFBEB', text: '#D97706', label: 'Diunggah' };
+      return { bg: '#FFFBEB', text: '#D97706', label: labels.uploaded };
     case 'missing':
     default:
-      return { bg: '#FEF2F2', text: '#DC2626', label: 'Belum Ada' };
+      return { bg: '#FEF2F2', text: '#DC2626', label: labels.missing };
   }
 }
 
@@ -52,7 +44,25 @@ export default function PilgrimDashboardPage() {
   const { c } = useTheme();
   const { isMobile } = useResponsive();
   const { data } = usePilgrim();
+  const { t } = useLanguage();
   const [gamification, setGamification] = useState<GamificationStats | null>(null);
+
+  const STATUS_STEPS = [
+    { key: 'lead', label: t.pilgrimPortal.stepRegistration },
+    { key: 'dp', label: t.pilgrimPortal.stepDp },
+    { key: 'lunas', label: t.pilgrimPortal.stepPaid },
+    { key: 'dokumen', label: t.pilgrimPortal.stepDocuments },
+    { key: 'visa', label: t.pilgrimPortal.stepVisa },
+    { key: 'ready', label: t.pilgrimPortal.stepReady },
+    { key: 'departed', label: t.pilgrimPortal.stepDeparted },
+    { key: 'completed', label: t.pilgrimPortal.stepCompleted },
+  ];
+
+  const docStatusLabels = {
+    verified: t.pilgrimPortal.docVerified,
+    uploaded: t.pilgrimPortal.docUploaded,
+    missing: t.pilgrimPortal.docMissing,
+  };
 
   useEffect(() => {
     fetch('/api/pilgrim-portal/gamification/stats')
@@ -91,7 +101,7 @@ export default function PilgrimDashboardPage() {
           color: c.textMuted,
           margin: '0 0 2px 0',
         }}>
-          Assalamu&apos;alaikum,
+          {t.pilgrimPortal.greeting}
         </p>
         <h1 style={{
           fontSize: isMobile ? '22px' : '26px',
@@ -121,7 +131,7 @@ export default function PilgrimDashboardPage() {
 
       {/* Status progress card */}
       <div style={cardStyle}>
-        <h2 style={sectionTitleStyle}>Status Umrah</h2>
+        <h2 style={sectionTitleStyle}>{t.pilgrimPortal.statusTitle}</h2>
         <div style={{
           display: 'flex',
           alignItems: 'center',
@@ -196,10 +206,10 @@ export default function PilgrimDashboardPage() {
         marginBottom: '16px',
       }}>
         {[
-          { emoji: '\u{1F4C5}', label: 'Keberangkatan', value: formatDate(trip.departureDate) },
-          { emoji: '\u{2708}\u{FE0F}', label: 'Maskapai', value: trip.airline },
-          { emoji: '\u{1F3E8}', label: 'Hotel Makkah', value: trip.makkahHotel + ' ' + '\u{2B50}'.repeat(trip.makkahHotelRating > 3 ? 3 : trip.makkahHotelRating) + (trip.makkahHotelRating > 3 ? '+' : '') },
-          { emoji: '\u{1F3E8}', label: 'Hotel Madinah', value: trip.madinahHotel + ' ' + '\u{2B50}'.repeat(trip.madinahHotelRating > 3 ? 3 : trip.madinahHotelRating) + (trip.madinahHotelRating > 3 ? '+' : '') },
+          { emoji: '\u{1F4C5}', label: t.pilgrimPortal.infoDeparture, value: formatDate(trip.departureDate) },
+          { emoji: '\u{2708}\u{FE0F}', label: t.pilgrimPortal.infoAirline, value: trip.airline },
+          { emoji: '\u{1F3E8}', label: t.pilgrimPortal.infoHotelMakkah, value: trip.makkahHotel + ' ' + '\u{2B50}'.repeat(trip.makkahHotelRating > 3 ? 3 : trip.makkahHotelRating) + (trip.makkahHotelRating > 3 ? '+' : '') },
+          { emoji: '\u{1F3E8}', label: t.pilgrimPortal.infoHotelMadinah, value: trip.madinahHotel + ' ' + '\u{2B50}'.repeat(trip.madinahHotelRating > 3 ? 3 : trip.madinahHotelRating) + (trip.madinahHotelRating > 3 ? '+' : '') },
         ].map((item, i) => (
           <div key={i} style={{
             backgroundColor: c.cardBg,
@@ -232,30 +242,30 @@ export default function PilgrimDashboardPage() {
       {/* Payment summary card */}
       <div style={cardStyle}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-          <h2 style={{ ...sectionTitleStyle, margin: 0 }}>Ringkasan Pembayaran</h2>
+          <h2 style={{ ...sectionTitleStyle, margin: 0 }}>{t.pilgrimPortal.paymentTitle}</h2>
           <a href="/pilgrim/payments" style={{
             fontSize: '13px', fontWeight: 600, color: PILGRIM_GREEN,
             textDecoration: 'none',
           }}>
-            Lihat Detail &rarr;
+            {t.pilgrimPortal.paymentViewDetail} &rarr;
           </a>
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '14px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '13px', color: c.textMuted }}>Total Paket</span>
+            <span style={{ fontSize: '13px', color: c.textMuted }}>{t.pilgrimPortal.paymentTotal}</span>
             <span style={{ fontSize: '14px', fontWeight: 600, color: c.textPrimary }}>
               {formatCurrency(totalPackagePrice)}
             </span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '13px', color: c.textMuted }}>Sudah Dibayar</span>
+            <span style={{ fontSize: '13px', color: c.textMuted }}>{t.pilgrimPortal.paymentPaid}</span>
             <span style={{ fontSize: '14px', fontWeight: 600, color: '#16A34A' }}>
               {formatCurrency(totalPaid)}
             </span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '13px', color: c.textMuted }}>Sisa Pembayaran</span>
+            <span style={{ fontSize: '13px', color: c.textMuted }}>{t.pilgrimPortal.paymentRemaining}</span>
             <span style={{ fontSize: '14px', fontWeight: 600, color: remainingBalance > 0 ? '#DC2626' : '#16A34A' }}>
               {formatCurrency(remainingBalance)}
             </span>
@@ -284,14 +294,14 @@ export default function PilgrimDashboardPage() {
           margin: 0,
           textAlign: 'right',
         }}>
-          {paymentPercentage}% terbayar
+          {paymentPercentage}% {t.pilgrimPortal.paymentPercent}
         </p>
 
         {/* Payment history */}
         {payments.length > 0 && (
           <div style={{ marginTop: '14px', borderTop: '1px solid ' + c.borderLight, paddingTop: '14px' }}>
             <p style={{ fontSize: '12px', fontWeight: 600, color: c.textMuted, margin: '0 0 8px 0', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-              Riwayat Pembayaran
+              {t.pilgrimPortal.paymentHistory}
             </p>
             {payments.map((pay) => (
               <div key={pay.id} style={{
@@ -320,10 +330,10 @@ export default function PilgrimDashboardPage() {
 
       {/* Document checklist card */}
       <div style={cardStyle}>
-        <h2 style={sectionTitleStyle}>Kelengkapan Dokumen</h2>
+        <h2 style={sectionTitleStyle}>{t.pilgrimPortal.docTitle}</h2>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           {documents.map((doc) => {
-            const statusInfo = getDocStatusColor(doc.status, c);
+            const statusInfo = getDocStatusColor(doc.status, docStatusLabels);
             return (
               <div key={doc.type} style={{
                 display: 'flex',
@@ -364,7 +374,7 @@ export default function PilgrimDashboardPage() {
 
       {/* Agency contact card */}
       <div style={cardStyle}>
-        <h2 style={sectionTitleStyle}>Travel Agent</h2>
+        <h2 style={sectionTitleStyle}>{t.pilgrimPortal.agencyTitle}</h2>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '14px' }}>
           <span style={{
             width: '44px',
@@ -409,7 +419,7 @@ export default function PilgrimDashboardPage() {
               fontWeight: 600,
             }}
           >
-            WhatsApp
+            {t.pilgrimPortal.agencyWa}
           </a>
           <a
             href={'tel:' + agency.phone}
@@ -429,7 +439,7 @@ export default function PilgrimDashboardPage() {
               fontWeight: 600,
             }}
           >
-            Telepon
+            {t.pilgrimPortal.agencyPhone}
           </a>
         </div>
       </div>
@@ -446,22 +456,22 @@ export default function PilgrimDashboardPage() {
           }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
               <h2 style={{ fontSize: '15px', fontWeight: 600, color: '#FFFFFF', margin: 0 }}>
-                {'\u{1F3C6}'} Pencapaian Anda
+                {'\u{1F3C6}'} {t.pilgrimPortal.achievementsTitle}
               </h2>
-              <span style={{ fontSize: '12px', opacity: 0.85 }}>Lihat semua &rarr;</span>
+              <span style={{ fontSize: '12px', opacity: 0.85 }}>{t.pilgrimPortal.achievementsViewAll} &rarr;</span>
             </div>
             <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
               <div style={{ textAlign: 'center' }}>
                 <p style={{ fontSize: '24px', fontWeight: 700, margin: 0 }}>Lv.{gamification.level}</p>
-                <p style={{ fontSize: '11px', opacity: 0.8, margin: '2px 0 0 0' }}>Level</p>
+                <p style={{ fontSize: '11px', opacity: 0.8, margin: '2px 0 0 0' }}>{t.gamification.statLevel}</p>
               </div>
               <div style={{ textAlign: 'center' }}>
                 <p style={{ fontSize: '24px', fontWeight: 700, margin: 0 }}>{gamification.totalPoints}</p>
-                <p style={{ fontSize: '11px', opacity: 0.8, margin: '2px 0 0 0' }}>Poin</p>
+                <p style={{ fontSize: '11px', opacity: 0.8, margin: '2px 0 0 0' }}>{t.gamification.statPoints}</p>
               </div>
               <div style={{ textAlign: 'center' }}>
                 <p style={{ fontSize: '24px', fontWeight: 700, margin: 0 }}>{gamification.badgeCount}</p>
-                <p style={{ fontSize: '11px', opacity: 0.8, margin: '2px 0 0 0' }}>Badge</p>
+                <p style={{ fontSize: '11px', opacity: 0.8, margin: '2px 0 0 0' }}>{t.gamification.statBadge}</p>
               </div>
             </div>
           </div>
@@ -470,7 +480,7 @@ export default function PilgrimDashboardPage() {
 
       {/* Muthawwif card */}
       <div style={cardStyle}>
-        <h2 style={sectionTitleStyle}>Pembimbing (Muthawwif)</h2>
+        <h2 style={sectionTitleStyle}>{t.pilgrimPortal.guideTitle}</h2>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <span style={{
             width: '40px',
@@ -507,7 +517,7 @@ export default function PilgrimDashboardPage() {
               fontWeight: 600,
             }}
           >
-            Chat
+            {t.pilgrimPortal.guideChat}
           </a>
         </div>
       </div>

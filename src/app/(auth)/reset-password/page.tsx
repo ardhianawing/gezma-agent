@@ -5,10 +5,12 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowLeft, Loader2, Lock, CheckCircle2, Eye, EyeOff } from 'lucide-react';
+import { useLanguage } from '@/lib/i18n';
 
 function ResetPasswordContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { t } = useLanguage();
   const code = searchParams.get('code');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -32,13 +34,13 @@ function ResetPasswordContent() {
       >
         <div style={{ width: '100%', maxWidth: '420px', textAlign: 'center' }}>
           <p style={{ color: '#64748B', fontSize: '14px', marginBottom: '16px' }}>
-            Link reset password tidak valid atau sudah kedaluwarsa.
+            {t.auth.resetInvalidLink}
           </p>
           <Link
             href="/forgot-password"
             style={{ color: '#D32F2F', fontWeight: '600', fontSize: '14px', textDecoration: 'none' }}
           >
-            Minta link reset baru
+            {t.auth.resetRequestNew}
           </Link>
         </div>
       </div>
@@ -50,12 +52,12 @@ function ResetPasswordContent() {
     setError('');
 
     if (password.length < 8) {
-      setError('Password minimal 8 karakter');
+      setError(t.auth.resetMinLength);
       return;
     }
 
     if (password !== confirmPassword) {
-      setError('Konfirmasi password tidak cocok');
+      setError(t.auth.resetMismatch);
       return;
     }
 
@@ -71,7 +73,7 @@ function ResetPasswordContent() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || 'Terjadi kesalahan');
+        setError(data.error || t.common.error);
         setIsLoading(false);
         return;
       }
@@ -83,7 +85,7 @@ function ResetPasswordContent() {
         router.push('/login');
       }, 2000);
     } catch {
-      setError('Terjadi kesalahan. Silakan coba lagi.');
+      setError(t.common.errorGeneric);
       setIsLoading(false);
     }
   };
@@ -115,7 +117,7 @@ function ResetPasswordContent() {
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '36px' }}>
           <Image src="/logo-light.png" alt="GEZMA" width={36} height={36} style={{ objectFit: 'contain' }} />
           <span style={{ fontSize: '18px', fontWeight: '700', color: '#1E293B', letterSpacing: '-0.5px' }}>
-            GEZMA Agent
+            {t.auth.brandName}
           </span>
         </div>
 
@@ -136,10 +138,10 @@ function ResetPasswordContent() {
               <CheckCircle2 style={{ width: '32px', height: '32px', color: '#16A34A' }} />
             </div>
             <h2 style={{ fontSize: '22px', fontWeight: '700', color: '#1E293B', margin: '0 0 8px 0' }}>
-              Password Berhasil Direset
+              {t.auth.resetSuccessTitle}
             </h2>
             <p style={{ fontSize: '14px', color: '#64748B', margin: '0 0 24px 0', lineHeight: '1.6' }}>
-              Password Anda telah diperbarui. Anda akan diarahkan ke halaman login...
+              {t.auth.resetSuccessMessage}
             </p>
             <Link
               href="/login"
@@ -154,16 +156,16 @@ function ResetPasswordContent() {
               }}
             >
               <ArrowLeft style={{ width: '16px', height: '16px' }} />
-              Ke halaman Login
+              {t.auth.resetGoToLogin}
             </Link>
           </div>
         ) : (
           <>
             <h2 style={{ fontSize: '22px', fontWeight: '700', color: '#1E293B', margin: '0 0 6px 0' }}>
-              Reset Password
+              {t.auth.resetTitle}
             </h2>
             <p style={{ fontSize: '14px', color: '#64748B', margin: '0 0 24px 0' }}>
-              Masukkan password baru untuk akun Anda
+              {t.auth.resetSubtitle}
             </p>
 
             {error && (
@@ -189,7 +191,7 @@ function ResetPasswordContent() {
                   htmlFor="password"
                   style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#334155', marginBottom: '6px' }}
                 >
-                  Password Baru
+                  {t.auth.resetNewPasswordLabel}
                 </label>
                 <div style={{ position: 'relative' }}>
                   <Lock
@@ -207,7 +209,7 @@ function ResetPasswordContent() {
                   <input
                     id="password"
                     type={showPassword ? 'text' : 'password'}
-                    placeholder="Minimal 8 karakter"
+                    placeholder={t.auth.resetNewPasswordPlaceholder}
                     value={password}
                     onChange={(e) => { setPassword(e.target.value); setError(''); }}
                     required
@@ -237,7 +239,7 @@ function ResetPasswordContent() {
                   htmlFor="confirmPassword"
                   style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#334155', marginBottom: '6px' }}
                 >
-                  Konfirmasi Password
+                  {t.auth.resetConfirmLabel}
                 </label>
                 <div style={{ position: 'relative' }}>
                   <Lock
@@ -255,7 +257,7 @@ function ResetPasswordContent() {
                   <input
                     id="confirmPassword"
                     type={showConfirm ? 'text' : 'password'}
-                    placeholder="Ulangi password baru"
+                    placeholder={t.auth.resetConfirmPlaceholder}
                     value={confirmPassword}
                     onChange={(e) => { setConfirmPassword(e.target.value); setError(''); }}
                     required
@@ -304,10 +306,10 @@ function ResetPasswordContent() {
                 {isLoading ? (
                   <>
                     <Loader2 style={{ width: '18px', height: '18px', animation: 'spin 1s linear infinite' }} />
-                    Menyimpan...
+                    {t.auth.resetSubmitLoading}
                   </>
                 ) : (
-                  'Simpan Password Baru'
+                  t.auth.resetSubmit
                 )}
               </button>
             </form>
@@ -318,7 +320,7 @@ function ResetPasswordContent() {
                 style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: '#D32F2F', fontWeight: '600', textDecoration: 'none' }}
               >
                 <ArrowLeft style={{ width: '14px', height: '14px' }} />
-                Kembali ke Login
+                {t.auth.forgotBackToLogin}
               </Link>
             </p>
           </>

@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
 import { usePilgrim } from '@/lib/contexts/pilgrim-context';
+import { useLanguage } from '@/lib/i18n';
 
 const GREEN = '#059669';
 const GREEN_LIGHT = '#ECFDF5';
@@ -37,19 +38,22 @@ function getStarString(rating: number): string {
 
 type StatusKey = 'open' | 'preparing' | 'confirmed' | 'ready' | 'departed' | 'completed';
 
-const STATUS_CONFIG: Record<StatusKey, { label: string; bg: string; color: string }> = {
-  open: { label: 'Pendaftaran', bg: '#DBEAFE', color: '#1D4ED8' },
-  preparing: { label: 'Persiapan', bg: '#FEF3C7', color: '#D97706' },
-  confirmed: { label: 'Terkonfirmasi', bg: '#D1FAE5', color: '#059669' },
-  ready: { label: 'Siap Berangkat', bg: '#D1FAE5', color: '#059669' },
-  departed: { label: 'Sedang Berlangsung', bg: '#DBEAFE', color: '#2563EB' },
-  completed: { label: 'Selesai', bg: '#F3F4F6', color: '#6B7280' },
-};
+// STATUS_CONFIG labels are set inside the component using t
 
 export default function TripDetailPage() {
   const { c } = useTheme();
   const { isMobile } = useResponsive();
   const { data } = usePilgrim();
+  const { t } = useLanguage();
+
+  const STATUS_CONFIG: Record<StatusKey, { label: string; bg: string; color: string }> = {
+    open: { label: t.pilgrimTrip.statusOpen, bg: '#DBEAFE', color: '#1D4ED8' },
+    preparing: { label: t.pilgrimTrip.statusPreparing, bg: '#FEF3C7', color: '#D97706' },
+    confirmed: { label: t.pilgrimTrip.statusConfirmed, bg: '#D1FAE5', color: '#059669' },
+    ready: { label: t.pilgrimTrip.statusReady, bg: '#D1FAE5', color: '#059669' },
+    departed: { label: t.pilgrimTrip.statusDeparted, bg: '#DBEAFE', color: '#2563EB' },
+    completed: { label: t.pilgrimTrip.statusCompleted, bg: '#F3F4F6', color: '#6B7280' },
+  };
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
   const [now, setNow] = useState(() => new Date());
   const [shareLoading, setShareLoading] = useState(false);
@@ -87,9 +91,9 @@ export default function TripDetailPage() {
     try {
       const res = await fetch('/api/pilgrim-portal/share-itinerary', { method: 'POST' });
       const json = await res.json();
-      if (!res.ok) throw new Error(json.error || 'Gagal membuat link');
+      if (!res.ok) throw new Error(json.error || t.common.error);
       await navigator.clipboard.writeText(json.shareUrl);
-      setShareMessage('Link berhasil disalin!');
+      setShareMessage(t.pilgrimTrip.shareSuccess);
       setTimeout(() => setShareMessage(''), 3000);
     } catch (err) {
       setShareMessage(err instanceof Error ? err.message : 'Gagal membagikan');
@@ -109,7 +113,7 @@ export default function TripDetailPage() {
         color: c.textMuted,
         fontSize: '16px',
       }}>
-        Silakan login terlebih dahulu
+        {t.pilgrimTrip.loginRequired}
       </div>
     );
   }
@@ -126,7 +130,7 @@ export default function TripDetailPage() {
         color: c.textMuted,
       }}>
         <span style={{ fontSize: '48px' }}>&#9992;&#65039;</span>
-        <p style={{ fontSize: '16px', margin: 0 }}>Belum ada trip yang terdaftar</p>
+        <p style={{ fontSize: '16px', margin: 0 }}>{t.pilgrimTrip.noTrip}</p>
       </div>
     );
   }
@@ -208,7 +212,7 @@ export default function TripDetailPage() {
                 alignItems: 'center',
                 gap: '6px',
               }}>
-                &#9202; {duration} Hari
+                &#9202; {duration} {t.pilgrimTrip.duration}
               </span>
             </div>
           </div>
@@ -237,30 +241,30 @@ export default function TripDetailPage() {
       }}>
         {countdown?.type === 'completed' ? (
           <>
-            <p style={{ fontSize: '14px', margin: '0 0 8px 0', opacity: 0.9 }}>Status Perjalanan</p>
-            <p style={{ fontSize: '28px', fontWeight: 700, margin: 0 }}>Selesai</p>
+            <p style={{ fontSize: '14px', margin: '0 0 8px 0', opacity: 0.9 }}>{t.pilgrimTrip.countdownStatus}</p>
+            <p style={{ fontSize: '28px', fontWeight: 700, margin: 0 }}>{t.pilgrimTrip.countdownCompleted}</p>
             <p style={{ fontSize: '13px', margin: '8px 0 0 0', opacity: 0.8 }}>
-              Alhamdulillah, semoga menjadi umrah yang mabrur
+              {t.pilgrimTrip.countdownCompletedMsg}
             </p>
           </>
         ) : countdown?.type === 'ongoing' ? (
           <>
-            <p style={{ fontSize: '14px', margin: '0 0 8px 0', opacity: 0.9 }}>Perjalanan Hari Ke</p>
+            <p style={{ fontSize: '14px', margin: '0 0 8px 0', opacity: 0.9 }}>{t.pilgrimTrip.countdownDay}</p>
             <p style={{ fontSize: '48px', fontWeight: 800, margin: 0, lineHeight: 1.1 }}>
               {countdown.days}
             </p>
             <p style={{ fontSize: '15px', margin: '8px 0 0 0', opacity: 0.9, fontWeight: 500 }}>
-              Sedang Berlangsung
+              {t.pilgrimTrip.countdownOngoing}
             </p>
           </>
         ) : (
           <>
-            <p style={{ fontSize: '14px', margin: '0 0 8px 0', opacity: 0.9 }}>Menuju Keberangkatan</p>
+            <p style={{ fontSize: '14px', margin: '0 0 8px 0', opacity: 0.9 }}>{t.pilgrimTrip.countdownUpcoming}</p>
             <p style={{ fontSize: '48px', fontWeight: 800, margin: 0, lineHeight: 1.1 }}>
               {countdown?.days ?? 0}
             </p>
             <p style={{ fontSize: '15px', margin: '8px 0 0 0', opacity: 0.9, fontWeight: 500 }}>
-              Hari Lagi
+              {t.pilgrimTrip.countdownDays}
             </p>
             <p style={{ fontSize: '12px', margin: '4px 0 0 0', opacity: 0.7 }}>
               {formatDate(trip.departureDate)}
@@ -290,13 +294,13 @@ export default function TripDetailPage() {
           opacity: shareLoading ? 0.7 : 1,
         }}
       >
-        {shareLoading ? 'Membuat link...' : '\u{1F517} Bagikan Itinerary'}
+        {shareLoading ? t.pilgrimTrip.shareLoading : '\u{1F517} ' + t.pilgrimTrip.shareBtn}
       </button>
       {shareMessage && (
         <p style={{
           fontSize: '13px',
           fontWeight: 500,
-          color: shareMessage.includes('berhasil') ? GREEN : '#DC2626',
+          color: shareMessage === t.pilgrimTrip.shareSuccess ? GREEN : '#DC2626',
           textAlign: 'center',
           margin: '4px 0 0 0',
         }}>
@@ -323,7 +327,7 @@ export default function TripDetailPage() {
             color: c.textPrimary,
             margin: 0,
           }}>
-            Informasi Penerbangan
+            {t.pilgrimTrip.flightTitle}
           </h2>
         </div>
 
@@ -351,7 +355,7 @@ export default function TripDetailPage() {
               &#9992;&#65039;
             </span>
             <div>
-              <p style={{ fontSize: '12px', color: c.textMuted, margin: '0 0 2px 0' }}>Maskapai</p>
+              <p style={{ fontSize: '12px', color: c.textMuted, margin: '0 0 2px 0' }}>{t.pilgrimTrip.airline}</p>
               <p style={{ fontSize: '14px', fontWeight: 500, color: c.textPrimary, margin: 0 }}>
                 {trip.airline}
               </p>
@@ -369,7 +373,7 @@ export default function TripDetailPage() {
               borderRadius: '10px',
             }}>
               <p style={{ fontSize: '11px', color: GREEN_DARK, margin: '0 0 4px 0', fontWeight: 500 }}>
-                &#128205; Keberangkatan
+                &#128205; {t.pilgrimTrip.departureLabel}
               </p>
               <p style={{ fontSize: '13px', fontWeight: 600, color: GREEN, margin: 0 }}>
                 {formatDate(trip.departureDate)}
@@ -381,7 +385,7 @@ export default function TripDetailPage() {
               borderRadius: '10px',
             }}>
               <p style={{ fontSize: '11px', color: GREEN_DARK, margin: '0 0 4px 0', fontWeight: 500 }}>
-                &#128205; Kepulangan
+                &#128205; {t.pilgrimTrip.returnLabel}
               </p>
               <p style={{ fontSize: '13px', fontWeight: 600, color: GREEN, margin: 0 }}>
                 {formatDate(trip.returnDate)}
@@ -416,7 +420,7 @@ export default function TripDetailPage() {
               color: c.textPrimary,
               margin: 0,
             }}>
-              Hotel Makkah
+              {t.pilgrimTrip.hotelMakkah}
             </h3>
           </div>
           <p style={{
@@ -432,7 +436,7 @@ export default function TripDetailPage() {
             color: c.textMuted,
             margin: '0 0 6px 0',
           }}>
-            {getStarString(trip.makkahHotelRating)} ({trip.makkahHotelRating} bintang)
+            {getStarString(trip.makkahHotelRating)} ({trip.makkahHotelRating} {t.pilgrimTrip.starUnit})
           </p>
           {trip.makkahHotelDistance && (
             <p style={{
@@ -465,7 +469,7 @@ export default function TripDetailPage() {
               color: c.textPrimary,
               margin: 0,
             }}>
-              Hotel Madinah
+              {t.pilgrimTrip.hotelMadinah}
             </h3>
           </div>
           <p style={{
@@ -481,7 +485,7 @@ export default function TripDetailPage() {
             color: c.textMuted,
             margin: '0 0 6px 0',
           }}>
-            {getStarString(trip.madinahHotelRating)} ({trip.madinahHotelRating} bintang)
+            {getStarString(trip.madinahHotelRating)} ({trip.madinahHotelRating} {t.pilgrimTrip.starUnit})
           </p>
           {trip.madinahHotelDistance && (
             <p style={{
@@ -515,7 +519,7 @@ export default function TripDetailPage() {
             color: c.textPrimary,
             margin: 0,
           }}>
-            Muthawwif / Pembimbing
+            {t.pilgrimTrip.guideTitle}
           </h2>
         </div>
 
@@ -567,7 +571,7 @@ export default function TripDetailPage() {
                 transition: 'background-color 0.15s',
               }}
             >
-              &#128222; Telepon
+              &#128222; {t.pilgrimTrip.callBtn}
             </a>
             <a
               href={`https://wa.me/${trip.muthawwifPhone.replace(/[^0-9]/g, '')}`}
@@ -587,7 +591,7 @@ export default function TripDetailPage() {
                 transition: 'background-color 0.15s',
               }}
             >
-              &#128172; WhatsApp
+              &#128172; {t.pilgrimTrip.waBtn}
             </a>
           </div>
         </div>
@@ -602,10 +606,10 @@ export default function TripDetailPage() {
           if (!roomNumber && !roomType) return null;
 
           const roomTypeLabel: Record<string, string> = {
-            single: 'Single (1 orang)',
-            double: 'Double (2 orang)',
-            triple: 'Triple (3 orang)',
-            quad: 'Quad (4 orang)',
+            single: t.pilgrimTrip.roomSingle,
+            double: t.pilgrimTrip.roomDouble,
+            triple: t.pilgrimTrip.roomTriple,
+            quad: t.pilgrimTrip.roomQuad,
           };
 
           return (
@@ -627,7 +631,7 @@ export default function TripDetailPage() {
                   color: c.textPrimary,
                   margin: 0,
                 }}>
-                  Kamar Anda
+                  {t.pilgrimTrip.roomTitle}
                 </h2>
               </div>
 
@@ -643,7 +647,7 @@ export default function TripDetailPage() {
                     borderRadius: '10px',
                   }}>
                     <p style={{ fontSize: '12px', color: GREEN_DARK, margin: '0 0 4px 0', fontWeight: 500 }}>
-                      &#127976; Nomor Kamar
+                      &#127976; {t.pilgrimTrip.roomNumber}
                     </p>
                     <p style={{ fontSize: '18px', fontWeight: 700, color: GREEN, margin: 0 }}>
                       {roomNumber}
@@ -657,7 +661,7 @@ export default function TripDetailPage() {
                     borderRadius: '10px',
                   }}>
                     <p style={{ fontSize: '12px', color: GREEN_DARK, margin: '0 0 4px 0', fontWeight: 500 }}>
-                      &#128716;&#65039; Tipe Kamar
+                      &#128716;&#65039; {t.pilgrimTrip.roomType}
                     </p>
                     <p style={{ fontSize: '15px', fontWeight: 600, color: GREEN, margin: 0, textTransform: 'capitalize' }}>
                       {roomTypeLabel[roomType] || roomType}
@@ -690,7 +694,7 @@ export default function TripDetailPage() {
             color: '#DC2626',
             margin: 0,
           }}>
-            Darurat / SOS
+            {t.pilgrimTrip.sosTitle}
           </h2>
         </div>
 
@@ -715,10 +719,10 @@ export default function TripDetailPage() {
             <span style={{ fontSize: '18px' }}>{'\u{1F4DE}'}</span>
             <div>
               <p style={{ fontSize: '14px', fontWeight: 600, color: '#DC2626', margin: '0 0 2px 0' }}>
-                Hubungi 997 (Saudi Emergency)
+                {t.pilgrimTrip.sosSaudi}
               </p>
               <p style={{ fontSize: '12px', color: '#991B1B', margin: 0 }}>
-                Ketuk untuk menelepon
+                {t.pilgrimTrip.sosTap}
               </p>
             </div>
           </a>
@@ -740,7 +744,7 @@ export default function TripDetailPage() {
               <span style={{ fontSize: '18px' }}>{'\u{1F4DE}'}</span>
               <div>
                 <p style={{ fontSize: '14px', fontWeight: 600, color: GREEN_DARK, margin: '0 0 2px 0' }}>
-                  Hubungi Muthawwif
+                  {t.pilgrimTrip.sosGuide}
                 </p>
                 <p style={{ fontSize: '12px', color: GREEN, margin: 0 }}>
                   {trip.muthawwifName} - {trip.muthawwifPhone}
@@ -771,7 +775,7 @@ export default function TripDetailPage() {
               color: c.textPrimary,
               margin: 0,
             }}>
-              Jadwal Perjalanan
+              {t.pilgrimTrip.itineraryTitle}
             </h2>
           </div>
 
@@ -863,7 +867,7 @@ export default function TripDetailPage() {
                           borderRadius: '10px',
                           verticalAlign: 'middle',
                         }}>
-                          Hari Ini
+                          {t.pilgrimTrip.itineraryToday}
                         </span>
                       )}
                     </h4>

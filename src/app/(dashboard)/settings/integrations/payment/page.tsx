@@ -6,6 +6,7 @@ import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
 import { useToast } from '@/components/ui/toast';
 import {
+import { useLanguage } from '@/lib/i18n';
   ArrowLeft,
   Save,
   Copy,
@@ -65,6 +66,7 @@ export default function PaymentConfigPage() {
   const { c } = useTheme();
   const { isMobile } = useResponsive();
   const { addToast } = useToast();
+  const { t } = useLanguage();
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -92,7 +94,7 @@ export default function PaymentConfigPage() {
         setConfig(data);
       })
       .catch(() => {
-        setMessage({ type: 'error', text: 'Gagal memuat konfigurasi' });
+        setMessage({ type: 'error', text: t.common.error });
       })
       .finally(() => setLoading(false));
   }, []);
@@ -115,15 +117,15 @@ export default function PaymentConfigPage() {
       });
       const data = await res.json();
       if (!res.ok) {
-        setMessage({ type: 'error', text: data.error || 'Gagal menyimpan' });
+        setMessage({ type: 'error', text: data.error || t.common.error });
       } else {
         setConfig(data);
-        setMessage({ type: 'success', text: 'Konfigurasi berhasil disimpan' });
-        addToast({ type: 'success', title: 'Konfigurasi berhasil disimpan' });
+        setMessage({ type: 'success', text: t.common.success });
+        addToast({ type: 'success', title: t.common.success });
       }
     } catch {
-      setMessage({ type: 'error', text: 'Terjadi kesalahan' });
-      addToast({ type: 'error', title: 'Gagal menyimpan konfigurasi' });
+      setMessage({ type: 'error', text: t.common.errorGeneric });
+      addToast({ type: 'error', title: t.common.error });
     } finally {
       setSaving(false);
     }
@@ -642,7 +644,7 @@ export default function PaymentConfigPage() {
           ) : (
             <Save style={{ width: '16px', height: '16px' }} />
           )}
-          {saving ? 'Menyimpan...' : 'Simpan Konfigurasi'}
+          {saving ? 'Menyimpan...' : t.common.save}
         </button>
       </div>
     </div>

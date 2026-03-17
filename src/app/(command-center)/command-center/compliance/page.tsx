@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ShieldCheck, ChevronDown, ChevronUp, Filter, Building2 } from 'lucide-react';
 import { useResponsive } from '@/lib/hooks/use-responsive';
+import { useLanguage } from '@/lib/i18n';
 
 const cc = {
   primary: '#2563EB',
@@ -61,6 +62,7 @@ function getScoreBarColor(score: number): string {
 
 export default function CompliancePage() {
   const { isMobile } = useResponsive();
+  const { t } = useLanguage();
   const [agencies, setAgencies] = useState<ComplianceAgency[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -240,9 +242,9 @@ export default function CompliancePage() {
 
       {/* Results */}
       {loading ? (
-        <p style={{ textAlign: 'center', color: cc.textMuted, padding: '40px 0' }}>Memuat data compliance...</p>
+        <p style={{ textAlign: 'center', color: cc.textMuted, padding: '40px 0' }}>{t.common.loadingData}</p>
       ) : agencies.length === 0 ? (
-        <p style={{ textAlign: 'center', color: cc.textMuted, padding: '40px 0' }}>Tidak ada data agensi.</p>
+        <p style={{ textAlign: 'center', color: cc.textMuted, padding: '40px 0' }}>{t.common.noData}</p>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           {agencies.map((agency) => {

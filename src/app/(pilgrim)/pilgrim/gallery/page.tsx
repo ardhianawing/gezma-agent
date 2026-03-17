@@ -5,6 +5,7 @@ import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
 import { useToast } from '@/components/ui/toast';
 import { ConfirmDialog } from '@/components/shared/confirm-dialog';
+import { useLanguage } from '@/lib/i18n';
 import { Loader2 } from 'lucide-react';
 
 const GREEN = '#059669';
@@ -32,6 +33,7 @@ export default function GalleryPage() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { addToast } = useToast();
+  const { t } = useLanguage();
 
   const gridCols = isMobile ? '1fr 1fr' : isTablet ? '1fr 1fr 1fr' : '1fr 1fr 1fr 1fr';
 
@@ -276,7 +278,7 @@ export default function GalleryPage() {
           >
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
               {submitting && <Loader2 style={{ width: '16px', height: '16px', animation: 'spin 1s linear infinite' }} />}
-              {submitting ? 'Mengunggah...' : 'Simpan Foto'}
+              {submitting ? t.common.processing : t.common.save}
             </span>
           </button>
         </div>
@@ -337,7 +339,7 @@ export default function GalleryPage() {
                         backgroundColor: 'transparent', border: 'none', cursor: 'pointer', padding: '2px 4px',
                       }}
                     >
-                      Unduh
+                      {t.common.download}
                     </button>
                     <button
                       onClick={() => setDeletePhotoId(photo.id)}
@@ -348,7 +350,7 @@ export default function GalleryPage() {
                         opacity: deletingId === photo.id ? 0.5 : 1,
                       }}
                     >
-                      Hapus
+                      {t.common.delete}
                     </button>
                   </div>
                 </div>
@@ -389,7 +391,7 @@ export default function GalleryPage() {
                 border: 'none', borderRadius: '8px', cursor: 'pointer',
               }}
             >
-              Unduh Foto
+              {t.common.download}
             </button>
             <button
               onClick={() => setPreviewPhoto(null)}
@@ -399,7 +401,7 @@ export default function GalleryPage() {
                 border: '1px solid rgba(255,255,255,0.3)', borderRadius: '8px', cursor: 'pointer',
               }}
             >
-              Tutup
+              {t.common.close}
             </button>
           </div>
         </div>

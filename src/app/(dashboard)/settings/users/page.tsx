@@ -11,6 +11,7 @@ import { ConfirmDialog } from '@/components/shared/confirm-dialog';
 import { usePermission } from '@/lib/hooks/use-permissions';
 import { PERMISSIONS } from '@/lib/permissions';
 import { ROLE_PERMISSIONS, PERMISSION_GROUPS } from '@/lib/permissions';
+import { useLanguage } from '@/lib/i18n';
 
 interface UserData {
   id: string;
@@ -41,6 +42,7 @@ export default function UsersPage() {
   const { c } = useTheme();
   const { isMobile } = useResponsive();
   const { can } = usePermission();
+  const { t } = useLanguage();
   const [users, setUsers] = useState<UserData[]>([]);
   const [showPermissions, setShowPermissions] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -166,8 +168,8 @@ export default function UsersPage() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '16px' : '24px' }}>
       <PageHeader
-        title="User Management"
-        description="Kelola staff dan hak akses pengguna"
+        title={t.settings.users}
+        description={t.settings.teamDesc}
         actions={
           <button
             onClick={openCreate}
@@ -187,7 +189,7 @@ export default function UsersPage() {
             }}
           >
             <Plus style={{ width: '20px', height: '20px' }} />
-            <span>Tambah User</span>
+            <span>{t.common.add} User</span>
           </button>
         }
       />
@@ -202,9 +204,9 @@ export default function UsersPage() {
         }}
       >
         {loading ? (
-          <div style={{ padding: '40px', textAlign: 'center', color: c.textSecondary }}>Memuat data...</div>
+          <div style={{ padding: '40px', textAlign: 'center', color: c.textSecondary }}>{t.common.loadingData}</div>
         ) : users.length === 0 ? (
-          <EmptyState icon={Users} title="Belum ada user" description="Tambahkan user baru untuk memulai." />
+          <EmptyState icon={Users} title={t.common.noData} description={t.common.noData} />
         ) : (
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
@@ -290,7 +292,7 @@ export default function UsersPage() {
             <Shield style={{ width: '18px', height: '18px', color: c.textMuted }} />
             <span style={{ fontSize: '14px', fontWeight: '600' }}>Permission Matrix per Role</span>
           </div>
-          <span style={{ fontSize: '12px', color: c.textMuted }}>{showPermissions ? 'Tutup' : 'Lihat'}</span>
+          <span style={{ fontSize: '12px', color: c.textMuted }}>{showPermissions ? t.common.close : t.common.view}</span>
         </button>
         {showPermissions && (
           <div style={{ overflowX: 'auto', borderTop: `1px solid ${c.border}` }}>
@@ -363,7 +365,7 @@ export default function UsersPage() {
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
               <h2 style={{ fontSize: '18px', fontWeight: '700', color: c.textPrimary, margin: 0 }}>
-                {editingId ? 'Edit User' : 'Tambah User'}
+                {editingId ? `${t.common.edit} User` : `${t.common.add} User`}
               </h2>
               <button onClick={() => setShowModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}>
                 <X style={{ width: '20px', height: '20px', color: c.textSecondary }} />
@@ -444,7 +446,7 @@ export default function UsersPage() {
                 onClick={() => setShowModal(false)}
                 style={{ padding: '10px 20px', borderRadius: '8px', border: `1px solid ${c.border}`, backgroundColor: 'transparent', color: c.textPrimary, fontWeight: '500', cursor: 'pointer', fontSize: '14px' }}
               >
-                Batal
+                {t.common.cancel}
               </button>
               <button
                 onClick={handleSave}
@@ -454,9 +456,9 @@ export default function UsersPage() {
                 {saving ? (
                   <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
                     <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} />
-                    Menyimpan...
+                    {t.common.saving}
                   </span>
-                ) : 'Simpan'}
+                ) : t.common.save}
               </button>
             </div>
           </div>

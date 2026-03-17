@@ -7,6 +7,7 @@ import { useResponsive } from '@/lib/hooks/use-responsive';
 import { Activity, Clock, ChevronLeft, ChevronRight } from 'lucide-react';
 import { EmptyState } from '@/components/shared/empty-state';
 import { TableSkeleton } from '@/components/shared/loading-skeleton';
+import { useLanguage } from '@/lib/i18n';
 
 interface Activity {
   id: string;
@@ -25,15 +26,7 @@ interface Pagination {
   totalPages: number;
 }
 
-const TYPE_OPTIONS = [
-  { label: 'Semua', value: '' },
-  { label: 'Jemaah', value: 'pilgrim' },
-  { label: 'Paket', value: 'package' },
-  { label: 'Trip', value: 'trip' },
-  { label: 'Pembayaran', value: 'payment' },
-  { label: 'Dokumen', value: 'document' },
-  { label: 'User', value: 'user' },
-];
+// TYPE_OPTIONS moved inside component for i18n
 
 const TYPE_COLORS: Record<string, string> = {
   pilgrim: '#3B82F6',
@@ -67,6 +60,17 @@ function timeAgo(timestamp: string): string {
 export default function ActivitiesPage() {
   const { c } = useTheme();
   const { isMobile } = useResponsive();
+  const { t } = useLanguage();
+
+  const TYPE_OPTIONS = [
+    { label: t.common.all, value: '' },
+    { label: t.activities.filterPilgrim, value: 'pilgrim' },
+    { label: t.activities.filterPackage, value: 'package' },
+    { label: t.activities.filterTrip, value: 'trip' },
+    { label: t.activities.filterPayment, value: 'payment' },
+    { label: t.activities.filterDocument, value: 'document' },
+    { label: t.activities.filterUser, value: 'user' },
+  ];
 
   const [activities, setActivities] = useState<Activity[]>([]);
   const [pagination, setPagination] = useState<Pagination>({ page: 1, limit: 20, total: 0, totalPages: 0 });
@@ -112,13 +116,13 @@ export default function ActivitiesPage() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '16px' : '24px' }}>
-      <PageHeader title="Log Aktivitas" description="Riwayat semua aktivitas dalam agensi" />
+      <PageHeader title={t.activities.title} description={t.activities.description} />
 
       {/* Filters */}
       <div style={{ display: 'flex', gap: '12px', flexDirection: isMobile ? 'column' : 'row' }}>
         <input
           type="text"
-          placeholder="Cari aktivitas..."
+          placeholder={t.activities.searchPlaceholder}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           style={{
@@ -145,7 +149,7 @@ export default function ActivitiesPage() {
         {loading ? (
           <TableSkeleton rows={5} columns={3} />
         ) : activities.length === 0 ? (
-          <EmptyState icon={Activity} title="Belum ada aktivitas" />
+          <EmptyState icon={Activity} title={t.activities.empty} />
         ) : (
           <div>
             {activities.map((activity, i) => {
@@ -196,7 +200,7 @@ export default function ActivitiesPage() {
             padding: '14px 24px', borderTop: `1px solid ${c.borderLight}`,
           }}>
             <span style={{ fontSize: '13px', color: c.textMuted }}>
-              {pagination.total} aktivitas
+              {t.activities.count.replace('{total}', String(pagination.total))}
             </span>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <button

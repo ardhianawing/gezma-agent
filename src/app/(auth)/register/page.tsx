@@ -6,16 +6,18 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Building2, User, Lock, ChevronRight, ChevronLeft, Check, Loader2, Eye, EyeOff } from 'lucide-react';
 import { useResponsive } from '@/lib/hooks/use-responsive';
-
-const STEPS = [
-  { number: 1, label: 'Data Agency', shortLabel: 'Agency', icon: Building2 },
-  { number: 2, label: 'Data PIC', shortLabel: 'PIC', icon: User },
-  { number: 3, label: 'Buat Password', shortLabel: 'Password', icon: Lock },
-];
+import { useLanguage } from '@/lib/i18n';
 
 export default function RegisterPage() {
   const router = useRouter();
   const { isMobile, isTablet } = useResponsive();
+  const { t } = useLanguage();
+
+  const STEPS = [
+    { number: 1, label: t.auth.step1Label, shortLabel: t.auth.step1Short, icon: Building2 },
+    { number: 2, label: t.auth.step2Label, shortLabel: t.auth.step2Short, icon: User },
+    { number: 3, label: t.auth.step3Label, shortLabel: t.auth.step3Short, icon: Lock },
+  ];
   const [currentStep, setCurrentStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -95,7 +97,7 @@ export default function RegisterPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || 'Registrasi gagal');
+        setError(data.error || t.auth.registerErrorDefault);
         setIsLoading(false);
         return;
       }
@@ -103,7 +105,7 @@ export default function RegisterPage() {
       // Redirect to verify email page
       router.push('/register/verify');
     } catch {
-      setError('Terjadi kesalahan. Silakan coba lagi.');
+      setError(t.common.errorGeneric);
       setIsLoading(false);
     }
   };
@@ -111,15 +113,15 @@ export default function RegisterPage() {
   const passwordStrength = () => {
     const p = formData.password;
     if (p.length === 0) return { level: 0, label: '', color: '' };
-    if (p.length < 8) return { level: 1, label: 'Terlalu pendek', color: '#EF4444' };
+    if (p.length < 8) return { level: 1, label: t.auth.passwordStrengthShort, color: '#EF4444' };
     const hasUpper = /[A-Z]/.test(p);
     const hasLower = /[a-z]/.test(p);
     const hasNum = /[0-9]/.test(p);
     const hasSpecial = /[^A-Za-z0-9]/.test(p);
     const score = [hasUpper, hasLower, hasNum, hasSpecial].filter(Boolean).length;
-    if (score <= 2) return { level: 2, label: 'Cukup', color: '#F59E0B' };
-    if (score === 3) return { level: 3, label: 'Kuat', color: '#10B981' };
-    return { level: 4, label: 'Sangat kuat', color: '#059669' };
+    if (score <= 2) return { level: 2, label: t.auth.passwordStrengthFair, color: '#F59E0B' };
+    if (score === 3) return { level: 3, label: t.auth.passwordStrengthStrong, color: '#10B981' };
+    return { level: 4, label: t.auth.passwordStrengthVeryStrong, color: '#059669' };
   };
 
   return (
@@ -174,7 +176,7 @@ export default function RegisterPage() {
             style={{ objectFit: 'contain' }}
           />
           <span style={{ color: 'white', fontSize: '20px', fontWeight: '700', letterSpacing: '-0.5px' }}>
-            GEZMA Agent
+            {t.auth.brandName}
           </span>
         </div>
 
@@ -191,7 +193,7 @@ export default function RegisterPage() {
             }}
           >
             <span style={{ color: '#FCA5A5', fontSize: '13px', fontWeight: '600' }}>
-              Platform PPIU Modern
+              {t.auth.platformBadge}
             </span>
           </div>
           <h1
@@ -204,8 +206,8 @@ export default function RegisterPage() {
               letterSpacing: '-0.5px',
             }}
           >
-            Kelola perjalanan Umrah dengan lebih{' '}
-            <span style={{ color: '#FCA5A5' }}>profesional</span>
+            {t.auth.loginHeadline}{' '}
+            <span style={{ color: '#FCA5A5' }}>{t.auth.loginHeadlineAccent}</span>
           </h1>
           <p
             style={{
@@ -215,15 +217,15 @@ export default function RegisterPage() {
               margin: 0,
             }}
           >
-            Satu platform untuk mengelola jemaah, dokumen, paket, dan keberangkatan. Daftarkan agency Anda sekarang.
+            {t.auth.registerDescription}
           </p>
 
           {/* Feature list */}
           <div style={{ marginTop: '32px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
             {[
-              'Manajemen jemaah & dokumen terpusat',
-              'Tracking pembayaran real-time',
-              'Laporan operasional otomatis',
+              t.auth.loginFeature1,
+              t.auth.loginFeature2,
+              t.auth.loginFeature3,
             ].map((feature) => (
               <div key={feature} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <div
@@ -250,7 +252,7 @@ export default function RegisterPage() {
         {/* Footer */}
         <div style={{ position: 'relative', zIndex: 1 }}>
           <p style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.35)', margin: 0 }}>
-            &copy; 2026 GEZMA Technology. All rights reserved.
+            &copy; {t.auth.copyright}
           </p>
         </div>
       </div>
@@ -287,7 +289,7 @@ export default function RegisterPage() {
                 style={{ objectFit: 'contain', marginBottom: '10px' }}
               />
               <span style={{ fontSize: '18px', fontWeight: '700', color: '#1E293B', letterSpacing: '-0.5px' }}>
-                GEZMA Agent
+                {t.auth.brandName}
               </span>
             </div>
           )}
@@ -303,10 +305,10 @@ export default function RegisterPage() {
                 letterSpacing: '-0.5px',
               }}
             >
-              Daftar Agency Baru
+              {t.auth.registerTitle}
             </h2>
             <p style={{ fontSize: isMobile ? '13px' : '14px', color: '#64748B', margin: 0 }}>
-              Lengkapi data berikut untuk mendaftarkan agency Anda
+              {t.auth.registerSubtitle}
             </p>
           </div>
 
@@ -435,32 +437,33 @@ export default function RegisterPage() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
                 <FormField
                   id="agencyName"
-                  label="Nama Travel"
-                  placeholder="Barokah Travel"
+                  label={t.auth.agencyNameLabel}
+                  placeholder={t.auth.agencyNamePlaceholder}
                   value={formData.agencyName}
                   onChange={handleChange}
                   required
                 />
                 <FormField
                   id="legalName"
-                  label="Nama PT / Badan Hukum"
-                  placeholder="PT. Barokah Perjalanan Wisata"
+                  label={t.auth.legalNameLabel}
+                  placeholder={t.auth.legalNamePlaceholder}
                   value={formData.legalName}
                   onChange={handleChange}
                   required
                 />
                 <FormField
                   id="ppiuNumber"
-                  label="Nomor Izin PPIU"
-                  placeholder="Contoh: 123/2024"
+                  label={t.auth.ppiuLabel}
+                  placeholder={t.auth.ppiuPlaceholder}
                   value={formData.ppiuNumber}
                   onChange={handleChange}
                   optional
+                  optionalLabel={t.auth.ppiuOptional}
                 />
                 <FormField
                   id="agencyPhone"
-                  label="Nomor Telepon Kantor"
-                  placeholder="021-12345678"
+                  label={t.auth.officePhoneLabel}
+                  placeholder={t.auth.officePhonePlaceholder}
                   type="tel"
                   value={formData.agencyPhone}
                   onChange={handleChange}
@@ -474,26 +477,26 @@ export default function RegisterPage() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
                 <FormField
                   id="picName"
-                  label="Nama Lengkap"
-                  placeholder="Ahmad Fauzi"
+                  label={t.auth.picNameLabel}
+                  placeholder={t.auth.picNamePlaceholder}
                   value={formData.picName}
                   onChange={handleChange}
                   required
                 />
                 <FormField
                   id="picEmail"
-                  label="Email"
-                  placeholder="ahmad@barokahtravel.com"
+                  label={t.auth.picEmailLabel}
+                  placeholder={t.auth.picEmailPlaceholder}
                   type="email"
                   value={formData.picEmail}
                   onChange={handleChange}
                   required
-                  hint="Akan digunakan untuk login"
+                  hint={t.auth.picEmailHint}
                 />
                 <FormField
                   id="picPhone"
-                  label="Nomor HP / WhatsApp"
-                  placeholder="081234567890"
+                  label={t.auth.picPhoneLabel}
+                  placeholder={t.auth.picPhonePlaceholder}
                   type="tel"
                   value={formData.picPhone}
                   onChange={handleChange}
@@ -501,8 +504,8 @@ export default function RegisterPage() {
                 />
                 <FormField
                   id="picPosition"
-                  label="Jabatan"
-                  placeholder="Direktur"
+                  label={t.auth.picPositionLabel}
+                  placeholder={t.auth.picPositionPlaceholder}
                   value={formData.picPosition}
                   onChange={handleChange}
                   required
@@ -519,13 +522,13 @@ export default function RegisterPage() {
                     htmlFor="password"
                     style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#334155', marginBottom: '6px' }}
                   >
-                    Password
+                    {t.auth.passwordLabel}
                   </label>
                   <div style={{ position: 'relative' }}>
                     <input
                       id="password"
                       type={showPassword ? 'text' : 'password'}
-                      placeholder="Minimal 8 karakter"
+                      placeholder={t.auth.passwordMinLength}
                       value={formData.password}
                       onChange={handleChange}
                       required
@@ -601,13 +604,13 @@ export default function RegisterPage() {
                     htmlFor="confirmPassword"
                     style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#334155', marginBottom: '6px' }}
                   >
-                    Konfirmasi Password
+                    {t.auth.confirmPasswordLabel}
                   </label>
                   <div style={{ position: 'relative' }}>
                     <input
                       id="confirmPassword"
                       type={showConfirm ? 'text' : 'password'}
-                      placeholder="Ketik ulang password"
+                      placeholder={t.auth.confirmPasswordPlaceholder}
                       value={formData.confirmPassword}
                       onChange={handleChange}
                       required
@@ -659,7 +662,7 @@ export default function RegisterPage() {
                   </div>
                   {formData.confirmPassword.length > 0 && formData.password !== formData.confirmPassword && (
                     <span style={{ fontSize: '12px', color: '#EF4444', marginTop: '4px', display: 'block' }}>
-                      Password tidak cocok
+                      {t.auth.passwordMismatch}
                     </span>
                   )}
                 </div>
@@ -696,11 +699,11 @@ export default function RegisterPage() {
                     htmlFor="agreeTerms"
                     style={{ fontSize: '13px', color: '#64748B', lineHeight: '1.5', cursor: 'pointer' }}
                   >
-                    Saya menyetujui{' '}
+                    {t.auth.termsAgree}{' '}
                     <Link href="#" style={{ color: '#D32F2F', fontWeight: '600', textDecoration: 'none' }}>
-                      Syarat &amp; Ketentuan
+                      {t.auth.termsLink}
                     </Link>{' '}
-                    yang berlaku
+                    {t.auth.termsSuffix}
                   </label>
                 </div>
               </div>
@@ -739,7 +742,7 @@ export default function RegisterPage() {
                   }}
                 >
                   <ChevronLeft style={{ width: '16px', height: '16px' }} />
-                  Kembali
+                  {t.common.back}
                 </button>
               )}
               {currentStep < 3 ? (
@@ -780,7 +783,7 @@ export default function RegisterPage() {
                         : '0 4px 12px rgba(211, 47, 47, 0.25)',
                   }}
                 >
-                  Selanjutnya
+                  {t.common.next}
                   <ChevronRight style={{ width: '16px', height: '16px' }} />
                 </button>
               ) : (
@@ -812,10 +815,10 @@ export default function RegisterPage() {
                   {isLoading ? (
                     <>
                       <Loader2 style={{ width: '18px', height: '18px', animation: 'spin 1s linear infinite' }} />
-                      Mendaftarkan...
+                      {t.auth.registerLoading}
                     </>
                   ) : (
-                    'Daftarkan Agency'
+                    t.auth.registerButton
                   )}
                 </button>
               )}
@@ -831,7 +834,7 @@ export default function RegisterPage() {
               marginTop: isMobile ? '20px' : '28px',
             }}
           >
-            Sudah punya akun?{' '}
+            {t.auth.loginPrompt}{' '}
             <Link
               href="/login"
               style={{
@@ -840,7 +843,7 @@ export default function RegisterPage() {
                 textDecoration: 'none',
               }}
             >
-              Masuk
+              {t.auth.loginLink}
             </Link>
           </p>
 
@@ -873,6 +876,7 @@ function FormField({
   onChange,
   required,
   optional,
+  optionalLabel,
   hint,
 }: {
   id: string;
@@ -883,6 +887,7 @@ function FormField({
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   required?: boolean;
   optional?: boolean;
+  optionalLabel?: string;
   hint?: string;
 }) {
   return (
@@ -901,7 +906,7 @@ function FormField({
       >
         {label}
         {optional && (
-          <span style={{ fontSize: '11px', fontWeight: '400', color: '#94A3B8' }}>(opsional)</span>
+          <span style={{ fontSize: '11px', fontWeight: '400', color: '#94A3B8' }}>{optionalLabel || '(optional)'}</span>
         )}
       </label>
       <input

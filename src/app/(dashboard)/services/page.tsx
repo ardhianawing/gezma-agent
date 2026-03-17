@@ -5,6 +5,7 @@ import { PageHeader } from '@/components/layout/page-header';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
 import { useToast } from '@/lib/hooks/use-toast';
+import { useLanguage } from '@/lib/i18n';
 
 interface PlatformService {
   id: string;
@@ -53,6 +54,7 @@ export default function ServicesPage() {
   const { c } = useTheme();
   const { isMobile, isTablet } = useResponsive();
   const { showToast } = useToast();
+  const { t } = useLanguage();
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
   const [hoveredFile, setHoveredFile] = useState<number | null>(null);
   const [hoveredContact, setHoveredContact] = useState<number | null>(null);
@@ -72,7 +74,7 @@ export default function ServicesPage() {
           setDocuments(data.documents);
         }
       } catch {
-        showToast('Gagal memuat data layanan', 'error');
+        showToast(t.services.errorLoad, 'error');
       } finally {
         setLoading(false);
       }
@@ -86,23 +88,23 @@ export default function ServicesPage() {
       if (doc.fileUrl) {
         window.open(doc.fileUrl, '_blank');
       } else {
-        showToast('File belum tersedia untuk diunduh', 'warning');
+        showToast(t.services.errorDownloadUnavailable, 'warning');
       }
     } catch {
-      showToast('Gagal mengunduh dokumen', 'error');
+      showToast(t.services.errorDownload, 'error');
     }
   };
 
   const contactCards: ContactCard[] = [
-    { emoji: '\uD83D\uDCAC', title: 'Live Chat', detail: 'Chat langsung dengan tim support kami', action: 'Mulai Chat' },
-    { emoji: '\uD83D\uDCF1', title: 'WhatsApp', detail: '+62 812-3456-7890', action: 'Kirim Pesan' },
-    { emoji: '\u2709\uFE0F', title: 'Email', detail: 'support@gezma.id', action: 'Kirim Email' },
+    { emoji: '\uD83D\uDCAC', title: t.services.liveChat, detail: t.services.liveChatDetail, action: t.services.liveChatBtn },
+    { emoji: '\uD83D\uDCF1', title: t.services.whatsApp, detail: '+62 812-3456-7890', action: t.services.whatsAppBtn },
+    { emoji: '\u2709\uFE0F', title: t.services.email, detail: 'support@gezma.id', action: t.services.emailBtn },
   ];
 
   if (loading) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '20px' : '32px' }}>
-        <PageHeader title="Layanan" description="Layanan pendukung untuk operasional travel umrah Anda" />
+        <PageHeader title={t.services.title} description={t.services.description} />
         <div style={{ display: 'grid', gridTemplateColumns: gridColumns, gap: '20px' }}>
           {[1, 2, 3, 4, 5, 6].map(i => (
             <div key={i} style={{
@@ -124,7 +126,7 @@ export default function ServicesPage() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '20px' : '32px' }}>
-      <PageHeader title="Layanan" description="Layanan pendukung untuk operasional travel umrah Anda" />
+      <PageHeader title={t.services.title} description={t.services.description} />
 
       {/* Service Categories Grid */}
       <div style={{ display: 'grid', gridTemplateColumns: gridColumns, gap: '20px' }}>
@@ -208,7 +210,7 @@ export default function ServicesPage() {
           fontSize: '20px', fontWeight: '700', color: c.textPrimary, margin: '0 0 20px 0',
           display: 'flex', alignItems: 'center', gap: '8px',
         }}>
-          <span style={{ fontSize: '24px' }}>{'\uD83D\uDCE5'}</span> Download Dokumen
+          <span style={{ fontSize: '24px' }}>{'\uD83D\uDCE5'}</span> {t.services.downloadTitle}
         </h2>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
@@ -280,7 +282,7 @@ export default function ServicesPage() {
           })}
           {documents.length === 0 && (
             <div style={{ textAlign: 'center', padding: '24px', color: c.textMuted, fontSize: '14px' }}>
-              Belum ada dokumen tersedia
+              {t.services.downloadEmpty}
             </div>
           )}
         </div>
@@ -289,7 +291,7 @@ export default function ServicesPage() {
       {/* Contact Section */}
       <div>
         <h2 style={{ fontSize: '20px', fontWeight: '700', color: c.textPrimary, margin: '0 0 16px 0' }}>
-          Hubungi Kami
+          {t.services.contactTitle}
         </h2>
         <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: '16px' }}>
           {contactCards.map((contact, index) => {
@@ -319,7 +321,7 @@ export default function ServicesPage() {
                     } else if (contact.title === 'Email') {
                       window.open('mailto:support@gezma.id?subject=Bantuan%20GEZMA', '_blank');
                     } else {
-                      showToast('Fitur live chat akan segera tersedia', 'info');
+                      showToast(t.services.liveChatUnavailable, 'info');
                     }
                   }}
                   style={{

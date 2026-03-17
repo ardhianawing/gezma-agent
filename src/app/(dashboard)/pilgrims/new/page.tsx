@@ -7,12 +7,14 @@ import { SectionCard, BackButton } from '@/components/shared';
 import { useFormStyles } from '@/lib/hooks/use-form-styles';
 import { useResponsive } from '@/lib/hooks/use-responsive';
 import { useToast } from '@/components/ui/toast';
+import { useLanguage } from '@/lib/i18n';
 
 export default function NewPilgrimPage() {
   const router = useRouter();
   const { inputStyle, selectStyle, textareaStyle, labelStyle, c } = useFormStyles();
   const { isMobile } = useResponsive();
   const { addToast } = useToast();
+  const { t } = useLanguage();
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
@@ -79,15 +81,15 @@ export default function NewPilgrimPage() {
 
       if (!res.ok) {
         const data = await res.json();
-        throw new Error(data.error || 'Gagal menyimpan');
+        throw new Error(data.error || t.common.error);
       }
 
-      addToast({ type: 'success', title: 'Jemaah berhasil ditambahkan' });
+      addToast({ type: 'success', title: t.common.success });
       router.push('/pilgrims');
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Gagal menyimpan data jemaah. Silakan coba lagi.';
       setError(message);
-      addToast({ type: 'error', title: 'Gagal menyimpan', description: message });
+      addToast({ type: 'error', title: t.common.error, description: message });
       setSaving(false);
     }
   };
@@ -217,9 +219,9 @@ export default function NewPilgrimPage() {
             }}
           >
             {saving ? (
-              <><Loader2 style={{ width: '16px', height: '16px', animation: 'spin 1s linear infinite' }} /> Menyimpan...</>
+              <><Loader2 style={{ width: '16px', height: '16px', animation: 'spin 1s linear infinite' }} /> {t.common.saving}</>
             ) : (
-              <><Save style={{ width: '16px', height: '16px' }} /> Simpan Jemaah</>
+              <><Save style={{ width: '16px', height: '16px' }} /> {t.common.save}</>
             )}
           </button>
         </div>

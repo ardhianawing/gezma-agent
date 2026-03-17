@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { PageHeader } from '@/components/layout/page-header';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
+import { useLanguage } from '@/lib/i18n';
 
 interface Installment {
   id: string;
@@ -52,39 +53,42 @@ function calculateMonthly(total: number, tenorMonths: number): number {
   return (total * (1 + MARGIN_RATE * tenorMonths / 12)) / tenorMonths;
 }
 
-function getStatusBadge(status: string): { bg: string; text: string; label: string } {
-  switch (status) {
-    case 'pending':
-      return { bg: '#fef9c3', text: '#854d0e', label: 'Menunggu' };
-    case 'approved':
-      return { bg: '#dcfce7', text: '#166534', label: 'Disetujui' };
-    case 'rejected':
-      return { bg: '#fecaca', text: '#991b1b', label: 'Ditolak' };
-    case 'active':
-      return { bg: '#dbeafe', text: '#1e40af', label: 'Aktif' };
-    case 'completed':
-      return { bg: '#d1fae5', text: '#065f46', label: 'Lunas' };
-    default:
-      return { bg: '#f3f4f6', text: '#6b7280', label: status };
-  }
-}
-
-function getInstallmentStatusBadge(status: string): { bg: string; text: string; label: string } {
-  switch (status) {
-    case 'paid':
-      return { bg: '#dcfce7', text: '#166534', label: 'Lunas' };
-    case 'pending':
-      return { bg: '#fef9c3', text: '#854d0e', label: 'Belum Bayar' };
-    case 'overdue':
-      return { bg: '#fecaca', text: '#991b1b', label: 'Terlambat' };
-    default:
-      return { bg: '#f3f4f6', text: '#6b7280', label: status };
-  }
-}
+// Status badge functions moved inside component for i18n
 
 export default function PayLaterPage() {
   const { c } = useTheme();
   const { isMobile, isTablet } = useResponsive();
+  const { t } = useLanguage();
+
+  function getStatusBadge(status: string): { bg: string; text: string; label: string } {
+    switch (status) {
+      case 'pending':
+        return { bg: '#fef9c3', text: '#854d0e', label: t.payLater.statusPending };
+      case 'approved':
+        return { bg: '#dcfce7', text: '#166534', label: t.payLater.statusApproved };
+      case 'rejected':
+        return { bg: '#fecaca', text: '#991b1b', label: t.payLater.statusRejected };
+      case 'active':
+        return { bg: '#dbeafe', text: '#1e40af', label: t.payLater.statusActive };
+      case 'completed':
+        return { bg: '#d1fae5', text: '#065f46', label: t.payLater.statusCompleted };
+      default:
+        return { bg: '#f3f4f6', text: '#6b7280', label: status };
+    }
+  }
+
+  function getInstallmentStatusBadge(status: string): { bg: string; text: string; label: string } {
+    switch (status) {
+      case 'paid':
+        return { bg: '#dcfce7', text: '#166534', label: t.payLater.installmentPaid };
+      case 'pending':
+        return { bg: '#fef9c3', text: '#854d0e', label: t.payLater.installmentPending };
+      case 'overdue':
+        return { bg: '#fecaca', text: '#991b1b', label: t.payLater.installmentOverdue };
+      default:
+        return { bg: '#f3f4f6', text: '#6b7280', label: status };
+    }
+  }
 
   const [applications, setApplications] = useState<PayLaterApp[]>([]);
   const [loading, setLoading] = useState(true);
@@ -162,8 +166,8 @@ export default function PayLaterPage() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
       <PageHeader
-        title="PayLater Syariah"
-        description="Pembiayaan umrah dengan akad syariah"
+        title={t.payLater.title}
+        description={t.payLater.description}
       />
 
       {/* Info Card */}
@@ -176,7 +180,7 @@ export default function PayLaterPage() {
         }}
       >
         <h3 style={{ fontSize: '16px', fontWeight: 700, color: c.textPrimary, margin: '0 0 12px' }}>
-          Akad Pembiayaan Syariah
+          {t.payLater.akadTitle}
         </h3>
         <div
           style={{
@@ -195,10 +199,10 @@ export default function PayLaterPage() {
           >
             <div style={{ fontSize: '20px', marginBottom: '6px' }}>{'\uD83D\uDCDC'}</div>
             <h4 style={{ fontSize: '14px', fontWeight: 700, color: '#1e40af', margin: '0 0 4px' }}>
-              Murabahah
+              {t.payLater.murabahahTitle}
             </h4>
             <p style={{ fontSize: '12px', color: '#3b82f6', margin: 0, lineHeight: '1.5' }}>
-              Akad jual beli dengan margin yang disepakati. Harga pokok dan keuntungan diketahui oleh kedua belah pihak secara transparan.
+              {t.payLater.murabahahDesc}
             </p>
           </div>
           <div
@@ -211,10 +215,10 @@ export default function PayLaterPage() {
           >
             <div style={{ fontSize: '20px', marginBottom: '6px' }}>{'\uD83E\uDD1D'}</div>
             <h4 style={{ fontSize: '14px', fontWeight: 700, color: '#166534', margin: '0 0 4px' }}>
-              Ijarah
+              {t.payLater.ijarahTitle}
             </h4>
             <p style={{ fontSize: '12px', color: '#22c55e', margin: 0, lineHeight: '1.5' }}>
-              Akad sewa-menyewa jasa layanan umrah. Pembayaran dilakukan secara angsuran dengan biaya sewa yang tetap setiap bulannya.
+              {t.payLater.ijarahDesc}
             </p>
           </div>
         </div>
@@ -230,7 +234,7 @@ export default function PayLaterPage() {
         }}
       >
         <h3 style={{ fontSize: '16px', fontWeight: 700, color: c.textPrimary, margin: '0 0 16px' }}>
-          Kalkulator Pembiayaan
+          {t.payLater.calculatorTitle}
         </h3>
         <div
           style={{
@@ -241,13 +245,13 @@ export default function PayLaterPage() {
         >
           <div>
             <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: c.textSecondary, marginBottom: '6px' }}>
-              Total Biaya Umrah
+              {t.payLater.calcTotalLabel}
             </label>
             <input
               type="number"
               value={calcTotal}
               onChange={(e) => setCalcTotal(e.target.value)}
-              placeholder="Contoh: 25000000"
+              placeholder={t.payLater.calcTotalPlaceholder}
               style={{
                 width: '100%',
                 padding: '10px 14px',
@@ -265,7 +269,7 @@ export default function PayLaterPage() {
           </div>
           <div>
             <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: c.textSecondary, marginBottom: '6px' }}>
-              Tenor (bulan)
+              {t.payLater.calcTenorLabel}
             </label>
             <div style={{ display: 'flex', gap: '8px' }}>
               {[3, 6, 12].map((tenor) => (
@@ -285,7 +289,7 @@ export default function PayLaterPage() {
                     transition: 'all 0.15s ease',
                   }}
                 >
-                  {tenor} bln
+                  {tenor} {t.payLater.tenorUnit}
                 </button>
               ))}
             </div>
@@ -310,19 +314,19 @@ export default function PayLaterPage() {
               }}
             >
               <div>
-                <p style={{ fontSize: '12px', color: c.textMuted, margin: '0 0 4px' }}>Angsuran / Bulan</p>
+                <p style={{ fontSize: '12px', color: c.textMuted, margin: '0 0 4px' }}>{t.payLater.calcMonthly}</p>
                 <p style={{ fontSize: '18px', fontWeight: 700, color: c.primary, margin: 0 }}>
                   {formatCurrency(calcMonthly)}
                 </p>
               </div>
               <div>
-                <p style={{ fontSize: '12px', color: c.textMuted, margin: '0 0 4px' }}>Total Pembayaran</p>
+                <p style={{ fontSize: '12px', color: c.textMuted, margin: '0 0 4px' }}>{t.payLater.calcTotalPayment}</p>
                 <p style={{ fontSize: '16px', fontWeight: 600, color: c.textPrimary, margin: 0 }}>
                   {formatCurrency(calcTotalPayment)}
                 </p>
               </div>
               <div>
-                <p style={{ fontSize: '12px', color: c.textMuted, margin: '0 0 4px' }}>Margin ({(MARGIN_RATE * 100).toFixed(1)}%/bln)</p>
+                <p style={{ fontSize: '12px', color: c.textMuted, margin: '0 0 4px' }}>{t.payLater.calcMargin} ({(MARGIN_RATE * 100).toFixed(1)}%{t.payLater.monthlyUnit})</p>
                 <p style={{ fontSize: '16px', fontWeight: 600, color: c.textSecondary, margin: 0 }}>
                   {formatCurrency(calcTotalPayment - parseFloat(calcTotal))}
                 </p>
@@ -347,7 +351,7 @@ export default function PayLaterPage() {
           transition: 'all 0.15s ease',
         }}
       >
-        {showForm ? 'Batal' : '+ Ajukan Pembiayaan Baru'}
+        {showForm ? t.common.cancel : t.payLater.applyBtn}
       </button>
 
       {/* Application Form */}
@@ -361,7 +365,7 @@ export default function PayLaterPage() {
           }}
         >
           <h3 style={{ fontSize: '16px', fontWeight: 700, color: c.textPrimary, margin: '0 0 16px' }}>
-            Form Pengajuan Pembiayaan
+            {t.payLater.formTitle}
           </h3>
           <div
             style={{
@@ -372,13 +376,13 @@ export default function PayLaterPage() {
           >
             <div>
               <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: c.textSecondary, marginBottom: '6px' }}>
-                Nama Jamaah
+                {t.payLater.formName}
               </label>
               <input
                 type="text"
                 value={form.pilgrimName}
                 onChange={(e) => setForm({ ...form, pilgrimName: e.target.value })}
-                placeholder="Nama lengkap"
+                placeholder={t.payLater.formNamePlaceholder}
                 style={{
                   width: '100%',
                   padding: '10px 14px',
@@ -396,13 +400,13 @@ export default function PayLaterPage() {
             </div>
             <div>
               <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: c.textSecondary, marginBottom: '6px' }}>
-                No. Telepon
+                {t.payLater.formPhone}
               </label>
               <input
                 type="tel"
                 value={form.pilgrimPhone}
                 onChange={(e) => setForm({ ...form, pilgrimPhone: e.target.value })}
-                placeholder="08xxxxxxxxxx"
+                placeholder={t.payLater.formPhonePlaceholder}
                 style={{
                   width: '100%',
                   padding: '10px 14px',
@@ -420,13 +424,13 @@ export default function PayLaterPage() {
             </div>
             <div>
               <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: c.textSecondary, marginBottom: '6px' }}>
-                Total Biaya
+                {t.payLater.formTotal}
               </label>
               <input
                 type="number"
                 value={form.totalAmount}
                 onChange={(e) => setForm({ ...form, totalAmount: e.target.value })}
-                placeholder="Contoh: 25000000"
+                placeholder={t.payLater.calcTotalPlaceholder}
                 style={{
                   width: '100%',
                   padding: '10px 14px',
@@ -444,7 +448,7 @@ export default function PayLaterPage() {
             </div>
             <div>
               <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: c.textSecondary, marginBottom: '6px' }}>
-                Tenor
+                {t.payLater.formTenor}
               </label>
               <select
                 value={form.tenorMonths}
@@ -462,14 +466,14 @@ export default function PayLaterPage() {
                   boxSizing: 'border-box',
                 }}
               >
-                <option value="3">3 Bulan</option>
-                <option value="6">6 Bulan</option>
-                <option value="12">12 Bulan</option>
+                <option value="3">{t.payLater.tenor3}</option>
+                <option value="6">{t.payLater.tenor6}</option>
+                <option value="12">{t.payLater.tenor12}</option>
               </select>
             </div>
             <div>
               <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: c.textSecondary, marginBottom: '6px' }}>
-                Jenis Akad
+                {t.payLater.formAkad}
               </label>
               <select
                 value={form.akadType}
@@ -504,7 +508,7 @@ export default function PayLaterPage() {
               }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '13px', color: c.textMuted }}>Estimasi angsuran / bulan</span>
+                <span style={{ fontSize: '13px', color: c.textMuted }}>{t.payLater.formEstimate}</span>
                 <span style={{ fontSize: '16px', fontWeight: 700, color: c.primary }}>
                   {formatCurrency(calculateMonthly(parseFloat(form.totalAmount), parseInt(form.tenorMonths, 10)))}
                 </span>
@@ -529,7 +533,7 @@ export default function PayLaterPage() {
               opacity: formLoading ? 0.7 : 1,
             }}
           >
-            {formLoading ? 'Memproses...' : 'Ajukan Pembiayaan'}
+            {formLoading ? t.payLater.formLoading : t.payLater.formSubmit}
           </button>
         </div>
       )}
@@ -544,21 +548,21 @@ export default function PayLaterPage() {
         }}
       >
         <h3 style={{ fontSize: '16px', fontWeight: 700, color: c.textPrimary, margin: '0 0 16px' }}>
-          Daftar Pengajuan
+          {t.payLater.listTitle}
         </h3>
 
         {loading ? (
           <div style={{ textAlign: 'center', padding: '40px 0' }}>
-            <p style={{ fontSize: '14px', color: c.textMuted }}>Memuat data...</p>
+            <p style={{ fontSize: '14px', color: c.textMuted }}>{t.common.loadingData}</p>
           </div>
         ) : applications.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '40px 0' }}>
             <div style={{ fontSize: '40px', marginBottom: '12px' }}>{'\uD83D\uDCB3'}</div>
             <p style={{ fontSize: '15px', fontWeight: 600, color: c.textPrimary, margin: '0 0 4px' }}>
-              Belum ada pengajuan
+              {t.payLater.listEmptyTitle}
             </p>
             <p style={{ fontSize: '13px', color: c.textMuted, margin: 0 }}>
-              Ajukan pembiayaan PayLater Syariah pertama Anda
+              {t.payLater.listEmptyDesc}
             </p>
           </div>
         ) : (
@@ -592,7 +596,7 @@ export default function PayLaterPage() {
                         {app.pilgrimName}
                       </p>
                       <p style={{ fontSize: '12px', color: c.textMuted, margin: 0 }}>
-                        {app.akadType === 'murabahah' ? 'Murabahah' : 'Ijarah'} - {app.tenorMonths} bulan
+                        {app.akadType === 'murabahah' ? t.payLater.murabahahTitle : t.payLater.ijarahTitle} - {app.tenorMonths} {t.payLater.tenorUnit}
                       </p>
                     </div>
                     <span
@@ -613,7 +617,7 @@ export default function PayLaterPage() {
                       {formatCurrency(app.totalAmount)}
                     </span>
                     <span style={{ fontSize: '12px', color: c.textMuted }}>
-                      {formatCurrency(app.monthlyAmount)}/bln
+                      {formatCurrency(app.monthlyAmount)}{t.payLater.monthlyUnit}
                     </span>
                   </div>
                   <p style={{ fontSize: '11px', color: c.textMuted, margin: '6px 0 0' }}>
@@ -637,15 +641,15 @@ export default function PayLaterPage() {
           }}
         >
           <h3 style={{ fontSize: '16px', fontWeight: 700, color: c.textPrimary, margin: '0 0 4px' }}>
-            Jadwal Angsuran - {selectedApplication.pilgrimName}
+            {t.payLater.scheduleTitle} - {selectedApplication.pilgrimName}
           </h3>
           <p style={{ fontSize: '13px', color: c.textMuted, margin: '0 0 16px' }}>
-            {selectedApplication.akadType === 'murabahah' ? 'Murabahah' : 'Ijarah'} | {selectedApplication.tenorMonths} bulan | Total: {formatCurrency(selectedApplication.totalAmount)}
+            {selectedApplication.akadType === 'murabahah' ? t.payLater.murabahahTitle : t.payLater.ijarahTitle} | {selectedApplication.tenorMonths} {t.payLater.tenorUnit} | Total: {formatCurrency(selectedApplication.totalAmount)}
           </p>
 
           {selectedApplication.installments.length === 0 ? (
             <p style={{ fontSize: '13px', color: c.textMuted, textAlign: 'center', padding: '20px 0' }}>
-              Jadwal angsuran belum tersedia
+              {t.payLater.scheduleEmpty}
             </p>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
@@ -686,8 +690,8 @@ export default function PayLaterPage() {
                         {formatCurrency(inst.amount)}
                       </p>
                       <p style={{ fontSize: '11px', color: c.textMuted, margin: '2px 0 0' }}>
-                        Jatuh tempo: {formatDate(inst.dueDate)}
-                        {inst.paidAt ? ` | Dibayar: ${formatDate(inst.paidAt)}` : ''}
+                        {t.payLater.scheduleDue} {formatDate(inst.dueDate)}
+                        {inst.paidAt ? ` | ${t.payLater.schedulePaid} ${formatDate(inst.paidAt)}` : ''}
                       </p>
                     </div>
                     <span

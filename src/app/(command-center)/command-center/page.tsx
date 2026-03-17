@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Building2, Users, Plane, DollarSign, ChevronRight, AlertTriangle, BarChart3, ShieldOff } from 'lucide-react';
 import {
+import { useLanguage } from '@/lib/i18n';
   LineChart, Line, BarChart, Bar, PieChart, Pie, AreaChart, Area,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, Legend,
 } from 'recharts';
@@ -54,6 +55,7 @@ const statusColors: Record<string, { bg: string; text: string }> = {
 };
 
 export default function CCDashboardPage() {
+  const { t } = useLanguage();
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
   const [alerts, setAlerts] = useState<PPIUAlert[]>([]);
@@ -342,14 +344,14 @@ export default function CCDashboardPage() {
       {/* Recent Agencies */}
       <div style={{ backgroundColor: cc.cardBg, borderRadius: '12px', border: `1px solid ${cc.border}`, overflow: 'hidden' }}>
         <div style={{ padding: '20px', borderBottom: `1px solid ${cc.borderLight}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h2 style={{ fontSize: '18px', fontWeight: '600', color: cc.textPrimary, margin: 0 }}>Agensi Terbaru</h2>
+          <h2 style={{ fontSize: '18px', fontWeight: '600', color: cc.textPrimary, margin: 0 }}>{t.commandCenter.agenciesTitle}</h2>
           <Link href="/command-center/agencies" style={{ fontSize: '13px', color: cc.primary, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px' }}>
             Lihat Semua <ChevronRight style={{ width: '14px', height: '14px' }} />
           </Link>
         </div>
         <div style={{ padding: '20px' }}>
           {!stats?.recentAgencies?.length ? (
-            <p style={{ textAlign: 'center', color: cc.textMuted, fontSize: '14px' }}>Belum ada agensi.</p>
+            <p style={{ textAlign: 'center', color: cc.textMuted, fontSize: '14px' }}>{t.common.noData}</p>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               {stats.recentAgencies.map(agency => {

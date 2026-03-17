@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { ArrowLeft, ChevronLeft, ChevronRight, CheckCircle, XCircle, Award, Send, Loader2 } from 'lucide-react';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
+import { useLanguage } from '@/lib/i18n';
 
 interface Question {
   id: string;
@@ -34,6 +35,7 @@ interface QuizResult {
 export default function QuizPage({ params }: { params: Promise<{ id: string }> }) {
   const { c } = useTheme();
   const { isMobile } = useResponsive();
+  const { t } = useLanguage();
   const router = useRouter();
 
   const [courseId, setCourseId] = useState('');
@@ -91,7 +93,7 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
   if (loading) {
     return (
       <div style={{ padding: isMobile ? '16px' : '24px', maxWidth: '800px', margin: '0 auto', textAlign: 'center', color: c.textMuted }}>
-        Memuat quiz...
+        {t.common.loading}
       </div>
     );
   }
@@ -100,10 +102,10 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
     return (
       <div style={{ padding: isMobile ? '16px' : '24px', maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
         <h3 style={{ fontSize: '18px', fontWeight: 600, color: c.textPrimary, margin: '0 0 8px 0' }}>
-          Quiz tidak ditemukan
+          Quiz not found
         </h3>
         <p style={{ fontSize: '14px', color: c.textMuted, margin: '0 0 16px 0' }}>
-          Kursus ini belum memiliki quiz.
+          This course does not have a quiz yet.
         </p>
         <button
           onClick={() => router.push(`/academy/${courseId}`)}
@@ -113,7 +115,7 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
             fontWeight: 600, cursor: 'pointer',
           }}
         >
-          Kembali ke Kursus
+          {t.common.back}
         </button>
       </div>
     );
@@ -138,13 +140,13 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
             fontSize: '24px', fontWeight: 700, margin: '0 0 8px 0',
             color: result.passed ? '#059669' : '#EF4444',
           }}>
-            {result.passed ? 'Selamat! Anda Lulus!' : 'Belum Lulus'}
+            {result.passed ? 'Congratulations! You Passed!' : 'Not Passed Yet'}
           </h2>
 
           <p style={{ fontSize: '14px', color: c.textMuted, margin: '0 0 24px 0' }}>
             {result.passed
-              ? 'Anda telah menyelesaikan quiz dengan baik.'
-              : `Skor minimum untuk lulus adalah ${result.passScore}%. Silakan coba lagi.`}
+              ? 'You have completed the quiz successfully.'
+              : `Minimum score to pass is ${result.passScore}%. Please try again.`}
           </p>
 
           {/* Score Display */}
@@ -157,7 +159,7 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
               {result.score}%
             </p>
             <p style={{ fontSize: '14px', color: c.textMuted, margin: '4px 0 0 0' }}>
-              {result.correctAnswers}/{result.totalQuestions} jawaban benar
+              {result.correctAnswers}/{result.totalQuestions} correct answers
             </p>
           </div>
 
@@ -175,7 +177,7 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
                 }}
               >
                 <Award style={{ width: '16px', height: '16px' }} />
-                Unduh Sertifikat
+                {t.common.download} Certificate
               </button>
             )}
             <button
@@ -190,7 +192,7 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
                 color: c.textSecondary, fontSize: '14px', fontWeight: 600, cursor: 'pointer',
               }}
             >
-              Coba Lagi
+              Try Again
             </button>
             <button
               onClick={() => router.push(`/academy/${courseId}`)}
@@ -200,7 +202,7 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
                 color: c.textSecondary, fontSize: '14px', fontWeight: 600, cursor: 'pointer',
               }}
             >
-              Kembali ke Kursus
+              {t.common.back}
             </button>
           </div>
         </div>
@@ -226,7 +228,7 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
         }}
       >
         <ArrowLeft size={16} />
-        Kembali
+        {t.common.back}
       </button>
 
       {/* Quiz Header */}
@@ -239,7 +241,7 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
           {quiz.title}
         </h1>
         <p style={{ fontSize: '13px', color: c.textMuted, margin: 0 }}>
-          Skor minimum: {quiz.passScore}% | {quiz.totalQuestions} pertanyaan | Dijawab: {answeredCount}/{quiz.totalQuestions}
+          Min score: {quiz.passScore}% | {quiz.totalQuestions} questions | Answered: {answeredCount}/{quiz.totalQuestions}
         </p>
 
         {/* Question indicators */}
@@ -271,7 +273,7 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
           marginBottom: '16px',
         }}>
           <p style={{ fontSize: '13px', color: c.textMuted, margin: '0 0 8px 0' }}>
-            Pertanyaan {currentIdx + 1} dari {quiz.totalQuestions}
+            Question {currentIdx + 1} {t.common.of} {quiz.totalQuestions}
           </p>
           <h3 style={{ fontSize: '16px', fontWeight: 600, color: c.textPrimary, margin: '0 0 20px 0', lineHeight: 1.5 }}>
             {currentQuestion.question}
@@ -327,7 +329,7 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
           }}
         >
           <ChevronLeft style={{ width: '16px', height: '16px' }} />
-          Sebelumnya
+          {t.common.previous}
         </button>
 
         {isLast ? (
@@ -348,7 +350,7 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
             ) : (
               <Send style={{ width: '16px', height: '16px' }} />
             )}
-            {submitting ? 'Mengirim...' : 'Kirim Jawaban'}
+            {submitting ? t.common.sending : t.common.submit}
           </button>
         ) : (
           <button
@@ -360,7 +362,7 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
               fontWeight: 500, cursor: 'pointer',
             }}
           >
-            Selanjutnya
+            {t.common.next}
             <ChevronRight style={{ width: '16px', height: '16px' }} />
           </button>
         )}

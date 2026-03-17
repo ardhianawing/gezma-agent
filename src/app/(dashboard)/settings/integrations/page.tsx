@@ -7,6 +7,7 @@ import { useResponsive } from '@/lib/hooks/use-responsive';
 import { PageHeader } from '@/components/layout/page-header';
 import { BackButton } from '@/components/shared/back-button';
 import {
+import { useLanguage } from '@/lib/i18n';
   ChevronRight,
   Wifi,
   WifiOff,
@@ -32,6 +33,7 @@ interface NusukConfigData {
 export default function IntegrationsPage() {
   const { c } = useTheme();
   const { isMobile, isTablet } = useResponsive();
+  const { t } = useLanguage();
   const [nusukConfig, setNusukConfig] = useState<NusukConfigData | null>(null);
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
 
@@ -105,8 +107,8 @@ export default function IntegrationsPage() {
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
         <BackButton href="/settings" />
         <PageHeader
-          title="Integrasi"
-          description="Kelola koneksi dengan layanan pihak ketiga"
+          title={t.settings.integrations}
+          description={t.settings.generalDesc}
         />
       </div>
 

@@ -7,6 +7,7 @@ import { useResponsive } from '@/lib/hooks/use-responsive';
 import { formatCurrency } from '@/lib/utils';
 import { DollarSign, TrendingUp, Users, AlertCircle, Download, ArrowUpRight, ArrowDownRight, GitCompareArrows, BarChart3 } from 'lucide-react';
 import { EmptyState } from '@/components/shared/empty-state';
+import { useLanguage } from '@/lib/i18n';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
 
 // ========== TYPES ==========
@@ -49,17 +50,7 @@ interface ConversionReport {
 }
 
 // ========== CONSTANTS ==========
-const TABS = [
-  { key: 'keuangan', label: 'Keuangan' },
-  { key: 'demografi', label: 'Demografi' },
-  { key: 'dokumen', label: 'Dokumen' },
-  { key: 'aging', label: 'Aging' },
-  { key: 'funnel', label: 'Funnel' },
-];
-
-const methodLabels: Record<string, string> = { transfer: 'Transfer', cash: 'Cash', card: 'Kartu' };
-const typeLabels: Record<string, string> = { dp: 'DP', installment: 'Cicilan', full: 'Lunas', refund: 'Refund' };
-const GENDER_LABELS: Record<string, string> = { male: 'Laki-laki', female: 'Perempuan', unknown: 'Tidak Diketahui' };
+// Tab keys and labels are set inside component to access translations
 const PIE_COLORS = ['#3B82F6', '#EC4899', '#94A3B8', '#10B981', '#F59E0B', '#8B5CF6'];
 const AGING_COLORS: Record<string, string> = { '0-30': '#10B981', '31-60': '#F59E0B', '61-90': '#F97316', '90+': '#EF4444' };
 
@@ -94,6 +85,20 @@ function DeltaIndicator({ current, previous, isCurrency }: { current: number; pr
 export default function ReportsPage() {
   const { c } = useTheme();
   const { isMobile } = useResponsive();
+  const { t } = useLanguage();
+
+  const TABS = [
+    { key: 'keuangan', label: t.reports.tabFinancial },
+    { key: 'demografi', label: t.reports.tabDemographics },
+    { key: 'dokumen', label: t.reports.tabDocuments },
+    { key: 'aging', label: t.reports.tabAging },
+    { key: 'funnel', label: t.reports.tabFunnel },
+  ];
+
+  const methodLabels: Record<string, string> = { transfer: t.reports.methodTransfer, cash: t.reports.methodCash, card: t.reports.methodCard };
+  const typeLabels: Record<string, string> = { dp: t.reports.typeDp, installment: t.reports.typeInstallment, full: t.reports.typeFull, refund: t.reports.typeRefund };
+  const GENDER_LABELS: Record<string, string> = { male: t.reports.genderMale, female: t.reports.genderFemale, unknown: t.reports.genderUnknown };
+
   const [activeTab, setActiveTab] = useState('keuangan');
   const [loading, setLoading] = useState(true);
 
@@ -173,7 +178,7 @@ export default function ReportsPage() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '16px' : '24px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px' }}>
-        <PageHeader title="Laporan" description="Analisis komprehensif data agensi Anda" />
+        <PageHeader title={t.reports.title} description={t.reports.description} />
         <button
           onClick={handleExportCSV}
           style={{
@@ -185,7 +190,7 @@ export default function ReportsPage() {
           }}
         >
           <Download style={{ width: '16px', height: '16px' }} />
-          Export CSV
+          {t.reports.exportCsv}
         </button>
       </div>
 
@@ -220,12 +225,12 @@ export default function ReportsPage() {
               }}
             >
               <GitCompareArrows style={{ width: '14px', height: '14px' }} />
-              Bandingkan Periode
+              {t.reports.comparePeriod}
             </button>
             {compareEnabled && (
               <>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <label style={{ fontSize: '12px', color: c.textMuted }}>Dari:</label>
+                  <label style={{ fontSize: '12px', color: c.textMuted }}>{t.reports.compareFrom}</label>
                   <input
                     type="date"
                     value={compareFrom}
@@ -238,7 +243,7 @@ export default function ReportsPage() {
                   />
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <label style={{ fontSize: '12px', color: c.textMuted }}>Sampai:</label>
+                  <label style={{ fontSize: '12px', color: c.textMuted }}>{t.reports.compareTo}</label>
                   <input
                     type="date"
                     value={compareTo}
@@ -257,7 +262,7 @@ export default function ReportsPage() {
       )}
 
       {loading ? (
-        <div style={{ padding: '40px', textAlign: 'center', color: c.textMuted }}>Memuat data...</div>
+        <div style={{ padding: '40px', textAlign: 'center', color: c.textMuted }}>{t.common.loadingData}</div>
       ) : (
         <>
           {/* Keuangan Tab */}
@@ -283,15 +288,16 @@ export default function ReportsPage() {
 // ========== TAB COMPONENTS ==========
 
 function FinancialTab({ data, c, isMobile }: { data: FinancialReport; c: ReturnType<typeof useTheme>['c']; isMobile: boolean }) {
+  const { t } = useLanguage();
   const comp = data.comparison;
   const collectionRate = data.totalPilgrims > 0 ? Math.round((data.paidPilgrims / data.totalPilgrims) * 100) : 0;
   const compCollectionRate = comp && comp.totalPilgrims > 0 ? Math.round((comp.paidPilgrims / comp.totalPilgrims) * 100) : 0;
 
   const stats = [
-    { label: 'Total Pemasukan', value: formatCurrency(data.totalRevenue), icon: DollarSign, color: c.success, bg: c.successLight, current: data.totalRevenue, compare: comp?.totalRevenue, isCurrency: true },
-    { label: 'Outstanding', value: formatCurrency(data.totalOutstanding), icon: AlertCircle, color: c.error, bg: c.errorLight, current: data.totalOutstanding, compare: comp?.totalOutstanding, isCurrency: true },
-    { label: 'Jemaah Lunas', value: `${data.paidPilgrims}/${data.totalPilgrims}`, icon: Users, color: c.info, bg: c.infoLight, current: data.paidPilgrims, compare: comp?.paidPilgrims, isCurrency: false },
-    { label: 'Collection Rate', value: `${collectionRate}%`, icon: TrendingUp, color: '#7C3AED', bg: '#F3E8FF', current: collectionRate, compare: compCollectionRate || undefined, isCurrency: false },
+    { label: t.reports.totalRevenue, value: formatCurrency(data.totalRevenue), icon: DollarSign, color: c.success, bg: c.successLight, current: data.totalRevenue, compare: comp?.totalRevenue, isCurrency: true },
+    { label: t.reports.outstanding, value: formatCurrency(data.totalOutstanding), icon: AlertCircle, color: c.error, bg: c.errorLight, current: data.totalOutstanding, compare: comp?.totalOutstanding, isCurrency: true },
+    { label: t.reports.paidPilgrims, value: `${data.paidPilgrims}/${data.totalPilgrims}`, icon: Users, color: c.info, bg: c.infoLight, current: data.paidPilgrims, compare: comp?.paidPilgrims, isCurrency: false },
+    { label: t.reports.collectionRate, value: `${collectionRate}%`, icon: TrendingUp, color: '#7C3AED', bg: '#F3E8FF', current: collectionRate, compare: compCollectionRate || undefined, isCurrency: false },
   ];
 
   const maxMonthly = Math.max(...data.monthlyRevenue.map(m => m.amount), 1);
@@ -328,19 +334,19 @@ function FinancialTab({ data, c, isMobile }: { data: FinancialReport; c: ReturnT
         }}>
           <h3 style={{ fontSize: '14px', fontWeight: 600, color: c.textPrimary, margin: '0 0 12px 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
             <GitCompareArrows style={{ width: '16px', height: '16px', color: c.primary }} />
-            Ringkasan Perbandingan Periode
+            {t.reports.comparisonTitle}
           </h3>
           <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: '16px' }}>
             <div>
-              <p style={{ fontSize: '12px', color: c.textMuted, margin: '0 0 4px 0' }}>Pemasukan Periode Perbandingan</p>
+              <p style={{ fontSize: '12px', color: c.textMuted, margin: '0 0 4px 0' }}>{t.reports.comparisonRevenue}</p>
               <p style={{ fontSize: '18px', fontWeight: 700, color: c.textPrimary, margin: 0 }}>{formatCurrency(comp.totalRevenue)}</p>
             </div>
             <div>
-              <p style={{ fontSize: '12px', color: c.textMuted, margin: '0 0 4px 0' }}>Jemaah Lunas Periode Perbandingan</p>
+              <p style={{ fontSize: '12px', color: c.textMuted, margin: '0 0 4px 0' }}>{t.reports.comparisonPaid}</p>
               <p style={{ fontSize: '18px', fontWeight: 700, color: c.textPrimary, margin: 0 }}>{comp.paidPilgrims}/{comp.totalPilgrims}</p>
             </div>
             <div>
-              <p style={{ fontSize: '12px', color: c.textMuted, margin: '0 0 4px 0' }}>Outstanding Periode Perbandingan</p>
+              <p style={{ fontSize: '12px', color: c.textMuted, margin: '0 0 4px 0' }}>{t.reports.comparisonOutstanding}</p>
               <p style={{ fontSize: '18px', fontWeight: 700, color: c.error, margin: 0 }}>{formatCurrency(comp.totalOutstanding)}</p>
             </div>
           </div>
@@ -350,11 +356,11 @@ function FinancialTab({ data, c, isMobile }: { data: FinancialReport; c: ReturnT
       <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '2fr 1fr', gap: '16px' }}>
         <div style={{ backgroundColor: c.cardBg, borderRadius: '12px', border: `1px solid ${c.border}`, overflow: 'hidden' }}>
           <div style={{ padding: isMobile ? '16px' : '20px', borderBottom: `1px solid ${c.borderLight}` }}>
-            <h3 style={{ fontSize: '16px', fontWeight: 600, color: c.textPrimary, margin: 0 }}>Pemasukan per Trip</h3>
+            <h3 style={{ fontSize: '16px', fontWeight: 600, color: c.textPrimary, margin: 0 }}>{t.reports.revenuePerTrip}</h3>
           </div>
           <div>
             {data.tripRevenue.length === 0 ? (
-              <EmptyState icon={BarChart3} title="Belum ada data laporan" />
+              <EmptyState icon={BarChart3} title={t.reports.noData} />
             ) : data.tripRevenue.map((trip, i) => (
               <div key={i} style={{
                 display: 'flex', alignItems: isMobile ? 'flex-start' : 'center', flexDirection: isMobile ? 'column' : 'row',
@@ -363,11 +369,11 @@ function FinancialTab({ data, c, isMobile }: { data: FinancialReport; c: ReturnT
               }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <p style={{ fontSize: '14px', fontWeight: 500, color: c.textPrimary, margin: 0 }}>{trip.name}</p>
-                  <p style={{ fontSize: '12px', color: c.textMuted, margin: '2px 0 0 0' }}>{trip.pilgrimCount} jemaah</p>
+                  <p style={{ fontSize: '12px', color: c.textMuted, margin: '2px 0 0 0' }}>{trip.pilgrimCount} {t.common.pilgrims}</p>
                 </div>
                 <div style={{ textAlign: isMobile ? 'left' : 'right' }}>
                   <p style={{ fontSize: '14px', fontWeight: 600, color: c.success, margin: 0 }}>{formatCurrency(trip.revenue)}</p>
-                  {trip.outstanding > 0 && <p style={{ fontSize: '12px', color: c.error, margin: '2px 0 0 0' }}>Sisa: {formatCurrency(trip.outstanding)}</p>}
+                  {trip.outstanding > 0 && <p style={{ fontSize: '12px', color: c.error, margin: '2px 0 0 0' }}>{t.reports.remaining} {formatCurrency(trip.outstanding)}</p>}
                 </div>
               </div>
             ))}
@@ -375,15 +381,15 @@ function FinancialTab({ data, c, isMobile }: { data: FinancialReport; c: ReturnT
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <BreakdownCard title="Per Metode Bayar" data={data.methodBreakdown} labels={methodLabels} color={c.info} c={c} isMobile={isMobile} />
-          <BreakdownCard title="Per Tipe Pembayaran" data={data.typeBreakdown} labels={typeLabels} color={c.success} c={c} isMobile={isMobile} />
+          <BreakdownCard title={t.reports.byMethod} data={data.methodBreakdown} labels={{ transfer: t.reports.methodTransfer, cash: t.reports.methodCash, card: t.reports.methodCard }} color={c.info} c={c} isMobile={isMobile} />
+          <BreakdownCard title={t.reports.byType} data={data.typeBreakdown} labels={{ dp: t.reports.typeDp, installment: t.reports.typeInstallment, full: t.reports.typeFull, refund: t.reports.typeRefund }} color={c.success} c={c} isMobile={isMobile} />
         </div>
       </div>
 
       {data.monthlyRevenue.length > 0 && (
         <div style={{ backgroundColor: c.cardBg, borderRadius: '12px', border: `1px solid ${c.border}`, overflow: 'hidden' }}>
           <div style={{ padding: isMobile ? '16px' : '20px', borderBottom: `1px solid ${c.borderLight}` }}>
-            <h3 style={{ fontSize: '16px', fontWeight: 600, color: c.textPrimary, margin: 0 }}>Pemasukan Bulanan</h3>
+            <h3 style={{ fontSize: '16px', fontWeight: 600, color: c.textPrimary, margin: 0 }}>{t.reports.monthlyRevenue}</h3>
           </div>
           <div style={{ padding: isMobile ? '16px' : '20px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
             {data.monthlyRevenue.map(m => (
@@ -406,6 +412,7 @@ function BreakdownCard({ title, data, labels, color, c, isMobile }: {
   title: string; data: Record<string, number>; labels: Record<string, string>;
   color: string; c: ReturnType<typeof useTheme>['c']; isMobile: boolean;
 }) {
+  const { t } = useLanguage();
   return (
     <div style={{ backgroundColor: c.cardBg, borderRadius: '12px', border: `1px solid ${c.border}`, overflow: 'hidden' }}>
       <div style={{ padding: isMobile ? '16px' : '20px', borderBottom: `1px solid ${c.borderLight}` }}>
@@ -436,8 +443,10 @@ function BreakdownCard({ title, data, labels, color, c, isMobile }: {
 }
 
 function DemografiTab({ data, c, isMobile }: { data: DemographicsReport; c: ReturnType<typeof useTheme>['c']; isMobile: boolean }) {
+  const { t } = useLanguage();
+  const genderLabels: Record<string, string> = { male: t.reports.genderMale, female: t.reports.genderFemale, unknown: t.reports.genderUnknown };
   const genderData = data.genderBreakdown.map((g, i) => ({
-    name: GENDER_LABELS[g.gender] || g.gender,
+    name: genderLabels[g.gender] || g.gender,
     value: g.count,
     color: PIE_COLORS[i % PIE_COLORS.length],
   }));
@@ -447,7 +456,7 @@ function DemografiTab({ data, c, isMobile }: { data: DemographicsReport; c: Retu
       <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '16px' }}>
         {/* Gender pie */}
         <div style={{ backgroundColor: c.cardBg, borderRadius: '12px', border: `1px solid ${c.border}`, padding: '20px' }}>
-          <h3 style={{ fontSize: '16px', fontWeight: 600, color: c.textPrimary, margin: '0 0 16px 0' }}>Jenis Kelamin</h3>
+          <h3 style={{ fontSize: '16px', fontWeight: 600, color: c.textPrimary, margin: '0 0 16px 0' }}>{t.reports.genderTitle}</h3>
           <div style={{ width: '100%', height: 220 }}>
             <ResponsiveContainer>
               <PieChart>
@@ -463,7 +472,7 @@ function DemografiTab({ data, c, isMobile }: { data: DemographicsReport; c: Retu
 
         {/* Age bar */}
         <div style={{ backgroundColor: c.cardBg, borderRadius: '12px', border: `1px solid ${c.border}`, padding: '20px' }}>
-          <h3 style={{ fontSize: '16px', fontWeight: 600, color: c.textPrimary, margin: '0 0 16px 0' }}>Kelompok Usia</h3>
+          <h3 style={{ fontSize: '16px', fontWeight: 600, color: c.textPrimary, margin: '0 0 16px 0' }}>{t.reports.ageTitle}</h3>
           <div style={{ width: '100%', height: 220 }}>
             <ResponsiveContainer>
               <BarChart data={data.ageBreakdown} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
@@ -471,7 +480,7 @@ function DemografiTab({ data, c, isMobile }: { data: DemographicsReport; c: Retu
                 <XAxis dataKey="range" tick={{ fontSize: 11, fill: c.textMuted }} />
                 <YAxis tick={{ fontSize: 11, fill: c.textMuted }} width={30} />
                 <Tooltip contentStyle={{ backgroundColor: c.cardBg, border: `1px solid ${c.border}`, borderRadius: '8px', fontSize: '13px' }} />
-                <Bar dataKey="count" name="Jemaah" fill="#8B5CF6" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="count" name={t.reports.ageChartLabel} fill="#8B5CF6" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -481,11 +490,11 @@ function DemografiTab({ data, c, isMobile }: { data: DemographicsReport; c: Retu
       {/* Province table */}
       <div style={{ backgroundColor: c.cardBg, borderRadius: '12px', border: `1px solid ${c.border}`, overflow: 'hidden' }}>
         <div style={{ padding: '20px', borderBottom: `1px solid ${c.borderLight}` }}>
-          <h3 style={{ fontSize: '16px', fontWeight: 600, color: c.textPrimary, margin: 0 }}>Top 10 Provinsi</h3>
+          <h3 style={{ fontSize: '16px', fontWeight: 600, color: c.textPrimary, margin: 0 }}>{t.reports.topProvinces}</h3>
         </div>
         <div>
           {data.provinceBreakdown.length === 0 ? (
-            <EmptyState icon={BarChart3} title="Belum ada data" />
+            <EmptyState icon={BarChart3} title={t.common.noData} />
           ) : data.provinceBreakdown.map((p, i) => (
             <div key={p.province} style={{
               display: 'flex', justifyContent: 'space-between', alignItems: 'center',
@@ -505,10 +514,11 @@ function DemografiTab({ data, c, isMobile }: { data: DemographicsReport; c: Retu
 }
 
 function DokumenTab({ data, c }: { data: DocumentsReport; c: ReturnType<typeof useTheme>['c']; isMobile: boolean }) {
+  const { t } = useLanguage();
   return (
     <div style={{ backgroundColor: c.cardBg, borderRadius: '12px', border: `1px solid ${c.border}`, overflow: 'hidden' }}>
       <div style={{ padding: '20px', borderBottom: `1px solid ${c.borderLight}` }}>
-        <h3 style={{ fontSize: '16px', fontWeight: 600, color: c.textPrimary, margin: 0 }}>Kelengkapan Dokumen per Tipe ({data.totalPilgrims} jemaah)</h3>
+        <h3 style={{ fontSize: '16px', fontWeight: 600, color: c.textPrimary, margin: 0 }}>{t.reports.docCompletion} ({data.totalPilgrims} {t.common.pilgrims})</h3>
       </div>
       <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
         {data.completion.length === 0 ? (
@@ -524,9 +534,9 @@ function DokumenTab({ data, c }: { data: DocumentsReport; c: ReturnType<typeof u
               <div style={{ width: `${doc.total > 0 ? (doc.uploaded / doc.total) * 100 : 0}%`, backgroundColor: '#F59E0B' }} />
             </div>
             <div style={{ display: 'flex', gap: '16px', marginTop: '4px' }}>
-              <span style={{ fontSize: '11px', color: '#10B981' }}>Verified: {doc.verified}</span>
-              <span style={{ fontSize: '11px', color: '#F59E0B' }}>Uploaded: {doc.uploaded}</span>
-              <span style={{ fontSize: '11px', color: '#EF4444' }}>Missing: {doc.missing}</span>
+              <span style={{ fontSize: '11px', color: '#10B981' }}>{t.reports.docVerified}: {doc.verified}</span>
+              <span style={{ fontSize: '11px', color: '#F59E0B' }}>{t.reports.docUploaded}: {doc.uploaded}</span>
+              <span style={{ fontSize: '11px', color: '#EF4444' }}>{t.reports.docMissing}: {doc.missing}</span>
             </div>
           </div>
         ))}
@@ -536,6 +546,7 @@ function DokumenTab({ data, c }: { data: DocumentsReport; c: ReturnType<typeof u
 }
 
 function AgingTab({ data, c, isMobile }: { data: AgingReport; c: ReturnType<typeof useTheme>['c']; isMobile: boolean }) {
+  const { t } = useLanguage();
   const chartData = data.agingBuckets.map(b => ({
     ...b,
     fill: AGING_COLORS[b.range] || '#94A3B8',
@@ -546,15 +557,15 @@ function AgingTab({ data, c, isMobile }: { data: AgingReport; c: ReturnType<type
       <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '16px' }}>
         {/* Aging buckets chart */}
         <div style={{ backgroundColor: c.cardBg, borderRadius: '12px', border: `1px solid ${c.border}`, padding: '20px' }}>
-          <h3 style={{ fontSize: '16px', fontWeight: 600, color: c.textPrimary, margin: '0 0 4px 0' }}>Aging Piutang</h3>
+          <h3 style={{ fontSize: '16px', fontWeight: 600, color: c.textPrimary, margin: '0 0 4px 0' }}>{t.reports.agingTitle}</h3>
           <p style={{ fontSize: '13px', color: c.textMuted, margin: '0 0 16px 0' }}>Total: {formatCurrency(data.totalOutstanding)}</p>
           <div style={{ width: '100%', height: 220 }}>
             <ResponsiveContainer>
               <BarChart data={chartData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke={c.borderLight} />
-                <XAxis dataKey="range" tick={{ fontSize: 11, fill: c.textMuted }} label={{ value: 'Hari', position: 'insideBottomRight', offset: -5, fontSize: 11, fill: c.textMuted }} />
+                <XAxis dataKey="range" tick={{ fontSize: 11, fill: c.textMuted }} label={{ value: t.reports.agingDaysLabel, position: 'insideBottomRight', offset: -5, fontSize: 11, fill: c.textMuted }} />
                 <YAxis tickFormatter={(v: number) => v >= 1_000_000 ? `${(v / 1_000_000).toFixed(0)}jt` : `${(v / 1_000).toFixed(0)}rb`} tick={{ fontSize: 11, fill: c.textMuted }} width={50} />
-                <Tooltip formatter={(value: unknown) => [formatCurrency(Number(value)), 'Outstanding']} contentStyle={{ backgroundColor: c.cardBg, border: `1px solid ${c.border}`, borderRadius: '8px', fontSize: '13px' }} />
+                <Tooltip formatter={(value: unknown) => [formatCurrency(Number(value)), t.reports.agingOutstandingLabel]} contentStyle={{ backgroundColor: c.cardBg, border: `1px solid ${c.border}`, borderRadius: '8px', fontSize: '13px' }} />
                 <Bar dataKey="amount" radius={[4, 4, 0, 0]}>
                   {chartData.map((entry, i) => <Cell key={i} fill={entry.fill} />)}
                 </Bar>
@@ -566,11 +577,11 @@ function AgingTab({ data, c, isMobile }: { data: AgingReport; c: ReturnType<type
         {/* Top debtors */}
         <div style={{ backgroundColor: c.cardBg, borderRadius: '12px', border: `1px solid ${c.border}`, overflow: 'hidden' }}>
           <div style={{ padding: '20px', borderBottom: `1px solid ${c.borderLight}` }}>
-            <h3 style={{ fontSize: '16px', fontWeight: 600, color: c.textPrimary, margin: 0 }}>Top 10 Piutang Terbesar</h3>
+            <h3 style={{ fontSize: '16px', fontWeight: 600, color: c.textPrimary, margin: 0 }}>{t.reports.topDebtors}</h3>
           </div>
           <div>
             {data.topDebtors.length === 0 ? (
-              <EmptyState icon={BarChart3} title="Tidak ada piutang" />
+              <EmptyState icon={BarChart3} title={t.reports.noDebtors} />
             ) : data.topDebtors.map((d, i) => (
               <div key={i} style={{
                 display: 'flex', justifyContent: 'space-between', alignItems: 'center',
@@ -578,7 +589,7 @@ function AgingTab({ data, c, isMobile }: { data: AgingReport; c: ReturnType<type
               }}>
                 <div>
                   <p style={{ fontSize: '14px', fontWeight: 500, color: c.textPrimary, margin: 0 }}>{d.name}</p>
-                  <p style={{ fontSize: '12px', color: c.textMuted, margin: '2px 0 0 0' }}>{d.daysOverdue} hari</p>
+                  <p style={{ fontSize: '12px', color: c.textMuted, margin: '2px 0 0 0' }}>{d.daysOverdue} {t.reports.agingDaysUnit}</p>
                 </div>
                 <span style={{ fontSize: '14px', fontWeight: 600, color: '#EF4444' }}>{formatCurrency(d.outstanding)}</span>
               </div>
@@ -591,12 +602,13 @@ function AgingTab({ data, c, isMobile }: { data: AgingReport; c: ReturnType<type
 }
 
 function FunnelTab({ data, c }: { data: ConversionReport; c: ReturnType<typeof useTheme>['c']; isMobile: boolean }) {
+  const { t } = useLanguage();
   const FUNNEL_COLORS = ['#3B82F6', '#6366F1', '#8B5CF6', '#A855F7', '#C084FC', '#059669', '#0EA5E9', '#10B981'];
 
   return (
     <div style={{ backgroundColor: c.cardBg, borderRadius: '12px', border: `1px solid ${c.border}`, padding: '20px' }}>
-      <h3 style={{ fontSize: '16px', fontWeight: 600, color: c.textPrimary, margin: '0 0 4px 0' }}>Funnel Konversi</h3>
-      <p style={{ fontSize: '13px', color: c.textMuted, margin: '0 0 20px 0' }}>Total: {data.total} jemaah</p>
+      <h3 style={{ fontSize: '16px', fontWeight: 600, color: c.textPrimary, margin: '0 0 4px 0' }}>{t.reports.funnelTitle}</h3>
+      <p style={{ fontSize: '13px', color: c.textMuted, margin: '0 0 20px 0' }}>Total: {data.total} {t.common.pilgrims}</p>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
         {data.funnel.map((step, i) => {

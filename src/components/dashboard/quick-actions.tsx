@@ -67,6 +67,7 @@ export function QuickActions() {
 
   return (
     <div
+      data-tour="quick-actions"
       style={{
         backgroundColor: c.cardBg,
         borderRadius: '12px',

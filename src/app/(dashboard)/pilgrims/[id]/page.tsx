@@ -15,6 +15,7 @@ import { useToast } from '@/components/ui/toast';
 import type { Pilgrim } from '@/types/pilgrim';
 import { PILGRIM_STATUS_CONFIG } from '@/types';
 import type { PilgrimStatus, DocumentType } from '@/types';
+import { useLanguage } from '@/lib/i18n';
 
 export default function PilgrimDetailPage() {
   const params = useParams();
@@ -23,6 +24,7 @@ export default function PilgrimDetailPage() {
   const { isMobile } = useResponsive();
   const { user: authUser } = useAuth();
   const { addToast } = useToast();
+  const { t } = useLanguage();
 
   const [pilgrim, setPilgrim] = useState<Pilgrim | null>(null);
   const [loading, setLoading] = useState(true);
@@ -86,12 +88,12 @@ export default function PilgrimDetailPage() {
       });
       if (res.ok) {
         setPilgrim((prev) => prev ? { ...prev, tripId: newTripId as string | undefined } : prev);
-        addToast({ type: 'success', title: 'Trip berhasil diubah' });
+        addToast({ type: 'success', title: t.common.success + ' ' diubah' });
       } else {
-        addToast({ type: 'error', title: 'Gagal mengubah trip' });
+        addToast({ type: 'error', title: t.common.error + ' ' mengubah trip' });
       }
     } catch {
-      addToast({ type: 'error', title: 'Gagal mengubah trip' });
+      addToast({ type: 'error', title: t.common.error + ' ' mengubah trip' });
     } finally {
       setSavingTrip(false);
     }
@@ -105,7 +107,7 @@ export default function PilgrimDetailPage() {
         const data = await res.json();
         setPilgrim(data);
       } catch {
-        setError('Jemaah tidak ditemukan');
+        setError(t.common.noData);
       } finally {
         setLoading(false);
       }
@@ -143,12 +145,12 @@ export default function PilgrimDetailPage() {
         const newNote = await res.json();
         setInternalNotes((prev) => [newNote, ...prev]);
         setNoteContent('');
-        addToast({ type: 'success', title: 'Catatan berhasil ditambahkan' });
+        addToast({ type: 'success', title: t.common.success + ' ' ditambahkan' });
       } else {
-        addToast({ type: 'error', title: 'Gagal menambahkan catatan' });
+        addToast({ type: 'error', title: t.common.error + ' ' menambahkan catatan' });
       }
     } catch {
-      addToast({ type: 'error', title: 'Gagal menambahkan catatan' });
+      addToast({ type: 'error', title: t.common.error + ' ' menambahkan catatan' });
     } finally {
       setSavingNote(false);
     }
@@ -159,12 +161,12 @@ export default function PilgrimDetailPage() {
       const res = await fetch(`/api/pilgrims/${id}/notes/${noteId}`, { method: 'DELETE' });
       if (res.ok) {
         setInternalNotes((prev) => prev.filter((n) => n.id !== noteId));
-        addToast({ type: 'success', title: 'Catatan berhasil dihapus' });
+        addToast({ type: 'success', title: t.common.success + ' ' dihapus' });
       } else {
-        addToast({ type: 'error', title: 'Gagal menghapus catatan' });
+        addToast({ type: 'error', title: t.common.error + ' ' menghapus catatan' });
       }
     } catch {
-      addToast({ type: 'error', title: 'Gagal menghapus catatan' });
+      addToast({ type: 'error', title: t.common.error + ' ' menghapus catatan' });
     }
   }
 
@@ -198,7 +200,7 @@ export default function PilgrimDetailPage() {
         }),
       });
       if (!res.ok) {
-        addToast({ type: 'error', title: 'Gagal menyimpan pembayaran' });
+        addToast({ type: 'error', title: t.common.error + ' ' menyimpan pembayaran' });
         return;
       }
       const newPayment = await res.json();
@@ -215,9 +217,9 @@ export default function PilgrimDetailPage() {
       );
       setShowPayment(false);
       setPaymentForm({ amount: '', type: 'dp', method: 'transfer', date: new Date().toISOString().split('T')[0], notes: '' });
-      addToast({ type: 'success', title: 'Pembayaran berhasil disimpan' });
+      addToast({ type: 'success', title: t.common.success + ' ' disimpan' });
     } catch {
-      addToast({ type: 'error', title: 'Gagal menyimpan pembayaran' });
+      addToast({ type: 'error', title: t.common.error + ' ' menyimpan pembayaran' });
     } finally {
       setSavingPayment(false);
     }
@@ -232,18 +234,18 @@ export default function PilgrimDetailPage() {
         body: JSON.stringify({ status: newStatus }),
       });
       if (!res.ok) {
-        addToast({ type: 'error', title: 'Gagal mengubah status' });
+        addToast({ type: 'error', title: t.common.error + ' ' mengubah status' });
         return;
       }
       setPilgrim((prev) => prev ? { ...prev, status: newStatus as PilgrimStatus } : prev);
-      addToast({ type: 'success', title: 'Status berhasil diubah' });
+      addToast({ type: 'success', title: t.common.success + ' ' diubah' });
       // Refresh status history after change
       fetch(`/api/pilgrims/${id}/history`)
         .then((r) => r.json())
         .then((json) => setStatusHistory(json.data || []))
         .catch(() => {});
     } catch {
-      addToast({ type: 'error', title: 'Gagal mengubah status' });
+      addToast({ type: 'error', title: t.common.error + ' ' mengubah status' });
     }
   }
 
@@ -252,7 +254,7 @@ export default function PilgrimDetailPage() {
     try {
       const res = await fetch(`/api/pilgrims/${id}/payments/${deletePayment.id}`, { method: 'DELETE' });
       if (!res.ok) {
-        addToast({ type: 'error', title: 'Gagal menghapus pembayaran' });
+        addToast({ type: 'error', title: t.common.error + ' ' menghapus pembayaran' });
         return;
       }
       setPilgrim((prev) =>
@@ -265,9 +267,9 @@ export default function PilgrimDetailPage() {
             }
           : prev
       );
-      addToast({ type: 'success', title: 'Pembayaran berhasil dihapus' });
+      addToast({ type: 'success', title: t.common.success + ' ' dihapus' });
     } catch {
-      addToast({ type: 'error', title: 'Gagal menghapus pembayaran' });
+      addToast({ type: 'error', title: t.common.error + ' ' menghapus pembayaran' });
     } finally {
       setDeletePayment(null);
     }
@@ -279,7 +281,7 @@ export default function PilgrimDetailPage() {
     try {
       const res = await fetch(`/api/pilgrims/${id}/invoice`);
       if (!res.ok) {
-        addToast({ type: 'error', title: 'Gagal mengunduh kwitansi' });
+        addToast({ type: 'error', title: t.common.error + ' ' mengunduh kwitansi' });
         return;
       }
       const blob = await res.blob();
@@ -290,7 +292,7 @@ export default function PilgrimDetailPage() {
       a.click();
       URL.revokeObjectURL(url);
     } catch {
-      addToast({ type: 'error', title: 'Gagal mengunduh kwitansi' });
+      addToast({ type: 'error', title: t.common.error + ' ' mengunduh kwitansi' });
     } finally {
       setDownloadingInvoice(false);
     }
@@ -305,10 +307,10 @@ export default function PilgrimDetailPage() {
         const json = await res.json();
         setQrData(json.data);
       } else {
-        addToast({ type: 'error', title: 'Gagal generate QR code' });
+        addToast({ type: 'error', title: t.common.error + ' ' generate QR code' });
       }
     } catch {
-      addToast({ type: 'error', title: 'Gagal generate QR code' });
+      addToast({ type: 'error', title: t.common.error + ' ' generate QR code' });
     } finally {
       setLoadingQr(false);
     }
@@ -335,9 +337,9 @@ export default function PilgrimDetailPage() {
   if (error || !pilgrim) {
     return (
       <EmptyState
-        title={error || 'Jemaah tidak ditemukan'}
-        description="Data tidak dapat ditemukan. Kembali ke daftar jemaah."
-        action={{ label: 'Kembali ke Daftar', href: '/pilgrims' }}
+        title={error || t.common.noData}
+        description={t.common.noData}
+        action={{ label: t.common.back, href: '/pilgrims' }}
       />
     );
   }
@@ -764,7 +766,7 @@ export default function PilgrimDetailPage() {
                 ))}
               </div>
             ) : (
-              <p style={{ fontSize: '14px', color: c.textMuted, textAlign: 'center', padding: '32px 0', margin: 0 }}>Belum ada pembayaran</p>
+              <p style={{ fontSize: '14px', color: c.textMuted, textAlign: 'center', padding: '32px 0', margin: 0 }}>{t.common.noData}</p>
             )}
           </SectionCard>
         </div>
@@ -775,7 +777,7 @@ export default function PilgrimDetailPage() {
         <div style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <div onClick={() => setShowPayment(false)} style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)' }} />
           <div style={{ position: 'relative', width: '100%', maxWidth: '480px', margin: '0 16px', backgroundColor: c.cardBg, borderRadius: '16px', border: `1px solid ${c.border}`, padding: '28px' }}>
-            <h3 style={{ fontSize: '18px', fontWeight: '600', color: c.textPrimary, margin: '0 0 20px' }}>Tambah Pembayaran</h3>
+            <h3 style={{ fontSize: '18px', fontWeight: '600', color: c.textPrimary, margin: '0 0 20px' }}>{t.common.add}</h3>
             <form onSubmit={handlePaymentSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div>
                 <label style={labelStyle}>Jumlah (Rp)</label>
@@ -814,7 +816,7 @@ export default function PilgrimDetailPage() {
                 </button>
                 <button type="submit" disabled={savingPayment} style={{ padding: '12px 24px', fontSize: '14px', fontWeight: '600', color: 'white', backgroundColor: savingPayment ? c.textMuted : c.primary, border: 'none', borderRadius: '12px', cursor: savingPayment ? 'not-allowed' : 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
                   {savingPayment && <Loader2 style={{ width: '16px', height: '16px', animation: 'spin 1s linear infinite' }} />}
-                  {savingPayment ? 'Menyimpan...' : 'Simpan'}
+                  {savingPayment ? 'Menyimpan...' : t.common.save}
                 </button>
               </div>
             </form>

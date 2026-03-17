@@ -3,6 +3,7 @@
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
 import { usePilgrim } from '@/lib/contexts/pilgrim-context';
+import { useLanguage } from '@/lib/i18n';
 
 const PILGRIM_GREEN = '#059669';
 
@@ -25,6 +26,7 @@ export default function PilgrimPaymentsPage() {
   const { c } = useTheme();
   const { isMobile } = useResponsive();
   const { data } = usePilgrim();
+  const { t } = useLanguage();
 
   if (!data) return null;
 
@@ -34,10 +36,10 @@ export default function PilgrimPaymentsPage() {
   return (
     <div>
       <h1 style={{ fontSize: isMobile ? '22px' : '26px', fontWeight: 700, color: c.textPrimary, margin: '0 0 4px 0' }}>
-        Riwayat Pembayaran
+        {t.pilgrimPayments.title}
       </h1>
       <p style={{ fontSize: '14px', color: c.textMuted, margin: '0 0 20px 0' }}>
-        Detail lengkap pembayaran paket umrah Anda.
+        {t.pilgrimPayments.description}
       </p>
 
       {/* Progress bar card */}
@@ -46,7 +48,7 @@ export default function PilgrimPaymentsPage() {
         borderRadius: '16px', padding: '20px', marginBottom: '16px',
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-          <span style={{ fontSize: '14px', fontWeight: 600, color: c.textPrimary }}>Progress Pembayaran</span>
+          <span style={{ fontSize: '14px', fontWeight: 600, color: c.textPrimary }}>{t.pilgrimPayments.progress}</span>
           <span style={{ fontSize: '14px', fontWeight: 700, color: PILGRIM_GREEN }}>{paymentPercentage}%</span>
         </div>
         <div style={{ height: '12px', backgroundColor: c.borderLight, borderRadius: '6px', overflow: 'hidden', marginBottom: '16px' }}>
@@ -59,19 +61,19 @@ export default function PilgrimPaymentsPage() {
         {/* Summary cards */}
         <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr 1fr', gap: '10px' }}>
           <div style={{ textAlign: 'center', padding: '12px', backgroundColor: c.pageBg, borderRadius: '10px' }}>
-            <p style={{ fontSize: '11px', color: c.textMuted, margin: '0 0 4px 0', fontWeight: 500 }}>Total Paket</p>
+            <p style={{ fontSize: '11px', color: c.textMuted, margin: '0 0 4px 0', fontWeight: 500 }}>{t.pilgrimPortal.paymentTotal}</p>
             <p style={{ fontSize: isMobile ? '13px' : '15px', fontWeight: 700, color: c.textPrimary, margin: 0 }}>
               {formatCurrency(totalPackagePrice)}
             </p>
           </div>
           <div style={{ textAlign: 'center', padding: '12px', backgroundColor: '#F0FDF4', borderRadius: '10px' }}>
-            <p style={{ fontSize: '11px', color: c.textMuted, margin: '0 0 4px 0', fontWeight: 500 }}>Sudah Bayar</p>
+            <p style={{ fontSize: '11px', color: c.textMuted, margin: '0 0 4px 0', fontWeight: 500 }}>{t.pilgrimPortal.paymentPaid}</p>
             <p style={{ fontSize: isMobile ? '13px' : '15px', fontWeight: 700, color: '#16A34A', margin: 0 }}>
               {formatCurrency(totalPaid)}
             </p>
           </div>
           <div style={{ textAlign: 'center', padding: '12px', backgroundColor: remainingBalance > 0 ? '#FEF2F2' : '#F0FDF4', borderRadius: '10px' }}>
-            <p style={{ fontSize: '11px', color: c.textMuted, margin: '0 0 4px 0', fontWeight: 500 }}>Sisa</p>
+            <p style={{ fontSize: '11px', color: c.textMuted, margin: '0 0 4px 0', fontWeight: 500 }}>{t.pilgrimPortal.paymentRemaining}</p>
             <p style={{ fontSize: isMobile ? '13px' : '15px', fontWeight: 700, color: remainingBalance > 0 ? '#DC2626' : '#16A34A', margin: 0 }}>
               {formatCurrency(remainingBalance)}
             </p>
@@ -85,7 +87,7 @@ export default function PilgrimPaymentsPage() {
         borderRadius: '16px', padding: '20px',
       }}>
         <h2 style={{ fontSize: '15px', fontWeight: 600, color: c.textPrimary, margin: '0 0 16px 0' }}>
-          Riwayat Transaksi
+          {t.pilgrimPortal.paymentHistory}
         </h2>
 
         {payments.length === 0 ? (
