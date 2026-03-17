@@ -165,7 +165,7 @@ export default function TradePage() {
       >
         {/* Product Image */}
         {product.imageUrl ? (
-          <img
+          <img loading="lazy"
             src={product.imageUrl}
             alt={product.name}
             style={{
@@ -725,7 +725,7 @@ export default function TradePage() {
                   >
                     {/* Product Thumbnail */}
                     {product.imageUrl ? (
-                      <img
+                      <img loading="lazy"
                         src={product.imageUrl}
                         alt={product.name}
                         style={{

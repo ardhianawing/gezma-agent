@@ -87,7 +87,7 @@ function MarketCard({
         {/* Emoji + Vendor + Name */}
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', marginBottom: '10px' }}>
           {item.imageUrl ? (
-            <img
+            <img loading="lazy"
               src={item.imageUrl}
               alt={item.name}
               style={{

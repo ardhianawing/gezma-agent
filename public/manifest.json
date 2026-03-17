@@ -4,7 +4,7 @@
   "description": "Travel Agency Operations Dashboard for Umrah PPIU",
   "start_url": "/dashboard",
   "scope": "/",
-  "display": "standalone",
+  "display": "minimal-ui",
   "theme_color": "#F60000",
   "background_color": "#FFFFFF",
   "icons": [

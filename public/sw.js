@@ -1,6 +1,6 @@
-const CACHE_NAME = 'gezma-agent-v1';
-const STATIC_CACHE = 'gezma-static-v1';
-const API_CACHE = 'gezma-api-v1';
+const CACHE_NAME = 'gezma-agent-v2';
+const STATIC_CACHE = 'gezma-static-v2';
+const API_CACHE = 'gezma-api-v2';
 
 const STATIC_ASSETS = [
   '/',
@@ -46,6 +46,9 @@ self.addEventListener('fetch', (event) => {
 
   // Skip chrome-extension and other non-http
   if (!url.protocol.startsWith('http')) return;
+
+  // Skip cross-origin requests (external images, fonts, etc.)
+  if (url.origin !== self.location.origin) return;
 
   // API routes — network-first with cache fallback
   if (API_ROUTES.some((route) => url.pathname.startsWith(route))) {

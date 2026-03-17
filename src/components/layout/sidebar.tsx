@@ -29,7 +29,7 @@ import {
   CheckSquare,
   Bell,
   Wallet,
-  PiggyBank,
+  Banknote,
   CreditCard,
 } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n';
@@ -68,7 +68,7 @@ const platformItems: MenuItem[] = [
   { label: 'Akademi', href: '/academy', icon: GraduationCap },
   { label: 'Layanan', href: '/services', icon: HeadphonesIcon },
   { label: 'GezmaPay', href: '/gezmapay', icon: Wallet },
-  { label: 'Tabungan', href: '/tabungan', icon: PiggyBank },
+  { label: 'Tabungan', href: '/tabungan', icon: Banknote },
   { label: 'PayLater', href: '/paylater', icon: CreditCard },
 ];
 

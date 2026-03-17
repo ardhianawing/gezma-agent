@@ -46,6 +46,8 @@ COPY --from=builder /app/src/generated ./src/generated
 COPY start.sh ./start.sh
 RUN chmod +x ./start.sh
 
+# Create cache directory for Next.js image optimization
+RUN mkdir -p .next/cache && chown nextjs:nodejs .next/cache
 USER nextjs
 
 EXPOSE 3000
