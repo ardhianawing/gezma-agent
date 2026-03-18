@@ -500,6 +500,7 @@ function ThreadRow({
   c: Record<string, string>;
   isMobile: boolean;
 }) {
+  const { t } = useLanguage();
   const catInfo = getCategoryInfo(thread.category);
   const avatarColors: Record<string, string> = {
     AG: '#2563EB',
