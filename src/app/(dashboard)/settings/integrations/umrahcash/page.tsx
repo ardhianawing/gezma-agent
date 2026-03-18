@@ -673,7 +673,7 @@ export default function UmrahCashSettingsPage() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
               <Clock style={{ width: '14px', height: '14px', color: c.textMuted }} />
               <span style={{ fontSize: '12px', color: c.textMuted }}>
-                Update: {rate?.updatedAt ? formatDate(rate.updatedAt) : '-'}
+                Diperbarui: {rate?.updatedAt ? formatDate(rate.updatedAt) : '-'}
               </span>
             </div>
             <div

@@ -353,7 +353,7 @@ export function Sidebar({ isOpen, onClose, isOverlay = false }: SidebarProps) {
                   textOverflow: 'ellipsis',
                 }}
               >
-                {user?.agency?.name || 'Loading...'}
+                {user?.agency?.name || 'Memuat...'}
               </p>
               <p
                 style={{

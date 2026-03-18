@@ -162,7 +162,7 @@ export default function EditTripPage() {
         </Link>
         <div>
           <h1 style={{ fontSize: isMobile ? '22px' : '28px', fontWeight: '700', color: c.textPrimary, margin: 0 }}>
-            Edit Trip
+            Ubah Perjalanan
           </h1>
           <p style={{ fontSize: '14px', color: c.textMuted, margin: '4px 0 0 0' }}>
             {trip.name}

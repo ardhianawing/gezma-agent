@@ -273,7 +273,7 @@ export default function ServicesPage() {
                     transition: 'all 0.15s ease', display: 'flex', alignItems: 'center',
                     justifyContent: 'center', padding: 0,
                   }}
-                  title="Download"
+                  title="Unduh"
                 >
                   {'\u2B07'}
                 </button>

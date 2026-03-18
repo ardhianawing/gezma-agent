@@ -59,6 +59,7 @@ export default function AcademyPage() {
   const [loading, setLoading] = useState(true);
   const [progressList, setProgressList] = useState<ProgressItem[]>([]);
   const [courseRatings, setCourseRatings] = useState<Record<string, { avg: number; count: number }>>({});
+  const [visibleCount, setVisibleCount] = useState(6);
 
   const fetchCourses = useCallback(async () => {
     setLoading(true);
@@ -349,6 +350,7 @@ export default function AcademyPage() {
           </p>
         </div>
       ) : (
+        <>
         <div
           style={{
             display: 'grid',
@@ -356,7 +358,7 @@ export default function AcademyPage() {
             gap: '20px',
           }}
         >
-          {coursesData.map((course) => {
+          {(isMobile ? coursesData.slice(0, visibleCount) : coursesData).map((course) => {
             const isHovered = hoveredCard === course.id;
             const categoryColor = getCategoryColor(course.category);
             const levelMeta = getLevelMeta(course.level);
@@ -558,6 +560,26 @@ export default function AcademyPage() {
             );
           })}
         </div>
+        {isMobile && visibleCount < coursesData.length && (
+          <button
+            onClick={() => setVisibleCount(v => v + 6)}
+            style={{
+              width: '100%',
+              padding: '14px',
+              marginTop: '8px',
+              borderRadius: '10px',
+              border: `1px solid ${c.border}`,
+              backgroundColor: c.cardBg,
+              color: c.primary,
+              fontSize: '14px',
+              fontWeight: '600',
+              cursor: 'pointer',
+            }}
+          >
+            Muat Lebih Banyak ({coursesData.length - visibleCount} lagi)
+          </button>
+        )}
+        </>
       )}
     </div>
   );

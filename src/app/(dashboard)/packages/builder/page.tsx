@@ -286,7 +286,7 @@ export default function PackageBuilderPage() {
         </div>
 
         {/* Navigation buttons */}
-        <div style={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
+        <div style={{ display: 'flex', gap: '8px', flexShrink: 0, width: isMobile ? '100%' : undefined }}>
           {currentStep > 0 && (
             <button
               onClick={handlePrev}
@@ -316,8 +316,9 @@ export default function PackageBuilderPage() {
               style={{
                 display: 'flex',
                 alignItems: 'center',
+                justifyContent: 'center',
                 gap: '6px',
-                padding: '10px 16px',
+                padding: '12px 20px',
                 fontSize: '14px',
                 fontWeight: '600',
                 backgroundColor: selectedOption ? c.primary : c.border,
@@ -325,6 +326,8 @@ export default function PackageBuilderPage() {
                 border: 'none',
                 borderRadius: '8px',
                 cursor: selectedOption ? 'pointer' : 'not-allowed',
+                flex: isMobile ? 1 : undefined,
+                minHeight: '48px',
               }}
             >
               Selanjutnya

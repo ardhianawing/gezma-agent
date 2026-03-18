@@ -576,7 +576,7 @@ function PilgrimsPageContent() {
         <div style={{ display: 'flex', gap: '4px', backgroundColor: c.cardBg, border: `1px solid ${c.border}`, borderRadius: '8px', padding: '4px', flexShrink: 0 }}>
           <button
             onClick={() => setViewMode('list')}
-            title="List View"
+            title="Tampilan Daftar"
             style={{
               padding: '12px',
               borderRadius: '6px',
@@ -595,7 +595,7 @@ function PilgrimsPageContent() {
           </button>
           <button
             onClick={() => setViewMode('kanban')}
-            title="Kanban View"
+            title="Tampilan Kanban"
             style={{
               padding: '12px',
               borderRadius: '6px',

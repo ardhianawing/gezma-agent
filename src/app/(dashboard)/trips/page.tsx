@@ -132,7 +132,7 @@ export default function TripsPage() {
             <div style={{ display: 'flex', gap: '4px', backgroundColor: c.cardBg, border: `1px solid ${c.border}`, borderRadius: '8px', padding: '4px' }}>
               <button
                 onClick={() => setViewMode('list')}
-                title="List View"
+                title="Tampilan Daftar"
                 style={{
                   padding: '8px',
                   borderRadius: '6px',
@@ -149,7 +149,7 @@ export default function TripsPage() {
               </button>
               <button
                 onClick={() => setViewMode('calendar')}
-                title="Calendar View"
+                title="Tampilan Kalender"
                 style={{
                   padding: '8px',
                   borderRadius: '6px',
@@ -425,6 +425,7 @@ export default function TripsPage() {
                   </div>
 
                   {/* Flight Info Ticket Stub */}
+                  {(trip.flightInfo?.departureFlightNo || trip.flightInfo?.departureAirline) && (
                   <div
                     style={{
                       backgroundColor: c.cardBgHover,
@@ -445,7 +446,7 @@ export default function TripsPage() {
                     >
                       <span style={{ color: c.textSecondary }}>{t.trips.departure}</span>
                       <span style={{ fontFamily: 'monospace', fontWeight: '500', color: c.textPrimary }}>
-                        {trip.flightInfo?.departureFlightNo || '-'}
+                        {trip.flightInfo?.departureFlightNo}
                       </span>
                     </div>
                     <div
@@ -457,10 +458,11 @@ export default function TripsPage() {
                         fontWeight: '500',
                       }}
                     >
-                      <span>{trip.flightInfo?.departureAirline || '-'}</span>
+                      <span>{trip.flightInfo?.departureAirline}</span>
                       <span>CGK &rarr; JED</span>
                     </div>
                   </div>
+                  )}
 
                   {/* Seat Availability - pushed to bottom */}
                   <div style={{ marginTop: 'auto' }}>

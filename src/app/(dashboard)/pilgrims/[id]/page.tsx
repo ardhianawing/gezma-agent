@@ -376,7 +376,7 @@ export default function PilgrimDetailPage() {
             }}
           >
             <Edit style={{ width: '16px', height: '16px' }} />
-            Edit
+            Ubah
           </button>
         </Link>
       </div>
@@ -384,26 +384,26 @@ export default function PilgrimDetailPage() {
       <div style={{ display: 'grid', gap: '24px', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr 1fr' }}>
         {/* Personal Info */}
         <div style={{ gridColumn: isMobile ? undefined : 'span 2' }}>
-          <SectionCard title="Personal Information" icon={<User style={{ width: '18px', height: '18px', color: c.textMuted }} />}>
+          <SectionCard title="Informasi Pribadi" icon={<User style={{ width: '18px', height: '18px', color: c.textMuted }} />}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div style={{ display: 'grid', gap: '16px', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr' }}>
-                <InfoField label="Full Name" value={pilgrim.name} c={c} />
+                <InfoField label="Nama Lengkap" value={pilgrim.name} c={c} />
                 <InfoField label="NIK" value={pilgrim.nik} c={c} mono />
-                <InfoField label="Gender" value={pilgrim.gender === 'male' ? 'Male' : 'Female'} c={c} />
-                <InfoField label="Birth" value={`${pilgrim.birthPlace}, ${formatDate(pilgrim.birthDate)}`} c={c} />
+                <InfoField label="Jenis Kelamin" value={pilgrim.gender === 'male' ? 'Laki-laki' : 'Perempuan'} c={c} />
+                <InfoField label="Tempat, Tanggal Lahir" value={`${pilgrim.birthPlace}, ${formatDate(pilgrim.birthDate)}`} c={c} />
                 <div style={{ gridColumn: isMobile ? undefined : '1 / -1' }}>
-                  <InfoField label="Address" value={`${pilgrim.address}, ${pilgrim.city}, ${pilgrim.province}`} c={c} />
+                  <InfoField label="Alamat" value={`${pilgrim.address}, ${pilgrim.city}, ${pilgrim.province}`} c={c} />
                 </div>
-                <InfoField label="Phone" value={pilgrim.phone} c={c} />
+                <InfoField label="Telepon" value={pilgrim.phone} c={c} />
                 <InfoField label="Email" value={pilgrim.email} c={c} />
               </div>
 
               <div style={{ borderTop: `1px solid ${c.border}`, paddingTop: '16px' }}>
-                <p style={{ fontSize: '13px', fontWeight: '500', color: c.textMuted, margin: '0 0 12px' }}>Emergency Contact</p>
+                <p style={{ fontSize: '13px', fontWeight: '500', color: c.textMuted, margin: '0 0 12px' }}>Kontak Darurat</p>
                 <div style={{ display: 'grid', gap: '16px', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr 1fr' }}>
-                  <InfoField label="Name" value={emergencyContact.name} c={c} small />
-                  <InfoField label="Relation" value={emergencyContact.relation} c={c} small />
-                  <InfoField label="Phone" value={emergencyContact.phone} c={c} small />
+                  <InfoField label="Nama" value={emergencyContact.name} c={c} small />
+                  <InfoField label="Hubungan" value={emergencyContact.relation} c={c} small />
+                  <InfoField label="Telepon" value={emergencyContact.phone} c={c} small />
                 </div>
               </div>
             </div>
@@ -411,10 +411,10 @@ export default function PilgrimDetailPage() {
         </div>
 
         {/* Status & Payment */}
-        <SectionCard title="Status & Payment" icon={<CreditCard style={{ width: '18px', height: '18px', color: c.textMuted }} />}>
+        <SectionCard title="Status & Pembayaran" icon={<CreditCard style={{ width: '18px', height: '18px', color: c.textMuted }} />}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <div>
-              <p style={{ fontSize: '13px', fontWeight: '500', color: c.textMuted, margin: '0 0 8px' }}>Current Status</p>
+              <p style={{ fontSize: '13px', fontWeight: '500', color: c.textMuted, margin: '0 0 8px' }}>Status Saat Ini</p>
               <select value={pilgrim.status} onChange={(e) => handleStatusChange(e.target.value)} style={selectStyle}>
                 {Object.entries(PILGRIM_STATUS_CONFIG).map(([value, cfg]) => (
                   <option key={value} value={value}>{cfg.label}</option>
@@ -422,17 +422,17 @@ export default function PilgrimDetailPage() {
               </select>
             </div>
             <div>
-              <p style={{ fontSize: '13px', fontWeight: '500', color: c.textMuted, margin: 0 }}>Total Paid</p>
+              <p style={{ fontSize: '13px', fontWeight: '500', color: c.textMuted, margin: 0 }}>Total Terbayar</p>
               <p style={{ fontSize: '18px', fontWeight: '700', color: c.textPrimary, margin: '4px 0 0' }}>{formatCurrency(pilgrim.totalPaid)}</p>
             </div>
             <div>
-              <p style={{ fontSize: '13px', fontWeight: '500', color: c.textMuted, margin: 0 }}>Remaining</p>
+              <p style={{ fontSize: '13px', fontWeight: '500', color: c.textMuted, margin: 0 }}>Sisa Tagihan</p>
               <p style={{ fontSize: '18px', fontWeight: '700', color: c.error, margin: '4px 0 0' }}>{formatCurrency(pilgrim.remainingBalance)}</p>
             </div>
             <div style={{ paddingTop: '16px', borderTop: `1px solid ${c.border}` }}>
               <p style={{ fontSize: '13px', fontWeight: '500', color: c.textMuted, margin: '0 0 8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <Plane style={{ width: '16px', height: '16px' }} />
-                Trip Assignment
+                Penugasan Perjalanan
               </p>
               <select
                 value={pilgrim.tripId || ''}
@@ -480,17 +480,17 @@ export default function PilgrimDetailPage() {
         </div>
 
         {/* Checklist */}
-        <SectionCard title="Checklist" icon={<ClipboardCheck style={{ width: '18px', height: '18px', color: c.textMuted }} />}>
+        <SectionCard title="Kelengkapan Berkas" icon={<ClipboardCheck style={{ width: '18px', height: '18px', color: c.textMuted }} />}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <ChecklistItem label="KTP Uploaded" checked={!!checklist.ktpUploaded} c={c} />
-            <ChecklistItem label="Passport Uploaded" checked={!!checklist.passportUploaded} c={c} />
-            <ChecklistItem label="Passport Valid (6+ months)" checked={!!checklist.passportValid} c={c} />
-            <ChecklistItem label="Photo Uploaded" checked={!!checklist.photoUploaded} c={c} />
-            <ChecklistItem label="DP Paid" checked={!!checklist.dpPaid} c={c} />
-            <ChecklistItem label="Full Payment" checked={!!checklist.fullPayment} c={c} />
-            <ChecklistItem label="Visa Submitted" checked={!!checklist.visaSubmitted} c={c} />
-            <ChecklistItem label="Visa Received" checked={!!checklist.visaReceived} c={c} />
-            <ChecklistItem label="Health Certificate" checked={!!checklist.healthCertificate} c={c} />
+            <ChecklistItem label="KTP Diunggah" checked={!!checklist.ktpUploaded} c={c} />
+            <ChecklistItem label="Paspor Diunggah" checked={!!checklist.passportUploaded} c={c} />
+            <ChecklistItem label="Paspor Masih Berlaku (6+ bulan)" checked={!!checklist.passportValid} c={c} />
+            <ChecklistItem label="Foto Diunggah" checked={!!checklist.photoUploaded} c={c} />
+            <ChecklistItem label="DP Terbayar" checked={!!checklist.dpPaid} c={c} />
+            <ChecklistItem label="Lunas" checked={!!checklist.fullPayment} c={c} />
+            <ChecklistItem label="Visa Diajukan" checked={!!checklist.visaSubmitted} c={c} />
+            <ChecklistItem label="Visa Diterima" checked={!!checklist.visaReceived} c={c} />
+            <ChecklistItem label="Surat Keterangan Sehat" checked={!!checklist.healthCertificate} c={c} />
           </div>
         </SectionCard>
 
@@ -517,7 +517,7 @@ export default function PilgrimDetailPage() {
                 }}
               >
                 <QrCode style={{ width: '16px', height: '16px' }} />
-                {loadingQr ? 'Generating...' : 'Generate QR Code'}
+                {loadingQr ? 'Membuat...' : 'Buat QR Code'}
               </button>
             ) : (
               <>
@@ -536,7 +536,7 @@ export default function PilgrimDetailPage() {
                     }}
                   >
                     <Download style={{ width: '14px', height: '14px' }} />
-                    Download
+                    Unduh
                   </button>
                   <button
                     type="button"
@@ -548,7 +548,7 @@ export default function PilgrimDetailPage() {
                     }}
                   >
                     <Link2 style={{ width: '14px', height: '14px' }} />
-                    {copyFeedback ? 'Tersalin!' : 'Copy Link'}
+                    {copyFeedback ? 'Tersalin!' : 'Salin Tautan'}
                   </button>
                 </div>
               </>
@@ -683,7 +683,7 @@ export default function PilgrimDetailPage() {
         {/* Payment History */}
         <div style={{ gridColumn: isMobile ? undefined : '1 / -1' }}>
           <SectionCard
-            title="Payment History"
+            title="Riwayat Pembayaran"
             icon={<DollarSign style={{ width: '18px', height: '18px', color: c.textMuted }} />}
             headerRight={
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>

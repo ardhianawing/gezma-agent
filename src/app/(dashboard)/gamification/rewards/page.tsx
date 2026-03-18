@@ -86,7 +86,7 @@ export default function RewardsPage() {
             flexShrink: 0,
           }}
         >
-          \u2B50
+          {'\u2B50'}
         </div>
         <div>
           <p style={{ fontSize: '13px', color: c.textMuted, margin: 0 }}>Poin Anda saat ini</p>

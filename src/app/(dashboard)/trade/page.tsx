@@ -37,6 +37,7 @@ export default function TradePage() {
   const [products, setProducts] = useState<TradeProduct[]>([]);
   const [myProducts, setMyProducts] = useState<TradeProduct[]>([]);
   const [loading, setLoading] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(8);
   const [apiStats, setApiStats] = useState({ totalProducts: 0, activeListings: 0, producers: 0, targetCountries: 0 });
 
   const fetchProducts = useCallback(async () => {
@@ -562,8 +563,26 @@ export default function TradePage() {
                 gap: isMobile ? '16px' : '20px',
               }}
             >
-              {filteredProducts.map(renderProductCard)}
+              {(isMobile ? filteredProducts.slice(0, visibleCount) : filteredProducts).map(renderProductCard)}
             </div>
+          )}
+          {isMobile && visibleCount < filteredProducts.length && (
+            <button
+              onClick={() => setVisibleCount(v => v + 8)}
+              style={{
+                width: '100%',
+                padding: '14px',
+                borderRadius: '10px',
+                border: `1px solid ${c.border}`,
+                backgroundColor: c.cardBg,
+                color: c.primary,
+                fontSize: '14px',
+                fontWeight: '600',
+                cursor: 'pointer',
+              }}
+            >
+              Muat Lebih Banyak ({filteredProducts.length - visibleCount} lagi)
+            </button>
           )}
         </>
       )}

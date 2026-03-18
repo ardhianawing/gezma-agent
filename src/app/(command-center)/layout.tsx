@@ -87,7 +87,7 @@ export default function CommandCenterLayout({ children }: { children: React.Reac
 
   useEffect(() => {
     if (isLoginPage) {
-      setLoading(false);
+      Promise.resolve().then(() => setLoading(false));
       return;
     }
     fetch('/api/command-center/auth/me')
@@ -102,7 +102,7 @@ export default function CommandCenterLayout({ children }: { children: React.Reac
 
   // Close sidebar on route change (mobile)
   useEffect(() => {
-    setSidebarOpen(false);
+    Promise.resolve().then(() => setSidebarOpen(false));
   }, [pathname]);
 
   const logout = useCallback(async () => {
@@ -125,7 +125,7 @@ export default function CommandCenterLayout({ children }: { children: React.Reac
   if (loading) {
     return (
       <div style={{ minHeight: '100vh', backgroundColor: cc.pageBg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <p style={{ color: cc.textMuted }}>Loading...</p>
+        <p style={{ color: cc.textMuted }}>Memuat...</p>
       </div>
     );
   }

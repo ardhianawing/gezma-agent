@@ -413,7 +413,7 @@ export default function GamificationPage() {
                       fontSize: '13px',
                     }}
                   >
-                    <ChevronLeft style={{ width: '16px', height: '16px' }} /> Prev
+                    <ChevronLeft style={{ width: '16px', height: '16px' }} /> Sebelumnya
                   </button>
                   <span style={{ padding: '8px 16px', fontSize: '13px', color: c.textMuted }}>
                     {historyPage} / {historyTotalPages}
@@ -434,7 +434,7 @@ export default function GamificationPage() {
                       fontSize: '13px',
                     }}
                   >
-                    Next <ChevronRight style={{ width: '16px', height: '16px' }} />
+                    Selanjutnya <ChevronRight style={{ width: '16px', height: '16px' }} />
                   </button>
                 </div>
               )}

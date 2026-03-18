@@ -335,13 +335,13 @@ export default function TripDetailPage({ params }: { params: Promise<{ id: strin
   const checklist = trip.checklist || {};
   const checklistItems = [
     { label: 'All pilgrims confirmed', checked: checklist.allPilgrimsConfirmed },
-    { label: 'Manifest complete', checked: checklist.manifestComplete },
-    { label: 'Rooming list finalized', checked: checklist.roomingListFinalized },
-    { label: 'Flight tickets issued', checked: checklist.flightTicketsIssued },
-    { label: 'Hotel confirmed', checked: checklist.hotelConfirmed },
-    { label: 'Guide assigned', checked: checklist.guideAssigned },
-    { label: 'Insurance processed', checked: checklist.insuranceProcessed },
-    { label: 'Departure briefing done', checked: checklist.departureBriefingDone },
+    { label: 'Manifest lengkap', checked: checklist.manifestComplete },
+    { label: 'Daftar kamar sudah final', checked: checklist.roomingListFinalized },
+    { label: 'Tiket pesawat sudah terbit', checked: checklist.flightTicketsIssued },
+    { label: 'Hotel sudah dikonfirmasi', checked: checklist.hotelConfirmed },
+    { label: 'Pembimbing sudah ditugaskan', checked: checklist.guideAssigned },
+    { label: 'Asuransi sudah diproses', checked: checklist.insuranceProcessed },
+    { label: 'Briefing keberangkatan selesai', checked: checklist.departureBriefingDone },
   ];
 
   const capacityPercent = trip.capacity > 0 ? Math.round((trip.registeredCount / trip.capacity) * 100) : 0;
@@ -421,7 +421,7 @@ export default function TripDetailPage({ params }: { params: Promise<{ id: strin
           >
             <Plane style={{ width: '18px', height: '18px', color: c.primary }} />
             <h3 style={{ fontSize: '16px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>
-              Trip Information
+              Informasi Perjalanan
             </h3>
           </div>
           <div style={{ padding: isMobile ? '20px' : '28px' }}>
@@ -433,7 +433,7 @@ export default function TripDetailPage({ params }: { params: Promise<{ id: strin
               }}
             >
               <div>
-                <p style={{ fontSize: '13px', fontWeight: '500', color: c.textMuted, margin: '0 0 4px 0' }}>Departure</p>
+                <p style={{ fontSize: '13px', fontWeight: '500', color: c.textMuted, margin: '0 0 4px 0' }}>Keberangkatan</p>
                 <p style={{ fontSize: '14px', color: c.textPrimary, margin: '0 0 4px 0' }}>
                   {trip.departureDate ? formatDate(trip.departureDate) : '-'}
                 </p>
@@ -443,7 +443,7 @@ export default function TripDetailPage({ params }: { params: Promise<{ id: strin
                 </p>
               </div>
               <div>
-                <p style={{ fontSize: '13px', fontWeight: '500', color: c.textMuted, margin: '0 0 4px 0' }}>Return</p>
+                <p style={{ fontSize: '13px', fontWeight: '500', color: c.textMuted, margin: '0 0 4px 0' }}>Kepulangan</p>
                 <p style={{ fontSize: '14px', color: c.textPrimary, margin: '0 0 4px 0' }}>
                   {trip.returnDate ? formatDate(trip.returnDate) : '-'}
                 </p>
@@ -453,9 +453,9 @@ export default function TripDetailPage({ params }: { params: Promise<{ id: strin
                 </p>
               </div>
               <div>
-                <p style={{ fontSize: '13px', fontWeight: '500', color: c.textMuted, margin: '0 0 4px 0' }}>Capacity</p>
+                <p style={{ fontSize: '13px', fontWeight: '500', color: c.textMuted, margin: '0 0 4px 0' }}>Kapasitas</p>
                 <p style={{ fontSize: '14px', color: c.textPrimary, margin: 0 }}>
-                  {trip.registeredCount}/{trip.capacity} pilgrims
+                  {trip.registeredCount}/{trip.capacity} jemaah
                 </p>
               </div>
             </div>
@@ -463,7 +463,7 @@ export default function TripDetailPage({ params }: { params: Promise<{ id: strin
             {(trip.muthawwifName || checklist.guideAssigned) && (
               <div style={{ paddingTop: '20px', marginTop: '20px', borderTop: `1px solid ${c.border}` }}>
                 <p style={{ fontSize: '13px', fontWeight: '500', color: c.textMuted, margin: '0 0 8px 0' }}>
-                  Guide/Muthawwif
+                  Pembimbing/Muthawwif
                 </p>
                 <p style={{ fontSize: '14px', color: c.textPrimary, margin: '0 0 4px 0' }}>
                   {trip.muthawwifName || '-'}
@@ -494,7 +494,7 @@ export default function TripDetailPage({ params }: { params: Promise<{ id: strin
           >
             <ClipboardCheck style={{ width: '18px', height: '18px', color: c.primary }} />
             <h3 style={{ fontSize: '16px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>
-              Operational Checklist
+              Checklist Operasional
             </h3>
           </div>
           <div style={{ padding: isMobile ? '20px' : '28px' }}>

@@ -54,6 +54,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
           style={{
             flex: 1,
             padding: isMobile ? '16px' : isTablet ? '24px' : '32px',
+            paddingBottom: isMobile ? '100px' : isTablet ? '24px' : '32px',
             position: 'relative',
             zIndex: 0,
             width: '100%',

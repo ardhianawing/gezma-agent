@@ -116,7 +116,7 @@ export function ActionCenter() {
       <div style={{ padding: isMobile ? '16px' : '24px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
         {loading ? (
           <p style={{ textAlign: 'center', fontSize: '14px', color: c.textMuted, padding: '24px 0' }}>
-            Loading...
+            Memuat...
           </p>
         ) : alerts.length === 0 ? (
           <p style={{ textAlign: 'center', fontSize: '14px', color: c.textMuted, padding: '24px 0' }}>

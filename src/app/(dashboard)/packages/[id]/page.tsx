@@ -194,7 +194,7 @@ export default function PackageDetailPage() {
               borderRadius: '12px', padding: '12px 24px', fontSize: '14px', fontWeight: '600', cursor: 'pointer',
             }}>
               <Edit style={{ width: '16px', height: '16px' }} />
-              Edit Package
+              Ubah Paket
             </button>
           </Link>
           <button onClick={() => setDeleteTarget(true)} style={{
@@ -217,11 +217,11 @@ export default function PackageDetailPage() {
         <div style={cardStyle}>
           <div style={cardHeaderStyle}>
             <DollarSign style={{ width: '18px', height: '18px', color: c.textMuted }} />
-            <h3 style={{ fontSize: '16px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>Pricing</h3>
+            <h3 style={{ fontSize: '16px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>Harga</h3>
           </div>
           <div style={{ ...cardBodyStyle, display: 'flex', flexDirection: 'column', gap: '12px' }}>
             <div>
-              <p style={{ fontSize: '14px', color: c.textMuted, margin: '0 0 4px 0' }}>Published Price</p>
+              <p style={{ fontSize: '14px', color: c.textMuted, margin: '0 0 4px 0' }}>Harga Jual</p>
               <p style={{ fontSize: '24px', fontWeight: '700', color: c.textPrimary, margin: 0 }}>{formatCurrency(pkg.publishedPrice)}</p>
             </div>
             {pkg.isPromo && pkg.promoPrice && (
@@ -229,7 +229,7 @@ export default function PackageDetailPage() {
                 <span style={{
                   display: 'inline-block', padding: '4px 10px', fontSize: '12px', fontWeight: '600',
                   backgroundColor: c.errorLight, color: c.error, borderRadius: '8px',
-                }}>Promo Price</span>
+                }}>Harga Promo</span>
                 <p style={{ fontSize: '20px', fontWeight: '700', color: c.error, margin: '4px 0 0 0' }}>{formatCurrency(pkg.promoPrice)}</p>
               </div>
             )}
@@ -250,18 +250,18 @@ export default function PackageDetailPage() {
         <div style={cardStyle}>
           <div style={cardHeaderStyle}>
             <Building2 style={{ width: '18px', height: '18px', color: c.textMuted }} />
-            <h3 style={{ fontSize: '16px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>Hotels</h3>
+            <h3 style={{ fontSize: '16px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>Hotel</h3>
           </div>
           <div style={{ ...cardBodyStyle, display: 'grid', gap: '16px', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr' }}>
             <div>
               <p style={{ fontWeight: '500', color: c.textPrimary, margin: '0 0 4px 0' }}>Makkah</p>
               <p style={{ fontSize: '14px', color: c.textMuted, margin: '0 0 2px 0' }}>{pkg.makkahHotel}</p>
-              <p style={{ fontSize: '14px', color: c.textMuted, margin: 0 }}>{pkg.makkahHotelRating} star &bull; {pkg.makkahHotelDistance}</p>
+              <p style={{ fontSize: '14px', color: c.textMuted, margin: 0 }}>{pkg.makkahHotelRating} bintang &bull; {pkg.makkahHotelDistance}</p>
             </div>
             <div>
               <p style={{ fontWeight: '500', color: c.textPrimary, margin: '0 0 4px 0' }}>Madinah</p>
               <p style={{ fontSize: '14px', color: c.textMuted, margin: '0 0 2px 0' }}>{pkg.madinahHotel}</p>
-              <p style={{ fontSize: '14px', color: c.textMuted, margin: 0 }}>{pkg.madinahHotelRating} star &bull; {pkg.madinahHotelDistance}</p>
+              <p style={{ fontSize: '14px', color: c.textMuted, margin: 0 }}>{pkg.madinahHotelRating} bintang &bull; {pkg.madinahHotelDistance}</p>
             </div>
           </div>
         </div>
@@ -270,7 +270,7 @@ export default function PackageDetailPage() {
         <div style={{ ...cardStyle, gridColumn: isMobile ? undefined : '1 / -1' }}>
           <div style={cardHeaderStyle}>
             <FileText style={{ width: '18px', height: '18px', color: c.textMuted }} />
-            <h3 style={{ fontSize: '16px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>Package Description</h3>
+            <h3 style={{ fontSize: '16px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>Deskripsi Paket</h3>
           </div>
           <div style={cardBodyStyle}>
             <p style={{ color: c.textMuted, margin: 0, lineHeight: '1.6' }}>{pkg.description}</p>
@@ -281,7 +281,7 @@ export default function PackageDetailPage() {
         <div style={{ ...cardStyle, gridColumn: isMobile ? undefined : 'span 1' }}>
           <div style={cardHeaderStyle}>
             <CheckCircle style={{ width: '18px', height: '18px', color: c.success }} />
-            <h3 style={{ fontSize: '16px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>Included</h3>
+            <h3 style={{ fontSize: '16px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>Termasuk</h3>
           </div>
           <div style={cardBodyStyle}>
             <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -299,7 +299,7 @@ export default function PackageDetailPage() {
         <div style={cardStyle}>
           <div style={cardHeaderStyle}>
             <XCircle style={{ width: '18px', height: '18px', color: c.error }} />
-            <h3 style={{ fontSize: '16px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>Not Included</h3>
+            <h3 style={{ fontSize: '16px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>Tidak Termasuk</h3>
           </div>
           <div style={cardBodyStyle}>
             <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -317,7 +317,7 @@ export default function PackageDetailPage() {
         <div style={{ ...cardStyle, gridColumn: isMobile ? undefined : '1 / -1' }}>
           <div style={cardHeaderStyle}>
             <Calendar style={{ width: '18px', height: '18px', color: c.textMuted }} />
-            <h3 style={{ fontSize: '16px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>Itinerary</h3>
+            <h3 style={{ fontSize: '16px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>Jadwal Perjalanan</h3>
           </div>
           <div style={cardBodyStyle}>
             {(() => {

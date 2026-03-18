@@ -102,10 +102,10 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
     return (
       <div style={{ padding: isMobile ? '16px' : '24px', maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
         <h3 style={{ fontSize: '18px', fontWeight: 600, color: c.textPrimary, margin: '0 0 8px 0' }}>
-          Quiz not found
+          Kuis tidak ditemukan
         </h3>
         <p style={{ fontSize: '14px', color: c.textMuted, margin: '0 0 16px 0' }}>
-          This course does not have a quiz yet.
+          Kursus ini belum memiliki kuis.
         </p>
         <button
           onClick={() => router.push(`/academy/${courseId}`)}
@@ -140,13 +140,13 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
             fontSize: '24px', fontWeight: 700, margin: '0 0 8px 0',
             color: result.passed ? '#059669' : '#EF4444',
           }}>
-            {result.passed ? 'Congratulations! You Passed!' : 'Not Passed Yet'}
+            {result.passed ? 'Selamat! Kamu Lulus!' : 'Belum Lulus'}
           </h2>
 
           <p style={{ fontSize: '14px', color: c.textMuted, margin: '0 0 24px 0' }}>
             {result.passed
-              ? 'You have completed the quiz successfully.'
-              : `Minimum score to pass is ${result.passScore}%. Please try again.`}
+              ? 'Kamu berhasil menyelesaikan kuis ini.'
+              : `Skor minimal untuk lulus adalah ${result.passScore}%. Coba lagi!`}
           </p>
 
           {/* Score Display */}
@@ -159,7 +159,7 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
               {result.score}%
             </p>
             <p style={{ fontSize: '14px', color: c.textMuted, margin: '4px 0 0 0' }}>
-              {result.correctAnswers}/{result.totalQuestions} correct answers
+              {result.correctAnswers}/{result.totalQuestions} jawaban benar
             </p>
           </div>
 
@@ -177,7 +177,7 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
                 }}
               >
                 <Award style={{ width: '16px', height: '16px' }} />
-                {t.common.download} Certificate
+                {t.common.download} Sertifikat
               </button>
             )}
             <button
@@ -192,7 +192,7 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
                 color: c.textSecondary, fontSize: '14px', fontWeight: 600, cursor: 'pointer',
               }}
             >
-              Try Again
+              Coba Lagi
             </button>
             <button
               onClick={() => router.push(`/academy/${courseId}`)}
@@ -241,7 +241,7 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
           {quiz.title}
         </h1>
         <p style={{ fontSize: '13px', color: c.textMuted, margin: 0 }}>
-          Min score: {quiz.passScore}% | {quiz.totalQuestions} questions | Answered: {answeredCount}/{quiz.totalQuestions}
+          Skor min: {quiz.passScore}% | {quiz.totalQuestions} soal | Terjawab: {answeredCount}/{quiz.totalQuestions}
         </p>
 
         {/* Question indicators */}
@@ -273,7 +273,7 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
           marginBottom: '16px',
         }}>
           <p style={{ fontSize: '13px', color: c.textMuted, margin: '0 0 8px 0' }}>
-            Question {currentIdx + 1} {t.common.of} {quiz.totalQuestions}
+            Soal {currentIdx + 1} dari {quiz.totalQuestions}
           </p>
           <h3 style={{ fontSize: '16px', fontWeight: 600, color: c.textPrimary, margin: '0 0 20px 0', lineHeight: 1.5 }}>
             {currentQuestion.question}

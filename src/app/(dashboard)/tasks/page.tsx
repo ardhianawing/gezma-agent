@@ -341,7 +341,7 @@ export default function TasksPage() {
                             onClick={() => setDeleteTaskId(task.id)}
                             title="Hapus task"
                             aria-label="Hapus"
-                            style={{ padding: '4px', border: 'none', backgroundColor: 'transparent', color: c.textMuted, cursor: 'pointer', display: 'flex', flexShrink: 0 }}
+                            style={{ padding: '8px', minWidth: '36px', minHeight: '36px', border: 'none', backgroundColor: 'transparent', color: c.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, borderRadius: '6px' }}
                           >
                             <Trash2 style={{ width: '14px', height: '14px' }} />
                           </button>

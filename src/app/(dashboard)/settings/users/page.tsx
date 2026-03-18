@@ -208,6 +208,72 @@ export default function UsersPage() {
           <div style={{ padding: '40px', textAlign: 'center', color: c.textSecondary }}>{t.common.loadingData}</div>
         ) : users.length === 0 ? (
           <EmptyState icon={Users} title={t.common.noData} description={t.common.noData} />
+        ) : isMobile ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1px', backgroundColor: c.borderLight }}>
+            {users.map((user) => {
+              const badge = roleBadgeColor(user.role);
+              return (
+                <div
+                  key={user.id}
+                  style={{
+                    backgroundColor: c.cardBg,
+                    padding: '16px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: '40px',
+                      height: '40px',
+                      borderRadius: '50%',
+                      backgroundColor: badge.bg,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                      fontSize: '14px',
+                      fontWeight: '700',
+                      color: badge.color,
+                    }}
+                  >
+                    {user.name.charAt(0).toUpperCase()}
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: '14px', fontWeight: '600', color: c.textPrimary, marginBottom: '2px' }}>{user.name}</div>
+                    <div style={{ fontSize: '13px', color: c.textSecondary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user.email}</div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '6px' }}>
+                      <span style={{ backgroundColor: badge.bg, color: badge.color, fontSize: '11px', fontWeight: '600', padding: '2px 8px', borderRadius: '10px' }}>
+                        {user.role}
+                      </span>
+                      <span style={{ fontSize: '11px', fontWeight: '500', color: user.isActive ? '#16a34a' : '#dc2626', backgroundColor: user.isActive ? '#dcfce7' : '#fee2e2', padding: '2px 8px', borderRadius: '10px' }}>
+                        {user.isActive ? 'Aktif' : 'Nonaktif'}
+                      </span>
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', gap: '4px', flexShrink: 0 }}>
+                    <button
+                      onClick={() => openEdit(user)}
+                      aria-label="Edit"
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '10px', minWidth: '44px', minHeight: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: c.textSecondary }}
+                    >
+                      <Edit2 style={{ width: '16px', height: '16px' }} />
+                    </button>
+                    {can(PERMISSIONS.USERS_DELETE) && (
+                      <button
+                        onClick={() => setDeleteTarget({id: user.id, name: user.name})}
+                        aria-label="Hapus"
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '10px', minWidth: '44px', minHeight: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#dc2626' }}
+                      >
+                        <Trash2 style={{ width: '16px', height: '16px' }} />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         ) : (
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>

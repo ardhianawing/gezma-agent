@@ -152,7 +152,7 @@ export default function EditPilgrimPage() {
         <BackButton href={`/pilgrims/${id}`} />
         <div>
           <h1 style={{ fontSize: isMobile ? '22px' : '28px', fontWeight: '700', color: c.textPrimary, margin: 0 }}>
-            Edit: {form.name}
+            Ubah: {form.name}
           </h1>
           <p style={{ fontSize: '14px', color: c.textMuted, marginTop: '4px' }}>{t.pilgrims.editPilgrim}</p>
         </div>

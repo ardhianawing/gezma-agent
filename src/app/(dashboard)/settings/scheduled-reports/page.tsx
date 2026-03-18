@@ -405,7 +405,7 @@ export default function ScheduledReportsPage() {
                       color: c.textSecondary, fontSize: '12px', fontWeight: 500, cursor: 'pointer',
                     }}
                   >
-                    Edit
+                    Ubah
                   </button>
                   <button
                     onClick={() => setDeleteReportId(r.id)}

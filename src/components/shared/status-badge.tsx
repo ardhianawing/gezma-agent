@@ -14,19 +14,19 @@ const PILGRIM_STATUS_ENHANCED: Record<PilgrimStatus, { label: string; color: str
   dp: { label: 'DP', color: '#854D0E', bgColor: '#FEF9C3', borderColor: '#FEF08A' },
   lunas: { label: 'Lunas', color: '#166534', bgColor: '#DCFCE7', borderColor: '#BBF7D0' },
   dokumen: { label: 'Dokumen', color: '#115E59', bgColor: '#CCFBF1', borderColor: '#99F6E4' },
-  visa: { label: 'Visa Process', color: '#854D0E', bgColor: '#FEF9C3', borderColor: '#FEF08A' },
-  ready: { label: 'Ready', color: '#5B21B6', bgColor: '#EDE9FE', borderColor: '#DDD6FE' },
-  departed: { label: 'Departed', color: '#9A3412', bgColor: '#FFEDD5', borderColor: '#FED7AA' },
-  completed: { label: 'Completed', color: '#166534', bgColor: '#DCFCE7', borderColor: '#BBF7D0' },
+  visa: { label: 'Proses Visa', color: '#854D0E', bgColor: '#FEF9C3', borderColor: '#FEF08A' },
+  ready: { label: 'Siap', color: '#5B21B6', bgColor: '#EDE9FE', borderColor: '#DDD6FE' },
+  departed: { label: 'Berangkat', color: '#9A3412', bgColor: '#FFEDD5', borderColor: '#FED7AA' },
+  completed: { label: 'Selesai', color: '#166534', bgColor: '#DCFCE7', borderColor: '#BBF7D0' },
 };
 
 const TRIP_STATUS_ENHANCED: Record<TripStatus, { label: string; color: string; bgColor: string; borderColor: string }> = {
-  open: { label: 'Open', color: '#1E40AF', bgColor: '#DBEAFE', borderColor: '#BFDBFE' },
-  preparing: { label: 'Preparing', color: '#854D0E', bgColor: '#FEF9C3', borderColor: '#FEF08A' },
-  ready: { label: 'Ready', color: '#5B21B6', bgColor: '#EDE9FE', borderColor: '#DDD6FE' },
-  departed: { label: 'Departed', color: '#9A3412', bgColor: '#FFEDD5', borderColor: '#FED7AA' },
-  completed: { label: 'Completed', color: '#166534', bgColor: '#DCFCE7', borderColor: '#BBF7D0' },
-  cancelled: { label: 'Cancelled', color: '#B91C1C', bgColor: '#FEE2E2', borderColor: '#FECACA' },
+  open: { label: 'Buka', color: '#1E40AF', bgColor: '#DBEAFE', borderColor: '#BFDBFE' },
+  preparing: { label: 'Persiapan', color: '#854D0E', bgColor: '#FEF9C3', borderColor: '#FEF08A' },
+  ready: { label: 'Siap', color: '#5B21B6', bgColor: '#EDE9FE', borderColor: '#DDD6FE' },
+  departed: { label: 'Berangkat', color: '#9A3412', bgColor: '#FFEDD5', borderColor: '#FED7AA' },
+  completed: { label: 'Selesai', color: '#166534', bgColor: '#DCFCE7', borderColor: '#BBF7D0' },
+  cancelled: { label: 'Dibatalkan', color: '#B91C1C', bgColor: '#FEE2E2', borderColor: '#FECACA' },
 };
 
 export function StatusBadge({ status, size = 'md', showDot = true }: StatusBadgeProps) {

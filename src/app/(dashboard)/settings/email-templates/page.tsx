@@ -192,7 +192,7 @@ export default function EmailTemplatesPage() {
           </button>
           <div style={{ flex: 1 }}>
             <h1 style={{ fontSize: isMobile ? '20px' : '24px', fontWeight: '700', color: c.textPrimary, margin: 0 }}>
-              Edit: {config.label}
+              Ubah: {config.label}
             </h1>
             <p style={{ fontSize: '14px', color: c.textMuted, margin: '4px 0 0' }}>{config.description}</p>
           </div>

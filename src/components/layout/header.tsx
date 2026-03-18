@@ -428,7 +428,7 @@ export function Header({ onMenuClick, showMenuButton = false }: HeaderProps) {
                 <>
                   <div style={{ textAlign: 'left' }}>
                     <p style={{ fontSize: '14px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>
-                      {user?.name || 'Loading...'}
+                      {user?.name || 'Memuat...'}
                     </p>
                     <p style={{ fontSize: '12px', color: c.textMuted, margin: 0 }}>
                       {user?.agency?.name || '-'}

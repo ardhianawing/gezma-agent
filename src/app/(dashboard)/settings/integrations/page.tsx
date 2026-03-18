@@ -257,7 +257,7 @@ export default function IntegrationsPage() {
                       fontWeight: '500',
                     }}
                   >
-                    Coming Soon
+                    Segera Hadir
                   </span>
                 ) : (
                   <span style={{ fontSize: '13px', fontWeight: '500', color: c.primary }}>

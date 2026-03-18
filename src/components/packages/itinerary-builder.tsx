@@ -14,9 +14,9 @@ interface ItineraryBuilderProps {
 
 const cities = ['Jakarta', 'Madinah', 'Makkah', 'Jeddah'];
 const mealOptions: { value: MealType; label: string }[] = [
-  { value: 'breakfast', label: 'Breakfast' },
-  { value: 'lunch', label: 'Lunch' },
-  { value: 'dinner', label: 'Dinner' },
+  { value: 'breakfast', label: 'Sarapan' },
+  { value: 'lunch', label: 'Makan Siang' },
+  { value: 'dinner', label: 'Makan Malam' },
 ];
 
 export function ItineraryBuilder({ value, onChange, duration }: ItineraryBuilderProps) {
@@ -152,7 +152,7 @@ export function ItineraryBuilder({ value, onChange, duration }: ItineraryBuilder
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <Calendar style={{ width: '18px', height: '18px', color: c.textMuted }} />
           <h3 style={{ fontSize: '16px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>
-            Itinerary ({value.length}/{duration} days)
+            Itinerary ({value.length}/{duration} hari)
           </h3>
         </div>
         <button
@@ -175,7 +175,7 @@ export function ItineraryBuilder({ value, onChange, duration }: ItineraryBuilder
           }}
         >
           <Plus style={{ width: '14px', height: '14px' }} />
-          Add Day
+          Tambah Hari
         </button>
       </div>
 
@@ -183,7 +183,7 @@ export function ItineraryBuilder({ value, onChange, duration }: ItineraryBuilder
       <div style={{ padding: isMobile ? '20px' : '28px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
         {value.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '32px 0', color: c.textMuted, fontSize: '14px' }}>
-            No itinerary yet. Click &quot;Add Day&quot; to start building.
+            Belum ada itinerary. Klik &quot;Tambah Hari&quot; untuk mulai.
           </div>
         ) : (
           value.map((day, dayIndex) => (
@@ -209,7 +209,7 @@ export function ItineraryBuilder({ value, onChange, duration }: ItineraryBuilder
               >
                 <GripVertical style={{ width: '16px', height: '16px', color: c.textLight }} />
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <span style={{ fontWeight: '600', color: c.textPrimary, fontSize: '14px' }}>Day {day.day}</span>
+                  <span style={{ fontWeight: '600', color: c.textPrimary, fontSize: '14px' }}>Hari {day.day}</span>
                   <span style={{ color: c.textMuted, margin: '0 8px' }}>-</span>
                   <span style={{ color: c.textMuted, fontSize: '14px' }}>{day.title}</span>
                   <span style={{ fontSize: '12px', color: c.textLight, marginLeft: '8px' }}>({day.city})</span>
@@ -244,16 +244,16 @@ export function ItineraryBuilder({ value, onChange, duration }: ItineraryBuilder
                 <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
                   <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr 1fr', gap: '16px' }}>
                     <div>
-                      <label style={labelStyle}>Day Title</label>
+                      <label style={labelStyle}>Judul Hari</label>
                       <input
                         value={day.title}
                         onChange={(e) => updateDay(dayIndex, { title: e.target.value })}
-                        placeholder="e.g., Arrival in Madinah"
+                        placeholder="mis. Tiba di Madinah"
                         style={inputStyle}
                       />
                     </div>
                     <div>
-                      <label style={labelStyle}>City</label>
+                      <label style={labelStyle}>Kota</label>
                       <select
                         value={day.city}
                         onChange={(e) => updateDay(dayIndex, { city: e.target.value })}
@@ -265,11 +265,11 @@ export function ItineraryBuilder({ value, onChange, duration }: ItineraryBuilder
                       </select>
                     </div>
                     <div>
-                      <label style={labelStyle}>Hotel (Optional)</label>
+                      <label style={labelStyle}>Hotel (Opsional)</label>
                       <input
                         value={day.hotel || ''}
                         onChange={(e) => updateDay(dayIndex, { hotel: e.target.value })}
-                        placeholder="Hotel name"
+                        placeholder="Nama hotel"
                         style={inputStyle}
                       />
                     </div>
@@ -277,7 +277,7 @@ export function ItineraryBuilder({ value, onChange, duration }: ItineraryBuilder
 
                   {/* Meals */}
                   <div>
-                    <label style={labelStyle}>Meals Included</label>
+                    <label style={labelStyle}>Makan Termasuk</label>
                     <div style={{ display: 'flex', gap: '8px' }}>
                       {mealOptions.map((meal) => (
                         <button
@@ -305,7 +305,7 @@ export function ItineraryBuilder({ value, onChange, duration }: ItineraryBuilder
                   {/* Activities */}
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                      <label style={{ ...labelStyle, marginBottom: 0 }}>Activities</label>
+                      <label style={{ ...labelStyle, marginBottom: 0 }}>Kegiatan</label>
                       <button
                         type="button"
                         onClick={() => addActivity(dayIndex)}
@@ -323,7 +323,7 @@ export function ItineraryBuilder({ value, onChange, duration }: ItineraryBuilder
                         }}
                       >
                         <Plus style={{ width: '14px', height: '14px' }} />
-                        Add Activity
+                        Tambah Kegiatan
                       </button>
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -338,7 +338,7 @@ export function ItineraryBuilder({ value, onChange, duration }: ItineraryBuilder
                           <input
                             value={activity.title}
                             onChange={(e) => updateActivity(dayIndex, actIndex, { title: e.target.value })}
-                            placeholder="Activity title"
+                            placeholder="Judul kegiatan"
                             style={{ ...inputStyle, flex: 1 }}
                           />
                           <button
@@ -364,11 +364,11 @@ export function ItineraryBuilder({ value, onChange, duration }: ItineraryBuilder
 
                   {/* Description */}
                   <div>
-                    <label style={labelStyle}>Description (Optional)</label>
+                    <label style={labelStyle}>Deskripsi (Opsional)</label>
                     <textarea
                       value={day.description || ''}
                       onChange={(e) => updateDay(dayIndex, { description: e.target.value })}
-                      placeholder="Additional notes for this day..."
+                      placeholder="Catatan tambahan untuk hari ini..."
                       rows={2}
                       style={textareaStyle}
                     />

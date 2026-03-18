@@ -32,11 +32,11 @@ const defaultHpp: PricingBreakdown = {
 const chevronSvg = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`;
 
 const tabs = [
-  { value: 'basic', label: 'Basic Info' },
+  { value: 'basic', label: 'Info Dasar' },
   { value: 'itinerary', label: 'Itinerary' },
-  { value: 'pricing', label: 'Pricing' },
-  { value: 'hotels', label: 'Hotels' },
-  { value: 'inclusions', label: 'Inclusions' },
+  { value: 'pricing', label: 'Harga' },
+  { value: 'hotels', label: 'Hotel' },
+  { value: 'inclusions', label: 'Fasilitas' },
 ];
 
 export function PackageForm({ initialData, onSubmit, onCancel, isLoading }: PackageFormProps) {
@@ -178,7 +178,7 @@ export function PackageForm({ initialData, onSubmit, onCancel, isLoading }: Pack
       {activeTab === 'basic' && (
         <div style={cardStyle}>
           <div style={cardHeaderStyle}>
-            <h3 style={{ fontSize: '16px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>Basic Information</h3>
+            <h3 style={{ fontSize: '16px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>Informasi Dasar</h3>
           </div>
           <div style={cardBodyStyle}>
             <div style={{
@@ -186,7 +186,7 @@ export function PackageForm({ initialData, onSubmit, onCancel, isLoading }: Pack
               gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
             }}>
               <div style={{ gridColumn: isMobile ? undefined : '1 / -1' }}>
-                <label htmlFor="name" style={labelStyle}>Package Name</label>
+                <label htmlFor="name" style={labelStyle}>Nama Paket</label>
                 <input
                   id="name"
                   placeholder="e.g., Umrah Reguler 9 Hari"
@@ -197,7 +197,7 @@ export function PackageForm({ initialData, onSubmit, onCancel, isLoading }: Pack
               </div>
 
               <div>
-                <label htmlFor="category" style={labelStyle}>Category</label>
+                <label htmlFor="category" style={labelStyle}>Kategori</label>
                 <select id="category" {...register('category')} style={selectStyle}>
                   <option value="regular">Regular</option>
                   <option value="plus">Plus</option>
@@ -208,7 +208,7 @@ export function PackageForm({ initialData, onSubmit, onCancel, isLoading }: Pack
               </div>
 
               <div>
-                <label htmlFor="duration" style={labelStyle}>Duration (days)</label>
+                <label htmlFor="duration" style={labelStyle}>Durasi (hari)</label>
                 <input
                   id="duration"
                   type="number"
@@ -221,7 +221,7 @@ export function PackageForm({ initialData, onSubmit, onCancel, isLoading }: Pack
               </div>
 
               <div>
-                <label htmlFor="airline" style={labelStyle}>Airline</label>
+                <label htmlFor="airline" style={labelStyle}>Maskapai</label>
                 <input
                   id="airline"
                   placeholder="e.g., Saudi Arabian Airlines"
@@ -232,14 +232,14 @@ export function PackageForm({ initialData, onSubmit, onCancel, isLoading }: Pack
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <input type="checkbox" id="isActive" {...register('isActive')} style={{ borderRadius: '4px' }} />
-                <label htmlFor="isActive" style={{ fontSize: '13px', fontWeight: '500', color: c.textMuted }}>Active Package</label>
+                <label htmlFor="isActive" style={{ fontSize: '13px', fontWeight: '500', color: c.textMuted }}>Paket Aktif</label>
               </div>
 
               <div style={{ gridColumn: isMobile ? undefined : '1 / -1' }}>
-                <label htmlFor="description" style={labelStyle}>Description</label>
+                <label htmlFor="description" style={labelStyle}>Deskripsi</label>
                 <textarea
                   id="description"
-                  placeholder="Package description..."
+                  placeholder="Deskripsi paket umrah..."
                   rows={4}
                   {...register('description')}
                   style={{
@@ -268,7 +268,7 @@ export function PackageForm({ initialData, onSubmit, onCancel, isLoading }: Pack
       {activeTab === 'hotels' && (
         <div style={cardStyle}>
           <div style={cardHeaderStyle}>
-            <h3 style={{ fontSize: '16px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>Hotel Information</h3>
+            <h3 style={{ fontSize: '16px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>Informasi Hotel</h3>
           </div>
           <div style={cardBodyStyle}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
@@ -278,20 +278,20 @@ export function PackageForm({ initialData, onSubmit, onCancel, isLoading }: Pack
                 gridTemplateColumns: isMobile ? '1fr' : '2fr 1fr',
               }}>
                 <div>
-                  <label style={labelStyle}>Makkah Hotel</label>
-                  <input placeholder="Hotel name" {...register('makkahHotel')} style={inputStyle} />
+                  <label style={labelStyle}>Hotel Makkah</label>
+                  <input placeholder="Nama hotel" {...register('makkahHotel')} style={inputStyle} />
                 </div>
                 <div>
-                  <label style={labelStyle}>Rating</label>
+                  <label style={labelStyle}>Bintang</label>
                   <select {...register('makkahHotelRating', { valueAsNumber: true })} style={selectStyle}>
-                    <option value={3}>3 Star</option>
-                    <option value={4}>4 Star</option>
-                    <option value={5}>5 Star</option>
+                    <option value={3}>3 Bintang</option>
+                    <option value={4}>4 Bintang</option>
+                    <option value={5}>5 Bintang</option>
                   </select>
                 </div>
                 <div style={{ gridColumn: '1 / -1' }}>
-                  <label style={labelStyle}>Distance</label>
-                  <input placeholder="e.g., 300m dari Masjidil Haram" {...register('makkahHotelDistance')} style={inputStyle} />
+                  <label style={labelStyle}>Jarak</label>
+                  <input placeholder="mis. 300m dari Masjidil Haram" {...register('makkahHotelDistance')} style={inputStyle} />
                 </div>
               </div>
 
@@ -304,20 +304,20 @@ export function PackageForm({ initialData, onSubmit, onCancel, isLoading }: Pack
                 gridTemplateColumns: isMobile ? '1fr' : '2fr 1fr',
               }}>
                 <div>
-                  <label style={labelStyle}>Madinah Hotel</label>
-                  <input placeholder="Hotel name" {...register('madinahHotel')} style={inputStyle} />
+                  <label style={labelStyle}>Hotel Madinah</label>
+                  <input placeholder="Nama hotel" {...register('madinahHotel')} style={inputStyle} />
                 </div>
                 <div>
-                  <label style={labelStyle}>Rating</label>
+                  <label style={labelStyle}>Bintang</label>
                   <select {...register('madinahHotelRating', { valueAsNumber: true })} style={selectStyle}>
-                    <option value={3}>3 Star</option>
-                    <option value={4}>4 Star</option>
-                    <option value={5}>5 Star</option>
+                    <option value={3}>3 Bintang</option>
+                    <option value={4}>4 Bintang</option>
+                    <option value={5}>5 Bintang</option>
                   </select>
                 </div>
                 <div style={{ gridColumn: '1 / -1' }}>
-                  <label style={labelStyle}>Distance</label>
-                  <input placeholder="e.g., 200m dari Masjid Nabawi" {...register('madinahHotelDistance')} style={inputStyle} />
+                  <label style={labelStyle}>Jarak</label>
+                  <input placeholder="mis. 200m dari Masjid Nabawi" {...register('madinahHotelDistance')} style={inputStyle} />
                 </div>
               </div>
             </div>
@@ -333,19 +333,19 @@ export function PackageForm({ initialData, onSubmit, onCancel, isLoading }: Pack
         }}>
           <div style={cardStyle}>
             <div style={cardHeaderStyle}>
-              <h3 style={{ fontSize: '16px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>Inclusions</h3>
+              <h3 style={{ fontSize: '16px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>Termasuk</h3>
             </div>
             <div style={cardBodyStyle}>
-              <InclusionList items={inclusions} onChange={setInclusions} placeholder="Add inclusion..." />
+              <InclusionList items={inclusions} onChange={setInclusions} placeholder="Tambah fasilitas..." />
             </div>
           </div>
 
           <div style={cardStyle}>
             <div style={cardHeaderStyle}>
-              <h3 style={{ fontSize: '16px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>Exclusions</h3>
+              <h3 style={{ fontSize: '16px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>Tidak Termasuk</h3>
             </div>
             <div style={cardBodyStyle}>
-              <InclusionList items={exclusions} onChange={setExclusions} placeholder="Add exclusion..." />
+              <InclusionList items={exclusions} onChange={setExclusions} placeholder="Tambah pengecualian..." />
             </div>
           </div>
         </div>
@@ -361,7 +361,7 @@ export function PackageForm({ initialData, onSubmit, onCancel, isLoading }: Pack
             borderRadius: '12px', padding: '12px 24px', fontSize: '14px', fontWeight: '600', cursor: 'pointer',
           }}
         >
-          Cancel
+          Batal
         </button>
         <button
           type="submit"
@@ -372,7 +372,7 @@ export function PackageForm({ initialData, onSubmit, onCancel, isLoading }: Pack
             cursor: isLoading ? 'not-allowed' : 'pointer', opacity: isLoading ? 0.6 : 1,
           }}
         >
-          {isLoading ? 'Saving...' : initialData?.id ? 'Update Package' : 'Create Package'}
+          {isLoading ? 'Menyimpan...' : initialData?.id ? 'Perbarui Paket' : 'Buat Paket'}
         </button>
       </div>
     </form>

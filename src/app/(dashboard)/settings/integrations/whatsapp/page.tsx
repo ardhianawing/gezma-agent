@@ -822,7 +822,7 @@ export default function WhatsAppSettingsPage() {
                             style={btnOutline('edit-' + tpl.id)}
                           >
                             <Edit3 size={12} />
-                            Edit
+                            Ubah
                           </button>
                           <button
                             onClick={() => handleTemplateToggle(tpl.id)}

@@ -129,10 +129,10 @@ export default function ChatWidget() {
           onClick={() => setIsOpen(true)}
           style={{
             position: 'fixed',
-            bottom: '24px',
-            right: '24px',
-            width: '60px',
-            height: '60px',
+            bottom: '80px',
+            right: '20px',
+            width: '56px',
+            height: '56px',
             borderRadius: '50%',
             backgroundColor: '#DC2626',
             border: 'none',

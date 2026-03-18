@@ -140,11 +140,11 @@ export function TripForm({ initialData, packages, onSubmit, onCancel, isLoading 
     <form onSubmit={handleSubmit(onSubmit)} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       {/* Basic Info */}
       {sectionCard(
-        'Trip Information',
+        'Informasi Perjalanan',
         <Plane style={{ width: '18px', height: '18px', color: c.primary }} />,
         <>
           <div style={{ marginBottom: '20px' }}>
-            <label htmlFor="name" style={labelStyle}>Trip Name</label>
+            <label htmlFor="name" style={labelStyle}>Nama Perjalanan</label>
             <input
               id="name"
               placeholder="e.g., Umrah Reguler - Maret 2026"
@@ -156,13 +156,13 @@ export function TripForm({ initialData, packages, onSubmit, onCancel, isLoading 
 
           <div style={gridStyle}>
             <div>
-              <label htmlFor="packageId" style={labelStyle}>Package</label>
+              <label htmlFor="packageId" style={labelStyle}>Paket</label>
               <select
                 id="packageId"
                 style={errors.packageId ? { ...selectStyle, border: `1px solid ${c.error}` } : selectStyle}
                 {...register('packageId')}
               >
-                <option value="">Select package</option>
+                <option value="">Pilih paket</option>
                 {packages.map((pkg) => (
                   <option key={pkg.id} value={pkg.id}>
                     {pkg.name} - {formatCurrency(pkg.publishedPrice)}
@@ -173,7 +173,7 @@ export function TripForm({ initialData, packages, onSubmit, onCancel, isLoading 
             </div>
 
             <div>
-              <label htmlFor="capacity" style={labelStyle}>Capacity</label>
+              <label htmlFor="capacity" style={labelStyle}>Kapasitas</label>
               <input
                 id="capacity"
                 type="number"
@@ -186,7 +186,7 @@ export function TripForm({ initialData, packages, onSubmit, onCancel, isLoading 
             </div>
 
             <div>
-              <label htmlFor="departureDate" style={labelStyle}>Departure Date</label>
+              <label htmlFor="departureDate" style={labelStyle}>Tanggal Keberangkatan</label>
               <input
                 id="departureDate"
                 type="date"
@@ -197,7 +197,7 @@ export function TripForm({ initialData, packages, onSubmit, onCancel, isLoading 
             </div>
 
             <div>
-              <label htmlFor="returnDate" style={labelStyle}>Return Date</label>
+              <label htmlFor="returnDate" style={labelStyle}>Tanggal Kembali</label>
               <input
                 id="returnDate"
                 type="date"
@@ -208,7 +208,7 @@ export function TripForm({ initialData, packages, onSubmit, onCancel, isLoading 
             </div>
 
             <div>
-              <label htmlFor="registrationCloseDate" style={labelStyle}>Registration Close Date (Optional)</label>
+              <label htmlFor="registrationCloseDate" style={labelStyle}>Batas Pendaftaran (Opsional)</label>
               <input
                 id="registrationCloseDate"
                 type="date"
@@ -222,11 +222,11 @@ export function TripForm({ initialData, packages, onSubmit, onCancel, isLoading 
 
       {/* Guide / Muthawwif */}
       {sectionCard(
-        'Guide / Muthawwif (Optional)',
+        'Pembimbing / Muthawwif (Opsional)',
         <User style={{ width: '18px', height: '18px', color: c.primary }} />,
         <div style={gridStyle}>
           <div>
-            <label htmlFor="muthawwifName" style={labelStyle}>Name</label>
+            <label htmlFor="muthawwifName" style={labelStyle}>Nama</label>
             <input
               id="muthawwifName"
               placeholder="e.g., Ustadz Ahmad"
@@ -236,7 +236,7 @@ export function TripForm({ initialData, packages, onSubmit, onCancel, isLoading 
           </div>
 
           <div>
-            <label htmlFor="muthawwifPhone" style={labelStyle}>Phone</label>
+            <label htmlFor="muthawwifPhone" style={labelStyle}>Telepon</label>
             <input
               id="muthawwifPhone"
               placeholder="e.g., +62 812 3456 7890"
@@ -249,31 +249,31 @@ export function TripForm({ initialData, packages, onSubmit, onCancel, isLoading 
 
       {/* Departure Flight */}
       {sectionCard(
-        'Departure Flight',
+        'Penerbangan Berangkat',
         <Plane style={{ width: '18px', height: '18px', color: c.primary }} />,
         <div style={gridStyle}>
           <div>
-            <label style={labelStyle}>Airline</label>
+            <label style={labelStyle}>Maskapai</label>
             <input placeholder="e.g., Saudi Arabian Airlines" style={inputStyle} {...register('flightInfo.departureAirline')} />
           </div>
           <div>
-            <label style={labelStyle}>Flight Number</label>
+            <label style={labelStyle}>No. Penerbangan</label>
             <input placeholder="e.g., SV 817" style={inputStyle} {...register('flightInfo.departureFlightNo')} />
           </div>
           <div>
-            <label style={labelStyle}>Date</label>
+            <label style={labelStyle}>Tanggal</label>
             <input type="date" style={inputStyle} {...register('flightInfo.departureDate')} />
           </div>
           <div>
-            <label style={labelStyle}>Time</label>
+            <label style={labelStyle}>Waktu</label>
             <input type="time" style={inputStyle} {...register('flightInfo.departureTime')} />
           </div>
           <div>
-            <label style={labelStyle}>Airport</label>
+            <label style={labelStyle}>Bandara</label>
             <input placeholder="CGK - Soekarno Hatta" style={inputStyle} {...register('flightInfo.departureAirport')} />
           </div>
           <div>
-            <label style={labelStyle}>Terminal (Optional)</label>
+            <label style={labelStyle}>Terminal (Opsional)</label>
             <input placeholder="Terminal 3" style={inputStyle} {...register('flightInfo.departureTerminal')} />
           </div>
         </div>
@@ -281,31 +281,31 @@ export function TripForm({ initialData, packages, onSubmit, onCancel, isLoading 
 
       {/* Return Flight */}
       {sectionCard(
-        'Return Flight',
+        'Penerbangan Pulang',
         <Plane style={{ width: '18px', height: '18px', color: c.primary, transform: 'scaleX(-1)' }} />,
         <div style={gridStyle}>
           <div>
-            <label style={labelStyle}>Airline</label>
+            <label style={labelStyle}>Maskapai</label>
             <input placeholder="e.g., Saudi Arabian Airlines" style={inputStyle} {...register('flightInfo.returnAirline')} />
           </div>
           <div>
-            <label style={labelStyle}>Flight Number</label>
+            <label style={labelStyle}>No. Penerbangan</label>
             <input placeholder="e.g., SV 816" style={inputStyle} {...register('flightInfo.returnFlightNo')} />
           </div>
           <div>
-            <label style={labelStyle}>Date</label>
+            <label style={labelStyle}>Tanggal</label>
             <input type="date" style={inputStyle} {...register('flightInfo.returnDate')} />
           </div>
           <div>
-            <label style={labelStyle}>Time</label>
+            <label style={labelStyle}>Waktu</label>
             <input type="time" style={inputStyle} {...register('flightInfo.returnTime')} />
           </div>
           <div>
-            <label style={labelStyle}>Airport</label>
+            <label style={labelStyle}>Bandara</label>
             <input placeholder="JED - King Abdulaziz" style={inputStyle} {...register('flightInfo.returnAirport')} />
           </div>
           <div>
-            <label style={labelStyle}>Terminal (Optional)</label>
+            <label style={labelStyle}>Terminal (Opsional)</label>
             <input style={inputStyle} {...register('flightInfo.returnTerminal')} />
           </div>
         </div>
@@ -313,12 +313,12 @@ export function TripForm({ initialData, packages, onSubmit, onCancel, isLoading 
 
       {/* Notes */}
       {sectionCard(
-        'Additional Notes (Optional)',
+        'Catatan Tambahan (Opsional)',
         <StickyNote style={{ width: '18px', height: '18px', color: c.primary }} />,
         <div>
           <textarea
             id="notes"
-            placeholder="Any additional information..."
+            placeholder="Informasi tambahan lainnya..."
             rows={4}
             style={textareaStyle}
             {...register('notes')}
@@ -342,7 +342,7 @@ export function TripForm({ initialData, packages, onSubmit, onCancel, isLoading 
             cursor: 'pointer',
           }}
         >
-          Cancel
+          Batal
         </button>
         <button
           type="submit"
@@ -359,7 +359,7 @@ export function TripForm({ initialData, packages, onSubmit, onCancel, isLoading 
             opacity: isLoading ? 0.7 : 1,
           }}
         >
-          {isLoading ? 'Saving...' : initialData?.id ? 'Update Trip' : 'Create Trip'}
+          {isLoading ? 'Menyimpan...' : initialData?.id ? 'Perbarui Perjalanan' : 'Buat Perjalanan'}
         </button>
       </div>
     </form>

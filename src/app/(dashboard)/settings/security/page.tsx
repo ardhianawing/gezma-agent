@@ -425,7 +425,7 @@ export default function SecuritySettingsPage() {
                 }}
               >
                 <ChevronLeft style={{ width: '14px', height: '14px' }} />
-                Prev
+                Sebelumnya
               </button>
               <span style={{ fontSize: '13px', color: c.textMuted }}>
                 {pagination.page} / {pagination.totalPages}
@@ -448,7 +448,7 @@ export default function SecuritySettingsPage() {
                   gap: '4px',
                 }}
               >
-                Next
+                Selanjutnya
                 <ChevronRight style={{ width: '14px', height: '14px' }} />
               </button>
             </div>
