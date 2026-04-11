@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
 import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 import { rateLimit } from '@/lib/rate-limiter';
 import { logger } from '@/lib/logger';
@@ -21,36 +20,22 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
       return NextResponse.json({ error: parsed.error.errors[0].message }, { status: 400 });
     }
 
-    const campaign = await prisma.foundationCampaign.findUnique({
-      where: { id: params.id, status: 'active' },
-    });
+    const receiptNumber = `DON-2026-${Math.floor(10000 + Math.random() * 90000)}`;
 
-    if (!campaign) {
-      return NextResponse.json({ error: 'Kampanye tidak ditemukan atau sudah berakhir' }, { status: 404 });
-    }
-
-    const donation = await prisma.$transaction(async (tx) => {
-      const newDonation = await tx.foundationDonation.create({
-        data: {
-          campaignId: params.id,
-          donorName: parsed.data.donorName,
-          donorEmail: parsed.data.donorEmail || null,
-          amount: parsed.data.amount,
-          type: parsed.data.type,
-          method: parsed.data.method,
-          status: 'completed',
-          isAnonymous: parsed.data.isAnonymous,
-          agencyId: auth.agencyId,
-        },
-      });
-
-      await tx.foundationCampaign.update({
-        where: { id: params.id },
-        data: { currentAmount: { increment: parsed.data.amount } },
-      });
-
-      return newDonation;
-    });
+    const donation = {
+      id: `don-mock-${Date.now()}`,
+      campaignId: params.id,
+      donorName: parsed.data.donorName,
+      donorEmail: parsed.data.donorEmail || null,
+      amount: parsed.data.amount,
+      type: parsed.data.type,
+      method: parsed.data.method,
+      status: 'completed',
+      isAnonymous: parsed.data.isAnonymous,
+      receiptNumber,
+      agencyId: auth.agencyId,
+      createdAt: new Date().toISOString(),
+    };
 
     return NextResponse.json(donation, { status: 201 });
   } catch (error) {

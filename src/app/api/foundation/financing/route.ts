@@ -1,9 +1,63 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
 import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 import { rateLimit } from '@/lib/rate-limiter';
 import { logger } from '@/lib/logger';
 import { createFinancingSchema } from '@/lib/validations/foundation';
+
+const MOCK_FINANCINGS = [
+  {
+    id: 'f1',
+    agencyId: 'agency-1',
+    amount: 50000000,
+    purpose: 'Pengadaan peralatan kantor dan komputer untuk meningkatkan operasional agen.',
+    tenorMonths: 12,
+    monthlyAmount: 4166667,
+    status: 'active',
+    approvedAt: '2026-02-01T08:00:00.000Z',
+    notes: 'Disetujui. Pastikan laporan bulanan tepat waktu.',
+    createdAt: '2026-01-20T08:00:00.000Z',
+    installments: [],
+  },
+  {
+    id: 'f2',
+    agencyId: 'agency-1',
+    amount: 30000000,
+    purpose: 'Renovasi kantor agen untuk kenyamanan pelayanan.',
+    tenorMonths: 6,
+    monthlyAmount: 5000000,
+    status: 'pending',
+    approvedAt: null,
+    notes: null,
+    createdAt: '2026-03-15T08:00:00.000Z',
+    installments: [],
+  },
+  {
+    id: 'f3',
+    agencyId: 'agency-2',
+    amount: 75000000,
+    purpose: 'Modal kerja untuk program beasiswa yatim semester genap 2026.',
+    tenorMonths: 9,
+    monthlyAmount: 8333333,
+    status: 'approved',
+    approvedAt: '2026-04-05T08:00:00.000Z',
+    notes: 'Disetujui dengan catatan: laporkan realisasi setiap bulan.',
+    createdAt: '2026-03-25T08:00:00.000Z',
+    installments: [],
+  },
+  {
+    id: 'f4',
+    agencyId: 'agency-3',
+    amount: 20000000,
+    purpose: 'Pengadaan kendaraan operasional distribusi bantuan.',
+    tenorMonths: 24,
+    monthlyAmount: 833333,
+    status: 'completed',
+    approvedAt: '2025-04-01T08:00:00.000Z',
+    notes: 'Lunas.',
+    createdAt: '2025-03-10T08:00:00.000Z',
+    installments: [],
+  },
+];
 
 export async function GET(req: NextRequest) {
   const auth = getAuthPayload(req);
@@ -19,20 +73,8 @@ export async function GET(req: NextRequest) {
   const limit = parseInt(searchParams.get('limit') || '10', 10);
 
   try {
-    const where = { agencyId: auth.agencyId };
-
-    const [financings, total] = await Promise.all([
-      prisma.foundationFinancing.findMany({
-        where,
-        orderBy: { createdAt: 'desc' },
-        skip: (page - 1) * limit,
-        take: limit,
-        include: {
-          installments: { orderBy: { installmentNo: 'asc' } },
-        },
-      }),
-      prisma.foundationFinancing.count({ where }),
-    ]);
+    const total = MOCK_FINANCINGS.length;
+    const financings = MOCK_FINANCINGS.slice((page - 1) * limit, page * limit);
 
     return NextResponse.json({
       financings,
@@ -63,16 +105,19 @@ export async function POST(req: NextRequest) {
     const { amount, purpose, tenorMonths } = parsed.data;
     const monthlyAmount = amount / tenorMonths;
 
-    const financing = await prisma.foundationFinancing.create({
-      data: {
-        agencyId: auth.agencyId,
-        amount,
-        purpose,
-        tenorMonths,
-        monthlyAmount,
-        status: 'pending',
-      },
-    });
+    const financing = {
+      id: `f-mock-${Date.now()}`,
+      agencyId: auth.agencyId,
+      amount,
+      purpose,
+      tenorMonths,
+      monthlyAmount,
+      status: 'pending',
+      approvedAt: null,
+      notes: null,
+      createdAt: new Date().toISOString(),
+      installments: [],
+    };
 
     return NextResponse.json(financing, { status: 201 });
   } catch (error) {
