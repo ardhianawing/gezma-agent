@@ -37,18 +37,20 @@ function formatDate(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
 }
 
-const STATUS_CONFIG: Record<string, { icon: typeof Clock; color: string; label: string }> = {
-  pending: { icon: Clock, color: '#D97706', label: 'Menunggu Review' },
-  approved: { icon: CheckCircle, color: '#16A34A', label: 'Disetujui' },
-  rejected: { icon: XCircle, color: '#DC2626', label: 'Ditolak' },
-  active: { icon: AlertCircle, color: '#2563EB', label: 'Aktif' },
-  completed: { icon: CheckCircle, color: '#6B7280', label: 'Selesai' },
-};
+// STATUS_CONFIG labels are set dynamically using t.foundation keys below
 
 export default function FinancingPage() {
   const { c } = useTheme();
   const { isMobile } = useResponsive();
   const { t } = useLanguage();
+
+  const STATUS_CONFIG: Record<string, { icon: typeof Clock; color: string; label: string }> = {
+    pending: { icon: Clock, color: '#D97706', label: t.foundation.statusPending },
+    approved: { icon: CheckCircle, color: '#16A34A', label: t.foundation.statusApproved },
+    rejected: { icon: XCircle, color: '#DC2626', label: t.foundation.statusRejected },
+    active: { icon: AlertCircle, color: '#2563EB', label: t.foundation.statusActive },
+    completed: { icon: CheckCircle, color: '#6B7280', label: t.foundation.statusCompleted },
+  };
 
   const [financings, setFinancings] = useState<Financing[]>([]);
   const [loading, setLoading] = useState(true);
@@ -83,7 +85,7 @@ export default function FinancingPage() {
   const handleSubmit = async () => {
     setFormError('');
     if (!form.amount || !form.purpose) {
-      setFormError('Jumlah dan tujuan wajib diisi');
+      setFormError(t.foundation.financingValidationRequired);
       return;
     }
     setSubmitting(true);
@@ -163,9 +165,9 @@ export default function FinancingPage() {
       >
         <Building2 style={{ width: '20px', height: '20px', color: '#2563EB', flexShrink: 0, marginTop: '2px' }} />
         <div>
-          <p style={{ fontSize: '14px', fontWeight: 600, color: '#1E40AF', margin: '0 0 4px' }}>Qardhul Hasan — Pinjaman Tanpa Bunga</p>
+          <p style={{ fontSize: '14px', fontWeight: 600, color: '#1E40AF', margin: '0 0 4px' }}>{t.foundation.financingBannerTitle}</p>
           <p style={{ fontSize: '13px', color: '#3B82F6', margin: 0, lineHeight: '1.5' }}>
-            Dana dari keuntungan Gezma Foundation. Cicilan transparan, 0% bunga. Tenor: 3, 6, atau 12 bulan.
+            {t.foundation.financingBannerDesc}
           </p>
         </div>
       </div>
@@ -188,7 +190,7 @@ export default function FinancingPage() {
           }}
         >
           <h3 style={{ fontSize: '16px', fontWeight: 700, color: c.textPrimary, margin: '0 0 20px' }}>
-            Formulir Pengajuan Pendanaan
+            {t.foundation.financingFormTitle}
           </h3>
 
           {formError && (
@@ -200,10 +202,10 @@ export default function FinancingPage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <div>
               <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: c.textSecondary, marginBottom: '6px' }}>
-                Jumlah Pinjaman (Rp) *
+                {t.foundation.labelLoanAmount}
               </label>
               <input type="number" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })}
-                placeholder="Contoh: 10000000" min="1" max="500000000" style={inputStyle}
+                placeholder={t.foundation.placeholderLoanAmount} min="1" max="500000000" style={inputStyle}
                 onFocus={(e) => { e.target.style.borderColor = c.primary; }} onBlur={(e) => { e.target.style.borderColor = c.border; }} />
               {form.amount && (
                 <p style={{ fontSize: '12px', color: c.textMuted, marginTop: '4px' }}>
@@ -214,17 +216,17 @@ export default function FinancingPage() {
 
             <div>
               <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: c.textSecondary, marginBottom: '6px' }}>
-                Tujuan Penggunaan *
+                {t.foundation.labelLoanPurpose}
               </label>
               <textarea value={form.purpose} onChange={(e) => setForm({ ...form, purpose: e.target.value })}
-                placeholder="Jelaskan untuk apa dana ini akan digunakan..." rows={4}
+                placeholder={t.foundation.placeholderLoanPurpose} rows={4}
                 style={{ ...inputStyle, minHeight: '100px', resize: 'vertical' as const }}
                 onFocus={(e) => { e.target.style.borderColor = c.primary; }} onBlur={(e) => { e.target.style.borderColor = c.border; }} />
             </div>
 
             <div>
               <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: c.textSecondary, marginBottom: '6px' }}>
-                Tenor (Lama Cicilan)
+                {t.foundation.labelTenor}
               </label>
               <div style={{ display: 'flex', gap: '12px' }}>
                 {[3, 6, 12].map((tenor) => {
@@ -248,7 +250,7 @@ export default function FinancingPage() {
                         transition: 'all 0.15s',
                       }}
                     >
-                      {tenor} bulan
+                      {tenor} {t.foundation.months}
                     </button>
                   );
                 })}
@@ -265,12 +267,12 @@ export default function FinancingPage() {
                   border: '1px solid ' + c.primary + '40',
                 }}
               >
-                <p style={{ fontSize: '13px', color: c.textSecondary, margin: '0 0 4px' }}>Estimasi Cicilan per Bulan:</p>
+                <p style={{ fontSize: '13px', color: c.textSecondary, margin: '0 0 4px' }}>{t.foundation.monthlyEstimate}</p>
                 <p style={{ fontSize: '22px', fontWeight: 700, color: c.primary, margin: 0 }}>
                   {formatRupiah(monthlyPreview)}
                 </p>
                 <p style={{ fontSize: '12px', color: c.textMuted, margin: '4px 0 0' }}>
-                  x {form.tenorMonths} bulan = {form.amount ? formatRupiah(parseFloat(form.amount)) : '-'}
+                  x {form.tenorMonths} {t.foundation.months} = {form.amount ? formatRupiah(parseFloat(form.amount)) : '-'}
                 </p>
               </div>
             )}
@@ -278,11 +280,11 @@ export default function FinancingPage() {
             <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
               <button type="button" onClick={() => { setShowForm(false); setFormError(''); }}
                 style={{ padding: '10px 20px', borderRadius: '10px', border: '1px solid ' + c.border, backgroundColor: 'transparent', color: c.textSecondary, fontSize: '14px', cursor: 'pointer' }}>
-                Batal
+                {t.foundation.cancelBtn}
               </button>
               <button type="button" onClick={handleSubmit} disabled={submitting}
                 style={{ padding: '10px 28px', borderRadius: '10px', border: 'none', backgroundColor: submitting ? c.border : c.primary, color: '#fff', fontSize: '14px', fontWeight: 600, cursor: submitting ? 'not-allowed' : 'pointer' }}>
-                {submitting ? 'Mengirim...' : 'Ajukan'}
+                {submitting ? t.foundation.financingSubmittingBtn : t.foundation.financingSubmitBtn}
               </button>
             </div>
           </div>
@@ -298,7 +300,7 @@ export default function FinancingPage() {
         <div style={{ textAlign: 'center', padding: '60px', backgroundColor: c.cardBg, borderRadius: '14px', border: '1px solid ' + c.border }}>
           <div style={{ fontSize: '48px', marginBottom: '12px' }}>{'\u{1F3E6}'}</div>
           <p style={{ fontSize: '16px', fontWeight: 600, color: c.textPrimary, margin: '0 0 4px' }}>{t.foundation.emptyTitle}</p>
-          <p style={{ fontSize: '14px', color: c.textMuted, margin: 0 }}>Belum ada pengajuan pendanaan.</p>
+          <p style={{ fontSize: '14px', color: c.textMuted, margin: 0 }}>{t.foundation.financingEmptyDesc}</p>
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -345,10 +347,10 @@ export default function FinancingPage() {
                     </p>
                     <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
                       <span style={{ fontSize: '12px', color: c.textMuted }}>
-                        {item.tenorMonths} bulan · {formatRupiah(item.monthlyAmount)}/bulan
+                        {item.tenorMonths} {t.foundation.months} · {formatRupiah(item.monthlyAmount)}/{t.foundation.months}
                       </span>
                       <span style={{ fontSize: '12px', color: c.textMuted }}>
-                        Diajukan: {formatDate(item.createdAt)}
+                        {t.foundation.submittedOn} {formatDate(item.createdAt)}
                       </span>
                     </div>
                   </div>
@@ -362,7 +364,7 @@ export default function FinancingPage() {
                 {isExpanded && item.installments.length > 0 && (
                   <div style={{ padding: '0 20px 20px', borderTop: '1px solid ' + c.borderLight }}>
                     <p style={{ fontSize: '13px', fontWeight: 600, color: c.textSecondary, margin: '16px 0 12px' }}>
-                      Jadwal Cicilan
+                      {t.foundation.installmentSchedule}
                     </p>
                     <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)', gap: '8px' }}>
                       {item.installments.map((ins) => {
@@ -383,7 +385,7 @@ export default function FinancingPage() {
                           >
                             <div>
                               <p style={{ fontSize: '12px', fontWeight: 600, color: c.textPrimary, margin: 0 }}>
-                                Cicilan {ins.installmentNo}
+                                {t.foundation.installmentLabel} {ins.installmentNo}
                               </p>
                               <p style={{ fontSize: '11px', color: c.textMuted, margin: '2px 0 0' }}>
                                 <Calendar style={{ width: '10px', height: '10px', display: 'inline', marginRight: '4px' }} />
@@ -395,7 +397,7 @@ export default function FinancingPage() {
                                 {formatRupiah(ins.amount)}
                               </p>
                               <p style={{ fontSize: '11px', color: isPaid ? '#16A34A' : isOverdue ? '#DC2626' : c.textMuted, margin: '2px 0 0' }}>
-                                {isPaid ? '\u{2705} Lunas' : isOverdue ? '\u{26A0} Terlambat' : 'Pending'}
+                                {isPaid ? `\u{2705} ${t.foundation.installmentPaid}` : isOverdue ? `\u{26A0} ${t.foundation.installmentOverdue}` : t.foundation.installmentPending}
                               </p>
                             </div>
                           </div>

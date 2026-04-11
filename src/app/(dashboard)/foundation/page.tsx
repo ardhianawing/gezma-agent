@@ -168,10 +168,10 @@ export default function FoundationPage() {
             {'\u{1F91D}'}
           </div>
           <h2 style={{ fontSize: isMobile ? '20px' : '26px', fontWeight: 700, margin: '0 0 8px' }}>
-            Gezma Foundation
+            {t.foundation.title}
           </h2>
           <p style={{ fontSize: '14px', opacity: 0.9, margin: 0, maxWidth: '400px', lineHeight: '1.5' }}>
-            Platform filantropi & sosial untuk ummat — transparansi penuh, dampak nyata
+            {t.foundation.heroBannerSubtitle}
           </p>
         </div>
         <button
@@ -250,7 +250,7 @@ export default function FoundationPage() {
       {/* Quick Links */}
       <div>
         <h3 style={{ fontSize: '16px', fontWeight: 700, color: c.textPrimary, margin: '0 0 16px' }}>
-          Modul Foundation
+          {t.foundation.modulesTitle}
         </h3>
         <div
           style={{
@@ -314,7 +314,7 @@ export default function FoundationPage() {
       <div>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
           <h3 style={{ fontSize: '16px', fontWeight: 700, color: c.textPrimary, margin: 0 }}>
-            Kampanye Aktif
+            {t.foundation.activeCampaignsTitle}
           </h3>
           <button
             onClick={() => router.push('/foundation/campaigns')}
@@ -329,7 +329,7 @@ export default function FoundationPage() {
               cursor: 'pointer',
             }}
           >
-            Lihat Semua
+            {t.foundation.viewAll}
           </button>
         </div>
 

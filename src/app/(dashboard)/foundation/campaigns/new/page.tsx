@@ -51,7 +51,7 @@ export default function NewCampaignPage() {
   const handleSubmit = async () => {
     setError('');
     if (!form.title.trim() || !form.description.trim() || !form.targetAmount) {
-      setError('Judul, deskripsi, dan target dana wajib diisi');
+      setError(t.foundation.validationRequired);
       return;
     }
 
@@ -109,8 +109,8 @@ export default function NewCampaignPage() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       <PageHeader
-        title="Kampanye Baru"
-        description="Buat kampanye donasi baru untuk Gezma Foundation"
+        title={t.foundation.newCampaignTitle}
+        description={t.foundation.newCampaignSubtitle}
         actions={
           <button
             onClick={() => router.back()}
@@ -129,7 +129,7 @@ export default function NewCampaignPage() {
             }}
           >
             <ArrowLeft style={{ width: '18px', height: '18px' }} />
-            Kembali
+            {t.foundation.backBtn}
           </button>
         }
       />
@@ -161,12 +161,12 @@ export default function NewCampaignPage() {
 
           {/* Title */}
           <div>
-            <label style={labelStyle}>Judul Kampanye *</label>
+            <label style={labelStyle}>{t.foundation.labelCampaignTitle}</label>
             <input
               type="text"
               value={form.title}
               onChange={(e) => setForm({ ...form, title: e.target.value })}
-              placeholder="Contoh: Bantu Korban Banjir Kalimantan"
+              placeholder={t.foundation.placeholderCampaignTitle}
               style={inputStyle}
               onFocus={(e) => { e.target.style.borderColor = c.primary; }}
               onBlur={(e) => { e.target.style.borderColor = c.border; }}
@@ -175,11 +175,11 @@ export default function NewCampaignPage() {
 
           {/* Description */}
           <div>
-            <label style={labelStyle}>Deskripsi *</label>
+            <label style={labelStyle}>{t.foundation.labelDescription}</label>
             <textarea
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
-              placeholder="Ceritakan latar belakang, kebutuhan, dan rencana penggunaan dana..."
+              placeholder={t.foundation.placeholderDescription}
               rows={5}
               style={{
                 ...inputStyle,
@@ -193,7 +193,7 @@ export default function NewCampaignPage() {
 
           {/* Category */}
           <div>
-            <label style={labelStyle}>Kategori *</label>
+            <label style={labelStyle}>{t.foundation.labelCategory}</label>
             <div
               style={{
                 display: 'grid',
@@ -235,12 +235,12 @@ export default function NewCampaignPage() {
 
           {/* Target Amount */}
           <div>
-            <label style={labelStyle}>Target Dana (Rp) *</label>
+            <label style={labelStyle}>{t.foundation.labelTargetAmount}</label>
             <input
               type="number"
               value={form.targetAmount}
               onChange={(e) => setForm({ ...form, targetAmount: e.target.value })}
-              placeholder="Contoh: 50000000"
+              placeholder={t.foundation.placeholderTargetAmount}
               min="1"
               style={inputStyle}
               onFocus={(e) => { e.target.style.borderColor = c.primary; }}
@@ -255,7 +255,7 @@ export default function NewCampaignPage() {
 
           {/* Deadline */}
           <div>
-            <label style={labelStyle}>Batas Waktu (opsional)</label>
+            <label style={labelStyle}>{t.foundation.labelDeadlineOptional}</label>
             <input
               type="date"
               value={form.deadline}
@@ -269,12 +269,12 @@ export default function NewCampaignPage() {
 
           {/* Image URL */}
           <div>
-            <label style={labelStyle}>URL Gambar (opsional)</label>
+            <label style={labelStyle}>{t.foundation.labelImageUrlOptional}</label>
             <input
               type="url"
               value={form.imageUrl}
               onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
-              placeholder="https://..."
+              placeholder={t.foundation.placeholderImageUrl}
               style={inputStyle}
               onFocus={(e) => { e.target.style.borderColor = c.primary; }}
               onBlur={(e) => { e.target.style.borderColor = c.border; }}
@@ -298,7 +298,7 @@ export default function NewCampaignPage() {
                 cursor: 'pointer',
               }}
             >
-              Batal
+              {t.foundation.cancelBtn}
             </button>
             <button
               type="button"
@@ -321,7 +321,7 @@ export default function NewCampaignPage() {
               }}
             >
               <Save style={{ width: '18px', height: '18px' }} />
-              {submitting ? 'Menyimpan...' : 'Simpan Kampanye'}
+              {submitting ? t.foundation.savingBtn : t.foundation.saveBtn}
             </button>
           </div>
         </div>

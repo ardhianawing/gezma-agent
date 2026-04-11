@@ -88,7 +88,7 @@ export default function CampaignDetailPage() {
   const handleDonate = async () => {
     setDonateError('');
     if (!donateForm.donorName || !donateForm.amount) {
-      setDonateError('Nama dan jumlah donasi wajib diisi');
+      setDonateError(t.foundation.validationRequired);
       return;
     }
 
@@ -136,12 +136,12 @@ export default function CampaignDetailPage() {
   if (!campaign) {
     return (
       <div style={{ textAlign: 'center', padding: '80px 20px' }}>
-        <p style={{ color: c.textMuted }}>Kampanye tidak ditemukan</p>
+        <p style={{ color: c.textMuted }}>{t.foundation.campaignNotFound}</p>
         <button
           onClick={() => router.back()}
           style={{ marginTop: '16px', padding: '10px 20px', borderRadius: '10px', border: '1px solid ' + c.border, cursor: 'pointer', backgroundColor: 'transparent', color: c.textSecondary }}
         >
-          Kembali
+          {t.foundation.backBtn}
         </button>
       </div>
     );
@@ -185,7 +185,7 @@ export default function CampaignDetailPage() {
         }}
       >
         <ArrowLeft style={{ width: '16px', height: '16px' }} />
-        Kembali
+        {t.foundation.backBtn}
       </button>
 
       <div
@@ -264,7 +264,7 @@ export default function CampaignDetailPage() {
                 <span style={{ fontSize: '24px', fontWeight: 700, color: c.primary }}>
                   {formatRupiah(campaign.currentAmount)}
                 </span>
-                <span style={{ fontSize: '13px', color: c.textMuted }}>dari {formatRupiah(campaign.targetAmount)}</span>
+                <span style={{ fontSize: '13px', color: c.textMuted }}>{t.foundation.fromTarget} {formatRupiah(campaign.targetAmount)}</span>
               </div>
               <div
                 style={{
@@ -285,7 +285,7 @@ export default function CampaignDetailPage() {
                   }}
                 />
               </div>
-              <p style={{ fontSize: '13px', color: c.textMuted, margin: 0 }}>{pct}% tercapai</p>
+              <p style={{ fontSize: '13px', color: c.textMuted, margin: 0 }}>{pct}% {t.foundation.progressAchieved}</p>
             </div>
 
             <div
@@ -296,7 +296,7 @@ export default function CampaignDetailPage() {
               }}
             >
               {[
-                { icon: Users, label: 'Donatur', value: String(campaign._count.donations) },
+                { icon: Users, label: t.foundation.donorLabel, value: String(campaign._count.donations) },
                 { icon: Target, label: t.foundation.target, value: formatRupiah(campaign.targetAmount) },
                 { icon: Calendar, label: t.foundation.deadline, value: daysLeft !== null ? `${daysLeft} hari` : t.foundation.noDeadline },
               ].map((stat) => {
@@ -323,7 +323,7 @@ export default function CampaignDetailPage() {
               }}
             >
               <h3 style={{ fontSize: '16px', fontWeight: 700, color: c.textPrimary, margin: '0 0 16px' }}>
-                Donatur Terbaru
+                {t.foundation.recentDonors}
               </h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 {campaign.donations.map((d) => (
@@ -355,7 +355,7 @@ export default function CampaignDetailPage() {
                       </div>
                       <div>
                         <p style={{ fontSize: '13px', fontWeight: 600, color: c.textPrimary, margin: 0 }}>
-                          {d.isAnonymous ? 'Anonim' : d.donorName}
+                          {d.isAnonymous ? t.foundation.anonymous : d.donorName}
                         </p>
                         <p style={{ fontSize: '11px', color: c.textMuted, margin: 0 }}>
                           {formatDate(d.createdAt)}
@@ -426,13 +426,13 @@ export default function CampaignDetailPage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <div>
               <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: c.textSecondary, marginBottom: '6px' }}>
-                Nama *
+                {t.foundation.labelDonorName}
               </label>
               <input
                 type="text"
                 value={donateForm.donorName}
                 onChange={(e) => setDonateForm({ ...donateForm, donorName: e.target.value })}
-                placeholder="Nama lengkap Anda"
+                placeholder={t.foundation.placeholderDonorName}
                 style={inputStyle}
                 onFocus={(e) => { e.target.style.borderColor = c.primary; }}
                 onBlur={(e) => { e.target.style.borderColor = c.border; }}
@@ -441,13 +441,13 @@ export default function CampaignDetailPage() {
 
             <div>
               <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: c.textSecondary, marginBottom: '6px' }}>
-                Email (opsional)
+                {t.foundation.labelDonorEmail}
               </label>
               <input
                 type="email"
                 value={donateForm.donorEmail}
                 onChange={(e) => setDonateForm({ ...donateForm, donorEmail: e.target.value })}
-                placeholder="email@contoh.com"
+                placeholder={t.foundation.placeholderDonorEmail}
                 style={inputStyle}
                 onFocus={(e) => { e.target.style.borderColor = c.primary; }}
                 onBlur={(e) => { e.target.style.borderColor = c.border; }}
@@ -456,13 +456,13 @@ export default function CampaignDetailPage() {
 
             <div>
               <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: c.textSecondary, marginBottom: '6px' }}>
-                Jumlah Donasi (Rp) *
+                {t.foundation.labelDonationAmount}
               </label>
               <input
                 type="number"
                 value={donateForm.amount}
                 onChange={(e) => setDonateForm({ ...donateForm, amount: e.target.value })}
-                placeholder="Contoh: 100000"
+                placeholder={t.foundation.placeholderDonationAmount}
                 min="1"
                 style={inputStyle}
                 onFocus={(e) => { e.target.style.borderColor = c.primary; }}
@@ -494,16 +494,16 @@ export default function CampaignDetailPage() {
 
             <div>
               <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: c.textSecondary, marginBottom: '6px' }}>
-                Metode Pembayaran
+                {t.foundation.labelPaymentMethod}
               </label>
               <select
                 value={donateForm.method}
                 onChange={(e) => setDonateForm({ ...donateForm, method: e.target.value })}
                 style={{ ...inputStyle, cursor: 'pointer' }}
               >
-                <option value="transfer">Transfer Bank</option>
-                <option value="cash">Tunai</option>
-                <option value="gezmapay">GezmaPay</option>
+                <option value="transfer">{t.foundation.methodTransfer}</option>
+                <option value="cash">{t.foundation.methodCash}</option>
+                <option value="gezmapay">{t.foundation.methodGezmaPay}</option>
               </select>
             </div>
 
@@ -523,7 +523,7 @@ export default function CampaignDetailPage() {
                 onChange={(e) => setDonateForm({ ...donateForm, isAnonymous: e.target.checked })}
                 style={{ width: '16px', height: '16px', cursor: 'pointer' }}
               />
-              Donasi sebagai anonim
+              {t.foundation.donateAnonymous}
             </label>
 
             <button
@@ -549,7 +549,7 @@ export default function CampaignDetailPage() {
               }}
             >
               <Heart style={{ width: '20px', height: '20px' }} />
-              {donating ? 'Memproses...' : campaign.status !== 'active' ? 'Kampanye Berakhir' : t.foundation.donateBtn}
+              {donating ? t.foundation.donatingBtn : campaign.status !== 'active' ? t.foundation.campaignEndedBtn : t.foundation.donateBtn}
             </button>
           </div>
         </div>

@@ -33,14 +33,14 @@ function formatRupiah(amount: number): string {
   return `Rp ${amount.toLocaleString('id-ID')}`;
 }
 
-const IMPACT_CATEGORIES = [
-  { key: 'bencana', emoji: '\u{1F6A8}', label: 'Bantuan Bencana', desc: 'Keluarga terbantu' },
-  { key: 'masjid', emoji: '\u{1F54C}', label: 'Masjid Dibangun', desc: 'Bangunan didirikan' },
-  { key: 'yatim', emoji: '\u{1F91D}', label: 'Anak Yatim', desc: 'Anak diasuh' },
-  { key: 'kesehatan', emoji: '\u{1F3E5}', label: 'Layanan Kesehatan', desc: 'Pasien dilayani' },
-  { key: 'pendidikan', emoji: '\u{1F4DA}', label: 'Beasiswa', desc: 'Siswa didukung' },
-  { key: 'umrah_dhuafa', emoji: '\u{1F4FF}', label: 'Umrah Dhuafa', desc: 'Jemaah diberangkatkan' },
-];
+const IMPACT_CATEGORY_KEYS = [
+  { key: 'bencana', emoji: '\u{1F6A8}', labelKey: 'impactBencana', descKey: 'impactBencanaDesc' },
+  { key: 'masjid', emoji: '\u{1F54C}', labelKey: 'impactMasjid', descKey: 'impactMasjidDesc' },
+  { key: 'yatim', emoji: '\u{1F91D}', labelKey: 'impactYatim', descKey: 'impactYatimDesc' },
+  { key: 'kesehatan', emoji: '\u{1F3E5}', labelKey: 'impactKesehatan', descKey: 'impactKesehatanDesc' },
+  { key: 'pendidikan', emoji: '\u{1F4DA}', labelKey: 'impactPendidikan', descKey: 'impactPendidikanDesc' },
+  { key: 'umrah_dhuafa', emoji: '\u{1F4FF}', labelKey: 'impactUmrah', descKey: 'impactUmrahDesc' },
+] as const;
 
 export default function ImpactPage() {
   const { c } = useTheme();
@@ -70,12 +70,12 @@ export default function ImpactPage() {
   }, []);
 
   const bigStats = [
-    { icon: TrendingUp, label: 'Total Dana Terkumpul', value: stats ? formatRupiah(stats.totalRaised) : '-', color: '#DC2626' },
-    { icon: Heart, label: 'Kampanye Aktif', value: stats ? String(stats.activeCampaigns) : '-', color: '#DC2626' },
-    { icon: Users, label: 'Total Donatur', value: stats ? stats.totalDonors.toLocaleString('id-ID') : '-', color: '#2563EB' },
-    { icon: Target, label: 'Orang Dibantu', value: stats ? stats.peopleImpacted.toLocaleString('id-ID') : '-', color: '#16A34A' },
-    { icon: Package, label: 'Barang Tersedia', value: stats ? String(stats.goodsAvailable) : '-', color: '#D97706' },
-    { icon: Building2, label: 'Pendanaan Aktif', value: stats ? String(stats.activeFinancings) : '-', color: '#7C3AED' },
+    { icon: TrendingUp, label: t.foundation.totalFundRaised, value: stats ? formatRupiah(stats.totalRaised) : '-', color: '#DC2626' },
+    { icon: Heart, label: t.foundation.totalCampaigns, value: stats ? String(stats.activeCampaigns) : '-', color: '#DC2626' },
+    { icon: Users, label: t.foundation.totalDonors, value: stats ? stats.totalDonors.toLocaleString('id-ID') : '-', color: '#2563EB' },
+    { icon: Target, label: t.foundation.totalImpact, value: stats ? stats.peopleImpacted.toLocaleString('id-ID') : '-', color: '#16A34A' },
+    { icon: Package, label: t.foundation.goodsAvailable, value: stats ? String(stats.goodsAvailable) : '-', color: '#D97706' },
+    { icon: Building2, label: t.foundation.activeFinancings, value: stats ? String(stats.activeFinancings) : '-', color: '#7C3AED' },
   ];
 
   const gridCols = isMobile ? 2 : isTablet ? 3 : 6;
@@ -148,15 +148,14 @@ export default function ImpactPage() {
           {'\u{1F4CA}'} {t.foundation.transparencyReport}
         </h3>
         <p style={{ fontSize: '14px', opacity: 0.9, margin: 0, lineHeight: '1.6' }}>
-          Gezma Foundation berkomitmen pada transparansi 100%. Setiap rupiah yang terkumpul tercatat dan dilaporkan
-          secara real-time. Donatur dapat memantau penggunaan dana melalui laporan dampak di halaman ini.
+          {t.foundation.transparencyDesc}
         </p>
       </div>
 
       {/* Impact by Category */}
       <div>
         <h3 style={{ fontSize: '16px', fontWeight: 700, color: c.textPrimary, margin: '0 0 16px' }}>
-          Dampak per Kategori Program
+          {t.foundation.impactByCategory}
         </h3>
         <div
           style={{
@@ -165,7 +164,7 @@ export default function ImpactPage() {
             gap: '12px',
           }}
         >
-          {IMPACT_CATEGORIES.map((cat) => (
+          {IMPACT_CATEGORY_KEYS.map((cat) => (
             <div
               key={cat.key}
               style={{
@@ -181,10 +180,10 @@ export default function ImpactPage() {
               <span style={{ fontSize: '28px', flexShrink: 0 }}>{cat.emoji}</span>
               <div>
                 <p style={{ fontSize: '14px', fontWeight: 600, color: c.textPrimary, margin: '0 0 2px' }}>
-                  {cat.label}
+                  {t.foundation[cat.labelKey]}
                 </p>
                 <p style={{ fontSize: '12px', color: c.textMuted, margin: 0 }}>
-                  {cat.desc}
+                  {t.foundation[cat.descKey]}
                 </p>
               </div>
             </div>
@@ -196,7 +195,7 @@ export default function ImpactPage() {
       {!loading && campaigns.length > 0 && (
         <div>
           <h3 style={{ fontSize: '16px', fontWeight: 700, color: c.textPrimary, margin: '0 0 16px' }}>
-            Progress Kampanye Aktif
+            {t.foundation.activeCampaignProgress}
           </h3>
           <div
             style={{
@@ -255,10 +254,10 @@ export default function ImpactPage() {
 
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span style={{ fontSize: '12px', color: c.textMuted }}>
-                      Target: {formatRupiah(campaign.targetAmount)}
+                      {t.foundation.targetLabel}: {formatRupiah(campaign.targetAmount)}
                     </span>
                     <span style={{ fontSize: '12px', color: c.textMuted }}>
-                      {campaign._count.donations} donatur
+                      {campaign._count.donations} {t.foundation.donorLabel}
                     </span>
                   </div>
                 </div>
@@ -278,18 +277,18 @@ export default function ImpactPage() {
         }}
       >
         <h3 style={{ fontSize: '16px', fontWeight: 700, color: c.textPrimary, margin: '0 0 12px' }}>
-          {'\u{1F30D}'} Tujuan Pembangunan Berkelanjutan (SDGs)
+          {'\u{1F30D}'} {t.foundation.sdgTitle}
         </h3>
         <p style={{ fontSize: '14px', color: c.textSecondary, margin: '0 0 16px', lineHeight: '1.6' }}>
-          Gezma Foundation berkontribusi pada pencapaian SDGs melalui program-program sosial yang terukur dan berkelanjutan.
+          {t.foundation.sdgDesc}
         </p>
         <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
           {[
-            { num: '1', label: 'Tanpa Kemiskinan', color: '#E5243B' },
-            { num: '3', label: 'Kehidupan Sehat', color: '#4C9F38' },
-            { num: '4', label: 'Pendidikan Berkualitas', color: '#C5192D' },
-            { num: '10', label: 'Berkurangnya Ketimpangan', color: '#DD1367' },
-            { num: '17', label: 'Kemitraan', color: '#19486A' },
+            { num: '1', label: t.foundation.sdg1Label, color: '#E5243B' },
+            { num: '3', label: t.foundation.sdg3Label, color: '#4C9F38' },
+            { num: '4', label: t.foundation.sdg4Label, color: '#C5192D' },
+            { num: '10', label: t.foundation.sdg10Label, color: '#DD1367' },
+            { num: '17', label: t.foundation.sdg17Label, color: '#19486A' },
           ].map((sdg) => (
             <div
               key={sdg.num}

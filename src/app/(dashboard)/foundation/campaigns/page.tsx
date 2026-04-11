@@ -86,7 +86,7 @@ export default function CampaignsPage() {
 
   const getCategoryLabel = (cat: string): string => {
     const labels: Record<string, string> = {
-      all: 'Semua',
+      all: t.foundation.filterAll,
       bencana: t.foundation.categoryBencana,
       masjid: t.foundation.categoryMasjid,
       yatim: t.foundation.categoryYatim,
@@ -181,7 +181,7 @@ export default function CampaignsPage() {
         />
         <input
           type="text"
-          placeholder="Cari kampanye..."
+          placeholder={t.foundation.searchCampaigns}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           style={{
@@ -203,7 +203,7 @@ export default function CampaignsPage() {
 
       {/* Count */}
       <p style={{ fontSize: '13px', color: c.textMuted, margin: 0 }}>
-        {filtered.length} kampanye ditemukan
+        {filtered.length} {t.foundation.campaignsFound}
       </p>
 
       {/* Grid */}
@@ -306,7 +306,7 @@ export default function CampaignsPage() {
                   >
                     <span style={{ color: statusColor[campaign.status] || '#fff' }}>●</span>
                     {' '}
-                    {campaign.status === 'active' ? 'Aktif' : campaign.status === 'completed' ? 'Selesai' : 'Dibatalkan'}
+                    {campaign.status === 'active' ? t.foundation.campaignStatusActive : campaign.status === 'completed' ? t.foundation.campaignStatusCompleted : t.foundation.campaignStatusCancelled}
                   </div>
                 </div>
 
@@ -380,7 +380,7 @@ export default function CampaignsPage() {
                     }}
                   >
                     <span style={{ fontSize: '12px', color: c.textMuted }}>
-                      {campaign._count.donations} donatur
+                      {campaign._count.donations} {t.foundation.donorLabel}
                     </span>
                     {daysLeft !== null ? (
                       <span style={{ fontSize: '11px', color: daysLeft <= 7 ? '#DC2626' : c.textMuted, fontWeight: daysLeft <= 7 ? 600 : 400 }}>

@@ -75,7 +75,7 @@ export default function GoodsPage() {
   const handleAddGoods = async () => {
     setFormError('');
     if (!form.title || !form.description) {
-      setFormError('Judul dan deskripsi wajib diisi');
+      setFormError(t.foundation.goodsValidationRequired);
       return;
     }
     setSubmitting(true);
@@ -91,10 +91,10 @@ export default function GoodsPage() {
         fetchGoods();
       } else {
         const data = await res.json();
-        setFormError(data.error || 'Gagal menyimpan barang');
+        setFormError(data.error || t.foundation.goodsSaveError);
       }
     } catch {
-      setFormError('Terjadi kesalahan');
+      setFormError(t.foundation.goodsSaveError);
     } finally {
       setSubmitting(false);
     }
@@ -102,7 +102,7 @@ export default function GoodsPage() {
 
   const getCategoryLabel = (cat: string): string => {
     const labels: Record<string, string> = {
-      all: 'Semua',
+      all: t.foundation.filterAll,
       pakaian: t.foundation.categoryPakaian,
       ibadah: t.foundation.categoryIbadah,
       elektronik: t.foundation.categoryElektronik,
@@ -167,7 +167,7 @@ export default function GoodsPage() {
           }}
         >
           <h3 style={{ fontSize: '16px', fontWeight: 700, color: c.textPrimary, margin: '0 0 20px' }}>
-            Tambah Barang Donasi
+            {t.foundation.addGoodFormTitle}
           </h3>
 
           {formError && (
@@ -184,13 +184,13 @@ export default function GoodsPage() {
             }}
           >
             <div>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: c.textSecondary, marginBottom: '6px' }}>Judul *</label>
-              <input type="text" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="Nama barang" style={inputStyle}
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: c.textSecondary, marginBottom: '6px' }}>{t.foundation.labelGoodsTitle}</label>
+              <input type="text" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder={t.foundation.placeholderGoodsTitle} style={inputStyle}
                 onFocus={(e) => { e.target.style.borderColor = c.primary; }} onBlur={(e) => { e.target.style.borderColor = c.border; }} />
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: c.textSecondary, marginBottom: '6px' }}>Kategori</label>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: c.textSecondary, marginBottom: '6px' }}>{t.foundation.labelGoodsCategory}</label>
               <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} style={{ ...inputStyle, cursor: 'pointer' }}>
                 <option value="pakaian">{t.foundation.categoryPakaian}</option>
                 <option value="ibadah">{t.foundation.categoryIbadah}</option>
@@ -200,14 +200,14 @@ export default function GoodsPage() {
             </div>
 
             <div style={{ gridColumn: isMobile ? undefined : '1 / -1' }}>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: c.textSecondary, marginBottom: '6px' }}>Deskripsi *</label>
-              <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="Jelaskan kondisi dan detail barang" rows={3}
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: c.textSecondary, marginBottom: '6px' }}>{t.foundation.labelGoodsDescription}</label>
+              <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder={t.foundation.placeholderGoodsDescription} rows={3}
                 style={{ ...inputStyle, minHeight: '80px', resize: 'vertical' as const }}
                 onFocus={(e) => { e.target.style.borderColor = c.primary; }} onBlur={(e) => { e.target.style.borderColor = c.border; }} />
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: c.textSecondary, marginBottom: '6px' }}>Kondisi</label>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: c.textSecondary, marginBottom: '6px' }}>{t.foundation.labelGoodsCondition}</label>
               <select value={form.condition} onChange={(e) => setForm({ ...form, condition: e.target.value })} style={{ ...inputStyle, cursor: 'pointer' }}>
                 <option value="baik">{t.foundation.conditionBaik}</option>
                 <option value="cukup_baik">{t.foundation.conditionCukupBaik}</option>
@@ -215,8 +215,8 @@ export default function GoodsPage() {
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: c.textSecondary, marginBottom: '6px' }}>URL Gambar (opsional)</label>
-              <input type="url" value={form.imageUrl} onChange={(e) => setForm({ ...form, imageUrl: e.target.value })} placeholder="https://..." style={inputStyle}
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: c.textSecondary, marginBottom: '6px' }}>{t.foundation.labelGoodsImageUrl}</label>
+              <input type="url" value={form.imageUrl} onChange={(e) => setForm({ ...form, imageUrl: e.target.value })} placeholder={t.foundation.placeholderImageUrl} style={inputStyle}
                 onFocus={(e) => { e.target.style.borderColor = c.primary; }} onBlur={(e) => { e.target.style.borderColor = c.border; }} />
             </div>
           </div>
@@ -226,13 +226,13 @@ export default function GoodsPage() {
               type="button" onClick={() => { setShowAddForm(false); setFormError(''); }}
               style={{ padding: '10px 20px', borderRadius: '10px', border: '1px solid ' + c.border, backgroundColor: 'transparent', color: c.textSecondary, fontSize: '14px', cursor: 'pointer' }}
             >
-              Batal
+              {t.foundation.cancelBtn}
             </button>
             <button
               type="button" onClick={handleAddGoods} disabled={submitting}
               style={{ padding: '10px 24px', borderRadius: '10px', border: 'none', backgroundColor: submitting ? c.border : c.primary, color: '#fff', fontSize: '14px', fontWeight: 600, cursor: submitting ? 'not-allowed' : 'pointer' }}
             >
-              {submitting ? 'Menyimpan...' : 'Simpan'}
+              {submitting ? t.foundation.goodsSavingBtn : t.foundation.goodsSaveBtn}
             </button>
           </div>
         </div>
@@ -266,7 +266,7 @@ export default function GoodsPage() {
       {/* Search */}
       <div style={{ position: 'relative', maxWidth: '400px' }}>
         <Search style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', width: '16px', height: '16px', color: c.textMuted, pointerEvents: 'none' }} />
-        <input type="text" placeholder="Cari barang..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} style={{ width: '100%', padding: '10px 12px 10px 36px', minHeight: '44px', borderRadius: '10px', border: '1px solid ' + c.border, backgroundColor: c.cardBg, color: c.textPrimary, fontSize: '14px', outline: 'none', boxSizing: 'border-box' }}
+        <input type="text" placeholder={t.foundation.searchGoods} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} style={{ width: '100%', padding: '10px 12px 10px 36px', minHeight: '44px', borderRadius: '10px', border: '1px solid ' + c.border, backgroundColor: c.cardBg, color: c.textPrimary, fontSize: '14px', outline: 'none', boxSizing: 'border-box' }}
           onFocus={(e) => { e.target.style.borderColor = c.primary; }} onBlur={(e) => { e.target.style.borderColor = c.border; }} />
       </div>
 
