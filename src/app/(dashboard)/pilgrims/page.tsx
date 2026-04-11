@@ -473,8 +473,62 @@ function PilgrimsPageContent() {
     minHeight: '44px',
   };
 
+  // Stat counts
+  const totalCount = pagination.total;
+  const activeCount = pilgrims.filter((p) => ['lead', 'dp', 'lunas', 'dokumen', 'visa', 'ready'].includes(p.status)).length;
+  const completedCount = pilgrims.filter((p) => p.status === 'completed' || p.status === 'departed').length;
+  const pendingCount = pilgrims.filter((p) => p.status === 'lead' || p.status === 'dp').length;
+
+  const statCards = [
+    { label: 'Total Jamaah', count: totalCount, color: c.primary },
+    { label: 'Aktif', count: activeCount, color: '#10B981' },
+    { label: 'Selesai', count: completedCount, color: '#3B82F6' },
+    { label: 'Pending', count: pendingCount, color: '#F59E0B' },
+  ];
+
+  const getStatusColor = (status: string): string => {
+    switch (status) {
+      case 'lunas':
+      case 'ready': return '#10B981';
+      case 'completed':
+      case 'departed': return '#3B82F6';
+      case 'lead':
+      case 'dp': return '#F59E0B';
+      case 'dokumen':
+      case 'visa': return '#8B5CF6';
+      default: return c.textMuted;
+    }
+  };
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '16px' : '24px', paddingBottom: selectedIds.size > 0 ? '80px' : '0' }}>
+
+      {/* Stat Cards */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
+        gap: isMobile ? '10px' : '16px',
+      }}>
+        {statCards.map((stat) => (
+          <div
+            key={stat.label}
+            style={{
+              backgroundColor: c.cardBg,
+              border: `1px solid ${c.border}`,
+              borderRadius: '12px',
+              padding: isMobile ? '14px' : '16px 20px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '4px',
+            }}
+          >
+            <span style={{ fontSize: isMobile ? '22px' : '28px', fontWeight: '700', color: stat.color, lineHeight: 1.1 }}>
+              {loading ? '—' : stat.count}
+            </span>
+            <span style={{ fontSize: '12px', color: c.textMuted, fontWeight: '500' }}>{stat.label}</span>
+          </div>
+        ))}
+      </div>
 
       {/* Header */}
       <div style={{ display: 'flex', alignItems: isMobile ? 'stretch' : 'flex-start', justifyContent: 'space-between', flexDirection: isMobile ? 'column' : 'row', gap: '16px' }}>
@@ -858,8 +912,164 @@ function PilgrimsPageContent() {
         )
       )}
 
-      {/* Table */}
-      {viewMode === 'list' && <DataTable
+      {/* Mobile Card View */}
+      {viewMode === 'list' && isMobile && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          {loading ? (
+            <div style={{ padding: '32px', textAlign: 'center', fontSize: '14px', color: c.textMuted }}>Memuat...</div>
+          ) : pilgrims.length === 0 ? (
+            <div style={{
+              padding: '40px 20px',
+              textAlign: 'center',
+              fontSize: '14px',
+              color: c.textMuted,
+              border: `2px dashed ${c.border}`,
+              borderRadius: '12px',
+            }}>
+              {search || statusFilter ? 'Tidak ada jemaah yang cocok' : 'Belum ada data jemaah'}
+            </div>
+          ) : (
+            pilgrims.map((pilgrim) => {
+              const statusColor = getStatusColor(pilgrim.status);
+              const initials = pilgrim.name.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase();
+              const docsCompleted = pilgrim.documents.filter((d) => d.status === 'verified').length;
+              return (
+                <div
+                  key={pilgrim.id}
+                  onClick={() => window.location.href = `/pilgrims/${pilgrim.id}`}
+                  style={{
+                    backgroundColor: selectedIds.has(pilgrim.id) ? (c.primaryLight || '#EFF6FF') : c.cardBg,
+                    border: `1px solid ${selectedIds.has(pilgrim.id) ? c.primary : c.border}`,
+                    borderRadius: '14px',
+                    padding: '14px 16px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '10px',
+                  }}
+                >
+                  {/* Top row: avatar + name + status badge */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    {/* Checkbox */}
+                    <div onClick={(e) => { e.stopPropagation(); toggleSelect(pilgrim.id); }}>
+                      <input
+                        type="checkbox"
+                        checked={selectedIds.has(pilgrim.id)}
+                        onChange={() => toggleSelect(pilgrim.id)}
+                        style={{ width: '18px', height: '18px', cursor: 'pointer', accentColor: c.primary, flexShrink: 0 }}
+                      />
+                    </div>
+                    {/* Avatar */}
+                    <div style={{
+                      width: '42px', height: '42px', borderRadius: '50%',
+                      backgroundColor: c.primary, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      color: 'white', fontSize: '15px', fontWeight: '700', flexShrink: 0,
+                    }}>
+                      {initials}
+                    </div>
+                    {/* Name + NIK */}
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: '15px', fontWeight: '700', color: c.textPrimary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {pilgrim.name}
+                      </div>
+                      <div style={{ fontSize: '12px', color: c.textMuted, fontFamily: 'monospace', marginTop: '1px' }}>
+                        {pilgrim.nik}
+                      </div>
+                    </div>
+                    {/* Status badge */}
+                    <div style={{
+                      padding: '4px 10px',
+                      borderRadius: '9999px',
+                      fontSize: '11px',
+                      fontWeight: '600',
+                      backgroundColor: statusColor + '22',
+                      color: statusColor,
+                      whiteSpace: 'nowrap',
+                      flexShrink: 0,
+                      textTransform: 'capitalize',
+                    }}>
+                      {pilgrim.status}
+                    </div>
+                  </div>
+                  {/* Contact info */}
+                  {(pilgrim.phone || pilgrim.email) && (
+                    <div style={{ paddingLeft: '30px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                      {pilgrim.phone && (
+                        <div style={{ fontSize: '13px', color: c.textSecondary }}>{pilgrim.phone}</div>
+                      )}
+                      {pilgrim.email && (
+                        <div style={{ fontSize: '12px', color: c.textMuted }}>{pilgrim.email}</div>
+                      )}
+                    </div>
+                  )}
+                  {/* Bottom row: docs + actions */}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingLeft: '30px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                      {Array.from({ length: 4 }).map((_, i) => (
+                        <div key={i} style={{
+                          width: '8px', height: '8px', borderRadius: '50%',
+                          backgroundColor: i < docsCompleted ? '#10B981' : c.border,
+                        }} />
+                      ))}
+                      <span style={{ fontSize: '11px', color: c.textMuted, marginLeft: '4px' }}>{docsCompleted}/4 dok</span>
+                    </div>
+                    <div style={{ display: 'flex', gap: '4px' }} onClick={(e) => e.stopPropagation()}>
+                      <Link href={`/pilgrims/${pilgrim.id}`}>
+                        <button aria-label="Lihat detail" style={{ ...actionBtnStyle, minWidth: '38px', minHeight: '38px', padding: '8px' }}>
+                          <Eye style={{ width: '16px', height: '16px' }} />
+                        </button>
+                      </Link>
+                      {can(PERMISSIONS.PILGRIMS_EDIT) && (
+                        <Link href={`/pilgrims/${pilgrim.id}/edit`}>
+                          <button aria-label="Edit" style={{ ...actionBtnStyle, minWidth: '38px', minHeight: '38px', padding: '8px' }}>
+                            <Edit2 style={{ width: '16px', height: '16px' }} />
+                          </button>
+                        </Link>
+                      )}
+                      {can(PERMISSIONS.PILGRIMS_DELETE) && (
+                        <button
+                          aria-label="Hapus"
+                          onClick={() => setDeleteTarget({ id: pilgrim.id, name: pilgrim.name })}
+                          style={{ ...actionBtnStyle, minWidth: '38px', minHeight: '38px', padding: '8px' }}
+                        >
+                          <Trash2 style={{ width: '16px', height: '16px' }} />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          )}
+          {/* Mobile pagination info */}
+          {pagination.totalPages > 1 && (
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 4px', fontSize: '13px', color: c.textMuted }}>
+              <span>Halaman {pagination.page} / {pagination.totalPages}</span>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                {pagination.page > 1 && (
+                  <button
+                    onClick={() => fetchPilgrims(pagination.page - 1)}
+                    style={{ padding: '8px 14px', border: `1px solid ${c.border}`, borderRadius: '8px', backgroundColor: c.cardBg, color: c.textPrimary, fontSize: '13px', cursor: 'pointer' }}
+                  >
+                    Sebelumnya
+                  </button>
+                )}
+                {pagination.page < pagination.totalPages && (
+                  <button
+                    onClick={() => fetchPilgrims(pagination.page + 1)}
+                    style={{ padding: '8px 14px', border: `1px solid ${c.border}`, borderRadius: '8px', backgroundColor: c.cardBg, color: c.textPrimary, fontSize: '13px', cursor: 'pointer' }}
+                  >
+                    Berikutnya
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Table (desktop only) */}
+      {viewMode === 'list' && !isMobile && <DataTable
         columns={columns}
         data={pilgrims}
         loading={loading}
