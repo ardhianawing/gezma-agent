@@ -1,0 +1,19 @@
+[     287ms] [ERROR] Loading the stylesheet 'https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap' violates the following Content Security Policy directive: "style-src 'self' 'unsafe-inline'". Note that 'style-src-elem' was not explicitly set, so 'style-src' is used as a fallback. The action has been blocked. @ https://gezma.ezyindustries.my.id/login:0
+[     300ms] [ERROR] Loading the stylesheet 'https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap' violates the following Content Security Policy directive: "style-src 'self' 'unsafe-inline'". Note that 'style-src-elem' was not explicitly set, so 'style-src' is used as a fallback. The action has been blocked. @ https://gezma.ezyindustries.my.id/login:0
+[     488ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ https://gezma.ezyindustries.my.id/login:0
+[     929ms] [ERROR] Failed to load resource: the server responded with a status of 401 () @ https://gezma.ezyindustries.my.id/api/auth/me:0
+[   19198ms] [ERROR] Loading the stylesheet 'https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap' violates the following Content Security Policy directive: "style-src 'self' 'unsafe-inline'". Note that 'style-src-elem' was not explicitly set, so 'style-src' is used as a fallback. The action has been blocked. @ https://gezma.ezyindustries.my.id/dashboard:0
+[   19199ms] [ERROR] Loading the stylesheet 'https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap' violates the following Content Security Policy directive: "style-src 'self' 'unsafe-inline'". Note that 'style-src-elem' was not explicitly set, so 'style-src' is used as a fallback. The action has been blocked. @ https://gezma.ezyindustries.my.id/dashboard:0
+[   20584ms] [WARNING] The width(-1) and height(-1) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width. @ https://gezma.ezyindustries.my.id/_next/static/chunks/2b055e65f1db4dff.js:0
+[   20595ms] [WARNING] The width(-1) and height(-1) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width. @ https://gezma.ezyindustries.my.id/_next/static/chunks/2b055e65f1db4dff.js:0
+[   20605ms] [WARNING] The width(-1) and height(-1) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width. @ https://gezma.ezyindustries.my.id/_next/static/chunks/2b055e65f1db4dff.js:0
+[   20700ms] [INFO] Banner not shown: beforeinstallpromptevent.preventDefault() called. The page must call beforeinstallpromptevent.prompt() to show the banner. @ https://gezma.ezyindustries.my.id/dashboard:0

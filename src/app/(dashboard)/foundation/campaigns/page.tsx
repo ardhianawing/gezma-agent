@@ -160,7 +160,7 @@ export default function CampaignsPage() {
                 transition: 'all 0.2s ease',
               }}
             >
-              {cat !== 'all' && <span>{CATEGORY_EMOJI[cat]}</span>}
+              {cat !== 'all' && <span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: CATEGORY_GRADIENT[cat] || CATEGORY_DEFAULT_GRADIENT, marginRight: 4 }} />}
               {getCategoryLabel(cat)}
             </button>
           );

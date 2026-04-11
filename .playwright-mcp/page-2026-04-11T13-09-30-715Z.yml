@@ -1,0 +1,460 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - generic [ref=e4]:
+        - link "GEZMA Logo GEZMA" [ref=e5] [cursor=pointer]:
+          - /url: /
+          - img "GEZMA Logo" [ref=e6]
+          - generic [ref=e7]: GEZMA
+        - button [ref=e8] [cursor=pointer]:
+          - img [ref=e9]
+      - generic [ref=e12]:
+        - generic [ref=e13]:
+          - paragraph [ref=e14]: Platform
+          - navigation [ref=e15]:
+            - link "Marketplace" [ref=e16] [cursor=pointer]:
+              - /url: /marketplace
+              - generic [ref=e17]:
+                - img [ref=e18]
+                - generic [ref=e21]: Marketplace
+            - link "Trade Centre" [ref=e22] [cursor=pointer]:
+              - /url: /trade
+              - generic [ref=e23]:
+                - img [ref=e24]
+                - generic [ref=e27]: Trade Centre
+            - link "Forum" [ref=e28] [cursor=pointer]:
+              - /url: /forum
+              - generic [ref=e29]:
+                - img [ref=e30]
+                - generic [ref=e32]: Forum
+            - link "News" [ref=e33] [cursor=pointer]:
+              - /url: /news
+              - generic [ref=e34]:
+                - img [ref=e35]
+                - generic [ref=e38]: News
+            - link "Academy" [ref=e39] [cursor=pointer]:
+              - /url: /academy
+              - generic [ref=e40]:
+                - img [ref=e41]
+                - generic [ref=e44]: Academy
+            - link "Services" [ref=e45] [cursor=pointer]:
+              - /url: /services
+              - generic [ref=e46]:
+                - img [ref=e47]
+                - generic [ref=e49]: Services
+            - link "GezmaPay" [ref=e50] [cursor=pointer]:
+              - /url: /gezmapay
+              - generic [ref=e51]:
+                - img [ref=e52]
+                - generic [ref=e55]: GezmaPay
+            - link "Savings" [ref=e56] [cursor=pointer]:
+              - /url: /tabungan
+              - generic [ref=e57]:
+                - img [ref=e58]
+                - generic [ref=e61]: Savings
+            - link "PayLater" [ref=e62] [cursor=pointer]:
+              - /url: /paylater
+              - generic [ref=e63]:
+                - img [ref=e64]
+                - generic [ref=e66]: PayLater
+            - link "Gezma Foundation" [ref=e67] [cursor=pointer]:
+              - /url: /foundation
+              - generic [ref=e68]:
+                - img [ref=e69]
+                - generic [ref=e71]: Gezma Foundation
+        - generic [ref=e73]:
+          - paragraph [ref=e74]: Operational
+          - navigation [ref=e75]:
+            - link "Dashboard" [ref=e76] [cursor=pointer]:
+              - /url: /dashboard
+              - generic [ref=e77]:
+                - img [ref=e78]
+                - generic [ref=e83]: Dashboard
+                - img [ref=e84]
+            - link "Pilgrims" [ref=e86] [cursor=pointer]:
+              - /url: /pilgrims
+              - generic [ref=e87]:
+                - img [ref=e88]
+                - generic [ref=e93]: Pilgrims
+            - link "Packages" [ref=e94] [cursor=pointer]:
+              - /url: /packages
+              - generic [ref=e95]:
+                - img [ref=e96]
+                - generic [ref=e100]: Packages
+            - link "Trips" [ref=e101] [cursor=pointer]:
+              - /url: /trips
+              - generic [ref=e102]:
+                - img [ref=e103]
+                - generic [ref=e105]: Trips
+            - link "Tasks" [ref=e106] [cursor=pointer]:
+              - /url: /tasks
+              - generic [ref=e107]:
+                - img [ref=e108]
+                - generic [ref=e111]: Tasks
+            - link "Notifications" [ref=e112] [cursor=pointer]:
+              - /url: /notifications
+              - generic [ref=e113]:
+                - img [ref=e114]
+                - generic [ref=e117]: Notifications
+            - link "Documents" [ref=e118] [cursor=pointer]:
+              - /url: /documents
+              - generic [ref=e119]:
+                - img [ref=e120]
+                - generic [ref=e123]: Documents
+            - link "Reports" [ref=e124] [cursor=pointer]:
+              - /url: /reports
+              - generic [ref=e125]:
+                - img [ref=e126]
+                - generic [ref=e128]: Reports
+            - link "Activities" [ref=e129] [cursor=pointer]:
+              - /url: /activities
+              - generic [ref=e130]:
+                - img [ref=e131]
+                - generic [ref=e134]: Activities
+            - link "Gamification" [ref=e135] [cursor=pointer]:
+              - /url: /gamification
+              - generic [ref=e136]:
+                - img [ref=e137]
+                - generic [ref=e143]: Gamification
+            - link "Blockchain" [ref=e144] [cursor=pointer]:
+              - /url: /blockchain
+              - generic [ref=e145]:
+                - img [ref=e146]
+                - generic [ref=e148]: Blockchain
+            - link "Agency" [ref=e149] [cursor=pointer]:
+              - /url: /agency
+              - generic [ref=e150]:
+                - img [ref=e151]
+                - generic [ref=e155]: Agency
+        - generic [ref=e157]:
+          - paragraph [ref=e158]: Other
+          - navigation [ref=e159]:
+            - link "Settings" [ref=e160] [cursor=pointer]:
+              - /url: /settings
+              - generic [ref=e161]:
+                - img [ref=e162]
+                - generic [ref=e165]: Settings
+            - link "Help Center" [ref=e166] [cursor=pointer]:
+              - /url: /help
+              - generic [ref=e167]:
+                - img [ref=e168]
+                - generic [ref=e171]: Help Center
+      - generic [ref=e172]:
+        - generic [ref=e173]:
+          - generic [ref=e174]: VT
+          - generic [ref=e175]:
+            - paragraph [ref=e176]: Vauza Tamma Abadi, PT.
+            - paragraph [ref=e177]: Admin Demo
+        - button "Sign Out" [ref=e178] [cursor=pointer]:
+          - img [ref=e179]
+          - text: Sign Out
+    - generic [ref=e182]:
+      - banner [ref=e183]:
+        - generic [ref=e184]:
+          - generic [ref=e185]:
+            - button [ref=e186] [cursor=pointer]:
+              - img [ref=e187]
+            - button "Search pilgrims, packages, trips... Ctrl+K" [ref=e188] [cursor=pointer]:
+              - img [ref=e189]
+              - generic [ref=e192]: Search pilgrims, packages, trips...
+              - generic [ref=e193]: Ctrl+K
+          - generic [ref=e194]:
+            - button "Switch to Dark Mode" [ref=e195] [cursor=pointer]:
+              - img [ref=e196]
+            - button "EN / ID" [ref=e198] [cursor=pointer]:
+              - generic [ref=e199]: EN
+              - generic [ref=e200]: /
+              - generic [ref=e201]: ID
+            - button [ref=e203] [cursor=pointer]:
+              - img [ref=e204]
+            - button "AD Admin Demo Vauza Tamma Abadi, PT." [ref=e210] [cursor=pointer]:
+              - generic [ref=e212]: AD
+              - generic [ref=e213]:
+                - paragraph [ref=e214]: Admin Demo
+                - paragraph [ref=e215]: Vauza Tamma Abadi, PT.
+              - img [ref=e216]
+      - main [ref=e218]:
+        - generic [ref=e219]:
+          - generic [ref=e220]:
+            - generic [ref=e221]:
+              - heading "Dashboard" [level=1] [ref=e222]
+              - paragraph [ref=e223]: Welcome back! Here's your operational summary for today.
+            - button "Edit Widgets" [ref=e225] [cursor=pointer]:
+              - img [ref=e226]
+              - text: Edit Widgets
+          - generic [ref=e229]:
+            - heading "GEZMA (Generation Z & Millennials Movement)" [level=2] [ref=e230]
+            - paragraph [ref=e231]: A nurturing ecosystem for Ashpirasi members, preparing the next generation ready to carry the torch of struggle towards Golden Indonesia 2030.
+          - generic [ref=e233]:
+            - link "Total Pilgrims 156" [ref=e234] [cursor=pointer]:
+              - /url: /pilgrims
+              - generic [ref=e235]:
+                - img [ref=e237]
+                - generic [ref=e242]:
+                  - paragraph [ref=e243]: Total Pilgrims
+                  - paragraph [ref=e244]: "156"
+            - link "Active Packages 8" [ref=e247] [cursor=pointer]:
+              - /url: /packages
+              - generic [ref=e248]:
+                - img [ref=e250]
+                - generic [ref=e254]:
+                  - paragraph [ref=e255]: Active Packages
+                  - paragraph [ref=e256]: "8"
+            - link "Active Trips 3" [ref=e259] [cursor=pointer]:
+              - /url: /trips
+              - generic [ref=e260]:
+                - img [ref=e262]
+                - generic [ref=e264]:
+                  - paragraph [ref=e265]: Active Trips
+                  - paragraph [ref=e266]: "3"
+            - link "Pending Documents 12" [ref=e269] [cursor=pointer]:
+              - /url: /pilgrims?filter=missing_docs
+              - generic [ref=e270]:
+                - img [ref=e272]
+                - generic [ref=e275]:
+                  - paragraph [ref=e276]: Pending Documents
+                  - paragraph [ref=e277]: "12"
+          - generic [ref=e281]:
+            - generic [ref=e282]:
+              - generic [ref=e284]:
+                - heading "Action Center" [level=2] [ref=e285]
+                - paragraph [ref=e286]: Items requiring your attention
+              - paragraph [ref=e288]: Semua sudah beres! Tidak ada aksi yang diperlukan.
+            - generic [ref=e289]:
+              - heading "Quick Actions" [level=2] [ref=e291]
+              - generic [ref=e293]:
+                - link "Add Pilgrim Register a new pilgrim" [ref=e294] [cursor=pointer]:
+                  - /url: /pilgrims/new
+                  - generic [ref=e295]:
+                    - img [ref=e297]
+                    - generic [ref=e300]:
+                      - paragraph [ref=e301]: Add Pilgrim
+                      - paragraph [ref=e302]: Register a new pilgrim
+                - link "Create Package Build a new umrah package" [ref=e303] [cursor=pointer]:
+                  - /url: /packages/new
+                  - generic [ref=e304]:
+                    - img [ref=e306]
+                    - generic [ref=e310]:
+                      - paragraph [ref=e311]: Create Package
+                      - paragraph [ref=e312]: Build a new umrah package
+                - link "New Trip Schedule a departure" [ref=e313] [cursor=pointer]:
+                  - /url: /trips/new
+                  - generic [ref=e314]:
+                    - img [ref=e316]
+                    - generic [ref=e318]:
+                      - paragraph [ref=e319]: New Trip
+                      - paragraph [ref=e320]: Schedule a departure
+                - link "Documents Manage agency docs" [ref=e321] [cursor=pointer]:
+                  - /url: /documents
+                  - generic [ref=e322]:
+                    - img [ref=e324]
+                    - generic [ref=e327]:
+                      - paragraph [ref=e328]: Documents
+                      - paragraph [ref=e329]: Manage agency docs
+                - link "Agency Profile Update company info" [ref=e330] [cursor=pointer]:
+                  - /url: /agency
+                  - generic [ref=e331]:
+                    - img [ref=e333]
+                    - generic [ref=e337]:
+                      - paragraph [ref=e338]: Agency Profile
+                      - paragraph [ref=e339]: Update company info
+                - link "Settings Configure system" [ref=e340] [cursor=pointer]:
+                  - /url: /settings
+                  - generic [ref=e341]:
+                    - img [ref=e343]
+                    - generic [ref=e346]:
+                      - paragraph [ref=e347]: Settings
+                      - paragraph [ref=e348]: Configure system
+          - generic [ref=e350]:
+            - generic [ref=e352]:
+              - heading "Tren Pemasukan (12 Bulan)" [level=3] [ref=e353]
+              - application [ref=e357]:
+                - generic [ref=e380]:
+                  - generic [ref=e381]:
+                    - generic [ref=e383]: Sep 2025
+                    - generic [ref=e385]: Oct 2025
+                    - generic [ref=e387]: Nov 2025
+                    - generic [ref=e389]: Dec 2025
+                    - generic [ref=e391]: Jan 2026
+                    - generic [ref=e393]: Feb 2026
+                  - generic [ref=e394]:
+                    - generic [ref=e396]: "0"
+                    - generic [ref=e398]: 200jt
+                    - generic [ref=e400]: 400jt
+                    - generic [ref=e402]: 600jt
+                    - generic [ref=e404]: 800jt
+            - generic [ref=e405]:
+              - heading "Distribusi Status Jemaah" [level=3] [ref=e406]
+              - generic [ref=e409]:
+                - list [ref=e411]:
+                  - listitem [ref=e412]:
+                    - img "[object Object] legend icon" [ref=e413]
+                    - generic [ref=e415]: Completed
+                  - listitem [ref=e416]:
+                    - img "[object Object] legend icon" [ref=e417]
+                    - generic [ref=e419]: DP
+                  - listitem [ref=e420]:
+                    - img "[object Object] legend icon" [ref=e421]
+                    - generic [ref=e423]: Departed
+                  - listitem [ref=e424]:
+                    - img "[object Object] legend icon" [ref=e425]
+                    - generic [ref=e427]: Dokumen
+                  - listitem [ref=e428]:
+                    - img "[object Object] legend icon" [ref=e429]
+                    - generic [ref=e431]: Lead
+                  - listitem [ref=e432]:
+                    - img "[object Object] legend icon" [ref=e433]
+                    - generic [ref=e435]: Lunas
+                  - listitem [ref=e436]:
+                    - img "[object Object] legend icon" [ref=e437]
+                    - generic [ref=e439]: Ready
+                  - listitem [ref=e440]:
+                    - img "[object Object] legend icon" [ref=e441]
+                    - generic [ref=e443]: Visa
+                - application [ref=e444]
+            - generic [ref=e445]:
+              - heading "Kapasitas Trip" [level=3] [ref=e446]
+              - generic [ref=e449]:
+                - list [ref=e451]:
+                  - listitem [ref=e452]:
+                    - img "Kapasitas legend icon" [ref=e453]
+                    - text: Kapasitas
+                  - listitem [ref=e455]:
+                    - img "Terdaftar legend icon" [ref=e456]
+                    - text: Terdaftar
+                - application [ref=e458]:
+                  - generic [ref=e470]:
+                    - generic [ref=e471]:
+                      - generic [ref=e473]: Umrah Reguler Mar 2026
+                      - generic [ref=e475]: Umrah VIP Apr 2026
+                      - generic [ref=e477]: Umrah Ramadhan 2026
+                    - generic [ref=e478]:
+                      - generic [ref=e480]: "0"
+                      - generic [ref=e482]: "15"
+                      - generic [ref=e484]: "30"
+                      - generic [ref=e486]: "45"
+                      - generic [ref=e488]: "60"
+          - generic [ref=e490]:
+            - generic [ref=e491]:
+              - generic [ref=e492]:
+                - img [ref=e493]
+                - heading "Gamification" [level=3] [ref=e499]
+              - generic [ref=e500]:
+                - generic [ref=e501]:
+                  - img [ref=e502]
+                  - generic [ref=e504]:
+                    - paragraph [ref=e505]: Points
+                    - paragraph [ref=e506]: "2450"
+                - generic [ref=e507]:
+                  - img [ref=e508]
+                  - generic [ref=e511]:
+                    - paragraph [ref=e512]: Level
+                    - paragraph [ref=e513]: "5"
+                - generic [ref=e514]:
+                  - img [ref=e515]
+                  - generic [ref=e521]:
+                    - paragraph [ref=e522]: Badge
+                    - paragraph [ref=e523]: "8"
+                - generic [ref=e524]:
+                  - img [ref=e525]
+                  - generic [ref=e531]:
+                    - paragraph [ref=e532]: Rank
+                    - paragraph [ref=e533]: "#12"
+            - generic [ref=e534]:
+              - generic [ref=e535]:
+                - img [ref=e536]
+                - heading "Top 5 This Month" [level=3] [ref=e542]
+              - generic [ref=e543]:
+                - generic [ref=e544]:
+                  - generic [ref=e545]: "1"
+                  - generic [ref=e546]: Vauza Tamma
+                  - generic [ref=e547]: "5.200"
+                - generic [ref=e548]:
+                  - generic [ref=e549]: "2"
+                  - generic [ref=e550]: Vauza Abadi
+                  - generic [ref=e551]: "4.800"
+                - generic [ref=e552]:
+                  - generic [ref=e553]: "3"
+                  - generic [ref=e554]: Vauza Tamma Umroh
+                  - generic [ref=e555]: "4.350"
+                - generic [ref=e556]:
+                  - generic [ref=e557]: "4"
+                  - generic [ref=e558]: Bukan Ghufron
+                  - generic [ref=e559]: "3.900"
+                - generic [ref=e560]:
+                  - generic [ref=e561]: "5"
+                  - generic [ref=e562]: Bukan Yang Lain
+                  - generic [ref=e563]: "2.450"
+          - generic [ref=e565]:
+            - generic [ref=e566]:
+              - generic [ref=e567]:
+                - img [ref=e568]
+                - heading "Upcoming Departures" [level=2] [ref=e570]
+              - generic [ref=e571]:
+                - link "Umrah Reguler Mar 2026 Ready 15/3/2026 42 pilgrims" [ref=e572] [cursor=pointer]:
+                  - /url: /trips/trip-1
+                  - generic [ref=e573]:
+                    - generic [ref=e574]:
+                      - heading "Umrah Reguler Mar 2026" [level=4] [ref=e575]
+                      - generic [ref=e576]: Ready
+                    - generic [ref=e577]:
+                      - generic [ref=e578]:
+                        - img [ref=e579]
+                        - text: 15/3/2026
+                      - generic [ref=e581]:
+                        - img [ref=e582]
+                        - text: 42 pilgrims
+                - link "Umrah VIP Apr 2026 Preparing 10/4/2026 18 pilgrims" [ref=e587] [cursor=pointer]:
+                  - /url: /trips/trip-2
+                  - generic [ref=e588]:
+                    - generic [ref=e589]:
+                      - heading "Umrah VIP Apr 2026" [level=4] [ref=e590]
+                      - generic [ref=e591]: Preparing
+                    - generic [ref=e592]:
+                      - generic [ref=e593]:
+                        - img [ref=e594]
+                        - text: 10/4/2026
+                      - generic [ref=e596]:
+                        - img [ref=e597]
+                        - text: 18 pilgrims
+            - generic [ref=e602]:
+              - generic [ref=e603]:
+                - img [ref=e604]
+                - heading "Recent Activity" [level=2] [ref=e607]
+              - generic [ref=e608]:
+                - generic [ref=e611]:
+                  - paragraph [ref=e612]: Jamaah baru terdaftar
+                  - paragraph [ref=e613]: Ahmad Rizki mendaftar paket Umrah Reguler Maret
+                  - text: 34d ago
+                - generic [ref=e616]:
+                  - paragraph [ref=e617]: Pembayaran diterima
+                  - paragraph [ref=e618]: Siti Nurhaliza - Pelunasan Rp 15.000.000
+                  - text: 34d ago
+                - generic [ref=e621]:
+                  - paragraph [ref=e622]: Dokumen diupload
+                  - paragraph [ref=e623]: Passport Budi Santoso telah diverifikasi
+                  - text: 34d ago
+                - generic [ref=e626]:
+                  - paragraph [ref=e627]: Trip diperbarui
+                  - paragraph [ref=e628]: Umrah VIP April - 2 jamaah baru ditambahkan
+                  - text: 34d ago
+                - generic [ref=e631]:
+                  - paragraph [ref=e632]: Visa disetujui
+                  - paragraph [ref=e633]: Visa untuk rombongan Maret (12 orang) telah terbit
+                  - text: 35d ago
+                - generic [ref=e636]:
+                  - paragraph [ref=e637]: DP diterima
+                  - paragraph [ref=e638]: Keluarga Hasan - DP Rp 10.000.000 untuk Umrah Ramadhan
+                  - text: 35d ago
+    - generic [ref=e640]:
+      - img [ref=e642]
+      - generic [ref=e645]:
+        - generic [ref=e646]: Install GEZMA Agent
+        - generic [ref=e647]: Akses lebih cepat dari home screen
+      - button "Install" [ref=e648] [cursor=pointer]
+      - button [ref=e649] [cursor=pointer]:
+        - img [ref=e650]
+    - button [ref=e653] [cursor=pointer]:
+      - img [ref=e654]
+  - alert [ref=e657]
+  - generic [ref=e658]: "15"

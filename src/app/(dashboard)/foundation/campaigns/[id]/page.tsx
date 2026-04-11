@@ -30,14 +30,14 @@ interface DonationItem {
   createdAt: string;
 }
 
-const CATEGORY_EMOJI: Record<string, string> = {
-  bencana: '\u{1F6A8}',
-  masjid: '\u{1F54C}',
-  yatim: '\u{1F91D}',
-  kesehatan: '\u{1F3E5}',
-  pendidikan: '\u{1F4DA}',
-  pelatihan: '\u{1F4BC}',
-  umrah_dhuafa: '\u{1F4FF}',
+const CATEGORY_GRADIENT: Record<string, string> = {
+  masjid: 'linear-gradient(135deg, #16A34A 0%, #064E3B 100%)',
+  bencana: 'linear-gradient(135deg, #DC2626 0%, #C2410C 100%)',
+  yatim: 'linear-gradient(135deg, #7C3AED 0%, #4C1D95 100%)',
+  kesehatan: 'linear-gradient(135deg, #0D9488 0%, #134E4A 100%)',
+  pendidikan: 'linear-gradient(135deg, #D97706 0%, #92400E 100%)',
+  pelatihan: 'linear-gradient(135deg, #DB2777 0%, #831843 100%)',
+  umrah_dhuafa: 'linear-gradient(135deg, #4F46E5 0%, #1E1B4B 100%)',
 };
 
 function formatRupiah(amount: number): string {
@@ -149,7 +149,7 @@ export default function CampaignDetailPage() {
 
   const pct = Math.min(100, Math.round((campaign.currentAmount / campaign.targetAmount) * 100));
   const daysLeft = campaign.deadline ? Math.max(0, Math.ceil((new Date(campaign.deadline).getTime() - Date.now()) / 86_400_000)) : null;
-  const emoji = CATEGORY_EMOJI[campaign.category] || '\u{1F4E6}';
+  const gradient = CATEGORY_GRADIENT[campaign.category] || 'linear-gradient(135deg, #6B7280 0%, #374151 100%)';
 
   const inputStyle = {
     width: '100%',
@@ -204,17 +204,16 @@ export default function CampaignDetailPage() {
               height: '260px',
               borderRadius: '16px',
               overflow: 'hidden',
-              background: 'linear-gradient(135deg, #DC2626 0%, #991B1B 100%)',
+              background: gradient,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: '80px',
             }}
           >
             {campaign.imageUrl ? (
               <img src={campaign.imageUrl} alt={campaign.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             ) : (
-              emoji
+              <span style={{ fontSize: '48px', color: 'rgba(255,255,255,0.3)', fontWeight: 700 }}>{campaign.category.toUpperCase()}</span>
             )}
           </div>
 

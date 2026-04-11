@@ -1,0 +1,25 @@
+[      59ms] [ERROR] Loading the stylesheet 'https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap' violates the following Content Security Policy directive: "style-src 'self' 'unsafe-inline'". Note that 'style-src-elem' was not explicitly set, so 'style-src' is used as a fallback. The action has been blocked. @ https://gezma.ezyindustries.my.id/foundation/goods:0
+[      63ms] [ERROR] Loading the stylesheet 'https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap' violates the following Content Security Policy directive: "style-src 'self' 'unsafe-inline'". Note that 'style-src-elem' was not explicitly set, so 'style-src' is used as a fallback. The action has been blocked. @ https://gezma.ezyindustries.my.id/foundation/goods:0
+[     254ms] [INFO] Banner not shown: beforeinstallpromptevent.preventDefault() called. The page must call beforeinstallpromptevent.prompt() to show the banner. @ https://gezma.ezyindustries.my.id/foundation/goods:0
+[     396ms] [ERROR] TypeError: Cannot read properties of undefined (reading 'toLowerCase')
+    at https://gezma.ezyindustries.my.id/_next/static/chunks/e5d52fcf7b22600a.js:1:2049
+    at Array.filter (<anonymous>)
+    at g (https://gezma.ezyindustries.my.id/_next/static/chunks/e5d52fcf7b22600a.js:1:2031)
+    at av (https://gezma.ezyindustries.my.id/_next/static/chunks/4af27f77bd5de33b.js:1:63258)
+    at oY (https://gezma.ezyindustries.my.id/_next/static/chunks/4af27f77bd5de33b.js:1:83531)
+    at io (https://gezma.ezyindustries.my.id/_next/static/chunks/4af27f77bd5de33b.js:1:94963)
+    at sc (https://gezma.ezyindustries.my.id/_next/static/chunks/4af27f77bd5de33b.js:1:137984)
+    at https://gezma.ezyindustries.my.id/_next/static/chunks/4af27f77bd5de33b.js:1:137829
+    at ss (https://gezma.ezyindustries.my.id/_next/static/chunks/4af27f77bd5de33b.js:1:137837)
+    at u9 (https://gezma.ezyindustries.my.id/_next/static/chunks/4af27f77bd5de33b.js:1:133762) @ https://gezma.ezyindustries.my.id/_next/static/chunks/4af27f77bd5de33b.js:0
+[     455ms] [ERROR] Dashboard error: TypeError: Cannot read properties of undefined (reading 'toLowerCase')
+    at https://gezma.ezyindustries.my.id/_next/static/chunks/e5d52fcf7b22600a.js:1:2049
+    at Array.filter (<anonymous>)
+    at g (https://gezma.ezyindustries.my.id/_next/static/chunks/e5d52fcf7b22600a.js:1:2031)
+    at av (https://gezma.ezyindustries.my.id/_next/static/chunks/4af27f77bd5de33b.js:1:63258)
+    at oY (https://gezma.ezyindustries.my.id/_next/static/chunks/4af27f77bd5de33b.js:1:83531)
+    at io (https://gezma.ezyindustries.my.id/_next/static/chunks/4af27f77bd5de33b.js:1:94963)
+    at sc (https://gezma.ezyindustries.my.id/_next/static/chunks/4af27f77bd5de33b.js:1:137984)
+    at https://gezma.ezyindustries.my.id/_next/static/chunks/4af27f77bd5de33b.js:1:137829
+    at ss (https://gezma.ezyindustries.my.id/_next/static/chunks/4af27f77bd5de33b.js:1:137837)
+    at u9 (https://gezma.ezyindustries.my.id/_next/static/chunks/4af27f77bd5de33b.js:1:133762) @ https://gezma.ezyindustries.my.id/_next/static/chunks/1d6e079bf6f181c2.js:0
