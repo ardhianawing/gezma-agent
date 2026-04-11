@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { ArrowUpCircle, Send, QrCode, Clock, Receipt } from 'lucide-react';
 import { PageHeader } from '@/components/layout/page-header';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
@@ -166,6 +167,19 @@ export default function GezmaPayPage() {
           overflow: 'hidden',
         }}
       >
+        {/* Radial gradient texture overlay for depth */}
+        <div
+          style={{
+            position: 'absolute',
+            top: '-60px',
+            right: '-60px',
+            width: '220px',
+            height: '220px',
+            borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.04) 60%, transparent 100%)',
+            pointerEvents: 'none',
+          }}
+        />
         <div
           style={{
             position: 'absolute',
@@ -224,6 +238,83 @@ export default function GezmaPayPage() {
         </button>
       </div>
 
+      {/* Quick Action Buttons */}
+      <div
+        style={{
+          backgroundColor: c.cardBg,
+          border: '1px solid ' + c.border,
+          borderRadius: '16px',
+          padding: isMobile ? '16px' : '20px',
+        }}
+      >
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(4, 1fr)',
+            gap: isMobile ? '8px' : '12px',
+          }}
+        >
+          {[
+            { icon: <ArrowUpCircle size={24} />, label: t.gezmaPay.topUp, onClick: () => setShowTopupModal(true) },
+            { icon: <Send size={24} />, label: 'Transfer', onClick: () => {} },
+            { icon: <QrCode size={24} />, label: 'Scan QR', onClick: () => {} },
+            { icon: <Clock size={24} />, label: 'Riwayat', onClick: () => {} },
+          ].map((action, idx) => (
+            <button
+              key={idx}
+              onClick={action.onClick}
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '8px',
+                padding: isMobile ? '12px 4px' : '16px 8px',
+                borderRadius: '14px',
+                border: '1px solid ' + c.borderLight,
+                backgroundColor: c.pageBg,
+                cursor: 'pointer',
+                transition: 'all 0.15s ease',
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.backgroundColor = c.primary + '12';
+                (e.currentTarget as HTMLButtonElement).style.borderColor = c.primary + '50';
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.backgroundColor = c.pageBg;
+                (e.currentTarget as HTMLButtonElement).style.borderColor = c.borderLight;
+              }}
+            >
+              <div
+                style={{
+                  width: isMobile ? '44px' : '52px',
+                  height: isMobile ? '44px' : '52px',
+                  borderRadius: '50%',
+                  backgroundColor: c.primary + '18',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: c.primary,
+                  flexShrink: 0,
+                }}
+              >
+                {action.icon}
+              </div>
+              <span
+                style={{
+                  fontSize: isMobile ? '11px' : '12px',
+                  fontWeight: 600,
+                  color: c.textPrimary,
+                  textAlign: 'center',
+                  lineHeight: '1.3',
+                }}
+              >
+                {action.label}
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Transaction History */}
       <div
         style={{
@@ -242,14 +333,47 @@ export default function GezmaPayPage() {
             <p style={{ fontSize: '14px', color: c.textMuted }}>{t.common.loadingData}</p>
           </div>
         ) : transactions.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '40px 0' }}>
-            <div style={{ fontSize: '40px', marginBottom: '12px' }}>{'\uD83D\uDCB3'}</div>
-            <p style={{ fontSize: '15px', fontWeight: 600, color: c.textPrimary, margin: '0 0 4px' }}>
-              {t.gezmaPay.emptyTitle}
+          <div style={{ textAlign: 'center', padding: isMobile ? '32px 16px' : '48px 24px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+            <div
+              style={{
+                width: '96px',
+                height: '96px',
+                borderRadius: '50%',
+                backgroundColor: c.borderLight,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginBottom: '4px',
+              }}
+            >
+              <Receipt size={48} color={c.textLight} strokeWidth={1.5} />
+            </div>
+            <p style={{ fontSize: '17px', fontWeight: 700, color: c.textPrimary, margin: 0 }}>
+              {t.gezmaPay.emptyTitle || 'Belum ada transaksi'}
             </p>
-            <p style={{ fontSize: '13px', color: c.textMuted, margin: 0 }}>
-              {t.gezmaPay.emptyDesc}
+            <p style={{ fontSize: '14px', color: c.textMuted, margin: 0, maxWidth: '280px', lineHeight: '1.5' }}>
+              {t.gezmaPay.emptyDesc || 'Mulai dengan top up saldo GezmaPay Anda'}
             </p>
+            <button
+              onClick={() => setShowTopupModal(true)}
+              style={{
+                marginTop: '8px',
+                padding: '12px 28px',
+                minHeight: '44px',
+                borderRadius: '12px',
+                border: 'none',
+                backgroundColor: c.primary,
+                color: '#fff',
+                fontSize: '14px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                transition: 'opacity 0.15s ease',
+              }}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.opacity = '0.85'; }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.opacity = '1'; }}
+            >
+              Top Up Sekarang
+            </button>
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
