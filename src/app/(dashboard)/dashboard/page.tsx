@@ -275,7 +275,7 @@ export default function DashboardPage() {
             data-tour="dashboard-stats"
             style={{
               display: 'grid',
-              gridTemplateColumns: isMobile ? '1fr' : isTablet ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
+              gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : isTablet ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
               gap: isMobile ? '12px' : '16px',
               opacity: loading ? 0.5 : 1,
               transition: 'opacity 0.2s',
@@ -312,11 +312,15 @@ export default function DashboardPage() {
               gap: isMobile ? '12px' : '16px',
             }}
           >
-            <div style={{ gridColumn: isMobile || isTablet ? undefined : '1 / -1' }}>
+            <div style={{ gridColumn: isMobile || isTablet ? undefined : '1 / -1', minHeight: isMobile ? '260px' : undefined }}>
               <RevenueChart data={charts.revenueTrend} />
             </div>
-            <PilgrimStatusChart data={charts.pilgrimStatus} />
-            <TripCapacityChart data={charts.tripCapacity} />
+            <div style={{ minHeight: isMobile ? '240px' : undefined }}>
+              <PilgrimStatusChart data={charts.pilgrimStatus} />
+            </div>
+            <div style={{ minHeight: isMobile ? '240px' : undefined }}>
+              <TripCapacityChart data={charts.tripCapacity} />
+            </div>
           </div>
         );
 
@@ -574,10 +578,10 @@ export default function DashboardPage() {
       <div
         data-tour="gezma-banner"
         style={{
-          background: 'linear-gradient(135deg, #1E40AF 0%, #3B82F6 100%)',
+          background: 'linear-gradient(135deg, #7F1D1D 0%, #DC2626 60%, #EF4444 100%)',
           borderRadius: isMobile ? '12px' : '16px',
-          padding: isMobile ? '20px 24px' : '32px 36px',
-          boxShadow: '0 8px 24px rgba(30, 64, 175, 0.25)',
+          padding: isMobile ? '16px 20px' : '32px 36px',
+          boxShadow: '0 8px 24px rgba(220, 38, 38, 0.3)',
           border: '1px solid rgba(255, 255, 255, 0.1)',
         }}
       >
