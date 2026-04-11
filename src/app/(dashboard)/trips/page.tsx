@@ -298,7 +298,13 @@ export default function TripsPage() {
                 Trip pada {selectedDate.getDate()} {MONTH_NAMES[selectedDate.getMonth()]} {selectedDate.getFullYear()}
               </h4>
               {selectedDayTrips.length === 0 ? (
-                <p style={{ fontSize: '13px', color: c.textMuted, margin: 0 }}>Tidak ada trip pada tanggal ini.</p>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '32px 24px', textAlign: 'center' }}>
+                  <div style={{ width: '56px', height: '56px', borderRadius: '12px', backgroundColor: c.cardBgHover, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '12px' }}>
+                    <span style={{ fontSize: '28px' }}>📅</span>
+                  </div>
+                  <p style={{ fontSize: '14px', fontWeight: '600', color: c.textPrimary, margin: '0 0 4px 0' }}>Tidak ada trip</p>
+                  <p style={{ fontSize: '13px', color: c.textMuted, margin: 0 }}>Tidak ada trip pada tanggal ini.</p>
+                </div>
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   {selectedDayTrips.map(({ trip, type }) => (

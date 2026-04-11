@@ -291,10 +291,12 @@ export default function GalleryPage() {
 
       {/* Empty state */}
       {!loading && photos.length === 0 && (
-        <div style={{ textAlign: 'center', padding: '60px 20px', color: c.textMuted }}>
-          <span style={{ fontSize: '48px' }}>📷</span>
-          <p style={{ fontSize: '16px', margin: '12px 0 4px 0', fontWeight: 500 }}>Belum ada foto</p>
-          <p style={{ fontSize: '13px', margin: 0 }}>Tambahkan foto kenangan perjalanan umrah Anda</p>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '48px 24px', textAlign: 'center' }}>
+          <div style={{ width: '64px', height: '64px', borderRadius: '16px', backgroundColor: c.cardBgHover, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
+            <span style={{ fontSize: '32px' }}>📷</span>
+          </div>
+          <h3 style={{ fontSize: '16px', fontWeight: '600', color: c.textPrimary, margin: '0 0 4px 0' }}>Belum ada foto</h3>
+          <p style={{ fontSize: '14px', color: c.textMuted, margin: 0, maxWidth: '320px' }}>Tambahkan foto kenangan perjalanan umrah Anda di atas</p>
         </div>
       )}
 

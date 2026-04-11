@@ -91,9 +91,13 @@ export default function PilgrimPaymentsPage() {
         </h2>
 
         {payments.length === 0 ? (
-          <p style={{ fontSize: '14px', color: c.textMuted, textAlign: 'center', padding: '24px 0' }}>
-            Belum ada riwayat pembayaran.
-          </p>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '48px 24px', textAlign: 'center' }}>
+            <div style={{ width: '64px', height: '64px', borderRadius: '16px', backgroundColor: c.cardBgHover, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
+              <span style={{ fontSize: '32px' }}>💳</span>
+            </div>
+            <h3 style={{ fontSize: '16px', fontWeight: '600', color: c.textPrimary, margin: '0 0 4px 0' }}>Belum ada riwayat pembayaran</h3>
+            <p style={{ fontSize: '14px', color: c.textMuted, margin: 0, maxWidth: '320px' }}>Riwayat pembayaran Anda akan muncul di sini setelah melakukan pembayaran.</p>
+          </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
             {payments.map((pay, i) => {

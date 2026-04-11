@@ -758,16 +758,12 @@ function PilgrimsPageContent() {
                 const activePilgrims = pilgrims.filter((p) => p.status === kanbanActiveStatus);
                 if (activePilgrims.length === 0) {
                   return (
-                    <div style={{
-                      padding: '32px 16px',
-                      textAlign: 'center',
-                      fontSize: '13px',
-                      color: c.textMuted,
-                      border: `2px dashed ${c.border}`,
-                      borderRadius: '12px',
-                      backgroundColor: c.pageBg,
-                    }}>
-                      Tidak ada jemaah dengan status ini
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '48px 24px', textAlign: 'center' }}>
+                      <div style={{ width: '64px', height: '64px', borderRadius: '16px', backgroundColor: c.cardBgHover, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
+                        <span style={{ fontSize: '32px' }}>👥</span>
+                      </div>
+                      <h3 style={{ fontSize: '16px', fontWeight: '600', color: c.textPrimary, margin: '0 0 4px 0' }}>Tidak ada jemaah</h3>
+                      <p style={{ fontSize: '14px', color: c.textMuted, margin: 0, maxWidth: '320px' }}>Tidak ada jemaah dengan status ini.</p>
                     </div>
                   );
                 }

@@ -629,9 +629,13 @@ export default function PilgrimDetailPage() {
 
               {/* Notes list */}
               {internalNotes.length === 0 ? (
-                <p style={{ fontSize: '14px', color: c.textMuted, textAlign: 'center', padding: '16px 0', margin: 0 }}>
-                  Belum ada catatan internal
-                </p>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '48px 24px', textAlign: 'center' }}>
+                  <div style={{ width: '64px', height: '64px', borderRadius: '16px', backgroundColor: c.cardBgHover, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
+                    <span style={{ fontSize: '32px' }}>📝</span>
+                  </div>
+                  <h3 style={{ fontSize: '16px', fontWeight: '600', color: c.textPrimary, margin: '0 0 4px 0' }}>Belum ada catatan</h3>
+                  <p style={{ fontSize: '14px', color: c.textMuted, margin: 0, maxWidth: '320px' }}>Tambahkan catatan internal untuk jemaah ini menggunakan form di atas.</p>
+                </div>
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   {internalNotes.map((note) => (

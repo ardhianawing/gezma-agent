@@ -1,0 +1,447 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - generic [ref=e4]:
+        - link "GEZMA Logo GEZMA" [ref=e5] [cursor=pointer]:
+          - /url: /
+          - img "GEZMA Logo" [ref=e6]
+          - generic [ref=e7]: GEZMA
+        - button [ref=e8] [cursor=pointer]:
+          - img [ref=e9]
+      - generic [ref=e12]:
+        - generic [ref=e13]:
+          - paragraph [ref=e14]: Platform
+          - navigation [ref=e15]:
+            - link "Marketplace" [ref=e16] [cursor=pointer]:
+              - /url: /marketplace
+              - generic [ref=e17]:
+                - img [ref=e18]
+                - generic [ref=e21]: Marketplace
+            - link "Trade Centre" [ref=e22] [cursor=pointer]:
+              - /url: /trade
+              - generic [ref=e23]:
+                - img [ref=e24]
+                - generic [ref=e27]: Trade Centre
+            - link "Forum" [ref=e28] [cursor=pointer]:
+              - /url: /forum
+              - generic [ref=e29]:
+                - img [ref=e30]
+                - generic [ref=e32]: Forum
+                - img [ref=e33]
+            - link "News" [ref=e35] [cursor=pointer]:
+              - /url: /news
+              - generic [ref=e36]:
+                - img [ref=e37]
+                - generic [ref=e40]: News
+            - link "Academy" [ref=e41] [cursor=pointer]:
+              - /url: /academy
+              - generic [ref=e42]:
+                - img [ref=e43]
+                - generic [ref=e46]: Academy
+            - link "Services" [ref=e47] [cursor=pointer]:
+              - /url: /services
+              - generic [ref=e48]:
+                - img [ref=e49]
+                - generic [ref=e51]: Services
+            - link "GezmaPay" [ref=e52] [cursor=pointer]:
+              - /url: /gezmapay
+              - generic [ref=e53]:
+                - img [ref=e54]
+                - generic [ref=e57]: GezmaPay
+            - link "Savings" [ref=e58] [cursor=pointer]:
+              - /url: /tabungan
+              - generic [ref=e59]:
+                - img [ref=e60]
+                - generic [ref=e63]: Savings
+            - link "PayLater" [ref=e64] [cursor=pointer]:
+              - /url: /paylater
+              - generic [ref=e65]:
+                - img [ref=e66]
+                - generic [ref=e68]: PayLater
+            - link "Gezma Foundation" [ref=e69] [cursor=pointer]:
+              - /url: /foundation
+              - generic [ref=e70]:
+                - img [ref=e71]
+                - generic [ref=e73]: Gezma Foundation
+        - generic [ref=e75]:
+          - paragraph [ref=e76]: Operational
+          - navigation [ref=e77]:
+            - link "Dashboard" [ref=e78] [cursor=pointer]:
+              - /url: /dashboard
+              - generic [ref=e79]:
+                - img [ref=e80]
+                - generic [ref=e85]: Dashboard
+            - link "Pilgrims" [ref=e86] [cursor=pointer]:
+              - /url: /pilgrims
+              - generic [ref=e87]:
+                - img [ref=e88]
+                - generic [ref=e93]: Pilgrims
+            - link "Packages" [ref=e94] [cursor=pointer]:
+              - /url: /packages
+              - generic [ref=e95]:
+                - img [ref=e96]
+                - generic [ref=e100]: Packages
+            - link "Trips" [ref=e101] [cursor=pointer]:
+              - /url: /trips
+              - generic [ref=e102]:
+                - img [ref=e103]
+                - generic [ref=e105]: Trips
+            - link "Tasks" [ref=e106] [cursor=pointer]:
+              - /url: /tasks
+              - generic [ref=e107]:
+                - img [ref=e108]
+                - generic [ref=e111]: Tasks
+            - link "Notifications" [ref=e112] [cursor=pointer]:
+              - /url: /notifications
+              - generic [ref=e113]:
+                - img [ref=e114]
+                - generic [ref=e117]: Notifications
+            - link "Documents" [ref=e118] [cursor=pointer]:
+              - /url: /documents
+              - generic [ref=e119]:
+                - img [ref=e120]
+                - generic [ref=e123]: Documents
+            - link "Reports" [ref=e124] [cursor=pointer]:
+              - /url: /reports
+              - generic [ref=e125]:
+                - img [ref=e126]
+                - generic [ref=e128]: Reports
+            - link "Activities" [ref=e129] [cursor=pointer]:
+              - /url: /activities
+              - generic [ref=e130]:
+                - img [ref=e131]
+                - generic [ref=e134]: Activities
+            - link "Gamification" [ref=e135] [cursor=pointer]:
+              - /url: /gamification
+              - generic [ref=e136]:
+                - img [ref=e137]
+                - generic [ref=e143]: Gamification
+            - link "Blockchain" [ref=e144] [cursor=pointer]:
+              - /url: /blockchain
+              - generic [ref=e145]:
+                - img [ref=e146]
+                - generic [ref=e148]: Blockchain
+            - link "Agency" [ref=e149] [cursor=pointer]:
+              - /url: /agency
+              - generic [ref=e150]:
+                - img [ref=e151]
+                - generic [ref=e155]: Agency
+        - generic [ref=e157]:
+          - paragraph [ref=e158]: Other
+          - navigation [ref=e159]:
+            - link "Settings" [ref=e160] [cursor=pointer]:
+              - /url: /settings
+              - generic [ref=e161]:
+                - img [ref=e162]
+                - generic [ref=e165]: Settings
+            - link "Help Center" [ref=e166] [cursor=pointer]:
+              - /url: /help
+              - generic [ref=e167]:
+                - img [ref=e168]
+                - generic [ref=e171]: Help Center
+      - generic [ref=e172]:
+        - generic [ref=e173]:
+          - generic [ref=e174]: VT
+          - generic [ref=e175]:
+            - paragraph [ref=e176]: Vauza Tamma Abadi, PT.
+            - paragraph [ref=e177]: Admin Demo
+        - button "Sign Out" [ref=e178] [cursor=pointer]:
+          - img [ref=e179]
+          - text: Sign Out
+    - generic [ref=e182]:
+      - banner [ref=e183]:
+        - generic [ref=e184]:
+          - generic [ref=e185]:
+            - button [ref=e186] [cursor=pointer]:
+              - img [ref=e187]
+            - button "Search pilgrims, packages, trips... Ctrl+K" [ref=e188] [cursor=pointer]:
+              - img [ref=e189]
+              - generic [ref=e192]: Search pilgrims, packages, trips...
+              - generic [ref=e193]: Ctrl+K
+          - generic [ref=e194]:
+            - button "Switch to Dark Mode" [ref=e195] [cursor=pointer]:
+              - img [ref=e196]
+            - button "EN / ID" [ref=e198] [cursor=pointer]:
+              - generic [ref=e199]: EN
+              - generic [ref=e200]: /
+              - generic [ref=e201]: ID
+            - button [ref=e203] [cursor=pointer]:
+              - img [ref=e204]
+            - button "AD Admin Demo Vauza Tamma Abadi, PT." [ref=e210] [cursor=pointer]:
+              - generic [ref=e212]: AD
+              - generic [ref=e213]:
+                - paragraph [ref=e214]: Admin Demo
+                - paragraph [ref=e215]: Vauza Tamma Abadi, PT.
+              - img [ref=e216]
+      - main [ref=e218]:
+        - generic [ref=e219]:
+          - generic [ref=e220]:
+            - generic [ref=e221]:
+              - heading "Community Forum" [level=1] [ref=e222]
+              - generic [ref=e224]: 384 threads
+            - button "+ Create Thread" [ref=e225] [cursor=pointer]
+          - generic [ref=e226]:
+            - button "📋 Semua 384" [ref=e227] [cursor=pointer]:
+              - generic [ref=e228]: 📋
+              - generic [ref=e229]: Semua
+              - generic [ref=e230]: "384"
+            - button "⭐ Review 72" [ref=e231] [cursor=pointer]:
+              - generic [ref=e232]: ⭐
+              - generic [ref=e233]: Review
+              - generic [ref=e234]: "72"
+            - button "📜 Regulasi 45" [ref=e235] [cursor=pointer]:
+              - generic [ref=e236]: 📜
+              - generic [ref=e237]: Regulasi
+              - generic [ref=e238]: "45"
+            - button "⚙️ Operasional 68" [ref=e239] [cursor=pointer]:
+              - generic [ref=e240]: ⚙️
+              - generic [ref=e241]: Operasional
+              - generic [ref=e242]: "68"
+            - button "💬 Sharing 91" [ref=e243] [cursor=pointer]:
+              - generic [ref=e244]: 💬
+              - generic [ref=e245]: Sharing
+              - generic [ref=e246]: "91"
+            - button "🚨 Scam Alert 34" [ref=e247] [cursor=pointer]:
+              - generic [ref=e248]: 🚨
+              - generic [ref=e249]: Scam Alert
+              - generic [ref=e250]: "34"
+            - button "❓ Tanya Jawab 74" [ref=e251] [cursor=pointer]:
+              - generic [ref=e252]: ❓
+              - generic [ref=e253]: Tanya Jawab
+              - generic [ref=e254]: "74"
+          - generic [ref=e255]:
+            - textbox "Search threads, tags, or authors..." [ref=e257]
+            - generic [ref=e258]:
+              - button "Latest" [ref=e259] [cursor=pointer]
+              - button "Hot" [ref=e260] [cursor=pointer]
+              - button "Top" [ref=e261] [cursor=pointer]
+          - generic [ref=e262]:
+            - generic [ref=e263]:
+              - generic [ref=e264]: Thread
+              - generic [ref=e265]: Replies
+              - generic [ref=e266]: Views
+              - generic [ref=e267]: Last
+            - generic [ref=e268]:
+              - generic [ref=e269]:
+                - generic [ref=e270]: AG
+                - generic [ref=e271]:
+                  - generic [ref=e272] [cursor=pointer]: 📌 [WAJIB BACA] Aturan Forum & Panduan Posting
+                  - generic [ref=e273]:
+                    - generic [ref=e274]: AdminGezma
+                    - generic [ref=e275]: Admin
+                    - generic [ref=e276]: 📜 Regulasi
+                    - generic [ref=e277]: "#rules"
+                    - generic [ref=e278]: "#panduan"
+              - generic [ref=e280]: "156"
+              - generic [ref=e282]: "8.420"
+              - generic [ref=e283]:
+                - generic [ref=e284]: NewbiePKB
+                - generic [ref=e285]: 1 months ago
+            - generic [ref=e286]:
+              - generic [ref=e287]:
+                - generic [ref=e288]: MR
+                - generic [ref=e289]:
+                  - generic [ref=e290] [cursor=pointer]: 📌 [INFO] Update Regulasi OJK Februari 2026 - Wajib Dibaca Semua Agen
+                  - generic [ref=e291]:
+                    - generic [ref=e292]: ModRina
+                    - generic [ref=e293]: Moderator
+                    - generic [ref=e294]: 📜 Regulasi
+                    - generic [ref=e295]: "#ojk"
+                    - generic [ref=e296]: "#update"
+                    - generic [ref=e297]: "#februari-2026"
+              - generic [ref=e299]: "89"
+              - generic [ref=e301]: "5.230"
+              - generic [ref=e302]:
+                - generic [ref=e303]: AgenBandung
+                - generic [ref=e304]: 1 months ago
+            - generic [ref=e305]:
+              - generic [ref=e306]:
+                - generic [ref=e307]: RA
+                - generic [ref=e308]:
+                  - generic [ref=e309] [cursor=pointer]: "🔥 Review Jujur: Pengalaman 6 Bulan Jadi Agen di Platform X"
+                  - generic [ref=e310]:
+                    - generic [ref=e311]: RizkyAgent
+                    - generic [ref=e312]: Verified
+                    - generic [ref=e313]: ⭐ Review
+                    - generic [ref=e314]: "#platform-x"
+                    - generic [ref=e315]: "#pengalaman"
+                    - generic [ref=e316]: "#honest-review"
+              - generic [ref=e318]: "47"
+              - generic [ref=e320]: "3.150"
+              - generic [ref=e321]:
+                - generic [ref=e322]: SuryaFintech
+                - generic [ref=e323]: 1 months ago
+            - generic [ref=e324]:
+              - generic [ref=e325]:
+                - generic [ref=e326]: WI
+                - generic [ref=e327]:
+                  - generic [ref=e328] [cursor=pointer]: 🔥 HATI-HATI! Modus Penipuan Berkedok "Upgrade Agen Premium"
+                  - generic [ref=e329]:
+                    - generic [ref=e330]: WatchdogID
+                    - generic [ref=e331]: Top Contributor
+                    - generic [ref=e332]: 🚨 Scam Alert
+                    - generic [ref=e333]: "#penipuan"
+                    - generic [ref=e334]: "#modus-baru"
+                    - generic [ref=e335]: "#waspada"
+              - generic [ref=e337]: "63"
+              - generic [ref=e339]: "4.870"
+              - generic [ref=e340]:
+                - generic [ref=e341]: AgenSolo
+                - generic [ref=e342]: 1 months ago
+            - generic [ref=e343]:
+              - generic [ref=e344]:
+                - generic [ref=e345]: TP
+                - generic [ref=e346]:
+                  - generic [ref=e347] [cursor=pointer]: ✅ Cara Mengatasi Error "Transaksi Gagal" Saat Pencairan Dana
+                  - generic [ref=e348]:
+                    - generic [ref=e349]: TeknisiPKB
+                    - generic [ref=e350]: Verified
+                    - generic [ref=e351]: ⚙️ Operasional
+                    - generic [ref=e352]: "#error"
+                    - generic [ref=e353]: "#pencairan"
+                    - generic [ref=e354]: "#troubleshoot"
+              - generic [ref=e356]: "32"
+              - generic [ref=e358]: "2.180"
+              - generic [ref=e359]:
+                - generic [ref=e360]: AgentBali
+                - generic [ref=e361]: 1 months ago
+            - generic [ref=e362]:
+              - generic [ref=e363]:
+                - generic [ref=e364]: DM
+                - generic [ref=e365]:
+                  - generic [ref=e366] [cursor=pointer]: "Tips: Cara Dapat 50+ Nasabah per Bulan dari Media Sosial"
+                  - generic [ref=e367]:
+                    - generic [ref=e368]: DigiMarketer
+                    - generic [ref=e369]: Top Contributor
+                    - generic [ref=e370]: 💬 Sharing
+                    - generic [ref=e371]: "#tips"
+                    - generic [ref=e372]: "#marketing"
+                    - generic [ref=e373]: "#sosmed"
+                    - generic [ref=e374]: "#nasabah"
+              - generic [ref=e376]: "28"
+              - generic [ref=e378]: "1.950"
+              - generic [ref=e379]:
+                - generic [ref=e380]: AgenJaksel
+                - generic [ref=e381]: 1 months ago
+            - generic [ref=e382]:
+              - generic [ref=e383]:
+                - generic [ref=e384]: NA
+                - generic [ref=e385]:
+                  - generic [ref=e386] [cursor=pointer]: ✅ Bagaimana Cara Hitung Komisi Berjenjang? Bingung Nih
+                  - generic [ref=e387]:
+                    - generic [ref=e388]: NewbieAgen
+                    - generic [ref=e389]: ❓ Tanya Jawab
+                    - generic [ref=e390]: "#komisi"
+                    - generic [ref=e391]: "#perhitungan"
+                    - generic [ref=e392]: "#newbie"
+              - generic [ref=e394]: "15"
+              - generic [ref=e396]: "890"
+              - generic [ref=e397]:
+                - generic [ref=e398]: ModRina
+                - generic [ref=e399]: 1 months ago
+            - generic [ref=e400]:
+              - generic [ref=e401]:
+                - generic [ref=e402]: AS
+                - generic [ref=e403]:
+                  - generic [ref=e404] [cursor=pointer]: "Review Platform Y: Fee Tertinggi tapi Ribet Prosesnya"
+                  - generic [ref=e405]:
+                    - generic [ref=e406]: AgenSurabaya
+                    - generic [ref=e407]: Verified
+                    - generic [ref=e408]: ⭐ Review
+                    - generic [ref=e409]: "#platform-y"
+                    - generic [ref=e410]: "#fee"
+                    - generic [ref=e411]: "#proses"
+              - generic [ref=e413]: "21"
+              - generic [ref=e415]: "1.640"
+              - generic [ref=e416]:
+                - generic [ref=e417]: RizkyAgent
+                - generic [ref=e418]: 1 months ago
+            - generic [ref=e419]:
+              - generic [ref=e420]:
+                - generic [ref=e421]: PA
+                - generic [ref=e422]:
+                  - generic [ref=e423] [cursor=pointer]: "SOP Lengkap: Onboarding Nasabah Baru dari Awal sampai Cair"
+                  - generic [ref=e424]:
+                    - generic [ref=e425]: ProAgent99
+                    - generic [ref=e426]: Top Contributor
+                    - generic [ref=e427]: ⚙️ Operasional
+                    - generic [ref=e428]: "#sop"
+                    - generic [ref=e429]: "#onboarding"
+                    - generic [ref=e430]: "#panduan-lengkap"
+              - generic [ref=e432]: "44"
+              - generic [ref=e434]: "3.680"
+              - generic [ref=e435]:
+                - generic [ref=e436]: NewbieAgen
+                - generic [ref=e437]: 1 months ago
+            - generic [ref=e438]:
+              - generic [ref=e439]:
+                - generic [ref=e440]: CA
+                - generic [ref=e441]:
+                  - generic [ref=e442] [cursor=pointer]: Waspada Link Phishing WhatsApp Mengatasnamakan Fintech
+                  - generic [ref=e443]:
+                    - generic [ref=e444]: CyberAware
+                    - generic [ref=e445]: 🚨 Scam Alert
+                    - generic [ref=e446]: "#phishing"
+                    - generic [ref=e447]: "#whatsapp"
+                    - generic [ref=e448]: "#waspada"
+              - generic [ref=e450]: "18"
+              - generic [ref=e452]: "2.340"
+              - generic [ref=e453]:
+                - generic [ref=e454]: WatchdogID
+                - generic [ref=e455]: 1 months ago
+            - generic [ref=e456]:
+              - generic [ref=e457]:
+                - generic [ref=e458]: MA
+                - generic [ref=e459]:
+                  - generic [ref=e460] [cursor=pointer]: Sharing Pendapatan Bulan Januari 2026 - Yuk Saling Motivasi!
+                  - generic [ref=e461]:
+                    - generic [ref=e462]: MotivatorAgen
+                    - generic [ref=e463]: 💬 Sharing
+                    - generic [ref=e464]: "#pendapatan"
+                    - generic [ref=e465]: "#januari"
+                    - generic [ref=e466]: "#motivasi"
+              - generic [ref=e468]: "36"
+              - generic [ref=e470]: "2.780"
+              - generic [ref=e471]:
+                - generic [ref=e472]: AgenMedan
+                - generic [ref=e473]: 1 months ago
+            - generic [ref=e474]:
+              - generic [ref=e475]:
+                - generic [ref=e476]: TN
+                - generic [ref=e477]:
+                  - generic [ref=e478] [cursor=pointer]: Apakah Agen Wajib Punya NPWP? Gimana Pajaknya?
+                  - generic [ref=e479]:
+                    - generic [ref=e480]: TaxNewbie
+                    - generic [ref=e481]: ❓ Tanya Jawab
+                    - generic [ref=e482]: "#pajak"
+                    - generic [ref=e483]: "#npwp"
+                    - generic [ref=e484]: "#regulasi"
+              - generic [ref=e486]: "12"
+              - generic [ref=e488]: "760"
+              - generic [ref=e489]:
+                - generic [ref=e490]: ProAgent99
+                - generic [ref=e491]: 1 months ago
+          - generic [ref=e492]:
+            - generic [ref=e493]:
+              - text: Showing
+              - strong [ref=e494]: 1-12
+              - text: of
+              - strong [ref=e495]: "384"
+              - text: threads
+            - generic [ref=e496]:
+              - button "1" [ref=e497] [cursor=pointer]
+              - button "2" [ref=e498] [cursor=pointer]
+              - button "3" [ref=e499] [cursor=pointer]
+              - button "..." [ref=e500]
+              - button "32" [ref=e501] [cursor=pointer]
+    - generic [ref=e503]:
+      - img [ref=e505]
+      - generic [ref=e508]:
+        - generic [ref=e509]: Install GEZMA Agent
+        - generic [ref=e510]: Akses lebih cepat dari home screen
+      - button "Install" [ref=e511] [cursor=pointer]
+      - button [ref=e512] [cursor=pointer]:
+        - img [ref=e513]
+    - button [ref=e516] [cursor=pointer]:
+      - img [ref=e517]
+  - alert [ref=e520]

@@ -414,9 +414,12 @@ export default function CCFoundationPage() {
               <p style={{ color: cc.textMuted }}>Memuat data...</p>
             </div>
           ) : campaigns.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '48px', backgroundColor: cc.cardBg, borderRadius: '12px', border: '1px solid ' + cc.border }}>
-              <div style={{ fontSize: '40px', marginBottom: '12px' }}>{'\u{1F91D}'}</div>
-              <p style={{ color: cc.textMuted }}>Belum ada kampanye</p>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '48px 24px', textAlign: 'center', backgroundColor: cc.cardBg, borderRadius: '12px', border: '1px solid ' + cc.border }}>
+              <div style={{ width: '64px', height: '64px', borderRadius: '16px', backgroundColor: cc.cardBgHover, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
+                <span style={{ fontSize: '32px' }}>{'\u{1F91D}'}</span>
+              </div>
+              <h3 style={{ fontSize: '16px', fontWeight: '600', color: cc.textPrimary, margin: '0 0 4px 0' }}>Belum ada kampanye</h3>
+              <p style={{ fontSize: '14px', color: cc.textMuted, margin: 0, maxWidth: '320px' }}>Kampanye penggalangan dana akan muncul di sini setelah dibuat.</p>
             </div>
           ) : (
             <div style={{ backgroundColor: cc.cardBg, border: '1px solid ' + cc.border, borderRadius: '12px', overflow: 'hidden' }}>

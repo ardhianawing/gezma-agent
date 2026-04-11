@@ -105,9 +105,13 @@ export default function ForumDetailPage({ params }: { params: Promise<{ id: stri
 
   if (!thread) {
     return (
-      <div style={{ padding: '60px 20px', textAlign: 'center' }}>
-        <p style={{ fontSize: '16px', color: c.textMuted }}>{t.forum.empty}</p>
-        <Link href="/forum" style={{ color: c.primary, textDecoration: 'none', fontSize: '14px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '48px 24px', textAlign: 'center' }}>
+        <div style={{ width: '64px', height: '64px', borderRadius: '16px', backgroundColor: c.cardBgHover, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
+          <span style={{ fontSize: '32px' }}>❓</span>
+        </div>
+        <h3 style={{ fontSize: '16px', fontWeight: '600', color: c.textPrimary, margin: '0 0 4px 0' }}>Diskusi tidak ditemukan</h3>
+        <p style={{ fontSize: '14px', color: c.textMuted, margin: '0 0 20px 0', maxWidth: '320px' }}>{t.forum.empty}</p>
+        <Link href="/forum" style={{ color: c.primary, textDecoration: 'none', fontSize: '14px', fontWeight: 600 }}>
           {t.common.back} {t.forum.title}
         </Link>
       </div>

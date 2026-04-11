@@ -626,9 +626,13 @@ export default function TripDetailPage({ params }: { params: Promise<{ id: strin
 
         <div style={{ padding: isMobile ? '20px' : '28px' }}>
           {(!trip.manifest || trip.manifest.length === 0) ? (
-            <p style={{ textAlign: 'center', fontSize: '14px', color: c.textMuted, padding: '16px 0' }}>
-              Belum ada jemaah. Klik &quot;Tambah Jemaah&quot; untuk menambahkan.
-            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '48px 24px', textAlign: 'center' }}>
+              <div style={{ width: '64px', height: '64px', borderRadius: '16px', backgroundColor: c.cardBgHover, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
+                <span style={{ fontSize: '32px' }}>👥</span>
+              </div>
+              <h3 style={{ fontSize: '16px', fontWeight: '600', color: c.textPrimary, margin: '0 0 4px 0' }}>Belum ada jemaah</h3>
+              <p style={{ fontSize: '14px', color: c.textMuted, margin: 0, maxWidth: '320px' }}>Tambahkan jemaah untuk trip ini menggunakan tombol di atas.</p>
+            </div>
           ) : (
             <div style={{ overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
@@ -907,9 +911,13 @@ export default function TripDetailPage({ params }: { params: Promise<{ id: strin
 
             {/* Waiting list entries */}
             {waitingList.length === 0 ? (
-              <p style={{ textAlign: 'center', fontSize: '14px', color: c.textMuted, padding: '16px 0' }}>
-                Belum ada yang masuk daftar tunggu.
-              </p>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '48px 24px', textAlign: 'center' }}>
+                <div style={{ width: '64px', height: '64px', borderRadius: '16px', backgroundColor: c.cardBgHover, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
+                  <span style={{ fontSize: '32px' }}>⏳</span>
+                </div>
+                <h3 style={{ fontSize: '16px', fontWeight: '600', color: c.textPrimary, margin: '0 0 4px 0' }}>Belum ada daftar tunggu</h3>
+                <p style={{ fontSize: '14px', color: c.textMuted, margin: 0, maxWidth: '320px' }}>Belum ada yang masuk daftar tunggu untuk trip ini.</p>
+              </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 {waitingList.map((entry, idx) => (

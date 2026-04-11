@@ -324,9 +324,13 @@ export default function PackageDetailPage() {
               const itinerary: ItineraryDay[] = Array.isArray(pkg.itinerary) ? pkg.itinerary : [];
               if (itinerary.length === 0) {
                 return (
-                  <p style={{ fontSize: '14px', color: c.textMuted, textAlign: 'center', padding: '24px 0' }}>
-                    Belum ada itinerary untuk paket ini.
-                  </p>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '48px 24px', textAlign: 'center' }}>
+                    <div style={{ width: '64px', height: '64px', borderRadius: '16px', backgroundColor: c.cardBgHover, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
+                      <span style={{ fontSize: '32px' }}>📅</span>
+                    </div>
+                    <h3 style={{ fontSize: '16px', fontWeight: '600', color: c.textPrimary, margin: '0 0 4px 0' }}>Belum ada itinerary</h3>
+                    <p style={{ fontSize: '14px', color: c.textMuted, margin: 0, maxWidth: '320px' }}>Jadwal perjalanan untuk paket ini belum tersedia.</p>
+                  </div>
                 );
               }
               return (
