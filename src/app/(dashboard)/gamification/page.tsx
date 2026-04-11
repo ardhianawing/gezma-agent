@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Trophy, Star, Medal, TrendingUp, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Trophy, Star, Medal, TrendingUp, ChevronLeft, ChevronRight, Award, Zap, Users, CheckCircle, Lock, Gift, Crown, Flame, Target, BookOpen } from 'lucide-react';
 import { EmptyState } from '@/components/shared/empty-state';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
@@ -41,6 +41,42 @@ interface PointEvent {
   points: number;
   description: string;
   createdAt: string;
+}
+
+// Badge key -> gradient + icon mapping
+const BADGE_STYLES: Record<string, { gradient: string; Icon: React.ElementType }> = {
+  first_pilgrim:    { gradient: 'linear-gradient(135deg, #F59E0B, #D97706)', Icon: Star },
+  ten_pilgrims:     { gradient: 'linear-gradient(135deg, #3B82F6, #1D4ED8)', Icon: Users },
+  fifty_pilgrims:   { gradient: 'linear-gradient(135deg, #8B5CF6, #6D28D9)', Icon: Crown },
+  hundred_pilgrims: { gradient: 'linear-gradient(135deg, #10B981, #059669)', Icon: Award },
+  complete_docs:    { gradient: 'linear-gradient(135deg, #06B6D4, #0891B2)', Icon: CheckCircle },
+  fast_responder:   { gradient: 'linear-gradient(135deg, #EF4444, #DC2626)', Icon: Zap },
+  top_agency:       { gradient: 'linear-gradient(135deg, #F59E0B, #EF4444)', Icon: Trophy },
+  loyal_partner:    { gradient: 'linear-gradient(135deg, #EC4899, #BE185D)', Icon: Flame },
+  goal_setter:      { gradient: 'linear-gradient(135deg, #14B8A6, #0F766E)', Icon: Target },
+  scholar:          { gradient: 'linear-gradient(135deg, #6366F1, #4338CA)', Icon: BookOpen },
+};
+
+const DEFAULT_BADGE_STYLE = { gradient: 'linear-gradient(135deg, #94A3B8, #64748B)', Icon: Gift };
+
+const AVATAR_COLORS = [
+  '#EF4444', '#F59E0B', '#10B981', '#3B82F6',
+  '#8B5CF6', '#EC4899', '#06B6D4', '#84CC16',
+  '#F97316', '#6366F1',
+];
+
+function hashName(name: string): number {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = (hash * 31 + name.charCodeAt(i)) & 0xffff;
+  }
+  return hash;
+}
+
+function getInitials(name: string): string {
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 }
 
 export default function GamificationPage() {
@@ -178,15 +214,15 @@ export default function GamificationPage() {
               width: '48px',
               height: '48px',
               borderRadius: '12px',
-              backgroundColor: '#10B98115',
+              background: 'linear-gradient(135deg, #10B981, #059669)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: '24px',
               flexShrink: 0,
+              boxShadow: '0 4px 12px rgba(16,185,129,0.3)',
             }}
           >
-            🎁
+            <Gift style={{ width: '24px', height: '24px', color: '#FFFFFF' }} />
           </div>
           <div style={{ flex: 1 }}>
             <p style={{ fontSize: '16px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>
@@ -230,32 +266,50 @@ export default function GamificationPage() {
               gap: '12px',
             }}
           >
-            {badges.map(badge => (
-              <div
-                key={badge.key}
-                style={{
-                  padding: '16px',
-                  borderRadius: '12px',
-                  border: `1px solid ${badge.unlocked ? '#F59E0B40' : c.borderLight}`,
-                  backgroundColor: badge.unlocked ? '#F59E0B08' : c.cardBgHover,
-                  textAlign: 'center',
-                  opacity: badge.unlocked ? 1 : 0.5,
-                  transition: 'all 0.2s',
-                }}
-              >
-                <div style={{ fontSize: '32px', marginBottom: '8px' }}>
-                  {badge.unlocked ? badge.emoji : '\u{1F512}'}
-                </div>
-                <p style={{ fontSize: '12px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>
-                  {badge.name}
-                </p>
-                {badge.unlocked && badge.unlockedAt && (
-                  <p style={{ fontSize: '10px', color: c.textMuted, margin: '4px 0 0 0' }}>
-                    {new Date(badge.unlockedAt).toLocaleDateString('id-ID')}
+            {badges.map(badge => {
+              const style = BADGE_STYLES[badge.key] || DEFAULT_BADGE_STYLE;
+              const BadgeIcon = badge.unlocked ? style.Icon : Lock;
+              const gradient = badge.unlocked ? style.gradient : 'linear-gradient(135deg, #94A3B8, #64748B)';
+              return (
+                <div
+                  key={badge.key}
+                  style={{
+                    padding: '16px',
+                    borderRadius: '12px',
+                    border: `1px solid ${badge.unlocked ? '#F59E0B40' : c.borderLight}`,
+                    backgroundColor: badge.unlocked ? '#F59E0B08' : c.cardBgHover,
+                    textAlign: 'center',
+                    opacity: badge.unlocked ? 1 : 0.45,
+                    transition: 'all 0.2s',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: '56px',
+                      height: '56px',
+                      borderRadius: '50%',
+                      background: gradient,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      margin: '0 auto 10px',
+                      boxShadow: badge.unlocked ? '0 4px 12px rgba(0,0,0,0.15)' : 'none',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <BadgeIcon style={{ width: '24px', height: '24px', color: '#FFFFFF' }} />
+                  </div>
+                  <p style={{ fontSize: '12px', fontWeight: '600', color: c.textPrimary, margin: 0 }}>
+                    {badge.name}
                   </p>
-                )}
-              </div>
-            ))}
+                  {badge.unlocked && badge.unlockedAt && (
+                    <p style={{ fontSize: '10px', color: c.textMuted, margin: '4px 0 0 0' }}>
+                      {new Date(badge.unlockedAt).toLocaleDateString('id-ID')}
+                    </p>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
 
@@ -295,22 +349,37 @@ export default function GamificationPage() {
                         border: `1px solid ${entry.rank <= 3 ? `${rankColor}30` : c.borderLight}`,
                       }}
                     >
+                      {/* Rank badge */}
                       <div
                         style={{
-                          width: '32px',
-                          height: '32px',
-                          borderRadius: '50%',
-                          backgroundColor: `${rankColor}20`,
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          fontSize: '14px',
+                          width: '24px',
+                          textAlign: 'center',
+                          fontSize: '13px',
                           fontWeight: '700',
                           color: rankColor,
                           flexShrink: 0,
                         }}
                       >
                         {entry.rank}
+                      </div>
+                      {/* Initials avatar */}
+                      <div
+                        style={{
+                          width: '36px',
+                          height: '36px',
+                          borderRadius: '50%',
+                          backgroundColor: AVATAR_COLORS[hashName(entry.agencyName) % AVATAR_COLORS.length],
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '13px',
+                          fontWeight: '700',
+                          color: '#FFFFFF',
+                          flexShrink: 0,
+                          letterSpacing: '0.02em',
+                        }}
+                      >
+                        {getInitials(entry.agencyName)}
                       </div>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <p style={{ fontSize: '14px', fontWeight: '600', color: c.textPrimary, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
