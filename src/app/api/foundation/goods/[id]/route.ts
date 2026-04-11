@@ -4,9 +4,10 @@ import { logger } from '@/lib/logger';
 
 const MOCK_GOODS_DETAIL = {
   id: 'g1',
-  name: 'Baju Layak Pakai Anak-anak',
+  title: 'Baju Layak Pakai Anak-anak',
   description: 'Pakaian anak usia 3–10 tahun, kondisi baik, sudah dicuci dan disetrika.',
   category: 'pakaian',
+  condition: 'baik',
   quantity: 50,
   unit: 'pcs',
   status: 'available',

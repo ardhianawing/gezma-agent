@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Heart, TrendingUp, Users, Package, Building2 } from 'lucide-react';
+import { Heart, TrendingUp, Users, Package, Building2, Flame, BookOpen, Stethoscope, GraduationCap, Briefcase, Star } from 'lucide-react';
 import { PageHeader } from '@/components/layout/page-header';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
@@ -28,15 +28,17 @@ interface FoundationStats {
   peopleImpacted: number;
 }
 
-const CATEGORY_EMOJI: Record<string, string> = {
-  bencana: '\u{1F6A8}',
-  masjid: '\u{1F54C}',
-  yatim: '\u{1F91D}',
-  kesehatan: '\u{1F3E5}',
-  pendidikan: '\u{1F4DA}',
-  pelatihan: '\u{1F4BC}',
-  umrah_dhuafa: '\u{1F4FF}',
+const CATEGORY_GRADIENT: Record<string, string> = {
+  masjid: 'linear-gradient(135deg, #16A34A 0%, #064E3B 100%)',
+  bencana: 'linear-gradient(135deg, #DC2626 0%, #C2410C 100%)',
+  yatim: 'linear-gradient(135deg, #7C3AED 0%, #4C1D95 100%)',
+  kesehatan: 'linear-gradient(135deg, #0D9488 0%, #134E4A 100%)',
+  pendidikan: 'linear-gradient(135deg, #D97706 0%, #92400E 100%)',
+  pelatihan: 'linear-gradient(135deg, #DB2777 0%, #831843 100%)',
+  umrah_dhuafa: 'linear-gradient(135deg, #4F46E5 0%, #1E1B4B 100%)',
 };
+
+const CATEGORY_DEFAULT_GRADIENT = 'linear-gradient(135deg, #6B7280 0%, #374151 100%)';
 
 function formatRupiah(amount: number): string {
   if (amount >= 1_000_000_000) return `Rp ${(amount / 1_000_000_000).toFixed(1)}M`;
@@ -372,7 +374,14 @@ export default function FoundationPage() {
             {campaigns.map((campaign) => {
               const pct = Math.min(100, Math.round((campaign.currentAmount / campaign.targetAmount) * 100));
               const daysLeft = getDaysLeft(campaign.deadline);
-              const emoji = CATEGORY_EMOJI[campaign.category] || '\u{1F4E6}';
+              const gradient = CATEGORY_GRADIENT[campaign.category] || CATEGORY_DEFAULT_GRADIENT;
+              const CategoryIcon = campaign.category === 'masjid' ? Star
+                : campaign.category === 'bencana' ? Flame
+                : campaign.category === 'yatim' ? Heart
+                : campaign.category === 'kesehatan' ? Stethoscope
+                : campaign.category === 'pendidikan' ? GraduationCap
+                : campaign.category === 'pelatihan' ? Briefcase
+                : Star;
               return (
                 <div
                   key={campaign.id}
@@ -398,11 +407,10 @@ export default function FoundationPage() {
                   <div
                     style={{
                       height: '140px',
-                      background: 'linear-gradient(135deg, #DC2626 0%, #991B1B 100%)',
+                      background: gradient,
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      fontSize: '48px',
                     }}
                   >
                     {campaign.imageUrl ? (
@@ -413,7 +421,7 @@ export default function FoundationPage() {
                         style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                       />
                     ) : (
-                      emoji
+                      <CategoryIcon style={{ width: '48px', height: '48px', color: 'rgba(255,255,255,0.85)' }} />
                     )}
                   </div>
 
