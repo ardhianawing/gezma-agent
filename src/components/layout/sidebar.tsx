@@ -31,6 +31,7 @@ import {
   Wallet,
   Banknote,
   CreditCard,
+  Heart,
 } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n';
 import { useTheme } from '@/lib/theme';
@@ -85,6 +86,7 @@ export function Sidebar({ isOpen, onClose, isOverlay = false }: SidebarProps) {
     { label: t.nav.gezmaPay, href: '/gezmapay', icon: Wallet },
     { label: t.nav.tabungan, href: '/tabungan', icon: Banknote },
     { label: t.nav.payLater, href: '/paylater', icon: CreditCard },
+    { label: t.nav.foundation, href: '/foundation', icon: Heart },
   ];
 
   // === LAINNYA ===

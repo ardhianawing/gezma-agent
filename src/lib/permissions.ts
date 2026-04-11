@@ -42,6 +42,13 @@ export const PERMISSIONS = {
   // Trade Centre
   TRADE_VIEW: 'trade:view',
   TRADE_SUBMIT: 'trade:submit',
+
+  // Foundation
+  FOUNDATION_VIEW: 'foundation:view',
+  FOUNDATION_CREATE: 'foundation:create',
+  FOUNDATION_EDIT: 'foundation:edit',
+  FOUNDATION_DELETE: 'foundation:delete',
+  FOUNDATION_FINANCING_APPROVE: 'foundation:financing:approve',
 } as const;
 
 export type Permission = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];
@@ -77,6 +84,11 @@ export const ROLE_PERMISSIONS: Record<string, Permission[]> = {
     PERMISSIONS.FORUM_MODERATE,
     PERMISSIONS.TRADE_VIEW,
     PERMISSIONS.TRADE_SUBMIT,
+    PERMISSIONS.FOUNDATION_VIEW,
+    PERMISSIONS.FOUNDATION_CREATE,
+    PERMISSIONS.FOUNDATION_EDIT,
+    PERMISSIONS.FOUNDATION_DELETE,
+    PERMISSIONS.FOUNDATION_FINANCING_APPROVE,
   ],
   staff: [
     PERMISSIONS.PACKAGES_VIEW,
@@ -87,6 +99,7 @@ export const ROLE_PERMISSIONS: Record<string, Permission[]> = {
     PERMISSIONS.PAYMENTS_CREATE,
     PERMISSIONS.FORUM_CREATE,
     PERMISSIONS.TRADE_VIEW,
+    PERMISSIONS.FOUNDATION_VIEW,
   ],
   marketing: [
     PERMISSIONS.PACKAGES_VIEW,
@@ -99,6 +112,8 @@ export const ROLE_PERMISSIONS: Record<string, Permission[]> = {
     PERMISSIONS.FORUM_CREATE,
     PERMISSIONS.TRADE_VIEW,
     PERMISSIONS.TRADE_SUBMIT,
+    PERMISSIONS.FOUNDATION_VIEW,
+    PERMISSIONS.FOUNDATION_CREATE,
   ],
 };
 
@@ -191,6 +206,16 @@ export const PERMISSION_GROUPS = [
     permissions: [
       { key: PERMISSIONS.TRADE_VIEW, label: 'Lihat Katalog' },
       { key: PERMISSIONS.TRADE_SUBMIT, label: 'Ajukan Produk' },
+    ],
+  },
+  {
+    label: 'Gezma Foundation',
+    permissions: [
+      { key: PERMISSIONS.FOUNDATION_VIEW, label: 'Lihat' },
+      { key: PERMISSIONS.FOUNDATION_CREATE, label: 'Buat Kampanye' },
+      { key: PERMISSIONS.FOUNDATION_EDIT, label: 'Edit' },
+      { key: PERMISSIONS.FOUNDATION_DELETE, label: 'Hapus' },
+      { key: PERMISSIONS.FOUNDATION_FINANCING_APPROVE, label: 'Approve Pendanaan' },
     ],
   },
 ];

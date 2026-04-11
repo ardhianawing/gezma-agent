@@ -87,6 +87,10 @@ model Agency {
   umrahSavings    UmrahSavings[]
   payLaterApps    PayLaterApplication[]
   webhookEndpoints WebhookEndpoint[]
+  foundationCampaigns FoundationCampaign[]
+  foundationDonations FoundationDonation[]
+  foundationGoods     FoundationGoods[]
+  foundationFinancings FoundationFinancing[]
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -1378,4 +1382,116 @@ model AuditTrail {
   @@index([agencyId])
   @@index([createdAt])
   @@map("audit_trails")
+}
+
+// === GEZMA FOUNDATION ===
+
+model FoundationCampaign {
+  id            String   @id @default(uuid())
+  title         String
+  description   String
+  category      String   // bencana|masjid|yatim|kesehatan|pendidikan|pelatihan|umrah_dhuafa
+  targetAmount  Float
+  currentAmount Float    @default(0)
+  deadline      DateTime?
+  status        String   @default("active") // active|completed|cancelled
+  imageUrl      String?
+  agencyId      String?  // null = platform-level campaign
+  agency        Agency?  @relation(fields: [agencyId], references: [id])
+  donations     FoundationDonation[]
+  impactReports FoundationImpact[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([agencyId])
+  @@index([status])
+  @@index([category])
+  @@map("foundation_campaigns")
+}
+
+model FoundationDonation {
+  id           String              @id @default(uuid())
+  campaignId   String
+  campaign     FoundationCampaign  @relation(fields: [campaignId], references: [id])
+  donorName    String
+  donorEmail   String?
+  amount       Float
+  type         String              // onetime|recurring
+  method       String              // transfer|cash|gezmapay
+  status       String              @default("pending") // pending|completed|failed
+  isAnonymous  Boolean             @default(false)
+  receiptUrl   String?
+  agencyId     String?
+  agency       Agency?             @relation(fields: [agencyId], references: [id])
+  createdAt    DateTime            @default(now())
+
+  @@index([campaignId])
+  @@index([agencyId])
+  @@map("foundation_donations")
+}
+
+model FoundationImpact {
+  id          String              @id @default(uuid())
+  campaignId  String
+  campaign    FoundationCampaign  @relation(fields: [campaignId], references: [id])
+  title       String
+  description String
+  amountUsed  Float
+  photoUrl    String?
+  createdAt   DateTime            @default(now())
+
+  @@index([campaignId])
+  @@map("foundation_impacts")
+}
+
+model FoundationGoods {
+  id          String   @id @default(uuid())
+  agencyId    String
+  agency      Agency   @relation(fields: [agencyId], references: [id])
+  title       String
+  description String
+  category    String   // pakaian|ibadah|elektronik|lainnya
+  condition   String   // baik|cukup_baik
+  imageUrl    String?
+  status      String   @default("available") // available|requested|delivered
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([agencyId])
+  @@index([status])
+  @@map("foundation_goods")
+}
+
+model FoundationFinancing {
+  id            String   @id @default(uuid())
+  agencyId      String
+  agency        Agency   @relation(fields: [agencyId], references: [id])
+  amount        Float
+  purpose       String
+  tenorMonths   Int      // 3, 6, 12
+  monthlyAmount Float
+  status        String   @default("pending") // pending|approved|rejected|active|completed
+  notes         String?
+  approvedAt    DateTime?
+  installments  FoundationFinancingInstallment[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([agencyId])
+  @@index([status])
+  @@map("foundation_financings")
+}
+
+model FoundationFinancingInstallment {
+  id            String              @id @default(uuid())
+  financingId   String
+  financing     FoundationFinancing @relation(fields: [financingId], references: [id])
+  installmentNo Int
+  amount        Float
+  dueDate       DateTime
+  paidAt        DateTime?
+  status        String              @default("pending") // pending|paid|overdue
+
+  @@index([financingId])
+  @@map("foundation_financing_installments")
 }
