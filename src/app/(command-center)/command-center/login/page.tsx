@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Shield, LogIn, Loader2 } from 'lucide-react';
+import { Shield, LogIn, Loader2, Zap } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n';
 
 export default function CCLoginPage() {
@@ -12,6 +12,19 @@ export default function CCLoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [bypassing, setBypassing] = useState(false);
+
+  const handleDevBypass = async () => {
+    setBypassing(true);
+    try {
+      const res = await fetch('/api/command-center/auth/dev-bypass', { method: 'POST' });
+      if (res.ok) {
+        router.push('/command-center');
+      }
+    } finally {
+      setBypassing(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -160,6 +173,41 @@ export default function CCLoginPage() {
             {loading ? 'Signing in...' : t.common.submit}
           </button>
         </form>
+
+        {/* DEV ONLY — hapus sebelum production */}
+        <div style={{ marginTop: '24px', paddingTop: '24px', borderTop: '1px dashed #E2E8F0' }}>
+          <p style={{ fontSize: '11px', color: '#94A3B8', textAlign: 'center', margin: '0 0 12px 0', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            Dev Mode
+          </p>
+          <button
+            type="button"
+            onClick={handleDevBypass}
+            disabled={bypassing}
+            style={{
+              width: '100%',
+              padding: '10px',
+              borderRadius: '8px',
+              border: '1px dashed #F59E0B',
+              backgroundColor: '#FFFBEB',
+              color: '#B45309',
+              fontSize: '13px',
+              fontWeight: '600',
+              cursor: bypassing ? 'not-allowed' : 'pointer',
+              opacity: bypassing ? 0.7 : 1,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px',
+            }}
+          >
+            {bypassing ? (
+              <Loader2 style={{ width: '16px', height: '16px', animation: 'spin 1s linear infinite' }} />
+            ) : (
+              <Zap style={{ width: '16px', height: '16px' }} />
+            )}
+            {bypassing ? 'Bypassing...' : 'Bypass Login (Dev Only)'}
+          </button>
+        </div>
       </div>
     </div>
   );
