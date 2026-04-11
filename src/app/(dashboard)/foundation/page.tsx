@@ -244,11 +244,11 @@ export default function FoundationPage() {
         <div style={{ position: 'relative', zIndex: 1 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '10px' }}>
             <HandHeart style={{ width: isMobile ? '28px' : '36px', height: isMobile ? '28px' : '36px', color: 'rgba(255,255,255,0.75)' }} />
-            <h2 style={{ fontSize: isMobile ? '22px' : '28px', fontWeight: 700, margin: 0 }}>
+            <h2 style={{ fontSize: isMobile ? '22px' : '28px', fontWeight: 700, margin: 0, color: '#FFFFFF' }}>
               {t.foundation.title}
             </h2>
           </div>
-          <p style={{ fontSize: '14px', opacity: 0.85, margin: 0, maxWidth: '420px', lineHeight: '1.6' }}>
+          <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.9)', margin: 0, maxWidth: '420px', lineHeight: '1.6' }}>
             {t.foundation.heroBannerSubtitle}
           </p>
         </div>

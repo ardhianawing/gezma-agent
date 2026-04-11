@@ -202,13 +202,13 @@ export default function GezmaPayPage() {
             backgroundColor: 'rgba(255,255,255,0.06)',
           }}
         />
-        <p style={{ fontSize: '14px', opacity: 0.85, margin: '0 0 8px', fontWeight: 500 }}>
+        <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.85)', margin: '0 0 8px', fontWeight: 500 }}>
           {t.gezmaPay.balance}
         </p>
-        <p style={{ fontSize: isMobile ? '28px' : '36px', fontWeight: 700, margin: '0 0 4px' }}>
+        <p style={{ fontSize: isMobile ? '28px' : '36px', fontWeight: 700, margin: '0 0 4px', color: '#FFFFFF' }}>
           {formatCurrency(wallet.balance)}
         </p>
-        <p style={{ fontSize: '13px', opacity: 0.7, margin: '0 0 20px' }}>
+        <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.7)', margin: '0 0 20px' }}>
           {wallet.currency}
         </p>
         <button

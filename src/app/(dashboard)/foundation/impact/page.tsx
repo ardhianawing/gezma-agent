@@ -147,7 +147,7 @@ export default function ImpactPage() {
         <h3 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 8px' }}>
           {'\u{1F4CA}'} {t.foundation.transparencyReport}
         </h3>
-        <p style={{ fontSize: '14px', opacity: 0.9, margin: 0, lineHeight: '1.6' }}>
+        <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.9)', margin: 0, lineHeight: '1.6' }}>
           {t.foundation.transparencyDesc}
         </p>
       </div>
