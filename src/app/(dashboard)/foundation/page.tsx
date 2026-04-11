@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Heart, TrendingUp, Users, Package, Building2, Flame, BookOpen, Stethoscope, GraduationCap, Briefcase, Star } from 'lucide-react';
+import { Heart, TrendingUp, Users, Package, Building2, Flame, BookOpen, Stethoscope, GraduationCap, Briefcase, Star, HandHeart } from 'lucide-react';
 import { PageHeader } from '@/components/layout/page-header';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
@@ -140,7 +140,7 @@ export default function FoundationPage() {
     },
   ];
 
-  const gridCols = isMobile ? 1 : isTablet ? 2 : 4;
+  const gridCols = isMobile ? 2 : isTablet ? 2 : 4;
   const linkCols = isMobile ? 1 : 2;
   const campaignCols = isMobile ? 1 : isTablet ? 2 : 3;
 
@@ -154,46 +154,131 @@ export default function FoundationPage() {
       {/* Hero Banner */}
       <div
         style={{
-          background: 'linear-gradient(135deg, #DC2626 0%, #991B1B 100%)',
+          background: 'linear-gradient(135deg, #7F1D1D 0%, #DC2626 50%, #EF4444 100%)',
           borderRadius: '16px',
-          padding: isMobile ? '24px 20px' : '32px 40px',
+          padding: isMobile ? '32px 24px' : '48px 48px',
+          minHeight: isMobile ? '160px' : '200px',
           color: '#fff',
           display: 'flex',
           flexDirection: isMobile ? 'column' : 'row',
           alignItems: isMobile ? 'flex-start' : 'center',
           justifyContent: 'space-between',
-          gap: '20px',
+          gap: '24px',
+          position: 'relative',
+          overflow: 'hidden',
         }}
       >
-        <div>
-          <div style={{ fontSize: isMobile ? '28px' : '36px', marginBottom: '8px' }}>
-            {'\u{1F91D}'}
+        {/* Radial depth overlay */}
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'radial-gradient(ellipse at 70% 50%, rgba(239,68,68,0.35) 0%, transparent 70%)',
+            pointerEvents: 'none',
+          }}
+        />
+        {/* Decorative circles */}
+        <div
+          style={{
+            position: 'absolute',
+            top: '-40px',
+            right: isMobile ? '-40px' : '120px',
+            width: '180px',
+            height: '180px',
+            borderRadius: '50%',
+            border: '2px solid rgba(255,255,255,0.12)',
+            pointerEvents: 'none',
+          }}
+        />
+        <div
+          style={{
+            position: 'absolute',
+            top: '20px',
+            right: isMobile ? '20px' : '200px',
+            width: '90px',
+            height: '90px',
+            borderRadius: '50%',
+            border: '2px solid rgba(255,255,255,0.08)',
+            pointerEvents: 'none',
+          }}
+        />
+        <div
+          style={{
+            position: 'absolute',
+            bottom: '-30px',
+            left: isMobile ? '-30px' : '30%',
+            width: '120px',
+            height: '120px',
+            borderRadius: '50%',
+            backgroundColor: 'rgba(255,255,255,0.05)',
+            pointerEvents: 'none',
+          }}
+        />
+        {/* Dot cluster top-right */}
+        {!isMobile && (
+          <div
+            style={{
+              position: 'absolute',
+              top: '24px',
+              right: '40px',
+              display: 'grid',
+              gridTemplateColumns: 'repeat(4, 8px)',
+              gap: '6px',
+              pointerEvents: 'none',
+            }}
+          >
+            {Array.from({ length: 16 }).map((_, i) => (
+              <div
+                key={i}
+                style={{
+                  width: '4px',
+                  height: '4px',
+                  borderRadius: '50%',
+                  backgroundColor: 'rgba(255,255,255,0.18)',
+                }}
+              />
+            ))}
           </div>
-          <h2 style={{ fontSize: isMobile ? '20px' : '26px', fontWeight: 700, margin: '0 0 8px' }}>
-            {t.foundation.title}
-          </h2>
-          <p style={{ fontSize: '14px', opacity: 0.9, margin: 0, maxWidth: '400px', lineHeight: '1.5' }}>
+        )}
+
+        <div style={{ position: 'relative', zIndex: 1 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '10px' }}>
+            <HandHeart style={{ width: isMobile ? '28px' : '36px', height: isMobile ? '28px' : '36px', color: 'rgba(255,255,255,0.75)' }} />
+            <h2 style={{ fontSize: isMobile ? '22px' : '28px', fontWeight: 700, margin: 0 }}>
+              {t.foundation.title}
+            </h2>
+          </div>
+          <p style={{ fontSize: '14px', opacity: 0.85, margin: 0, maxWidth: '420px', lineHeight: '1.6' }}>
             {t.foundation.heroBannerSubtitle}
           </p>
         </div>
         <button
           onClick={() => router.push('/foundation/campaigns')}
           style={{
-            padding: '12px 28px',
-            minHeight: '48px',
-            borderRadius: '12px',
-            border: '2px solid rgba(255,255,255,0.6)',
-            backgroundColor: 'rgba(255,255,255,0.15)',
-            color: '#fff',
+            position: 'relative',
+            zIndex: 1,
+            padding: '14px 36px',
+            minHeight: '52px',
+            borderRadius: '14px',
+            border: 'none',
+            backgroundColor: '#fff',
+            color: '#DC2626',
             fontSize: '15px',
-            fontWeight: 600,
+            fontWeight: 700,
             cursor: 'pointer',
             whiteSpace: 'nowrap',
-            backdropFilter: 'blur(4px)',
-            transition: 'background-color 0.15s',
+            transition: 'transform 0.15s, box-shadow 0.15s',
+            boxShadow: '0 4px 16px rgba(0,0,0,0.15)',
+            flexShrink: 0,
           }}
-          onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'rgba(255,255,255,0.25)'; }}
-          onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'rgba(255,255,255,0.15)'; }}
+          onMouseEnter={(e) => {
+            (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(-2px)';
+            (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 8px 24px rgba(0,0,0,0.2)';
+          }}
+          onMouseLeave={(e) => {
+            (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(0)';
+            (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 4px 16px rgba(0,0,0,0.15)';
+          }}
         >
           {t.foundation.donateBtn}
         </button>
@@ -215,6 +300,7 @@ export default function FoundationPage() {
               style={{
                 backgroundColor: c.cardBg,
                 border: '1px solid ' + c.border,
+                borderLeft: `4px solid ${card.color}`,
                 borderRadius: '14px',
                 padding: '20px',
                 display: 'flex',
@@ -224,8 +310,8 @@ export default function FoundationPage() {
             >
               <div
                 style={{
-                  width: '48px',
-                  height: '48px',
+                  width: '52px',
+                  height: '52px',
                   borderRadius: '12px',
                   backgroundColor: card.color + '18',
                   display: 'flex',
@@ -234,13 +320,13 @@ export default function FoundationPage() {
                   flexShrink: 0,
                 }}
               >
-                <Icon style={{ width: '22px', height: '22px', color: card.color }} />
+                <Icon style={{ width: '32px', height: '32px', color: card.color }} />
               </div>
               <div>
-                <p style={{ fontSize: '12px', color: c.textMuted, margin: '0 0 4px', fontWeight: 500 }}>
+                <p style={{ fontSize: '13px', color: c.textMuted, margin: '0 0 4px', fontWeight: 500 }}>
                   {card.label}
                 </p>
-                <p style={{ fontSize: '22px', fontWeight: 700, color: c.textPrimary, margin: 0 }}>
+                <p style={{ fontSize: '24px', fontWeight: 700, color: c.textPrimary, margin: 0 }}>
                   {loading ? '...' : card.value}
                 </p>
               </div>
