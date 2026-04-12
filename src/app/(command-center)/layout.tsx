@@ -13,6 +13,9 @@ import {
   Shield,
   Menu,
   X,
+  CreditCard,
+  MessageSquare,
+  Wallet,
   LucideIcon,
 } from 'lucide-react';
 import { useResponsive } from '@/lib/hooks/use-responsive';
@@ -70,6 +73,9 @@ interface MenuItem {
 const menuItems: MenuItem[] = [
   { label: 'Dashboard', href: '/command-center', icon: LayoutDashboard },
   { label: 'Agencies', href: '/command-center/agencies', icon: Building2 },
+  { label: 'PayLater', href: '/command-center/paylater', icon: CreditCard },
+  { label: 'GezmaPay', href: '/command-center/gezmapay', icon: Wallet },
+  { label: 'Forum', href: '/command-center/forum', icon: MessageSquare },
   { label: 'Kepatuhan', href: '/command-center/compliance', icon: ShieldCheck },
   { label: 'Audit Log', href: '/command-center/audit-log', icon: ScrollText },
 ];
