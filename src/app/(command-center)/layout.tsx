@@ -20,6 +20,10 @@ import {
   GraduationCap,
   ShoppingBag,
   Package,
+  PiggyBank,
+  Trophy,
+  Receipt,
+  Plug,
   LucideIcon,
 } from 'lucide-react';
 import { useResponsive } from '@/lib/hooks/use-responsive';
@@ -85,6 +89,10 @@ const menuItems: MenuItem[] = [
   { label: 'Certificates', href: '/command-center/blockchain', icon: Shield },
   { label: 'Marketplace', href: '/command-center/marketplace', icon: ShoppingBag },
   { label: 'Academy', href: '/command-center/academy', icon: GraduationCap },
+  { label: 'Tabungan', href: '/command-center/tabungan', icon: PiggyBank },
+  { label: 'Gamification', href: '/command-center/gamification', icon: Trophy },
+  { label: 'Billing', href: '/command-center/billing', icon: Receipt },
+  { label: 'Integrations', href: '/command-center/integrations', icon: Plug },
   { label: 'Kepatuhan', href: '/command-center/compliance', icon: ShieldCheck },
   { label: 'Audit Log', href: '/command-center/audit-log', icon: ScrollText },
 ];
