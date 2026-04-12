@@ -3,7 +3,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Bell, Search, Menu, ChevronDown, LogOut, Building2, Settings, User } from 'lucide-react';
+import { Bell, Search, Menu, ChevronDown, LogOut, Building2, Settings, User, MessageCircle } from 'lucide-react';
+import ChatWidget from '@/components/ai-assistant/ChatWidget';
 import { LanguageToggle } from '@/components/shared/language-toggle';
 import { ThemeToggle } from '@/components/shared/theme-toggle';
 import { CommandPalette } from '@/components/shared/command-palette';
@@ -61,6 +62,9 @@ export function Header({ onMenuClick, showMenuButton = false }: HeaderProps) {
   const [hasNew, setHasNew] = useState(false);
   const [notifLoaded, setNotifLoaded] = useState(false);
   const notifRef = useRef<HTMLDivElement>(null);
+
+  // Chat widget
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   // User menu dropdown
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -255,6 +259,36 @@ export function Header({ onMenuClick, showMenuButton = false }: HeaderProps) {
 
           {/* Language Toggle - compact on mobile */}
           {!isMobile && <LanguageToggle />}
+
+          {/* AI Chat */}
+          <button
+            data-tour="chat-widget"
+            onClick={() => setIsChatOpen((prev) => !prev)}
+            title="GEZMA Assistant"
+            style={{
+              position: 'relative',
+              padding: '12px',
+              borderRadius: '12px',
+              border: 'none',
+              backgroundColor: isChatOpen ? '#FEF2F2' : 'transparent',
+              cursor: 'pointer',
+              transition: 'background-color 0.2s',
+              minWidth: '44px',
+              minHeight: '44px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <MessageCircle
+              style={{
+                width: '20px',
+                height: '20px',
+                color: isChatOpen ? '#DC2626' : c.textMuted,
+                transition: 'color 0.2s',
+              }}
+            />
+          </button>
 
           {/* Notifications */}
           <div ref={notifRef} data-tour="notifications" style={{ position: 'relative' }}>
@@ -559,6 +593,9 @@ export function Header({ onMenuClick, showMenuButton = false }: HeaderProps) {
 
     {/* Command Palette */}
     <CommandPalette open={showCommandPalette} onClose={() => setShowCommandPalette(false)} />
+
+    {/* AI Chat Widget */}
+    <ChatWidget isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
     </>
   );
 }

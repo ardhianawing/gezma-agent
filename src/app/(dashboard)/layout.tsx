@@ -5,7 +5,6 @@ import { Sidebar } from '@/components/layout/sidebar';
 import { Header } from '@/components/layout/header';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
-import ChatWidget from '@/components/ai-assistant/ChatWidget';
 import { OfflineIndicator } from '@/components/pwa/offline-indicator';
 import { InstallPrompt } from '@/components/pwa/install-prompt';
 import { UpdatePrompt } from '@/components/pwa/update-prompt';
@@ -72,8 +71,6 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
       <InstallPrompt />
       <UpdatePrompt />
 
-      {/* AI Assistant Chat Widget */}
-      <ChatWidget />
     </div>
   );
 }
