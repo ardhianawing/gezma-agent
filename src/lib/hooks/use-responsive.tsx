@@ -15,41 +15,36 @@ interface ResponsiveState {
   isLandscape: boolean;
 }
 
+function getResponsiveState(width: number, height: number): ResponsiveState {
+  let breakpoint: Breakpoint = 'desktop';
+  if (width < 640) {
+    breakpoint = 'mobile';
+  } else if (width < 1280) {
+    breakpoint = 'tablet';
+  }
+  return {
+    breakpoint,
+    isMobile: breakpoint === 'mobile',
+    isTablet: breakpoint === 'tablet',
+    isDesktop: breakpoint === 'desktop',
+    width,
+    height,
+    isPortrait: height > width,
+    isLandscape: width >= height,
+  };
+}
+
 export function useResponsive(): ResponsiveState {
-  const [state, setState] = useState<ResponsiveState>({
-    breakpoint: 'desktop',
-    isMobile: false,
-    isTablet: false,
-    isDesktop: true,
-    width: 1200,
-    height: 800,
-    isPortrait: false,
-    isLandscape: true,
+  const [state, setState] = useState<ResponsiveState>(() => {
+    if (typeof window !== 'undefined') {
+      return getResponsiveState(window.innerWidth, window.innerHeight);
+    }
+    return getResponsiveState(1200, 800);
   });
 
   useEffect(() => {
     const updateState = () => {
-      const width = window.innerWidth;
-      const height = window.innerHeight;
-
-      let breakpoint: Breakpoint = 'desktop';
-      if (width < 640) {
-        breakpoint = 'mobile';
-      } else if (width < 1280) {
-        // Include iPad landscape (1024-1194px) as tablet
-        breakpoint = 'tablet';
-      }
-
-      setState({
-        breakpoint,
-        isMobile: breakpoint === 'mobile',
-        isTablet: breakpoint === 'tablet',
-        isDesktop: breakpoint === 'desktop',
-        width,
-        height,
-        isPortrait: height > width,
-        isLandscape: width >= height,
-      });
+      setState(getResponsiveState(window.innerWidth, window.innerHeight));
     };
 
     updateState();
