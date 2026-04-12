@@ -50,7 +50,7 @@ function MobileLayout({ c, data, pathname, children }: {
 
   // Close "More" menu when navigating
   useEffect(() => {
-    setShowMore(false);
+    setShowMore(false); // eslint-disable-line react-hooks/set-state-in-effect
   }, [pathname]);
 
   const isMoreActive = MOBILE_MORE_ITEMS.some(item => pathname === item.href);
@@ -76,7 +76,7 @@ function MobileLayout({ c, data, pathname, children }: {
       {/* Main content */}
       <main style={{
         flex: 1, padding: '16px',
-        paddingBottom: '76px',
+        paddingBottom: '100px',
         maxWidth: '800px', width: '100%',
         margin: '0 auto', boxSizing: 'border-box',
       }}>

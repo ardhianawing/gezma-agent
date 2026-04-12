@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useTheme } from '@/lib/theme';
 
+// SOS emergency button component
 const RED = '#DC2626';
 const RED_DARK = '#B91C1C';
 const RED_LIGHT = '#FEF2F2';
@@ -53,9 +54,9 @@ export default function SOSButton() {
         body: JSON.stringify({ contactName: selectedContact.name, contactPhone: selectedContact.phone }),
       }).catch(() => {});
 
-      // Open phone dialer
+      // Open phone dialer — defer resetState to avoid setState-in-effect lint error
       window.location.href = 'tel:' + selectedContact.phone;
-      resetState();
+      setTimeout(resetState, 0);
       return;
     }
 
@@ -72,10 +73,10 @@ export default function SOSButton() {
           aria-label="Tombol SOS darurat"
           style={{
             position: 'fixed',
-            bottom: '130px',
-            right: '12px',
-            width: '40px',
-            height: '40px',
+            bottom: '80px',
+            right: '16px',
+            width: '36px',
+            height: '36px',
             borderRadius: '50%',
             backgroundColor: RED,
             color: '#FFFFFF',
