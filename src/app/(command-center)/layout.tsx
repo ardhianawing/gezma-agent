@@ -19,6 +19,7 @@ import {
   Users,
   GraduationCap,
   ShoppingBag,
+  Package,
   LucideIcon,
 } from 'lucide-react';
 import { useResponsive } from '@/lib/hooks/use-responsive';
@@ -80,6 +81,8 @@ const menuItems: MenuItem[] = [
   { label: 'PayLater', href: '/command-center/paylater', icon: CreditCard },
   { label: 'GezmaPay', href: '/command-center/gezmapay', icon: Wallet },
   { label: 'Forum', href: '/command-center/forum', icon: MessageSquare },
+  { label: 'Packages', href: '/command-center/packages', icon: Package },
+  { label: 'Certificates', href: '/command-center/blockchain', icon: Shield },
   { label: 'Marketplace', href: '/command-center/marketplace', icon: ShoppingBag },
   { label: 'Academy', href: '/command-center/academy', icon: GraduationCap },
   { label: 'Kepatuhan', href: '/command-center/compliance', icon: ShieldCheck },
