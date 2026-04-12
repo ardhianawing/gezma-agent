@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { PiggyBank, Target, TrendingUp, Users, CheckCircle, Eye, Settings } from 'lucide-react';
+import { Landmark, Target, TrendingUp, Users, CheckCircle, Eye, Settings } from 'lucide-react';
 
 const cc = {
   primary: '#2563EB',
@@ -86,7 +86,7 @@ export default function CCTabunganPage() {
   const avgGoal = Math.round(MOCK_PLANS.reduce((s, p) => s + p.goalAmount, 0) / MOCK_PLANS.length);
 
   const statCards = [
-    { label: 'Total Plans',      value: MOCK_PLANS.length,         icon: PiggyBank,   color: '#2563EB', format: (v: number) => v.toString() },
+    { label: 'Total Plans',      value: MOCK_PLANS.length,         icon: Landmark,   color: '#2563EB', format: (v: number) => v.toString() },
     { label: 'Total Saved (IDR)',value: totalSaved,                icon: TrendingUp,  color: '#10B981', format: formatRupiah },
     { label: 'Active Savers',    value: activeSavers,              icon: Users,       color: '#F59E0B', format: (v: number) => v.toString() },
     { label: 'Completion Rate',  value: completionRate,            icon: CheckCircle, color: '#8B5CF6', format: (v: number) => `${v}%` },
@@ -119,7 +119,7 @@ export default function CCTabunganPage() {
             alignItems: 'center',
             justifyContent: 'center',
           }}>
-            <PiggyBank style={{ width: '20px', height: '20px', color: '#2563EB' }} />
+            <Landmark style={{ width: '20px', height: '20px', color: '#2563EB' }} />
           </div>
           <h1 style={{ fontSize: '28px', fontWeight: '700', color: cc.textPrimary, margin: 0 }}>
             Tabungan Administration

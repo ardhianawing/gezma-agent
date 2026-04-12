@@ -2,6 +2,7 @@
 
 import { useState, useEffect, createContext, useContext, useCallback } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard,
@@ -20,7 +21,7 @@ import {
   GraduationCap,
   ShoppingBag,
   Package,
-  PiggyBank,
+  Landmark,
   Trophy,
   Receipt,
   Plug,
@@ -89,7 +90,7 @@ const menuItems: MenuItem[] = [
   { label: 'Certificates', href: '/command-center/blockchain', icon: Shield },
   { label: 'Marketplace', href: '/command-center/marketplace', icon: ShoppingBag },
   { label: 'Academy', href: '/command-center/academy', icon: GraduationCap },
-  { label: 'Tabungan', href: '/command-center/tabungan', icon: PiggyBank },
+  { label: 'Tabungan', href: '/command-center/tabungan', icon: Landmark },
   { label: 'Gamification', href: '/command-center/gamification', icon: Trophy },
   { label: 'Billing', href: '/command-center/billing', icon: Receipt },
   { label: 'Integrations', href: '/command-center/integrations', icon: Plug },
@@ -163,20 +164,18 @@ export default function CommandCenterLayout({ children }: { children: React.Reac
       {/* Logo */}
       <div style={{ padding: '24px 20px', borderBottom: `1px solid ${cc.sidebarBorder}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Link href="/command-center" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div
+          <Image
+            src="/images/gezma-logo.png"
+            alt="Gezma Logo"
+            width={40}
+            height={40}
             style={{
-              width: '40px',
-              height: '40px',
+              objectFit: 'contain',
               borderRadius: '10px',
-              background: 'linear-gradient(135deg, #2563EB, #3B82F6)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
               flexShrink: 0,
             }}
-          >
-            <Shield style={{ width: '22px', height: '22px', color: 'white' }} />
-          </div>
+            priority
+          />
           <div>
             <span style={{ fontSize: '16px', fontWeight: '700', color: 'white', display: 'block' }}>
               GEZMA
@@ -344,7 +343,13 @@ export default function CommandCenterLayout({ children }: { children: React.Reac
                 <Menu style={{ width: '22px', height: '22px', color: cc.primary }} />
               </button>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Shield style={{ width: '20px', height: '20px', color: cc.primary }} />
+                <Image
+                  src="/images/gezma-logo.png"
+                  alt="Gezma Logo"
+                  width={24}
+                  height={24}
+                  style={{ objectFit: 'contain', borderRadius: '6px' }}
+                />
                 <span style={{ fontSize: '15px', fontWeight: '700', color: cc.textPrimary }}>
                   GEZMA Command Center
                 </span>

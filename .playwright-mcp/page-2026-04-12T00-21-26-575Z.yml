@@ -1,0 +1,230 @@
+- generic [ref=e2]:
+  - complementary [ref=e3]:
+    - link "GEZMA Logo GEZMA" [ref=e5] [cursor=pointer]:
+      - /url: /
+      - img "GEZMA Logo" [ref=e6]
+      - generic [ref=e7]: GEZMA
+    - generic [ref=e8]:
+      - generic [ref=e9]:
+        - paragraph [ref=e10]: Platform
+        - navigation [ref=e11]:
+          - link "Marketplace" [ref=e12] [cursor=pointer]:
+            - /url: /marketplace
+            - generic [ref=e13]:
+              - img [ref=e14]
+              - generic [ref=e17]: Marketplace
+          - link "Trade Centre" [ref=e18] [cursor=pointer]:
+            - /url: /trade
+            - generic [ref=e19]:
+              - img [ref=e20]
+              - generic [ref=e23]: Trade Centre
+          - link "Forum" [ref=e24] [cursor=pointer]:
+            - /url: /forum
+            - generic [ref=e25]:
+              - img [ref=e26]
+              - generic [ref=e28]: Forum
+          - link "News" [ref=e29] [cursor=pointer]:
+            - /url: /news
+            - generic [ref=e30]:
+              - img [ref=e31]
+              - generic [ref=e34]: News
+          - link "Academy" [ref=e35] [cursor=pointer]:
+            - /url: /academy
+            - generic [ref=e36]:
+              - img [ref=e37]
+              - generic [ref=e40]: Academy
+          - link "Services" [ref=e41] [cursor=pointer]:
+            - /url: /services
+            - generic [ref=e42]:
+              - img [ref=e43]
+              - generic [ref=e45]: Services
+          - link "GezmaPay" [ref=e46] [cursor=pointer]:
+            - /url: /gezmapay
+            - generic [ref=e47]:
+              - img [ref=e48]
+              - generic [ref=e51]: GezmaPay
+          - link "Savings" [ref=e52] [cursor=pointer]:
+            - /url: /tabungan
+            - generic [ref=e53]:
+              - img [ref=e54]
+              - generic [ref=e57]: Savings
+          - link "PayLater" [ref=e58] [cursor=pointer]:
+            - /url: /paylater
+            - generic [ref=e59]:
+              - img [ref=e60]
+              - generic [ref=e62]: PayLater
+          - link "Gezma Foundation" [ref=e63] [cursor=pointer]:
+            - /url: /foundation
+            - generic [ref=e64]:
+              - img [ref=e65]
+              - generic [ref=e67]: Gezma Foundation
+      - generic [ref=e69]:
+        - paragraph [ref=e70]: Operational
+        - navigation [ref=e71]:
+          - link "Dashboard" [ref=e72] [cursor=pointer]:
+            - /url: /dashboard
+            - generic [ref=e73]:
+              - img [ref=e74]
+              - generic [ref=e79]: Dashboard
+          - link "Pilgrims" [ref=e80] [cursor=pointer]:
+            - /url: /pilgrims
+            - generic [ref=e81]:
+              - img [ref=e82]
+              - generic [ref=e87]: Pilgrims
+          - link "Packages" [ref=e88] [cursor=pointer]:
+            - /url: /packages
+            - generic [ref=e89]:
+              - img [ref=e90]
+              - generic [ref=e94]: Packages
+          - link "Trips" [ref=e95] [cursor=pointer]:
+            - /url: /trips
+            - generic [ref=e96]:
+              - img [ref=e97]
+              - generic [ref=e99]: Trips
+          - link "Tasks" [ref=e100] [cursor=pointer]:
+            - /url: /tasks
+            - generic [ref=e101]:
+              - img [ref=e102]
+              - generic [ref=e105]: Tasks
+          - link "Notifications" [ref=e106] [cursor=pointer]:
+            - /url: /notifications
+            - generic [ref=e107]:
+              - img [ref=e108]
+              - generic [ref=e111]: Notifications
+          - link "Documents" [ref=e112] [cursor=pointer]:
+            - /url: /documents
+            - generic [ref=e113]:
+              - img [ref=e114]
+              - generic [ref=e117]: Documents
+          - link "Reports" [ref=e118] [cursor=pointer]:
+            - /url: /reports
+            - generic [ref=e119]:
+              - img [ref=e120]
+              - generic [ref=e122]: Reports
+          - link "Activities" [ref=e123] [cursor=pointer]:
+            - /url: /activities
+            - generic [ref=e124]:
+              - img [ref=e125]
+              - generic [ref=e128]: Activities
+          - link "Gamification" [ref=e129] [cursor=pointer]:
+            - /url: /gamification
+            - generic [ref=e130]:
+              - img [ref=e131]
+              - generic [ref=e137]: Gamification
+          - link "Blockchain" [ref=e138] [cursor=pointer]:
+            - /url: /blockchain
+            - generic [ref=e139]:
+              - img [ref=e140]
+              - generic [ref=e142]: Blockchain
+          - link "Agency" [ref=e143] [cursor=pointer]:
+            - /url: /agency
+            - generic [ref=e144]:
+              - img [ref=e145]
+              - generic [ref=e149]: Agency
+      - generic [ref=e151]:
+        - paragraph [ref=e152]: Other
+        - navigation [ref=e153]:
+          - link "Settings" [ref=e154] [cursor=pointer]:
+            - /url: /settings
+            - generic [ref=e155]:
+              - img [ref=e156]
+              - generic [ref=e159]: Settings
+              - img [ref=e160]
+          - link "Help Center" [ref=e162] [cursor=pointer]:
+            - /url: /help
+            - generic [ref=e163]:
+              - img [ref=e164]
+              - generic [ref=e167]: Help Center
+    - generic [ref=e168]:
+      - generic [ref=e169]:
+        - generic [ref=e170]: "??"
+        - generic [ref=e171]:
+          - paragraph [ref=e172]: Memuat...
+          - paragraph [ref=e173]: "-"
+      - button "Sign Out" [ref=e174] [cursor=pointer]:
+        - img [ref=e175]
+        - text: Sign Out
+  - generic [ref=e178]:
+    - banner [ref=e179]:
+      - generic [ref=e180]:
+        - button "Search pilgrims, packages, trips... Ctrl+K" [ref=e182] [cursor=pointer]:
+          - img [ref=e183]
+          - generic [ref=e186]: Search pilgrims, packages, trips...
+          - generic [ref=e187]: Ctrl+K
+        - generic [ref=e188]:
+          - button "Switch to Dark Mode" [ref=e189] [cursor=pointer]:
+            - img [ref=e190]
+          - button "EN / ID" [ref=e192] [cursor=pointer]:
+            - generic [ref=e193]: EN
+            - generic [ref=e194]: /
+            - generic [ref=e195]: ID
+          - button "GEZMA Assistant" [ref=e196] [cursor=pointer]:
+            - img [ref=e197]
+          - button [ref=e200] [cursor=pointer]:
+            - img [ref=e201]
+          - button "?? Memuat... -" [ref=e206] [cursor=pointer]:
+            - generic [ref=e208]: "??"
+            - generic [ref=e209]:
+              - paragraph [ref=e210]: Memuat...
+              - paragraph [ref=e211]: "-"
+            - img [ref=e212]
+    - main [ref=e214]:
+      - generic [ref=e215]:
+        - generic [ref=e216]:
+          - link [ref=e217] [cursor=pointer]:
+            - /url: /settings
+            - img [ref=e219]
+          - generic [ref=e222]:
+            - heading "Integrations" [level=1] [ref=e223]
+            - paragraph [ref=e224]: Basic application settings and preferences
+        - generic [ref=e225]:
+          - generic [ref=e226]:
+            - img [ref=e227]
+            - generic [ref=e231]: 0 Aktif
+          - generic [ref=e233]:
+            - img [ref=e234]
+            - generic [ref=e241]: 3 Nonaktif
+          - generic [ref=e243]:
+            - img [ref=e244]
+            - generic [ref=e247]: 1 Menunggu
+        - generic [ref=e248]:
+          - link "🕋 Nonaktif Nusuk API Integrasi resmi dengan platform Nusuk Saudi Arabia untuk manajemen hotel, visa, dan inventori umrah/haji. Konfigurasi" [ref=e249] [cursor=pointer]:
+            - /url: /settings/integrations/nusuk
+            - generic [ref=e250]:
+              - generic [ref=e251]:
+                - generic [ref=e252]: 🕋
+                - generic [ref=e253]: Nonaktif
+              - generic [ref=e255]:
+                - heading "Nusuk API" [level=3] [ref=e256]
+                - paragraph [ref=e257]: Integrasi resmi dengan platform Nusuk Saudi Arabia untuk manajemen hotel, visa, dan inventori umrah/haji.
+              - generic [ref=e258]:
+                - generic [ref=e259]: Konfigurasi
+                - img [ref=e260]
+          - generic [ref=e263]:
+            - generic [ref=e264]:
+              - generic [ref=e265]: 💳
+              - generic [ref=e266]: Nonaktif
+            - generic [ref=e268]:
+              - heading "Payment Gateway" [level=3] [ref=e269]
+              - paragraph [ref=e270]: Terima pembayaran online via transfer bank, kartu kredit, dan e-wallet untuk kemudahan jemaah.
+            - generic [ref=e272]: Segera Hadir
+          - generic [ref=e274]:
+            - generic [ref=e275]:
+              - generic [ref=e276]: 💬
+              - generic [ref=e277]: Nonaktif
+            - generic [ref=e279]:
+              - heading "WhatsApp Business" [level=3] [ref=e280]
+              - paragraph [ref=e281]: Kirim notifikasi otomatis, pengingat pembayaran, dan update status via WhatsApp ke jemaah.
+            - generic [ref=e283]: Segera Hadir
+          - link "💰 Menunggu UmrahCash Pembayaran lintas negara IDR ke SAR dengan kurs kompetitif dan transfer cepat ke bank Saudi. Konfigurasi" [ref=e284] [cursor=pointer]:
+            - /url: /settings/integrations/umrahcash
+            - generic [ref=e285]:
+              - generic [ref=e286]:
+                - generic [ref=e287]: 💰
+                - generic [ref=e288]: Menunggu
+              - generic [ref=e290]:
+                - heading "UmrahCash" [level=3] [ref=e291]
+                - paragraph [ref=e292]: Pembayaran lintas negara IDR ke SAR dengan kurs kompetitif dan transfer cepat ke bank Saudi.
+              - generic [ref=e293]:
+                - generic [ref=e294]: Konfigurasi
+                - img [ref=e295]
