@@ -17,6 +17,7 @@ import {
   MessageSquare,
   Wallet,
   Users,
+  GraduationCap,
   LucideIcon,
 } from 'lucide-react';
 import { useResponsive } from '@/lib/hooks/use-responsive';
@@ -78,6 +79,7 @@ const menuItems: MenuItem[] = [
   { label: 'PayLater', href: '/command-center/paylater', icon: CreditCard },
   { label: 'GezmaPay', href: '/command-center/gezmapay', icon: Wallet },
   { label: 'Forum', href: '/command-center/forum', icon: MessageSquare },
+  { label: 'Academy', href: '/command-center/academy', icon: GraduationCap },
   { label: 'Kepatuhan', href: '/command-center/compliance', icon: ShieldCheck },
   { label: 'Audit Log', href: '/command-center/audit-log', icon: ScrollText },
 ];
