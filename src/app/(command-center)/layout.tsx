@@ -16,6 +16,7 @@ import {
   CreditCard,
   MessageSquare,
   Wallet,
+  Users,
   LucideIcon,
 } from 'lucide-react';
 import { useResponsive } from '@/lib/hooks/use-responsive';
@@ -73,6 +74,7 @@ interface MenuItem {
 const menuItems: MenuItem[] = [
   { label: 'Dashboard', href: '/command-center', icon: LayoutDashboard },
   { label: 'Agencies', href: '/command-center/agencies', icon: Building2 },
+  { label: 'Pilgrims', href: '/command-center/pilgrims', icon: Users },
   { label: 'PayLater', href: '/command-center/paylater', icon: CreditCard },
   { label: 'GezmaPay', href: '/command-center/gezmapay', icon: Wallet },
   { label: 'Forum', href: '/command-center/forum', icon: MessageSquare },
