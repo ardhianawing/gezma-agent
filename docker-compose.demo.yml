@@ -7,8 +7,8 @@ services:
     ports:
       - "3001:3000"
     environment:
-      DATABASE_URL: postgresql://demo:demo@localhost:5432/demo
-      JWT_SECRET: gezma-agent-preview-secret-key-2024-investor-show
+      DATABASE_URL: ${DATABASE_URL:?Set DATABASE_URL in .env}
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env}
       JWT_EXPIRES_IN: 7d
       NEXT_PUBLIC_APP_URL: https://gezma.ezyindustries.my.id
       NEXT_PUBLIC_APP_NAME: GEZMA Agent
