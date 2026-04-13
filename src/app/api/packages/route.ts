@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
+import { prisma } from '@/lib/prisma';
 
 const mockPackages = [
   {
@@ -47,6 +48,7 @@ const mockPackages = [
     ],
     isActive: true,
     createdAt: '2025-01-01',
+    _source: 'mock' as const,
   },
   {
     id: 'pkg-002',
@@ -95,6 +97,7 @@ const mockPackages = [
     ],
     isActive: true,
     createdAt: '2025-01-01',
+    _source: 'mock' as const,
   },
   {
     id: 'pkg-003',
@@ -141,6 +144,7 @@ const mockPackages = [
     ],
     isActive: true,
     createdAt: '2025-01-01',
+    _source: 'mock' as const,
   },
   {
     id: 'pkg-004',
@@ -187,6 +191,7 @@ const mockPackages = [
     ],
     isActive: true,
     createdAt: '2025-01-01',
+    _source: 'mock' as const,
   },
   {
     id: 'pkg-005',
@@ -236,6 +241,7 @@ const mockPackages = [
     ],
     isActive: true,
     createdAt: '2025-01-01',
+    _source: 'mock' as const,
   },
 ];
 
@@ -245,7 +251,21 @@ export async function GET(req: NextRequest) {
   const category = searchParams.get('category') || '';
   const isActive = searchParams.get('isActive');
 
-  let filtered = [...mockPackages];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let filtered: any[] = [...mockPackages];
+
+  // Hybrid: try DB first, merge with mock
+  try {
+    const dbPackages = await prisma.package.findMany({
+      where: { deletedAt: null, isActive: true },
+      orderBy: { createdAt: 'desc' },
+    });
+    const dbMapped = dbPackages.map(p => ({ ...p, _source: 'db' as const }));
+    filtered = [...dbMapped, ...mockPackages];
+  } catch {
+    // DB unavailable, use mock only
+    filtered = [...mockPackages];
+  }
 
   if (category) {
     filtered = filtered.filter((p) => p.category === category);
@@ -272,32 +292,76 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
 
-    const newPackage = {
-      id: `pkg-${Date.now()}`,
-      name: body.name || '',
-      slug: (body.name || '').toLowerCase().replace(/\s+/g, '-'),
-      category: body.category || 'reguler',
-      description: body.description || '',
-      duration: body.duration || 12,
-      airline: body.airline || '',
-      publishedPrice: body.publishedPrice || 0,
-      totalHpp: body.totalHpp || 0,
-      margin: body.margin || 0,
-      marginAmount: body.marginAmount || 0,
-      makkahHotel: body.makkahHotel || '',
-      makkahHotelRating: body.makkahHotelRating || 0,
-      makkahHotelDistance: body.makkahHotelDistance || '',
-      madinahHotel: body.madinahHotel || '',
-      madinahHotelRating: body.madinahHotelRating || 0,
-      madinahHotelDistance: body.madinahHotelDistance || '',
-      inclusions: body.inclusions || [],
-      exclusions: body.exclusions || [],
-      features: body.features || [],
-      isActive: body.isActive ?? true,
-      createdAt: new Date().toISOString().split('T')[0],
-    };
+    // Validate required fields
+    if (!body.name || !body.category || !body.duration || !body.publishedPrice) {
+      return NextResponse.json(
+        { error: 'Field name, category, duration, dan publishedPrice wajib diisi' },
+        { status: 400 }
+      );
+    }
 
-    return NextResponse.json(newPackage, { status: 201 });
+    const slug = (body.name || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+
+    // Hybrid: try DB first, mock fallback
+    try {
+      const dbPackage = await prisma.package.create({
+        data: {
+          name: body.name,
+          slug,
+          category: body.category,
+          description: body.description || '',
+          duration: body.duration,
+          airline: body.airline || '',
+          publishedPrice: body.publishedPrice,
+          totalHpp: body.totalHpp || 0,
+          margin: body.margin || 0,
+          marginAmount: body.marginAmount || 0,
+          makkahHotel: body.makkahHotel || '',
+          makkahHotelRating: body.makkahHotelRating || 0,
+          makkahHotelDistance: body.makkahHotelDistance || '',
+          madinahHotel: body.madinahHotel || '',
+          madinahHotelRating: body.madinahHotelRating || 0,
+          madinahHotelDistance: body.madinahHotelDistance || '',
+          inclusions: body.inclusions || [],
+          exclusions: body.exclusions || [],
+          hpp: body.hpp || {},
+          isActive: body.isActive ?? true,
+          agencyId: auth.agencyId,
+        },
+      });
+
+      return NextResponse.json({ ...dbPackage, _source: 'db' }, { status: 201 });
+    } catch (dbError) {
+      // DB failed, fallback to mock response
+      console.error('[packages POST] DB error, falling back to mock:', dbError);
+      const newPackage = {
+        id: `pkg-${Date.now()}`,
+        name: body.name || '',
+        slug,
+        category: body.category || 'reguler',
+        description: body.description || '',
+        duration: body.duration || 12,
+        airline: body.airline || '',
+        publishedPrice: body.publishedPrice || 0,
+        totalHpp: body.totalHpp || 0,
+        margin: body.margin || 0,
+        marginAmount: body.marginAmount || 0,
+        makkahHotel: body.makkahHotel || '',
+        makkahHotelRating: body.makkahHotelRating || 0,
+        makkahHotelDistance: body.makkahHotelDistance || '',
+        madinahHotel: body.madinahHotel || '',
+        madinahHotelRating: body.madinahHotelRating || 0,
+        madinahHotelDistance: body.madinahHotelDistance || '',
+        inclusions: body.inclusions || [],
+        exclusions: body.exclusions || [],
+        features: body.features || [],
+        isActive: body.isActive ?? true,
+        createdAt: new Date().toISOString().split('T')[0],
+        _source: 'mock' as const,
+      };
+
+      return NextResponse.json(newPackage, { status: 201 });
+    }
   } catch {
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }

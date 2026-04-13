@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 
+// TODO: connect to real payment/booking data when available
+
 export async function GET(req: NextRequest) {
   const auth = getAuthPayload(req); if (!auth) return unauthorizedResponse();
   return NextResponse.json({
