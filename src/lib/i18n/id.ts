@@ -255,7 +255,7 @@ export const id: Translations = {
     resetDefault: 'Reset ke Default',
     widgetVisible: 'Tampil',
     widgetHidden: 'Tersembunyi',
-    bannerTitle: 'GEZMA (Gerakan Generasi Z & Milenial)',
+    bannerTitle: 'GEZMA (Generasi Z dan Milenial Ashpirasi)',
     bannerDescription: 'Ekosistem pembinaan bagi anggota Ashpirasi, menyiapkan generasi penerus yang siap menerima tongkat estafet perjuangan menuju Indonesia Emas 2030.',
     gamificationTitle: 'Gamifikasi',
     gamificationPoints: 'Poin',

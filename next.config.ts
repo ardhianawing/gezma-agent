@@ -54,6 +54,7 @@ const nextConfig: NextConfig = {
             "img-src 'self' data: blob: https:",
             "font-src 'self' https://fonts.gstatic.com",
             "connect-src 'self' https://generativelanguage.googleapis.com",
+            "media-src 'self' blob:",
             "frame-src 'self' https://www.youtube.com",
             "frame-ancestors 'none'",
           ].join("; "),

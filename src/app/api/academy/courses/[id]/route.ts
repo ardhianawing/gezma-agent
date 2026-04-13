@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { courses } from '@/data/mock-academy';
+import { courses as mockCourses } from '@/data/mock-academy';
+import { prisma } from '@/lib/prisma';
 
 export async function GET(
   req: NextRequest,
@@ -7,18 +8,57 @@ export async function GET(
 ) {
   const { id } = await params;
 
-  const course = courses.find((c) => c.id === id);
+  // 1. Try real DB first
+  try {
+    const course = await prisma.academyCourse.findUnique({
+      where: { id },
+      include: {
+        lessons: { orderBy: { order: 'asc' } },
+      },
+    });
+
+    if (course) {
+      return NextResponse.json({
+        id: course.id,
+        title: course.title,
+        description: course.description,
+        category: course.category,
+        level: course.level,
+        thumbnailUrl: course.thumbnailUrl || null,
+        duration: course.duration,
+        instructorName: course.instructorName,
+        totalLessons: course.lessons.length,
+        isPublished: course.isPublished,
+        lessons: course.lessons.map((l) => ({
+          id: l.id,
+          title: l.title,
+          order: l.order,
+          duration: l.duration,
+          videoUrl: l.videoUrl,
+          videoStatus: l.videoStatus,
+          thumbnailKey: l.thumbnailKey,
+        })),
+        progress: null,
+      });
+    }
+  } catch {
+    // DB not available, fall through to mock
+  }
+
+  // 2. Fallback to mock data
+  const course = mockCourses.find((c) => c.id === id);
   if (!course) {
     return NextResponse.json({ error: 'Kursus tidak ditemukan' }, { status: 404 });
   }
 
-  // Generate mock lessons from course data
   const lessons = Array.from({ length: course.lessonCount }, (_, i) => ({
     id: `${course.id}-lesson-${i + 1}`,
     title: `Pelajaran ${i + 1}: ${course.title} - Bagian ${i + 1}`,
     order: i + 1,
     duration: `${Math.floor(Math.random() * 20 + 10)} menit`,
     videoUrl: course.videoUrl,
+    videoStatus: 'none',
+    thumbnailKey: null,
   }));
 
   const progressPercent = course.progress ?? 0;

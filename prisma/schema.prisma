@@ -617,14 +617,38 @@ model AcademyLesson {
   course     AcademyCourse @relation(fields: [courseId], references: [id], onDelete: Cascade)
   title      String
   content    String  // markdown/text
-  videoUrl   String?
+  videoUrl   String? // legacy YouTube URLs
   order      Int     @default(0)
   duration   String? // e.g. "30 menit"
 
+  // Video upload fields
+  videoStorageKey String?  // S3 key for uploaded video
+  videoStatus     String   @default("none") // none, uploading, processing, ready, error
+  videoError      String?
+  videoDuration   Int?     // duration in seconds
+  videoSize       BigInt?  // file size in bytes
+  thumbnailKey    String?  // S3 key for thumbnail image
+
   createdAt  DateTime @default(now())
+
+  videoProgress AcademyVideoProgress[]
 
   @@index([courseId])
   @@map("academy_lessons")
+}
+
+model AcademyVideoProgress {
+  id           String   @id @default(cuid())
+  lessonId     String
+  lesson       AcademyLesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  userId       String
+  lastPosition Int      @default(0) // seconds
+  completed    Boolean  @default(false)
+  updatedAt    DateTime @updatedAt
+
+  @@unique([lessonId, userId])
+  @@index([userId])
+  @@map("academy_video_progress")
 }
 
 model AcademyCourseProgress {

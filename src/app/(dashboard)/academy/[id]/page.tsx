@@ -9,6 +9,7 @@ import { useLanguage } from '@/lib/i18n';
 import { useToast } from '@/components/ui/toast';
 import { ConfirmDialog } from '@/components/shared/confirm-dialog';
 import { levels, categories } from '@/data/mock-academy';
+import { SecureVideoPlayer } from '@/components/academy/secure-video-player';
 
 interface Lesson {
   id: string;
@@ -16,6 +17,8 @@ interface Lesson {
   order: number;
   duration: string | null;
   videoUrl: string | null;
+  videoStatus?: string;
+  thumbnailKey?: string;
   content?: string;
 }
 
@@ -538,7 +541,12 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
                       </div>
                     ) : content ? (
                       <>
-                        {lesson.videoUrl && (
+                        {/* Video Player: uploaded video or legacy YouTube */}
+                        {lesson.videoStatus === 'ready' ? (
+                          <div style={{ marginTop: '16px' }}>
+                            <SecureVideoPlayer lessonId={lesson.id} />
+                          </div>
+                        ) : lesson.videoUrl ? (
                           <div style={{
                             borderRadius: '12px', overflow: 'hidden',
                             marginTop: '16px', aspectRatio: '16/9',
@@ -554,7 +562,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
                               style={{ border: 'none', borderRadius: '12px' }}
                             />
                           </div>
-                        )}
+                        ) : null}
                         <div
                           style={{ padding: '16px 0', fontSize: '14px', lineHeight: 1.7, color: c.textPrimary }}
                           dangerouslySetInnerHTML={{ __html: renderMarkdown(content) }}
