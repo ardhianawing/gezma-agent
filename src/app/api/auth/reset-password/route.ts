@@ -17,8 +17,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Kode dan password baru harus diisi' }, { status: 400 });
     }
 
-    if (newPassword.length < 8) {
-      return NextResponse.json({ error: 'Password minimal 8 karakter' }, { status: 400 });
+    if (typeof newPassword !== 'string' || newPassword.length < 8 || newPassword.length > 72) {
+      return NextResponse.json({ error: 'Password harus 8-72 karakter' }, { status: 400 });
     }
 
     const user = await prisma.user.findFirst({
@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Kode reset tidak valid atau sudah kedaluwarsa' }, { status: 400 });
     }
 
-    const hashed = await bcrypt.hash(newPassword, 10);
+    const hashed = await bcrypt.hash(newPassword, 12);
 
     await prisma.user.update({
       where: { id: user.id },

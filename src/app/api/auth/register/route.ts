@@ -38,6 +38,14 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Validate string types and max lengths
+    if (typeof password !== 'string' || typeof picEmail !== 'string' || typeof agencyName !== 'string') {
+      return NextResponse.json({ error: 'Data tidak valid' }, { status: 400 });
+    }
+    if (agencyName.length > 200 || legalName.length > 200 || picName.length > 100 || picEmail.length > 254) {
+      return NextResponse.json({ error: 'Input melebihi batas maksimal' }, { status: 400 });
+    }
+
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(picEmail)) {
@@ -47,34 +55,26 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Validate password length
-    if (password.length < 8) {
+    // Validate password length (min 8, max 72 — bcrypt truncates at 72 bytes)
+    if (password.length < 8 || password.length > 72) {
       return NextResponse.json(
-        { error: 'Password minimal 8 karakter' },
+        { error: 'Password harus 8-72 karakter' },
         { status: 400 }
       );
     }
 
-    // Check if email already exists
+    // Check if email already exists (anti-enumeration: same message for both)
     const existingUser = await prisma.user.findUnique({
       where: { email: picEmail },
     });
 
-    if (existingUser) {
-      return NextResponse.json(
-        { error: 'Email sudah terdaftar' },
-        { status: 409 }
-      );
-    }
-
-    // Check if agency email already exists
     const existingAgency = await prisma.agency.findUnique({
       where: { email: picEmail },
     });
 
-    if (existingAgency) {
+    if (existingUser || existingAgency) {
       return NextResponse.json(
-        { error: 'Agency dengan email ini sudah terdaftar' },
+        { error: 'Registrasi tidak dapat diproses. Silakan gunakan email lain atau hubungi admin.' },
         { status: 409 }
       );
     }

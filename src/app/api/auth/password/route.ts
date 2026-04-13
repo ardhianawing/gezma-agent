@@ -19,9 +19,9 @@ export async function PUT(req: NextRequest) {
       );
     }
 
-    if (newPassword.length < 6) {
+    if (typeof newPassword !== 'string' || newPassword.length < 8 || newPassword.length > 72) {
       return NextResponse.json(
-        { error: 'Password baru minimal 6 karakter' },
+        { error: 'Password baru harus 8-72 karakter' },
         { status: 400 }
       );
     }
@@ -39,7 +39,7 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: 'Password lama salah' }, { status: 400 });
     }
 
-    const hashed = await bcrypt.hash(newPassword, 10);
+    const hashed = await bcrypt.hash(newPassword, 12);
     await prisma.user.update({
       where: { id: auth.userId },
       data: { password: hashed },
