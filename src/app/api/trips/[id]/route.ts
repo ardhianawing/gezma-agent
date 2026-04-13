@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { mockTrips } from '@/data/mock-trips';
 import { mockPilgrims } from '@/data/mock-pilgrims';
+import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 
 type Context = { params: Promise<{ id: string }> };
 
 export async function GET(req: NextRequest, { params }: Context) {
+  const auth = getAuthPayload(req); if (!auth) return unauthorizedResponse();
   const { id } = await params;
 
   const trip = mockTrips.find((t) => t.id === id);
@@ -30,6 +32,7 @@ export async function GET(req: NextRequest, { params }: Context) {
 }
 
 export async function PUT(req: NextRequest, { params }: Context) {
+  const auth = getAuthPayload(req); if (!auth) return unauthorizedResponse();
   const { id } = await params;
 
   const trip = mockTrips.find((t) => t.id === id);
@@ -54,6 +57,7 @@ export async function PUT(req: NextRequest, { params }: Context) {
 }
 
 export async function DELETE(req: NextRequest, { params }: Context) {
+  const auth = getAuthPayload(req); if (!auth) return unauthorizedResponse();
   const { id } = await params;
 
   const trip = mockTrips.find((t) => t.id === id);

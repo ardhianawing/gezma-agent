@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 import { courses } from '@/data/mock-academy';
 
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ courseId: string }> }
 ) {
+  const auth = getAuthPayload(req); if (!auth) return unauthorizedResponse();
   const { courseId } = await params;
 
   const body = await req.json();

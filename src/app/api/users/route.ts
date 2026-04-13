@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 
 const mockUsers = [
   { id: "user-1", name: "Ahmad Fauzi", email: "ahmad@gezma.id", role: "operations" },
@@ -7,11 +8,13 @@ const mockUsers = [
   { id: "user-4", name: "Dewi Kartika", email: "dewi@gezma.id", role: "marketing" },
 ];
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const auth = getAuthPayload(req); if (!auth) return unauthorizedResponse();
   return NextResponse.json({ data: mockUsers });
 }
 
 export async function POST(req: NextRequest) {
+  const auth = getAuthPayload(req); if (!auth) return unauthorizedResponse();
   try {
     const body = await req.json();
 

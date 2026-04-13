@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 
 const mockPackages = [
   {
@@ -267,6 +268,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  const auth = getAuthPayload(req); if (!auth) return unauthorizedResponse();
   try {
     const body = await req.json();
 

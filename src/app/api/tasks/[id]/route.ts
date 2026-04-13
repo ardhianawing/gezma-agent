@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 
 type Context = { params: Promise<{ id: string }> };
 
 export async function PATCH(req: NextRequest, { params }: Context) {
+  const auth = getAuthPayload(req); if (!auth) return unauthorizedResponse();
   const { id } = await params;
 
   try {
@@ -28,7 +30,8 @@ export async function PATCH(req: NextRequest, { params }: Context) {
   }
 }
 
-export async function DELETE(_req: NextRequest, { params }: Context) {
+export async function DELETE(req: NextRequest, { params }: Context) {
+  const auth = getAuthPayload(req); if (!auth) return unauthorizedResponse();
   const { id } = await params;
 
   return NextResponse.json({ success: true, deletedId: id });

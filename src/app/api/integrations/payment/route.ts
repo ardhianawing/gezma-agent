@@ -13,7 +13,9 @@ export async function GET(req: NextRequest) {
 
   try {
     const config = await getPaymentGatewayConfig(auth.agencyId);
-    return NextResponse.json(config);
+    // Strip server-side secrets from response
+    const { serverKey: _sk, ...safeConfig } = config;
+    return NextResponse.json({ ...safeConfig, hasServerKey: !!config.serverKey });
   } catch (error) {
     logger.error('GET /api/integrations/payment error', { error: String(error) });
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });

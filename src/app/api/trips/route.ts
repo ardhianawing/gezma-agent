@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { mockTrips } from '@/data/mock-trips';
+import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 
 export async function GET(req: NextRequest) {
+  const auth = getAuthPayload(req); if (!auth) return unauthorizedResponse();
   const { searchParams } = new URL(req.url);
   const search = searchParams.get('search') || '';
   const status = searchParams.get('status') || '';
@@ -24,6 +26,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  const auth = getAuthPayload(req); if (!auth) return unauthorizedResponse();
   try {
     const body = await req.json();
 

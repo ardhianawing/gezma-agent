@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 
 export async function GET(request: NextRequest) {
+  const auth = getAuthPayload(request); if (!auth) return unauthorizedResponse();
   const searchParams = request.nextUrl.searchParams;
   const compareFrom = searchParams.get('compareFrom');
   const compareTo = searchParams.get('compareTo');

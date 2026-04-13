@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 
 const mockTasks = [
   { id: "task-1", title: "Verifikasi passport rombongan Maret", description: "Cek validitas passport 42 jamaah keberangkatan 15 Maret", status: "in_progress", priority: "high", dueDate: "2026-03-10", assignedTo: "user-1", assigneeName: "Ahmad Fauzi", createdBy: "Admin", createdAt: "2026-03-01T08:00:00Z" },
@@ -12,6 +13,7 @@ const mockTasks = [
 ];
 
 export async function GET(req: NextRequest) {
+  const auth = getAuthPayload(req); if (!auth) return unauthorizedResponse();
   const status = req.nextUrl.searchParams.get('status') || undefined;
   const assignedTo = req.nextUrl.searchParams.get('assignedTo') || undefined;
 
@@ -23,6 +25,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  const auth = getAuthPayload(req); if (!auth) return unauthorizedResponse();
   try {
     const body = await req.json();
 

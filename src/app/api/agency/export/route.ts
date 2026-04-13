@@ -7,6 +7,11 @@ export async function GET(req: NextRequest) {
   const auth = getAuthPayload(req);
   if (!auth) return unauthorizedResponse();
 
+  // Only owner/admin can export all agency data
+  if (!['owner', 'admin'].includes(auth.role)) {
+    return NextResponse.json({ error: 'Hanya owner/admin yang bisa export data' }, { status: 403 });
+  }
+
   const { agencyId } = auth;
 
   try {
