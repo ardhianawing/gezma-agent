@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
 import { logger } from '@/lib/logger';
+import { findFAQAnswer } from '@/lib/chat-faq';
+import { checkChatLimit } from '@/lib/chat-rate-limit';
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
@@ -149,6 +151,28 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Step 1: Try FAQ first (0 API calls)
+    const lastMessage = messages[messages.length - 1];
+    const userQuestion = lastMessage?.content || '';
+    const faqAnswer = findFAQAnswer(userQuestion);
+    if (faqAnswer) {
+      return NextResponse.json({
+        message: faqAnswer,
+        source: 'faq',
+      });
+    }
+
+    // Step 2: Check rate limit before calling Gemini
+    const rateCheck = checkChatLimit(auth.userId);
+    if (!rateCheck.allowed) {
+      return NextResponse.json({
+        message: 'Kamu sudah mencapai batas chat AI hari ini (5x/hari). Coba lagi besok ya!\n\nSementara itu, kamu bisa:\n- Cek pertanyaan umum yang sering ditanyakan\n- Hubungi CS via WhatsApp\n- Buka menu Help di app',
+        source: 'rate_limited',
+        remaining: 0,
+      });
+    }
+
+    // Step 3: Call Gemini API (rate-limited)
     if (!GEMINI_API_KEY) {
       return NextResponse.json(
         { error: 'Layanan AI belum dikonfigurasi' },
@@ -210,7 +234,11 @@ export async function POST(request: NextRequest) {
     const assistantMessage = data.candidates?.[0]?.content?.parts?.[0]?.text ||
       'Mohon maaf, saya tidak dapat memproses permintaan Anda saat ini. Silakan coba lagi.';
 
-    return NextResponse.json({ message: assistantMessage });
+    return NextResponse.json({
+      message: assistantMessage,
+      source: 'ai',
+      remaining: rateCheck.remaining,
+    });
   } catch (error) {
     logger.error('Chat API Error', { error: String(error) });
     return NextResponse.json(
