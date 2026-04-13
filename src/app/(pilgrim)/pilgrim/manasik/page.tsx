@@ -179,7 +179,7 @@ export default function ManasikPage() {
               <iframe
                 width="100%"
                 height="100%"
-                src={selectedLesson.videoUrl.replace('watch?v=', 'embed/')}
+                src={(() => { try { const u = new URL(selectedLesson.videoUrl.replace('watch?v=', 'embed/')); return ['www.youtube.com','youtube.com','youtu.be'].includes(u.hostname) ? u.toString() : ''; } catch { return ''; } })()}
                 title={selectedLesson.title}
                 frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

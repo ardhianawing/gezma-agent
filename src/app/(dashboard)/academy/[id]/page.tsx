@@ -10,6 +10,7 @@ import { useToast } from '@/components/ui/toast';
 import { ConfirmDialog } from '@/components/shared/confirm-dialog';
 import { levels, categories } from '@/data/mock-academy';
 import { SecureVideoPlayer } from '@/components/academy/secure-video-player';
+import DOMPurify from 'isomorphic-dompurify';
 
 interface Lesson {
   id: string;
@@ -72,7 +73,10 @@ function renderMarkdown(md: string): string {
     return '<ul>' + match.replace(/<br\/>/g, '') + '</ul>';
   });
 
-  return '<p>' + html + '</p>';
+  return DOMPurify.sanitize('<p>' + html + '</p>', {
+    ALLOWED_TAGS: ['p', 'h1', 'h2', 'h3', 'strong', 'em', 'a', 'ul', 'ol', 'li', 'br', 'code', 'pre'],
+    ALLOWED_ATTR: ['href', 'target', 'rel'],
+  });
 }
 
 export default function CourseDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -554,7 +558,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
                             <iframe
                               width="100%"
                               height="100%"
-                              src={lesson.videoUrl.replace('watch?v=', 'embed/')}
+                              src={(() => { try { const u = new URL(lesson.videoUrl.replace('watch?v=', 'embed/')); return ['www.youtube.com','youtube.com','youtu.be'].includes(u.hostname) ? u.toString() : ''; } catch { return ''; } })()}
                               title={lesson.title}
                               frameBorder="0"
                               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

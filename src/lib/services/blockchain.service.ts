@@ -1,13 +1,13 @@
 import { prisma } from '@/lib/prisma';
+import crypto from 'crypto';
 
 /**
  * Generate certificate number: GEZMA-{YEAR}-{RANDOM_HEX_8chars}
+ * Uses crypto.randomBytes instead of Math.random for security
  */
 export function generateCertificateNumber(): string {
   const year = new Date().getFullYear();
-  const hex = Array.from({ length: 8 }, () =>
-    Math.floor(Math.random() * 16).toString(16)
-  ).join('').toUpperCase();
+  const hex = crypto.randomBytes(4).toString('hex').toUpperCase();
   return `GEZMA-${year}-${hex}`;
 }
 
@@ -15,66 +15,66 @@ export function generateCertificateNumber(): string {
  * Simulate a blockchain transaction hash: 0x + 64 hex chars
  */
 export function simulateTxHash(): string {
-  const hex = Array.from({ length: 64 }, () =>
-    Math.floor(Math.random() * 16).toString(16)
-  ).join('');
-  return `0x${hex}`;
+  return '0x' + crypto.randomBytes(32).toString('hex');
 }
 
 /**
  * Simulate a block number between 1000000 and 9999999
  */
 export function simulateBlockNumber(): number {
-  return Math.floor(Math.random() * 9000000) + 1000000;
+  return crypto.randomInt(1000000, 10000000);
 }
 
 /**
  * Issue a new blockchain certificate for a pilgrim
+ * Uses prisma.$transaction to prevent race conditions
  */
 export async function issueCertificate(pilgrimId: string, agencyId: string) {
-  const pilgrim = await prisma.pilgrim.findFirst({
-    where: { id: pilgrimId, agencyId },
-  });
+  return prisma.$transaction(async (tx) => {
+    const pilgrim = await tx.pilgrim.findFirst({
+      where: { id: pilgrimId, agencyId },
+    });
 
-  if (!pilgrim) {
-    throw new Error('Jamaah tidak ditemukan');
-  }
+    if (!pilgrim) {
+      throw new Error('Jamaah tidak ditemukan');
+    }
 
-  // Check if pilgrim already has an active certificate
-  const existing = await prisma.blockchainCertificate.findFirst({
-    where: { pilgrimId, agencyId, status: { not: 'revoked' } },
-  });
+    // Check if pilgrim already has an active certificate (inside transaction)
+    const existing = await tx.blockchainCertificate.findFirst({
+      where: { pilgrimId, agencyId, status: { not: 'revoked' } },
+    });
 
-  if (existing) {
-    throw new Error('Jamaah sudah memiliki sertifikat aktif');
-  }
+    if (existing) {
+      throw new Error('Jamaah sudah memiliki sertifikat aktif');
+    }
 
-  const now = new Date();
-  const certificate = await prisma.blockchainCertificate.create({
-    data: {
-      certificateNumber: generateCertificateNumber(),
-      txHash: simulateTxHash(),
-      blockNumber: simulateBlockNumber(),
-      status: 'verified',
-      verifiedAt: now,
-      pilgrimId,
-      agencyId,
-      metadata: {
-        pilgrimName: pilgrim.name,
-        pilgrimNik: pilgrim.nik,
-        network: 'Gezma Simulated Chain',
-        consensus: 'Proof of Authority',
-        gasUsed: Math.floor(Math.random() * 50000) + 21000,
-        confirmations: Math.floor(Math.random() * 100) + 12,
+    const now = new Date();
+    const certificate = await tx.blockchainCertificate.create({
+      data: {
+        certificateNumber: generateCertificateNumber(),
+        txHash: simulateTxHash(),
+        blockNumber: simulateBlockNumber(),
+        status: 'verified',
+        verifiedAt: now,
+        pilgrimId,
+        agencyId,
+        metadata: {
+          pilgrimName: pilgrim.name,
+          pilgrimNik: pilgrim.nik,
+          network: 'Gezma Simulated Chain',
+          consensus: 'Proof of Authority',
+          gasUsed: crypto.randomInt(21000, 71000),
+          confirmations: crypto.randomInt(12, 112),
+        },
       },
-    },
-    include: {
-      pilgrim: { select: { name: true, nik: true } },
-      agency: { select: { name: true } },
-    },
-  });
+      include: {
+        pilgrim: { select: { name: true, nik: true } },
+        agency: { select: { name: true } },
+      },
+    });
 
-  return certificate;
+    return certificate;
+  });
 }
 
 /**
