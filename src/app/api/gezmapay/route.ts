@@ -74,8 +74,8 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { amount } = body;
 
-    if (!amount || typeof amount !== 'number' || amount <= 0) {
-      return NextResponse.json({ error: 'Jumlah top up tidak valid' }, { status: 400 });
+    if (typeof amount !== 'number' || amount <= 0 || amount > 100000000) {
+      return NextResponse.json({ error: 'Jumlah tidak valid (maks Rp 100 juta)' }, { status: 400 });
     }
 
     const result = await prisma.$transaction(async (tx) => {

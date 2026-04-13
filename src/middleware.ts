@@ -4,6 +4,11 @@ import { jwtVerify } from 'jose';
 const protectedPaths = ['/dashboard', '/pilgrims', '/packages', '/trips', '/documents', '/agency', '/settings', '/marketplace', '/trade', '/forum', '/news', '/academy', '/services', '/help', '/reports', '/activities', '/gamification', '/blockchain', '/tasks', '/notifications', '/gezmapay', '/tabungan', '/paylater', '/foundation'];
 const authPaths = ['/login', '/register'];
 
+// Only allow relative redirects (prevent open redirect)
+function isValidRedirect(path: string): boolean {
+  return path.startsWith('/') && !path.startsWith('//') && !path.includes('://');
+}
+
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || '');
 
 async function verifyToken(token: string): Promise<boolean> {
@@ -53,7 +58,9 @@ export async function middleware(req: NextRequest) {
   // Check if accessing auth pages with valid token (already logged in)
   const isAuthPage = authPaths.some(path => pathname === path || pathname.startsWith(path + '/'));
   if (isAuthPage && token && (await verifyToken(token))) {
-    return NextResponse.redirect(new URL('/dashboard', req.url));
+    const redirectParam = req.nextUrl.searchParams.get('redirect');
+    const destination = redirectParam && isValidRedirect(redirectParam) ? redirectParam : '/dashboard';
+    return NextResponse.redirect(new URL(destination, req.url));
   }
 
   return response;

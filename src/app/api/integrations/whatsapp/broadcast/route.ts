@@ -23,6 +23,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    if (recipients.length > 500) {
+      return NextResponse.json(
+        { error: 'Maksimal 500 penerima per broadcast' },
+        { status: 400 }
+      );
+    }
+
     if (!templateContent) {
       return NextResponse.json(
         { error: 'Konten template wajib diisi' },

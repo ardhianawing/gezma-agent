@@ -73,8 +73,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(invoice, { status: 201 });
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Terjadi kesalahan server';
     logger.error('POST /api/integrations/payment/invoices error', { error: String(error) });
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }

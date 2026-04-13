@@ -42,7 +42,8 @@ export async function GET(req: NextRequest) {
                 status: true,
               },
             },
-            verificationCode: true,
+            // verificationCode excluded — use status to determine verification
+            status: true,
           },
         },
         activityLogs: {
@@ -99,7 +100,8 @@ export async function GET(req: NextRequest) {
 
       // 4. Verified pilgrim ratio weight 10%
       const totalPilgrims = agency.pilgrims.length;
-      const verifiedPilgrims = agency.pilgrims.filter(p => p.verificationCode !== null).length;
+      // Pilgrims past 'lead' status are considered verified (replaces verificationCode check)
+      const verifiedPilgrims = agency.pilgrims.filter(p => p.status !== 'lead').length;
       const pilgrimScore = totalPilgrims > 0 ? (verifiedPilgrims / totalPilgrims) * 100 : 0;
 
       // Weighted total

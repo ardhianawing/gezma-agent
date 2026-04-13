@@ -8,9 +8,9 @@ import { logger } from '@/lib/logger';
 
 export async function POST(req: NextRequest) {
   try {
-    const { allowed } = rateLimit(req, { limit: 3, window: 60 });
+    const { allowed } = rateLimit(req, { limit: 5, window: 900 });
     if (!allowed) {
-      return NextResponse.json({ error: 'Terlalu banyak percobaan. Silakan coba lagi nanti.' }, { status: 429 });
+      return NextResponse.json({ error: 'Terlalu banyak percobaan. Coba lagi nanti.' }, { status: 429 });
     }
 
     const auth = getAuthPayload(req);

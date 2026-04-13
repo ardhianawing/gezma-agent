@@ -75,7 +75,8 @@ const IDS = {
   },
 };
 
-const PASSWORD_HASH = hashSync('password123', 10);
+// Development seeding only — not for production use
+const PASSWORD_HASH = hashSync('SeedP@ss2026!Demo', 10);
 
 // ============ Seed Functions ============
 
@@ -624,12 +625,12 @@ async function main() {
   console.log('Demo Credentials:');
   console.log('─────────────────────────────────────────');
   console.log('Agent Portal:');
-  console.log('  Owner:  owner@gezma.id / password123');
-  console.log('  Admin:  admin@gezma.id / password123');
-  console.log('  Staff:  staff@gezma.id / password123');
+  console.log('  Owner:  owner@gezma.id / SeedP@ss2026!Demo');
+  console.log('  Admin:  admin@gezma.id / SeedP@ss2026!Demo');
+  console.log('  Staff:  staff@gezma.id / SeedP@ss2026!Demo');
   console.log('');
   console.log('Command Center:');
-  console.log('  Admin:  superadmin@gezma.id / password123');
+  console.log('  Admin:  superadmin@gezma.id / SeedP@ss2026!Demo');
   console.log('─────────────────────────────────────────');
   console.log('');
   console.warn('\u26A0\uFE0F  CHANGE DEFAULT ADMIN PASSWORD IN PRODUCTION!');

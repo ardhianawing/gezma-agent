@@ -72,9 +72,10 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ data: certificate }, { status: 201 });
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Terjadi kesalahan server';
-    const status = message.includes('tidak ditemukan') || message.includes('sudah memiliki') ? 400 : 500;
+    const internalMsg = error instanceof Error ? error.message : 'Terjadi kesalahan server';
+    const isClientError = internalMsg.includes('tidak ditemukan') || internalMsg.includes('sudah memiliki');
+    const status = isClientError ? 400 : 500;
     logger.error('POST /api/blockchain/certificates error', { error: String(error) });
-    return NextResponse.json({ error: message }, { status });
+    return NextResponse.json({ error: isClientError ? internalMsg : 'Terjadi kesalahan server' }, { status });
   }
 }

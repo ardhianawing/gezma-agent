@@ -3,12 +3,18 @@ import { prisma } from '@/lib/prisma';
 import jwt from 'jsonwebtoken';
 import { logger } from '@/lib/logger';
 import { JWT_SECRET } from '@/lib/auth-server';
+import { rateLimit } from '@/lib/rate-limiter';
 
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ code: string }> }
 ) {
   try {
+    const rl = rateLimit(req, { limit: 5, window: 300 }); // 5 attempts per 5 min
+    if (!rl.allowed) {
+      return NextResponse.json({ error: 'Terlalu banyak percobaan. Coba lagi nanti.' }, { status: 429 });
+    }
+
     const { code } = await params;
 
     if (!code) {

@@ -47,6 +47,15 @@ export async function PUT(req: NextRequest) {
       'logoLightUrl', 'logoDarkUrl', 'appTitle',
     ] as const;
 
+    // Validate critical string fields if provided
+    for (const field of ['name', 'phone', 'email'] as const) {
+      if (body[field] !== undefined) {
+        if (typeof body[field] !== 'string' || body[field].trim() === '') {
+          return NextResponse.json({ error: `Field "${field}" harus berupa teks dan tidak boleh kosong` }, { status: 400 });
+        }
+      }
+    }
+
     const updateData: Record<string, unknown> = {};
     for (const field of allowedFields) {
       if (body[field] !== undefined) {

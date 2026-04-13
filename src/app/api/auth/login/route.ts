@@ -29,6 +29,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    if (typeof email !== 'string' || typeof password !== 'string') {
+      return NextResponse.json({ error: 'Email dan password harus berupa teks' }, { status: 400 });
+    }
+
     // Brute force check (per email)
     const bruteCheck = checkBruteForce(`agent:${email}`);
     if (!bruteCheck.allowed) {

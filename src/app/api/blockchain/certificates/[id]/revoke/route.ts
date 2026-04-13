@@ -28,9 +28,10 @@ export async function POST(
 
     return NextResponse.json({ data: certificate });
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Terjadi kesalahan server';
-    const status = message.includes('tidak ditemukan') || message.includes('sudah dicabut') ? 400 : 500;
+    const internalMsg = error instanceof Error ? error.message : 'Terjadi kesalahan server';
+    const isClientError = internalMsg.includes('tidak ditemukan') || internalMsg.includes('sudah dicabut');
+    const status = isClientError ? 400 : 500;
     logger.error('POST /api/blockchain/certificates/[id]/revoke error', { error: String(error) });
-    return NextResponse.json({ error: message }, { status });
+    return NextResponse.json({ error: isClientError ? internalMsg : 'Terjadi kesalahan server' }, { status });
   }
 }

@@ -13,6 +13,14 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { contactName, contactPhone } = body;
 
+    // Validate required SOS fields
+    if (typeof contactName !== 'string' || contactName.trim() === '') {
+      return NextResponse.json({ error: 'Nama kontak darurat harus diisi' }, { status: 400 });
+    }
+    if (typeof contactPhone !== 'string' || contactPhone.trim() === '') {
+      return NextResponse.json({ error: 'Nomor telepon kontak darurat harus diisi' }, { status: 400 });
+    }
+
     // Get pilgrim info for logging
     const pilgrim = await prisma.pilgrim.findUnique({
       where: { id: payload.pilgrimId },

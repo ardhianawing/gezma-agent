@@ -8,6 +8,19 @@ import { logger } from '@/lib/logger';
 
 export type AuditAction = 'created' | 'updated' | 'deleted' | 'restored';
 
+const SENSITIVE_FIELDS = ['password', 'token', 'secret', 'apiKey', 'serverKey', 'creditCard', 'nik'];
+
+function sanitizeForAudit(data: Record<string, unknown>): Record<string, unknown> {
+  if (!data || typeof data !== 'object') return data;
+  const sanitized = { ...data };
+  for (const field of SENSITIVE_FIELDS) {
+    if (field in sanitized) {
+      sanitized[field] = '[REDACTED]';
+    }
+  }
+  return sanitized;
+}
+
 export interface FieldChange {
   field: string;
   oldValue: unknown;
@@ -98,10 +111,11 @@ export async function auditCreate(
   performer: { id: string; name: string },
   opts?: { ipAddress?: string; agencyId?: string }
 ): Promise<void> {
-  const changes: FieldChange[] = Object.keys(data).map(field => ({
+  const sanitized = sanitizeForAudit(data);
+  const changes: FieldChange[] = Object.keys(sanitized).map(field => ({
     field,
     oldValue: null,
-    newValue: data[field],
+    newValue: sanitized[field],
   }));
 
   await recordAudit({

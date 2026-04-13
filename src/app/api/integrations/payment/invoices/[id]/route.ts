@@ -33,8 +33,7 @@ export async function DELETE(req: NextRequest, { params }: Context) {
     const invoice = await cancelInvoice(id, auth.agencyId);
     return NextResponse.json(invoice);
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Terjadi kesalahan server';
     logger.error('DELETE /api/integrations/payment/invoices/[id] error', { error: String(error) });
-    return NextResponse.json({ error: message }, { status: 400 });
+    return NextResponse.json({ error: 'Gagal membatalkan invoice' }, { status: 400 });
   }
 }

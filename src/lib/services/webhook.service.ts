@@ -6,6 +6,25 @@ import { withCircuitBreaker, registerCircuitBreaker } from '@/lib/circuit-breake
 // Register circuit breaker for webhook delivery
 registerCircuitBreaker({ name: 'webhook-delivery', failureThreshold: 10, resetTimeout: 60_000, successThreshold: 3 });
 
+/**
+ * Validate that a webhook URL is not targeting internal/private networks (SSRF protection).
+ */
+function isPrivateUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    const hostname = parsed.hostname;
+    // Block private/internal IPs
+    if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '0.0.0.0') return true;
+    if (hostname.startsWith('10.') || hostname.startsWith('192.168.') || hostname.startsWith('172.')) return true;
+    if (hostname.endsWith('.internal') || hostname.endsWith('.local')) return true;
+    // Block non-HTTPS
+    if (parsed.protocol !== 'https:') return true;
+    return false;
+  } catch {
+    return true;
+  }
+}
+
 /** Supported webhook events */
 export const WEBHOOK_EVENTS = [
   'pilgrim.created',
@@ -78,6 +97,12 @@ async function deliverWebhook(
   event: string,
   payloadStr: string
 ): Promise<void> {
+  // SSRF protection: block requests to private/internal URLs
+  if (isPrivateUrl(url)) {
+    logger.error('Webhook delivery blocked — private/internal URL', { endpointId, url });
+    return;
+  }
+
   const signature = signPayload(payloadStr, secret);
 
   try {

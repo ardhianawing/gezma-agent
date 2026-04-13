@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
     root: import.meta.dirname,
   },
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: true, // TODO: set to false before production
   },
   images: {
     formats: ["image/avif", "image/webp"],
@@ -49,12 +49,14 @@ const nextConfig: NextConfig = {
           key: "Content-Security-Policy",
           value: [
             "default-src 'self'",
+            // unsafe-eval needed for Next.js dev mode; unsafe-inline needed for styled-jsx
             "script-src 'self' 'unsafe-eval' 'unsafe-inline'",
+            // unsafe-inline required for Next.js styled-jsx
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
             "img-src 'self' data: blob: https:",
             "font-src 'self' https://fonts.gstatic.com",
             "connect-src 'self' https://generativelanguage.googleapis.com",
-            "media-src 'self' blob: https: http:",
+            "media-src 'self' blob: https:",
             "frame-src 'self' https://www.youtube.com",
             "frame-ancestors 'none'",
           ].join("; "),
