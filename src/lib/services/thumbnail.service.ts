@@ -1,7 +1,10 @@
 import { execFile } from 'child_process';
 import { promisify } from 'util';
-import { writeFile, unlink, readFile } from 'fs/promises';
+import { createWriteStream } from 'fs';
+import { unlink, readFile, rmdir } from 'fs/promises';
 import { mkdtempSync } from 'fs';
+import { Readable } from 'stream';
+import { pipeline } from 'stream/promises';
 import path from 'path';
 import os from 'os';
 import { getPresignedDownloadUrl } from '@/lib/storage-multipart';
@@ -18,11 +21,12 @@ export async function generateThumbnail(
   const thumbPath = path.join(tmpDir, 'thumb.jpg');
 
   try {
-    // Download video from S3
+    // Stream download video from S3 to disk (prevents OOM on large files)
     const videoUrl = await getPresignedDownloadUrl(videoStorageKey, 300);
     const response = await fetch(videoUrl);
-    const buffer = Buffer.from(await response.arrayBuffer());
-    await writeFile(videoPath, buffer);
+    if (!response.body) throw new Error('No response body');
+    const readable = Readable.fromWeb(response.body as import('stream/web').ReadableStream);
+    await pipeline(readable, createWriteStream(videoPath));
 
     // Get video duration
     const { stdout: probeOut } = await execFileAsync('ffprobe', [
@@ -54,5 +58,6 @@ export async function generateThumbnail(
   } finally {
     await unlink(videoPath).catch(() => {});
     await unlink(thumbPath).catch(() => {});
+    await rmdir(tmpDir).catch(() => {});
   }
 }

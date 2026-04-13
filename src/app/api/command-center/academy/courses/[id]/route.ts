@@ -17,7 +17,11 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   });
 
   if (!course) return NextResponse.json({ error: 'Not found' }, { status: 404 });
-  return NextResponse.json({ course });
+  const serialized = {
+    ...course,
+    lessons: course.lessons.map((l) => ({ ...l, videoSize: l.videoSize?.toString() ?? null })),
+  };
+  return NextResponse.json({ course: serialized });
 }
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {

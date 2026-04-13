@@ -28,7 +28,8 @@ export async function POST(req: NextRequest) {
   const lesson = await prisma.academyLesson.findUnique({ where: { id: lessonId } });
   if (!lesson) return NextResponse.json({ error: 'Lesson not found' }, { status: 404 });
 
-  const ext = fileName.split('.').pop() || 'mp4';
+  const EXT_MAP: Record<string, string> = { 'video/mp4': 'mp4', 'video/webm': 'webm', 'video/quicktime': 'mov' };
+  const ext = EXT_MAP[contentType] || 'mp4';
   const storageKey = `academy/videos/${lessonId}.${ext}`;
 
   const uploadId = await createMultipartUpload(storageKey, contentType);

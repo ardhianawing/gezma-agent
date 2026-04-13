@@ -63,13 +63,15 @@ export function SecureVideoPlayer({ lessonId }: SecureVideoPlayerProps) {
     if (!video) return;
 
     video.src = `/api/academy/video/${lessonId}/stream`;
-    video.load();
 
     if (resumePrompt && lastPosition > 5) {
-      video.currentTime = lastPosition;
+      video.addEventListener('loadedmetadata', () => {
+        video.currentTime = lastPosition;
+      }, { once: true });
       setResumePrompt(false);
     }
 
+    video.load();
     video
       .play()
       .then(() => {
@@ -91,7 +93,6 @@ export function SecureVideoPlayer({ lessonId }: SecureVideoPlayerProps) {
 
     video.src = `/api/academy/video/${lessonId}/stream`;
     video.load();
-    video.currentTime = 0;
     video.play().then(() => {
       setPlaying(true);
       setShowOverlay(false);

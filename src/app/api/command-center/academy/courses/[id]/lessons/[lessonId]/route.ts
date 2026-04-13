@@ -9,9 +9,15 @@ export async function PUT(req: NextRequest, { params }: Params) {
   const auth = getCCAuthPayload(req);
   if (!auth) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const { lessonId } = await params;
+  const { id, lessonId } = await params;
   const body = await req.json();
   const { title, content, duration } = body;
+
+  // Verify lesson belongs to this course
+  const existing = await prisma.academyLesson.findFirst({
+    where: { id: lessonId, courseId: id },
+  });
+  if (!existing) return NextResponse.json({ error: 'Lesson not found' }, { status: 404 });
 
   const lesson = await prisma.academyLesson.update({
     where: { id: lessonId },
@@ -31,13 +37,15 @@ export async function DELETE(req: NextRequest, { params }: Params) {
 
   const { id, lessonId } = await params;
 
-  const lesson = await prisma.academyLesson.findUnique({
-    where: { id: lessonId },
+  // Verify lesson belongs to this course
+  const lesson = await prisma.academyLesson.findFirst({
+    where: { id: lessonId, courseId: id },
     select: { videoStorageKey: true, thumbnailKey: true },
   });
+  if (!lesson) return NextResponse.json({ error: 'Lesson not found' }, { status: 404 });
 
-  if (lesson?.videoStorageKey) await deleteS3Object(lesson.videoStorageKey).catch(() => {});
-  if (lesson?.thumbnailKey) await deleteS3Object(lesson.thumbnailKey).catch(() => {});
+  if (lesson.videoStorageKey) await deleteS3Object(lesson.videoStorageKey).catch(() => {});
+  if (lesson.thumbnailKey) await deleteS3Object(lesson.thumbnailKey).catch(() => {});
 
   await prisma.academyLesson.delete({ where: { id: lessonId } });
 

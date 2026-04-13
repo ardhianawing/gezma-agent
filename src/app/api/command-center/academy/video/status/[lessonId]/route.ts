@@ -13,5 +13,5 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ less
   });
 
   if (!lesson) return NextResponse.json({ error: 'Not found' }, { status: 404 });
-  return NextResponse.json(lesson);
+  return NextResponse.json({ ...lesson, videoSize: lesson.videoSize?.toString() ?? null });
 }

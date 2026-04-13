@@ -25,6 +25,13 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ less
   const body = await req.json();
   const { lastPosition, completed } = body;
 
+  if (lastPosition !== undefined && (typeof lastPosition !== 'number' || lastPosition < 0)) {
+    return NextResponse.json({ error: 'Invalid position' }, { status: 400 });
+  }
+  if (completed !== undefined && typeof completed !== 'boolean') {
+    return NextResponse.json({ error: 'Invalid completed value' }, { status: 400 });
+  }
+
   const progress = await prisma.academyVideoProgress.upsert({
     where: { lessonId_userId: { lessonId, userId: auth.userId } },
     create: {
