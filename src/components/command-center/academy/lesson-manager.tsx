@@ -3,6 +3,7 @@
 import { useState, useCallback, useRef } from 'react';
 import { GripVertical, Plus, Trash2, Edit2, Check, X, ChevronUp, ChevronDown, Play, Image as ImageIcon, Clock, Film } from 'lucide-react';
 import { VideoUpload } from './video-upload';
+import { BulkVideoUpload } from './bulk-video-upload';
 
 const cc = {
   primary: '#2563EB',
@@ -146,20 +147,29 @@ export function LessonManager({ courseId, lessons, onUpdate }: LessonManagerProp
   return (
     <div>
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 8 }}>
         <h3 style={{ fontSize: 16, fontWeight: 600, color: cc.textPrimary, margin: 0 }}>
           Lesson / Kurikulum ({lessons.length})
         </h3>
-        <button
-          onClick={() => setAdding(true)}
-          style={{
-            padding: '8px 14px', fontSize: 13, fontWeight: 500,
-            background: cc.primary, color: '#fff', border: 'none',
-            borderRadius: 8, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6,
-          }}
-        >
-          <Plus size={14} /> Tambah Lesson
-        </button>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          {lessons.length > 0 && (
+            <BulkVideoUpload
+              courseId={courseId}
+              lessons={lessons.map(l => ({ id: l.id, title: l.title }))}
+              onComplete={onUpdate}
+            />
+          )}
+          <button
+            onClick={() => setAdding(true)}
+            style={{
+              padding: '8px 14px', fontSize: 13, fontWeight: 500,
+              background: cc.primary, color: '#fff', border: 'none',
+              borderRadius: 8, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6,
+            }}
+          >
+            <Plus size={14} /> Tambah Lesson
+          </button>
+        </div>
       </div>
 
       {/* Add Lesson Form */}
