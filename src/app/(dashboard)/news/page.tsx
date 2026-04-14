@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import Link from 'next/link';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
 import { PageHeader } from '@/components/layout/page-header';
@@ -134,22 +135,26 @@ export default function NewsPage() {
           }}
         >
           {/* Main Featured */}
-          <FeaturedCard
-            article={mainFeatured}
-            isMain
-            c={c}
-            isMobile={isMobile}
-            t={t}
-          />
-          {/* Side Featured */}
-          {sideFeatured && (
+          <Link href={`/news/${mainFeatured.id}`} style={{ textDecoration: 'none', flex: 2 }}>
             <FeaturedCard
-              article={sideFeatured}
-              isMain={false}
+              article={mainFeatured}
+              isMain
               c={c}
               isMobile={isMobile}
               t={t}
             />
+          </Link>
+          {/* Side Featured */}
+          {sideFeatured && (
+            <Link href={`/news/${sideFeatured.id}`} style={{ textDecoration: 'none', flex: 1 }}>
+              <FeaturedCard
+                article={sideFeatured}
+                isMain={false}
+                c={c}
+                isMobile={isMobile}
+                t={t}
+              />
+            </Link>
           )}
         </div>
       )}
@@ -275,12 +280,13 @@ export default function NewsPage() {
           }}
         >
           {displayArticles.map((article) => (
-            <ArticleCard
-              key={article.id}
-              article={article}
-              c={c}
-              t={t}
-            />
+            <Link key={article.id} href={`/news/${article.id}`} style={{ textDecoration: 'none' }}>
+              <ArticleCard
+                article={article}
+                c={c}
+                t={t}
+              />
+            </Link>
           ))}
         </div>
       )}
@@ -307,7 +313,6 @@ function FeaturedCard({
   return (
     <div
       style={{
-        flex: isMain ? 2 : 1,
         backgroundColor: c.cardBg,
         borderRadius: '16px',
         border: `1px solid ${c.border}`,
@@ -315,6 +320,7 @@ function FeaturedCard({
         cursor: 'pointer',
         transition: 'all 0.3s ease',
         position: 'relative',
+        height: '100%',
       }}
       onMouseEnter={(e) => {
         e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.08)';
