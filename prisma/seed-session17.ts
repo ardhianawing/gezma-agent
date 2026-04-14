@@ -218,8 +218,13 @@ export async function seedNews(prisma: PrismaClient) {
   }
 
   for (let i = 0; i < articles.length; i++) {
+    const slug = articles[i].title
+      .toLowerCase()
+      .replace(/[^\w\s-]/g, '')
+      .replace(/[\s_-]+/g, '-')
+      .replace(/^-+|-+$/g, '');
     await prisma.newsArticle.create({
-      data: { id: S17_IDS.news[i], ...articles[i], createdBy: SYSTEM_ADMIN_ID },
+      data: { id: S17_IDS.news[i], slug, ...articles[i], createdBy: SYSTEM_ADMIN_ID },
     });
   }
   console.log(`  Created ${articles.length} news articles`);

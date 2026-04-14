@@ -4,6 +4,7 @@ import { getCCAuthPayload, ccUnauthorizedResponse } from '@/lib/auth-command-cen
 import { rateLimit } from '@/lib/rate-limiter';
 import { createNewsArticleSchema } from '@/lib/validations/news';
 import { logger } from '@/lib/logger';
+import { slugify } from '@/lib/utils';
 
 export async function GET(req: NextRequest) {
   const auth = getCCAuthPayload(req);
@@ -51,9 +52,18 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Auto-generate slug from title if not provided
+    let slug = parsed.data.slug || slugify(parsed.data.title);
+    // Ensure slug is unique
+    const existingSlug = await prisma.newsArticle.findUnique({ where: { slug } });
+    if (existingSlug) {
+      slug = `${slug}-${Date.now().toString(36)}`;
+    }
+
     const article = await prisma.newsArticle.create({
       data: {
         ...parsed.data,
+        slug,
         publishedAt: parsed.data.isPublished ? (parsed.data.publishedAt ? new Date(parsed.data.publishedAt) : new Date()) : null,
         createdBy: auth.adminId,
       },

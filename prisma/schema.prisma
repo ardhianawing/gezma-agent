@@ -1089,6 +1089,7 @@ model ForumReply {
 model NewsArticle {
   id            String    @id @default(uuid())
   title         String
+  slug          String    @unique
   excerpt       String
   content       String
   category      String    // regulasi, pengumuman, event, tips, peringatan
@@ -1103,6 +1104,7 @@ model NewsArticle {
   isFeatured    Boolean   @default(false)
   isPublished   Boolean   @default(false)
   publishedAt   DateTime?
+  imageUrl      String?
 
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt

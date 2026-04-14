@@ -25,6 +25,7 @@ import {
   Trophy,
   Receipt,
   Plug,
+  Newspaper,
   LucideIcon,
   Bell,
 } from 'lucide-react';
@@ -88,6 +89,7 @@ const menuItems: MenuItem[] = [
   { label: 'PayLater', href: '/command-center/paylater', icon: CreditCard },
   { label: 'GezmaPay', href: '/command-center/gezmapay', icon: Wallet },
   { label: 'Forum', href: '/command-center/forum', icon: MessageSquare },
+  { label: 'Berita', href: '/command-center/news', icon: Newspaper },
   { label: 'Packages', href: '/command-center/packages', icon: Package },
   { label: 'Certificates', href: '/command-center/blockchain', icon: Shield },
   { label: 'Marketplace', href: '/command-center/marketplace', icon: ShoppingBag },
