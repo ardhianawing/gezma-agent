@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { forumThreads, forumCategories, forumStats } from '@/data/mock-forum';
 import { getAuthPayload, unauthorizedResponse } from '@/lib/auth-server';
+import { checkPermission } from '@/lib/auth-permissions';
+import { PERMISSIONS } from '@/lib/permissions';
+import { createForumThreadSchema } from '@/lib/validations/forum';
+import { rateLimit } from '@/lib/rate-limiter';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
 
@@ -153,5 +157,81 @@ export async function GET(req: NextRequest) {
       categories: forumCategories,
       stats: forumStats,
     });
+  }
+}
+
+export async function POST(req: NextRequest) {
+  const auth = getAuthPayload(req);
+  if (!auth) return unauthorizedResponse();
+
+  const denied = await checkPermission(auth, PERMISSIONS.FORUM_CREATE);
+  if (denied) return denied;
+
+  const { allowed } = rateLimit(req, { limit: 5, window: 60 });
+  if (!allowed) {
+    return NextResponse.json(
+      { error: 'Terlalu banyak permintaan, coba lagi nanti' },
+      { status: 429 }
+    );
+  }
+
+  try {
+    const body = await req.json();
+    const parsed = createForumThreadSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Validasi gagal', details: parsed.error.flatten().fieldErrors },
+        { status: 400 }
+      );
+    }
+
+    const [user, agency] = await Promise.all([
+      prisma.user.findUnique({
+        where: { id: auth.userId },
+        select: { name: true, avatarUrl: true, role: true },
+      }),
+      prisma.agency.findUnique({
+        where: { id: auth.agencyId },
+        select: { name: true },
+      }),
+    ]);
+
+    if (!user) return unauthorizedResponse();
+
+    const authorAvatar =
+      user.avatarUrl ||
+      user.name
+        .split(' ')
+        .map((n) => n[0])
+        .join('')
+        .substring(0, 2)
+        .toUpperCase();
+
+    const excerpt =
+      parsed.data.content.length > 200
+        ? parsed.data.content.substring(0, 200) + '...'
+        : parsed.data.content;
+
+    const thread = await prisma.forumThread.create({
+      data: {
+        title: parsed.data.title,
+        content: parsed.data.content,
+        excerpt,
+        category: parsed.data.category,
+        tags: parsed.data.tags,
+        authorId: auth.userId,
+        authorName: user.name,
+        authorAvatar,
+        agencyName: agency?.name || null,
+      },
+    });
+
+    return NextResponse.json({ ...thread, _source: 'db' }, { status: 201 });
+  } catch (error) {
+    logger.error('POST /api/forum error', { error: String(error) });
+    return NextResponse.json(
+      { error: 'Terjadi kesalahan server' },
+      { status: 500 }
+    );
   }
 }
