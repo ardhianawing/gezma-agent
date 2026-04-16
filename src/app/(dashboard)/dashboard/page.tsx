@@ -590,13 +590,24 @@ export default function DashboardPage() {
             fontSize: isMobile ? '18px' : '24px',
             fontWeight: '800',
             color: 'white',
-            margin: '0 0 12px 0',
+            margin: '0 0 4px 0',
             letterSpacing: '0.5px',
             textTransform: 'uppercase',
           }}
         >
           {t.dashboard.bannerTitle}
         </h2>
+        <p
+          style={{
+            fontSize: isMobile ? '11px' : '13px',
+            color: 'rgba(255, 255, 255, 0.7)',
+            margin: '0 0 12px 0',
+            fontWeight: '400',
+            fontStyle: 'italic',
+          }}
+        >
+          {t.dashboard.bannerSubtitle}
+        </p>
         <p
           style={{
             fontSize: isMobile ? '13px' : '15px',

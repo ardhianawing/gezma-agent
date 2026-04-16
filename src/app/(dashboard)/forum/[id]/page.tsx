@@ -32,6 +32,7 @@ interface ThreadData {
   viewCount: number;
   isPinned: boolean;
   isHot: boolean;
+  isLocked: boolean;
   isSolved: boolean;
   lastReplyBy?: string;
   lastReplyAt?: string;
@@ -63,6 +64,8 @@ export default function ForumDetailPage({ params }: { params: Promise<{ id: stri
   const [thread, setThread] = useState<ThreadData | null>(null);
   const [replies, setReplies] = useState<ThreadReply[]>([]);
   const [loading, setLoading] = useState(true);
+  const [submittingReply, setSubmittingReply] = useState(false);
+  const [replyError, setReplyError] = useState('');
 
   useEffect(() => {
     async function fetchThread() {
