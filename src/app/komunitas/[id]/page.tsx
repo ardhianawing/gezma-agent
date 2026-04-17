@@ -4,13 +4,13 @@ import { notFound } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import { forumThreads as mockThreads } from '@/data/mock-forum';
 
-const CATEGORIES: Record<string, { label: string; icon: string; color: string }> = {
-  review: { label: 'Review', icon: '⭐', color: '#D97706' },
-  regulasi: { label: 'Regulasi', icon: '📜', color: '#2563EB' },
-  operasional: { label: 'Operasional', icon: '⚙️', color: '#059669' },
-  sharing: { label: 'Sharing', icon: '💬', color: '#7C3AED' },
-  scam: { label: 'Scam Alert', icon: '🚨', color: '#DC2626' },
-  tanya: { label: 'Tanya Jawab', icon: '❓', color: '#0891B2' },
+const CATEGORIES: Record<string, { label: string; sub: string }> = {
+  review: { label: 'Review', sub: 'Reviews' },
+  regulasi: { label: 'Regulasi', sub: 'Regulation' },
+  operasional: { label: 'Operasional', sub: 'Operations' },
+  sharing: { label: 'Sharing', sub: 'Stories' },
+  scam: { label: 'Peringatan', sub: 'Scam Alert' },
+  tanya: { label: 'Tanya Jawab', sub: 'Q & A' },
 };
 
 type Props = { params: Promise<{ id: string }> };
@@ -86,7 +86,7 @@ async function getThread(id: string): Promise<ThreadDetail | null> {
       };
     }
   } catch {
-    // fall through to mock
+    // fall through
   }
 
   const mock = mockThreads.find((m) => m.id === id);
@@ -135,12 +135,16 @@ function formatDateTime(d: Date | string): string {
   return new Date(d).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 }
 
+function categoryInfo(key: string) {
+  return CATEGORIES[key] || { label: key, sub: '' };
+}
+
 export default async function KomunitasThreadPage({ params }: Props) {
   const { id } = await params;
   const thread = await getThread(id);
   if (!thread) notFound();
 
-  const catInfo = CATEGORIES[thread.category] || { label: thread.category, icon: '📋', color: '#6B7280' };
+  const cat = categoryInfo(thread.category);
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -161,199 +165,364 @@ export default async function KomunitasThreadPage({ params }: Props) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+
+      <article style={{ maxWidth: '780px', margin: '0 auto' }}>
+        {/* Back */}
         <Link href="/komunitas" style={{
-          textDecoration: 'none',
-          fontSize: 13,
-          color: '#6B7280',
           display: 'inline-flex',
           alignItems: 'center',
-          gap: 6,
+          gap: 10,
+          fontSize: 12,
+          fontWeight: 600,
+          letterSpacing: '0.16em',
+          textTransform: 'uppercase',
+          color: '#5C5346',
+          textDecoration: 'none',
+          marginBottom: 40,
         }}>
-          ← Kembali ke Forum
+          <span style={{ width: 24, height: 1, backgroundColor: '#BF9D63' }} />
+          Kembali ke Forum
         </Link>
 
-        {/* Thread card */}
+        {/* Category kicker */}
         <div style={{
-          backgroundColor: '#FFFFFF',
-          borderRadius: 12,
-          border: '1px solid #E5E7EB',
-          overflow: 'hidden',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 14,
+          marginBottom: 18,
+          flexWrap: 'wrap',
         }}>
-          <div style={{ padding: '24px', borderBottom: '1px solid #F3F4F6' }}>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 10 }}>
-              {thread.isPinned && (
-                <span style={{ fontSize: 11, fontWeight: 600, padding: '3px 8px', borderRadius: 4, backgroundColor: '#FEF3C7', color: '#92400E' }}>📌 Pinned</span>
-              )}
-              {thread.isSolved && (
-                <span style={{ fontSize: 11, fontWeight: 600, padding: '3px 8px', borderRadius: 4, backgroundColor: '#D1FAE5', color: '#065F46' }}>✅ Solved</span>
-              )}
-              <span style={{
-                fontSize: 11,
-                fontWeight: 600,
-                padding: '3px 10px',
-                borderRadius: 4,
-                backgroundColor: `${catInfo.color}18`,
-                color: catInfo.color,
-              }}>
-                {catInfo.icon} {catInfo.label}
+          <span style={{
+            fontSize: 11,
+            fontWeight: 700,
+            letterSpacing: '0.24em',
+            textTransform: 'uppercase',
+            color: '#0B5D4E',
+          }}>
+            {cat.label}
+          </span>
+          {cat.sub && (
+            <span style={{
+              fontFamily: 'var(--font-display), Georgia, serif',
+              fontStyle: 'italic',
+              fontSize: 14,
+              color: '#BF9D63',
+            }}>
+              {cat.sub}
+            </span>
+          )}
+          {thread.isPinned && (
+            <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.24em', textTransform: 'uppercase', color: '#BF9D63' }}>
+              · Pinned
+            </span>
+          )}
+          {thread.isSolved && (
+            <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.24em', textTransform: 'uppercase', color: '#0B5D4E' }}>
+              · Solved
+            </span>
+          )}
+          {thread.isHot && (
+            <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.24em', textTransform: 'uppercase', color: '#A83232' }}>
+              · Hot
+            </span>
+          )}
+        </div>
+
+        {/* Title */}
+        <h1 style={{
+          fontFamily: 'var(--font-display), Georgia, serif',
+          fontSize: 'clamp(34px, 5.5vw, 56px)',
+          fontWeight: 500,
+          lineHeight: 1.05,
+          letterSpacing: '-0.025em',
+          color: '#1A1814',
+          margin: '0 0 28px',
+        }}>
+          {thread.title}
+        </h1>
+
+        {/* Byline */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 14,
+          paddingBottom: 24,
+          borderBottom: '1px solid rgba(26, 24, 20, 0.12)',
+          marginBottom: 40,
+          flexWrap: 'wrap',
+        }}>
+          <span style={{
+            width: 48,
+            height: 48,
+            borderRadius: '50%',
+            backgroundColor: '#0B5D4E',
+            color: '#FAF6EE',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: 14,
+            fontWeight: 700,
+          }}>
+            {thread.authorAvatar || thread.authorName.substring(0, 2).toUpperCase()}
+          </span>
+          <div style={{ flex: '1 1 auto', minWidth: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+              <span style={{ fontSize: 15, fontWeight: 600, color: '#1A1814', letterSpacing: '-0.01em' }}>
+                {thread.authorName}
               </span>
-            </div>
-
-            <h1 style={{ fontSize: 24, fontWeight: 800, color: '#111827', margin: '0 0 14px 0', lineHeight: 1.3 }}>
-              {thread.title}
-            </h1>
-
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-              <div style={{
-                width: 36,
-                height: 36,
-                borderRadius: '50%',
-                backgroundColor: '#F60000',
-                color: '#FFFFFF',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: 12,
-                fontWeight: 700,
-              }}>
-                {thread.authorAvatar || thread.authorName.substring(0, 2).toUpperCase()}
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: 14, fontWeight: 600, color: '#111827' }}>{thread.authorName}</span>
-                  {thread.authorBadge && (
-                    <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 6px', borderRadius: 4, backgroundColor: '#2563EB18', color: '#2563EB' }}>
-                      {thread.authorBadge}
-                    </span>
-                  )}
-                  {thread.agencyName && (
-                    <span style={{ fontSize: 11, color: '#6B7280' }}>· {thread.agencyName}</span>
-                  )}
-                </div>
-                <span style={{ fontSize: 12, color: '#6B7280' }}>
-                  {formatDate(thread.createdAt)} · {thread.viewCount.toLocaleString('id-ID')} views · {thread.replyCount} balasan
+              {thread.authorBadge && (
+                <span style={{
+                  fontSize: 10,
+                  fontWeight: 700,
+                  letterSpacing: '0.18em',
+                  textTransform: 'uppercase',
+                  color: '#BF9D63',
+                }}>
+                  {thread.authorBadge}
                 </span>
-              </div>
+              )}
+              {thread.agencyName && (
+                <span style={{ fontSize: 12, color: '#5C5346' }}>· {thread.agencyName}</span>
+              )}
             </div>
-          </div>
-
-          <div style={{ padding: '24px' }}>
-            <div style={{ fontSize: 15, lineHeight: 1.8, color: '#374151', whiteSpace: 'pre-line' }}>
-              {thread.content}
+            <div style={{ fontSize: 12, color: '#5C5346', marginTop: 4 }}>
+              {formatDate(thread.createdAt)} · {thread.viewCount.toLocaleString('id-ID')} lihat · {thread.replyCount.toLocaleString('id-ID')} balasan
             </div>
-            {thread.tags.length > 0 && (
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 20, paddingTop: 16, borderTop: '1px solid #F3F4F6' }}>
-                {thread.tags.map((tag) => (
-                  <span key={tag} style={{ fontSize: 12, padding: '3px 10px', borderRadius: 6, backgroundColor: '#F3F4F6', color: '#6B7280' }}>
-                    #{tag}
-                  </span>
-                ))}
-              </div>
-            )}
           </div>
         </div>
 
-        {/* Replies */}
-        <h2 style={{ fontSize: 17, fontWeight: 700, color: '#111827', margin: '8px 0 0 0' }}>
-          Balasan ({thread.replies.length})
-        </h2>
+        {/* Content */}
+        <div style={{
+          fontSize: 17,
+          lineHeight: 1.75,
+          color: '#2A251E',
+          whiteSpace: 'pre-line',
+          letterSpacing: '-0.005em',
+        }}>
+          {thread.content}
+        </div>
 
-        {thread.replies.length === 0 ? (
+        {/* Tags */}
+        {thread.tags.length > 0 && (
           <div style={{
-            backgroundColor: '#FFFFFF',
-            borderRadius: 12,
-            border: '1px dashed #E5E7EB',
-            padding: '32px 20px',
-            textAlign: 'center',
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: 10,
+            marginTop: 40,
+            paddingTop: 24,
+            borderTop: '1px solid rgba(26, 24, 20, 0.12)',
           }}>
-            <p style={{ fontSize: 14, color: '#6B7280', margin: 0 }}>Belum ada balasan. Jadi yang pertama!</p>
-          </div>
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {thread.replies.map((reply) => (
-              <div key={reply.id} style={{
+            {thread.tags.map((tag) => (
+              <span key={tag} style={{
+                fontSize: 11,
+                fontWeight: 600,
+                letterSpacing: '0.1em',
+                textTransform: 'uppercase',
+                color: '#5C5346',
+                padding: '6px 12px',
+                border: '1px solid rgba(26, 24, 20, 0.16)',
                 backgroundColor: '#FFFFFF',
-                borderRadius: 12,
-                border: '1px solid #E5E7EB',
-                padding: '16px 20px',
               }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
-                  <div style={{
-                    width: 32,
-                    height: 32,
-                    borderRadius: '50%',
-                    backgroundColor: '#F60000',
-                    color: '#FFFFFF',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: 11,
-                    fontWeight: 700,
-                    flexShrink: 0,
-                  }}>
-                    {reply.authorAvatar || reply.authorName.substring(0, 2).toUpperCase()}
-                  </div>
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-                      <span style={{ fontSize: 13, fontWeight: 600, color: '#111827' }}>{reply.authorName}</span>
-                      {reply.authorBadge && (
-                        <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 6px', borderRadius: 4, backgroundColor: '#2563EB18', color: '#2563EB' }}>
-                          {reply.authorBadge}
-                        </span>
-                      )}
-                    </div>
-                    <span style={{ fontSize: 11, color: '#6B7280' }}>{formatDateTime(reply.createdAt)}</span>
-                  </div>
-                </div>
-                <p style={{ fontSize: 14, lineHeight: 1.7, color: '#374151', margin: 0, whiteSpace: 'pre-line' }}>
-                  {reply.content}
-                </p>
-              </div>
+                #{tag}
+              </span>
             ))}
           </div>
         )}
 
-        {/* Login CTA for reply */}
+        {/* Ornamental divider */}
+        <div aria-hidden style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 24,
+          margin: '64px 0 48px',
+        }}>
+          <div style={{ flex: 1, height: 1, backgroundColor: 'rgba(26, 24, 20, 0.12)' }} />
+          <span style={{ fontSize: 20, color: '#BF9D63', fontWeight: 700 }}>۞</span>
+          <div style={{ flex: 1, height: 1, backgroundColor: 'rgba(26, 24, 20, 0.12)' }} />
+        </div>
+
+        {/* Replies header */}
         <div style={{
+          display: 'flex',
+          alignItems: 'baseline',
+          justifyContent: 'space-between',
+          gap: 16,
+          marginBottom: 28,
+          flexWrap: 'wrap',
+        }}>
+          <h2 style={{
+            fontFamily: 'var(--font-display), Georgia, serif',
+            fontSize: 28,
+            fontWeight: 500,
+            letterSpacing: '-0.02em',
+            color: '#1A1814',
+            margin: 0,
+          }}>
+            Balasan <em style={{ fontStyle: 'italic', color: '#BF9D63' }}>({thread.replies.length})</em>
+          </h2>
+          <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#5C5346' }}>
+            Urut dari terlama
+          </span>
+        </div>
+
+        {/* Replies list */}
+        {thread.replies.length === 0 ? (
+          <div style={{
+            padding: '48px 24px',
+            textAlign: 'center',
+            border: '1px dashed rgba(26, 24, 20, 0.2)',
+            marginBottom: 40,
+          }}>
+            <p style={{
+              fontFamily: 'var(--font-display), Georgia, serif',
+              fontStyle: 'italic',
+              fontSize: 19,
+              color: '#5C5346',
+              margin: 0,
+            }}>
+              Belum ada balasan — jadi yang pertama memberi pendapat.
+            </p>
+          </div>
+        ) : (
+          <ol style={{ listStyle: 'none', margin: '0 0 40px', padding: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {thread.replies.map((reply, idx) => (
+              <li key={reply.id} style={{
+                display: 'grid',
+                gridTemplateColumns: 'auto 1fr',
+                columnGap: 20,
+                padding: '22px 0',
+                borderBottom: '1px solid rgba(26, 24, 20, 0.08)',
+              }}>
+                <div style={{
+                  fontFamily: 'var(--font-display), Georgia, serif',
+                  fontStyle: 'italic',
+                  fontSize: 18,
+                  fontWeight: 500,
+                  color: '#BF9D63',
+                  lineHeight: 1.1,
+                  minWidth: 30,
+                }}>
+                  #{String(idx + 1).padStart(2, '0')}
+                </div>
+                <div style={{ minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10, flexWrap: 'wrap' }}>
+                    <span style={{
+                      width: 28,
+                      height: 28,
+                      borderRadius: '50%',
+                      backgroundColor: '#0B5D4E',
+                      color: '#FAF6EE',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: 10,
+                      fontWeight: 700,
+                    }}>
+                      {reply.authorAvatar || reply.authorName.substring(0, 2).toUpperCase()}
+                    </span>
+                    <span style={{ fontSize: 14, fontWeight: 600, color: '#1A1814' }}>{reply.authorName}</span>
+                    {reply.authorBadge && (
+                      <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#BF9D63' }}>
+                        {reply.authorBadge}
+                      </span>
+                    )}
+                    <span style={{ fontSize: 11, color: '#9C9382' }}>· {formatDateTime(reply.createdAt)}</span>
+                  </div>
+                  <p style={{
+                    fontSize: 15,
+                    lineHeight: 1.7,
+                    color: '#2A251E',
+                    margin: 0,
+                    whiteSpace: 'pre-line',
+                  }}>
+                    {reply.content}
+                  </p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        )}
+
+        {/* Reply CTA */}
+        <div style={{
+          padding: '36px 32px',
           backgroundColor: '#FFFFFF',
-          borderRadius: 12,
-          border: '1px solid #E5E7EB',
-          padding: '20px 24px',
-          textAlign: 'center',
+          borderLeft: '3px solid #BF9D63',
+          textAlign: 'left',
+          boxShadow: '0 1px 2px rgba(26, 24, 20, 0.04), 0 20px 40px -20px rgba(26, 24, 20, 0.08)',
         }}>
           {thread.isLocked ? (
-            <p style={{ fontSize: 14, color: '#6B7280', margin: 0 }}>🔒 Thread ini sudah dikunci. Tidak bisa membalas.</p>
+            <>
+              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.24em', textTransform: 'uppercase', color: '#A83232', marginBottom: 8 }}>
+                Dikunci
+              </div>
+              <p style={{
+                fontFamily: 'var(--font-display), Georgia, serif',
+                fontStyle: 'italic',
+                fontSize: 20,
+                color: '#5C5346',
+                margin: 0,
+              }}>
+                Thread ini telah dikunci oleh moderator. Tidak ada balasan baru yang bisa dikirim.
+              </p>
+            </>
           ) : (
             <>
-              <p style={{ fontSize: 14, color: '#374151', margin: '0 0 12px 0' }}>
-                Ingin ikut diskusi? Login dulu buat posting balasan.
+              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.24em', textTransform: 'uppercase', color: '#BF9D63', marginBottom: 10 }}>
+                Ikut Diskusi
+              </div>
+              <p style={{
+                fontFamily: 'var(--font-display), Georgia, serif',
+                fontSize: 22,
+                fontWeight: 400,
+                lineHeight: 1.3,
+                color: '#1A1814',
+                margin: '0 0 20px',
+                letterSpacing: '-0.015em',
+              }}>
+                Punya pengalaman atau pertanyaan serupa?{' '}
+                <em style={{ fontStyle: 'italic', color: '#0B5D4E', fontWeight: 500 }}>
+                  Login untuk berbalasan.
+                </em>
               </p>
-              <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
                 <Link href={`/login?redirect=/forum/${thread.id}`} style={{
-                  padding: '10px 20px',
-                  backgroundColor: '#F60000',
-                  color: '#FFFFFF',
-                  borderRadius: 8,
-                  fontSize: 14,
-                  fontWeight: 600,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  padding: '12px 26px',
+                  backgroundColor: '#0B5D4E',
+                  color: '#FAF6EE',
+                  fontSize: 12,
+                  fontWeight: 700,
+                  letterSpacing: '0.1em',
+                  textTransform: 'uppercase',
                   textDecoration: 'none',
-                }}>Masuk</Link>
+                  borderBottom: '3px solid #08443A',
+                }}>
+                  Masuk
+                </Link>
                 <Link href="/register" style={{
-                  padding: '10px 20px',
-                  backgroundColor: '#FFFFFF',
-                  color: '#F60000',
-                  border: '1px solid #F60000',
-                  borderRadius: 8,
-                  fontSize: 14,
-                  fontWeight: 600,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  padding: '12px 26px',
+                  backgroundColor: 'transparent',
+                  color: '#0B5D4E',
+                  fontSize: 12,
+                  fontWeight: 700,
+                  letterSpacing: '0.1em',
+                  textTransform: 'uppercase',
                   textDecoration: 'none',
-                }}>Daftar</Link>
+                  border: '1px solid rgba(11, 93, 78, 0.3)',
+                }}>
+                  Daftar Gratis
+                </Link>
               </div>
             </>
           )}
         </div>
-      </div>
+      </article>
     </>
   );
 }
