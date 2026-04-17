@@ -4,13 +4,13 @@ import { prisma } from '@/lib/prisma';
 import { forumThreads as mockThreads } from '@/data/mock-forum';
 
 const CATEGORIES = [
-  { key: 'all', label: 'Semua', sub: 'All' },
-  { key: 'review', label: 'Review', sub: 'Reviews' },
-  { key: 'regulasi', label: 'Regulasi', sub: 'Regulation' },
-  { key: 'operasional', label: 'Operasional', sub: 'Operations' },
-  { key: 'sharing', label: 'Sharing', sub: 'Stories' },
-  { key: 'scam', label: 'Peringatan', sub: 'Scam Alert' },
-  { key: 'tanya', label: 'Tanya Jawab', sub: 'Q & A' },
+  { key: 'all', label: 'Semua' },
+  { key: 'review', label: 'Review' },
+  { key: 'regulasi', label: 'Regulasi' },
+  { key: 'operasional', label: 'Operasional' },
+  { key: 'sharing', label: 'Sharing' },
+  { key: 'scam', label: 'Peringatan' },
+  { key: 'tanya', label: 'Tanya Jawab' },
 ];
 
 type Props = {
@@ -22,8 +22,8 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   const cat = CATEGORIES.find((c) => c.key === params.category);
   if (cat && cat.key !== 'all') {
     return {
-      title: `${cat.label} · Forum Komunitas`,
-      description: `Diskusi ${cat.label.toLowerCase()} seputar umrah, haji, dan industri travel ibadah di komunitas GEZMA.`,
+      title: `${cat.label} · Komunitas GEZMA`,
+      description: `Diskusi ${cat.label.toLowerCase()} seputar umrah, haji, dan industri travel ibadah.`,
     };
   }
   return {};
@@ -109,16 +109,27 @@ function timeAgo(date: Date | string | null | undefined): string {
   const diffMin = Math.floor(diffMs / 60000);
   const diffHour = Math.floor(diffMs / 3600000);
   const diffDay = Math.floor(diffMs / 86400000);
-  if (diffMin < 1) return 'baru saja';
-  if (diffMin < 60) return `${diffMin} menit`;
-  if (diffHour < 24) return `${diffHour} jam`;
-  if (diffDay < 7) return `${diffDay} hari`;
-  if (diffDay < 30) return `${Math.floor(diffDay / 7)} minggu`;
-  return `${Math.floor(diffDay / 30)} bulan`;
+  if (diffMin < 1) return 'baru';
+  if (diffMin < 60) return `${diffMin}m`;
+  if (diffHour < 24) return `${diffHour}j`;
+  if (diffDay < 7) return `${diffDay}h`;
+  if (diffDay < 30) return `${Math.floor(diffDay / 7)}mg`;
+  return `${Math.floor(diffDay / 30)}bl`;
 }
 
-function categoryLabel(key: string): string {
-  return CATEGORIES.find((c) => c.key === key)?.label || key;
+function formatNumber(n: number): string {
+  if (n >= 1000000) return `${(n / 1000000).toFixed(1)}jt`;
+  if (n >= 1000) return `${(n / 1000).toFixed(1)}rb`;
+  return n.toString();
+}
+
+function avatarColor(seed: string): string {
+  const colors = ['#0A0A0A', '#1F2937', '#374151', '#4B5563', '#6B7280'];
+  let hash = 0;
+  for (let i = 0; i < seed.length; i++) {
+    hash = seed.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return colors[Math.abs(hash) % colors.length];
 }
 
 export default async function KomunitasPage({ searchParams }: Props) {
@@ -127,93 +138,23 @@ export default async function KomunitasPage({ searchParams }: Props) {
   const page = parseInt(params.page || '1', 10);
   const { threads, total } = await getThreads(category, page);
   const totalPages = Math.max(1, Math.min(Math.ceil(total / 20), 10));
-  const featured = threads[0];
-  const rest = threads.slice(1);
 
   return (
     <>
-      {/* Hero */}
-      <section style={{
-        display: 'grid',
-        gridTemplateColumns: 'minmax(0, 1fr)',
-        gap: 24,
-        padding: '20px 0 32px',
-        position: 'relative',
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, color: '#BF9D63' }}>
-          <div style={{ width: 32, height: 1, backgroundColor: '#BF9D63' }} />
-          <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.28em', textTransform: 'uppercase' }}>
-            Ruang Diskusi
-          </span>
-        </div>
-
-        <h1 style={{
-          fontFamily: 'var(--font-display), Georgia, serif',
-          fontSize: 'clamp(42px, 7vw, 84px)',
-          fontWeight: 400,
-          lineHeight: 0.95,
-          letterSpacing: '-0.035em',
-          color: '#1A1814',
-          margin: 0,
-          maxWidth: '980px',
-        }}>
-          Tempat jemaah & agen{' '}
-          <em style={{ fontStyle: 'italic', color: '#0B5D4E', fontWeight: 500 }}>
-            saling berbagi kisah
-          </em>{' '}
-          sebelum berangkat ke Tanah Suci.
-        </h1>
-
-        <p style={{
-          fontSize: 16,
-          lineHeight: 1.65,
-          color: '#5C5346',
-          maxWidth: '620px',
-          margin: '8px 0 0',
-          fontWeight: 400,
-        }}>
-          Baca tanpa login. Diskusi regulasi terbaru, review hotel & maktab, cerita perjalanan, tanya jawab, dan peringatan penting — semuanya dari komunitas jemaah & agen travel tepercaya.
-        </p>
-
-        {/* Meta bar */}
-        <div style={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          gap: 32,
-          marginTop: 8,
-          paddingTop: 20,
-          borderTop: '1px solid rgba(26, 24, 20, 0.12)',
-          fontSize: 12,
-          color: '#5C5346',
-          fontWeight: 500,
-          letterSpacing: '0.02em',
-        }}>
-          <span>
-            <span style={{ fontFamily: 'var(--font-display), Georgia, serif', fontSize: 22, fontWeight: 700, color: '#0B5D4E' }}>
-              {total.toLocaleString('id-ID')}
-            </span>{' '}
-            thread aktif
-          </span>
-          <span>
-            <span style={{ fontFamily: 'var(--font-display), Georgia, serif', fontSize: 22, fontWeight: 700, color: '#0B5D4E' }}>
-              6
-            </span>{' '}
-            kategori
-          </span>
-          <span style={{ marginLeft: 'auto', textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 11 }}>
-            Diperbarui setiap hari
-          </span>
-        </div>
-      </section>
-
-      {/* Category navigation — editorial tab bar */}
-      <nav style={{
+      {/* Category tabs — sticky below header */}
+      <div style={{
         display: 'flex',
-        gap: 36,
+        gap: 0,
         overflowX: 'auto',
-        padding: '4px 0 20px',
-        borderBottom: '1px solid rgba(26, 24, 20, 0.12)',
-        marginBottom: 32,
+        borderBottom: '0.5px solid #E5E5E5',
+        marginBottom: 0,
+        paddingTop: 4,
+        position: 'sticky',
+        top: 56,
+        backgroundColor: 'rgba(255, 255, 255, 0.92)',
+        backdropFilter: 'saturate(180%) blur(20px)',
+        WebkitBackdropFilter: 'saturate(180%) blur(20px)',
+        zIndex: 40,
         WebkitOverflowScrolling: 'touch',
       }}>
         {CATEGORIES.map((cat) => {
@@ -224,315 +165,196 @@ export default async function KomunitasPage({ searchParams }: Props) {
               href={cat.key === 'all' ? '/komunitas' : `/komunitas?category=${cat.key}`}
               style={{
                 textDecoration: 'none',
-                padding: '6px 0',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 2,
+                padding: '14px 16px',
+                fontSize: 14,
+                fontWeight: active ? 600 : 500,
+                color: active ? '#0A0A0A' : '#737373',
+                whiteSpace: 'nowrap',
                 flexShrink: 0,
+                borderBottom: active ? '2px solid #0A0A0A' : '2px solid transparent',
                 position: 'relative',
+                marginBottom: -0.5,
               }}
             >
-              <span style={{
-                fontSize: 15,
-                fontWeight: active ? 700 : 500,
-                color: active ? '#0B5D4E' : '#1A1814',
-                letterSpacing: '-0.01em',
-              }}>
-                {cat.label}
-              </span>
-              <span style={{
-                fontSize: 10,
-                fontWeight: 600,
-                letterSpacing: '0.2em',
-                textTransform: 'uppercase',
-                color: active ? '#BF9D63' : '#9C9382',
-              }}>
-                {cat.sub}
-              </span>
-              {active && (
-                <span style={{
-                  position: 'absolute',
-                  bottom: -20,
-                  left: 0,
-                  right: 0,
-                  height: 2,
-                  backgroundColor: '#0B5D4E',
-                }} />
-              )}
+              {cat.label}
             </Link>
           );
         })}
-      </nav>
+      </div>
 
-      {/* Content */}
+      {/* Feed */}
       {threads.length === 0 ? (
         <div style={{
-          padding: '80px 24px',
+          padding: '80px 20px',
           textAlign: 'center',
-          border: '1px dashed rgba(26, 24, 20, 0.18)',
-          borderRadius: 0,
+          color: '#737373',
+          fontSize: 15,
         }}>
-          <p style={{ fontFamily: 'var(--font-display), Georgia, serif', fontStyle: 'italic', fontSize: 22, color: '#5C5346', margin: 0 }}>
-            Belum ada thread di kategori ini.
-          </p>
+          Belum ada thread di kategori ini.
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 48 }}>
-          {/* Featured thread — editorial hero card */}
-          {featured && (
-            <Link
-              href={`/komunitas/${featured.id}`}
-              style={{
-                display: 'grid',
-                gridTemplateColumns: '1fr',
-                gap: 24,
-                padding: '36px 32px',
-                backgroundColor: '#FFFFFF',
-                borderLeft: '3px solid #BF9D63',
-                textDecoration: 'none',
-                color: 'inherit',
-                boxShadow: '0 1px 2px rgba(26, 24, 20, 0.04), 0 20px 40px -20px rgba(26, 24, 20, 0.08)',
-                position: 'relative',
-              }}
-            >
-              <div style={{
-                position: 'absolute',
-                top: 20,
-                right: 24,
-                fontSize: 10,
-                fontWeight: 700,
-                letterSpacing: '0.24em',
-                textTransform: 'uppercase',
-                color: '#BF9D63',
-              }}>
-                {featured.isPinned ? 'Dipilih · Pinned' : 'Terbaru'}
-              </div>
-
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#0B5D4E', fontSize: 11, fontWeight: 700, letterSpacing: '0.22em', textTransform: 'uppercase' }}>
-                <span style={{ width: 20, height: 1, backgroundColor: '#0B5D4E' }} />
-                <span>{categoryLabel(featured.category)}</span>
-                {featured.isHot && <span style={{ color: '#A83232' }}>· Hot</span>}
-                {featured.isSolved && <span style={{ color: '#0B5D4E' }}>· Solved</span>}
-              </div>
-
-              <h2 style={{
-                fontFamily: 'var(--font-display), Georgia, serif',
-                fontSize: 'clamp(28px, 4vw, 42px)',
-                fontWeight: 500,
-                lineHeight: 1.1,
-                letterSpacing: '-0.02em',
-                color: '#1A1814',
-                margin: 0,
-              }}>
-                {featured.title}
-              </h2>
-
-              {(featured.excerpt || featured.content) && (
-                <p style={{
-                  fontSize: 16,
-                  lineHeight: 1.7,
-                  color: '#5C5346',
-                  margin: 0,
-                  maxWidth: '760px',
-                  overflow: 'hidden',
-                  display: '-webkit-box',
-                  WebkitLineClamp: 3,
-                  WebkitBoxOrient: 'vertical',
-                }}>
-                  {featured.excerpt || featured.content}
-                </p>
-              )}
-
-              <div style={{
-                display: 'flex',
-                flexWrap: 'wrap',
-                alignItems: 'center',
-                gap: 18,
-                paddingTop: 8,
-                borderTop: '1px solid rgba(26, 24, 20, 0.08)',
-                fontSize: 12,
-                color: '#5C5346',
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <span style={{
-                    width: 34,
-                    height: 34,
+        <div>
+          {threads.map((thread) => {
+            const catLabel = CATEGORIES.find((c) => c.key === thread.category)?.label || thread.category;
+            const preview = thread.excerpt || thread.content || '';
+            return (
+              <Link
+                key={thread.id}
+                href={`/komunitas/${thread.id}`}
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '48px 1fr',
+                  columnGap: 12,
+                  padding: '16px 0',
+                  borderBottom: '0.5px solid #E5E5E5',
+                  textDecoration: 'none',
+                  color: 'inherit',
+                }}
+              >
+                {/* Avatar */}
+                <div style={{ paddingTop: 2 }}>
+                  <div style={{
+                    width: 40,
+                    height: 40,
                     borderRadius: '50%',
-                    backgroundColor: '#0B5D4E',
-                    color: '#FAF6EE',
+                    backgroundColor: avatarColor(thread.authorName),
+                    color: '#FFFFFF',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    fontSize: 11,
-                    fontWeight: 700,
-                    letterSpacing: '0.02em',
+                    fontSize: 14,
+                    fontWeight: 600,
+                    letterSpacing: '-0.01em',
                   }}>
-                    {featured.authorAvatar || featured.authorName.substring(0, 2).toUpperCase()}
-                  </span>
-                  <div>
-                    <div style={{ fontWeight: 600, color: '#1A1814' }}>{featured.authorName}</div>
-                    {featured.authorBadge && (
-                      <div style={{ fontSize: 10, color: '#BF9D63', fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', marginTop: 2 }}>
-                        {featured.authorBadge}
-                      </div>
-                    )}
+                    {(thread.authorAvatar || thread.authorName.substring(0, 2)).toUpperCase()}
                   </div>
                 </div>
-                <span style={{ color: '#BF9D63' }}>۞</span>
-                <span>{featured.replyCount.toLocaleString('id-ID')} balasan</span>
-                <span>·</span>
-                <span>{featured.viewCount.toLocaleString('id-ID')} lihat</span>
-                <span>·</span>
-                <span>{timeAgo(featured.lastReplyAt || featured.createdAt)} lalu</span>
-              </div>
-            </Link>
-          )}
 
-          {/* List — editorial numbered rows */}
-          {rest.length > 0 && (
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 14,
-                marginBottom: 24,
-              }}>
-                <span style={{
-                  fontFamily: 'var(--font-display), Georgia, serif',
-                  fontSize: 13,
-                  fontWeight: 700,
-                  letterSpacing: '0.18em',
-                  textTransform: 'uppercase',
-                  color: '#0B5D4E',
-                }}>
-                  Semua Diskusi
-                </span>
-                <div style={{ flex: 1, height: 1, backgroundColor: 'rgba(26, 24, 20, 0.12)' }} />
-              </div>
+                {/* Content */}
+                <div style={{ minWidth: 0 }}>
+                  {/* Header row */}
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    fontSize: 14,
+                    marginBottom: 4,
+                    flexWrap: 'wrap',
+                  }}>
+                    <span style={{ fontWeight: 600, color: '#0A0A0A' }}>{thread.authorName}</span>
+                    {thread.authorBadge && (
+                      <span title={thread.authorBadge} style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: 14,
+                        height: 14,
+                        borderRadius: '50%',
+                        backgroundColor: '#0A0A0A',
+                        color: '#FFFFFF',
+                        fontSize: 9,
+                        fontWeight: 700,
+                      }}>✓</span>
+                    )}
+                    <span style={{ color: '#A3A3A3' }}>·</span>
+                    <span style={{ color: '#737373' }}>{timeAgo(thread.lastReplyAt || thread.createdAt)}</span>
+                    {thread.isPinned && (
+                      <>
+                        <span style={{ color: '#A3A3A3' }}>·</span>
+                        <span style={{ color: '#737373', fontSize: 12 }}>📌 Pinned</span>
+                      </>
+                    )}
+                  </div>
 
-              <ol style={{
-                margin: 0,
-                padding: 0,
-                listStyle: 'none',
-                display: 'flex',
-                flexDirection: 'column',
-              }}>
-                {rest.map((thread, idx) => (
-                  <li key={thread.id}>
-                    <Link
-                      href={`/komunitas/${thread.id}`}
-                      style={{
-                        display: 'grid',
-                        gridTemplateColumns: 'auto 1fr auto',
-                        columnGap: 24,
-                        rowGap: 6,
-                        padding: '22px 0',
-                        borderBottom: '1px solid rgba(26, 24, 20, 0.08)',
-                        textDecoration: 'none',
-                        color: 'inherit',
-                        alignItems: 'start',
-                      }}
-                    >
-                      <span style={{
-                        fontFamily: 'var(--font-display), Georgia, serif',
-                        fontStyle: 'italic',
-                        fontSize: 22,
-                        fontWeight: 500,
-                        color: '#BF9D63',
-                        minWidth: 34,
-                        lineHeight: 1.1,
-                      }}>
-                        {String(idx + 2).padStart(2, '0')}
-                      </span>
+                  {/* Category + flags */}
+                  <div style={{ display: 'flex', gap: 6, marginBottom: 6, flexWrap: 'wrap' }}>
+                    <span style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      padding: '2px 8px',
+                      fontSize: 11,
+                      fontWeight: 600,
+                      color: '#0A0A0A',
+                      backgroundColor: '#F4F4F4',
+                      borderRadius: 999,
+                    }}>
+                      {catLabel}
+                    </span>
+                    {thread.isHot && (
+                      <span style={{ fontSize: 11, fontWeight: 600, color: '#D4183D' }}>🔥 Hot</span>
+                    )}
+                    {thread.isSolved && (
+                      <span style={{ fontSize: 11, fontWeight: 600, color: '#047857' }}>✓ Solved</span>
+                    )}
+                  </div>
 
-                      <div style={{ minWidth: 0 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4, flexWrap: 'wrap' }}>
-                          <span style={{
-                            fontSize: 10,
-                            fontWeight: 700,
-                            letterSpacing: '0.2em',
-                            textTransform: 'uppercase',
-                            color: '#0B5D4E',
-                          }}>
-                            {categoryLabel(thread.category)}
-                          </span>
-                          {thread.isPinned && (
-                            <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#BF9D63' }}>
-                              · Pinned
-                            </span>
-                          )}
-                          {thread.isSolved && (
-                            <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#0B5D4E' }}>
-                              · Solved
-                            </span>
-                          )}
-                          {thread.isHot && (
-                            <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#A83232' }}>
-                              · Hot
-                            </span>
-                          )}
-                        </div>
-                        <h3 style={{
-                          fontFamily: 'var(--font-display), Georgia, serif',
-                          fontSize: 22,
-                          fontWeight: 500,
-                          lineHeight: 1.2,
-                          letterSpacing: '-0.015em',
-                          color: '#1A1814',
-                          margin: '0 0 8px',
-                          overflow: 'hidden',
-                          display: '-webkit-box',
-                          WebkitLineClamp: 2,
-                          WebkitBoxOrient: 'vertical',
-                        }}>
-                          {thread.title}
-                        </h3>
-                        <div style={{
-                          fontSize: 12,
-                          color: '#5C5346',
-                          display: 'flex',
-                          flexWrap: 'wrap',
-                          gap: 10,
-                          alignItems: 'center',
-                        }}>
-                          <span style={{ fontWeight: 600, color: '#1A1814' }}>{thread.authorName}</span>
-                          {thread.authorBadge && (
-                            <span style={{ fontSize: 10, color: '#BF9D63', fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
-                              · {thread.authorBadge}
-                            </span>
-                          )}
-                          <span>·</span>
-                          <span>{timeAgo(thread.lastReplyAt || thread.createdAt)} lalu</span>
-                        </div>
-                      </div>
+                  {/* Title */}
+                  <div style={{
+                    fontSize: 15,
+                    fontWeight: 600,
+                    lineHeight: 1.35,
+                    color: '#0A0A0A',
+                    marginBottom: preview ? 4 : 8,
+                    letterSpacing: '-0.01em',
+                    overflow: 'hidden',
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical',
+                  }}>
+                    {thread.title}
+                  </div>
 
-                      <div style={{
-                        textAlign: 'right',
-                        fontSize: 12,
-                        color: '#5C5346',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: 4,
-                        minWidth: 90,
-                      }}>
-                        <div>
-                          <span style={{ fontFamily: 'var(--font-display), Georgia, serif', fontSize: 20, fontWeight: 700, color: '#0B5D4E' }}>
-                            {thread.replyCount.toLocaleString('id-ID')}
-                          </span>
-                          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#9C9382' }}>
-                            Balasan
-                          </div>
-                        </div>
-                        <div style={{ fontSize: 11, color: '#9C9382' }}>
-                          {thread.viewCount.toLocaleString('id-ID')} lihat
-                        </div>
-                      </div>
-                    </Link>
-                  </li>
-                ))}
-              </ol>
-            </div>
-          )}
+                  {/* Preview */}
+                  {preview && (
+                    <div style={{
+                      fontSize: 15,
+                      lineHeight: 1.4,
+                      color: '#525252',
+                      marginBottom: 8,
+                      overflow: 'hidden',
+                      display: '-webkit-box',
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: 'vertical',
+                    }}>
+                      {preview}
+                    </div>
+                  )}
+
+                  {/* Action row */}
+                  <div style={{
+                    display: 'flex',
+                    gap: 20,
+                    fontSize: 13,
+                    color: '#737373',
+                    marginTop: 4,
+                  }}>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                      </svg>
+                      {formatNumber(thread.replyCount)}
+                    </span>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                        <circle cx="12" cy="12" r="3" />
+                      </svg>
+                      {formatNumber(thread.viewCount)}
+                    </span>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="18" cy="5" r="3" />
+                        <circle cx="6" cy="12" r="3" />
+                        <circle cx="18" cy="19" r="3" />
+                        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+                        <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+                      </svg>
+                    </span>
+                  </div>
+                </div>
+              </Link>
+            );
+          })}
         </div>
       )}
 
@@ -542,8 +364,8 @@ export default async function KomunitasPage({ searchParams }: Props) {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          gap: 4,
-          marginTop: 48,
+          gap: 2,
+          marginTop: 32,
           flexWrap: 'wrap',
         }}>
           {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => {
@@ -554,106 +376,69 @@ export default async function KomunitasPage({ searchParams }: Props) {
                 key={p}
                 href={`/komunitas${qs}`}
                 style={{
-                  minWidth: 44,
-                  height: 44,
+                  minWidth: 36,
+                  height: 36,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  padding: '0 12px',
-                  fontFamily: 'var(--font-display), Georgia, serif',
-                  fontSize: 16,
-                  fontWeight: isCurrent ? 700 : 400,
-                  fontStyle: isCurrent ? 'normal' : 'italic',
-                  color: isCurrent ? '#FAF6EE' : '#1A1814',
-                  backgroundColor: isCurrent ? '#0B5D4E' : 'transparent',
+                  padding: '0 10px',
+                  fontSize: 14,
+                  fontWeight: isCurrent ? 600 : 500,
+                  color: isCurrent ? '#FFFFFF' : '#0A0A0A',
+                  backgroundColor: isCurrent ? '#0A0A0A' : 'transparent',
                   textDecoration: 'none',
-                  letterSpacing: '0.02em',
-                  borderBottom: isCurrent ? 'none' : '1px solid transparent',
+                  borderRadius: 999,
                 }}
               >
-                {String(p).padStart(2, '0')}
+                {p}
               </Link>
             );
           })}
         </div>
       )}
 
-      {/* CTA — editorial box */}
-      <section style={{
-        marginTop: 72,
-        padding: '56px 48px',
-        backgroundColor: '#0B5D4E',
-        color: '#FAF6EE',
-        position: 'relative',
-        overflow: 'hidden',
+      {/* Login prompt */}
+      <div style={{
+        marginTop: 40,
+        padding: '24px 20px',
+        borderRadius: 16,
+        backgroundColor: '#F4F4F4',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        gap: 16,
+        flexWrap: 'wrap',
       }}>
-        {/* Decorative corner */}
-        <div aria-hidden style={{
-          position: 'absolute',
-          top: -20,
-          right: -20,
-          fontSize: 200,
-          color: 'rgba(191, 157, 99, 0.16)',
-          fontFamily: 'var(--font-display), Georgia, serif',
-          fontWeight: 900,
-          lineHeight: 0.8,
-          pointerEvents: 'none',
-        }}>۞</div>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 24, maxWidth: '640px', position: 'relative' }}>
-          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.3em', textTransform: 'uppercase', color: '#BF9D63' }}>
-            Jadi Bagian Komunitas
+        <div>
+          <div style={{ fontSize: 15, fontWeight: 600, color: '#0A0A0A', marginBottom: 2 }}>
+            Mau ikut diskusi?
           </div>
-          <h3 style={{
-            fontFamily: 'var(--font-display), Georgia, serif',
-            fontSize: 'clamp(28px, 4vw, 40px)',
-            fontWeight: 500,
-            lineHeight: 1.15,
-            letterSpacing: '-0.02em',
-            margin: 0,
-          }}>
-            Daftar gratis untuk{' '}
-            <em style={{ fontStyle: 'italic', color: '#BF9D63' }}>
-              posting, balasan, dan notifikasi
-            </em>{' '}
-            thread kesukaan Anda.
-          </h3>
-          <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', marginTop: 4 }}>
-            <Link href="/register" style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 8,
-              padding: '14px 28px',
-              backgroundColor: '#BF9D63',
-              color: '#0B2A24',
-              fontSize: 13,
-              fontWeight: 700,
-              letterSpacing: '0.08em',
-              textTransform: 'uppercase',
-              textDecoration: 'none',
-              borderBottom: '3px solid #8F7245',
-            }}>
-              Daftar Sekarang
-            </Link>
-            <Link href="/login" style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 8,
-              padding: '14px 28px',
-              backgroundColor: 'transparent',
-              color: '#FAF6EE',
-              fontSize: 13,
-              fontWeight: 700,
-              letterSpacing: '0.08em',
-              textTransform: 'uppercase',
-              textDecoration: 'none',
-              border: '1px solid rgba(250, 246, 238, 0.3)',
-            }}>
-              Sudah Punya Akun
-            </Link>
+          <div style={{ fontSize: 13, color: '#525252' }}>
+            Login atau daftar gratis buat posting & balas thread.
           </div>
         </div>
-      </section>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <Link href="/login" style={{
+            padding: '8px 18px',
+            fontSize: 13,
+            fontWeight: 600,
+            color: '#0A0A0A',
+            backgroundColor: '#FFFFFF',
+            borderRadius: 999,
+            textDecoration: 'none',
+            border: '0.5px solid #D4D4D4',
+          }}>Masuk</Link>
+          <Link href="/register" style={{
+            padding: '8px 18px',
+            fontSize: 13,
+            fontWeight: 600,
+            color: '#FFFFFF',
+            backgroundColor: '#0A0A0A',
+            borderRadius: 999,
+            textDecoration: 'none',
+          }}>Daftar</Link>
+        </div>
+      </div>
     </>
   );
 }
