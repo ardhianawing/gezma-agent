@@ -158,42 +158,52 @@ export default function ForumPage() {
           }}
         >
           <h3 style={{ fontSize: '16px', fontWeight: 600, color: c.textPrimary, margin: 0 }}>{t.forum.createTitle}</h3>
-          <input
-            type="text"
-            placeholder={t.forum.createTitlePlaceholder}
-            value={newTitle}
-            onChange={(e) => setNewTitle(e.target.value)}
-            style={{
-              width: '100%',
-              padding: '10px 14px',
-              minHeight: '46px',
-              borderRadius: 8,
-              border: '1px solid ' + c.border,
-              backgroundColor: c.inputBg,
-              color: c.textPrimary,
-              fontSize: 14,
-              outline: 'none',
-              boxSizing: 'border-box' as const,
-            }}
-          />
-          <textarea
-            placeholder={t.forum.createContentPlaceholder}
-            value={newContent}
-            onChange={(e) => setNewContent(e.target.value)}
-            rows={5}
-            style={{
-              width: '100%',
-              padding: '10px 14px',
-              borderRadius: 8,
-              border: '1px solid ' + c.border,
-              backgroundColor: c.inputBg,
-              color: c.textPrimary,
-              fontSize: 14,
-              outline: 'none',
-              boxSizing: 'border-box',
-              resize: 'vertical',
-            }}
-          />
+          <div>
+            <input
+              type="text"
+              placeholder={t.forum.createTitlePlaceholder}
+              value={newTitle}
+              onChange={(e) => setNewTitle(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '10px 14px',
+                minHeight: '46px',
+                borderRadius: 8,
+                border: '1px solid ' + c.border,
+                backgroundColor: c.inputBg,
+                color: c.textPrimary,
+                fontSize: 14,
+                outline: 'none',
+                boxSizing: 'border-box' as const,
+              }}
+            />
+            <div style={{ fontSize: 11, color: newTitle.trim().length < 5 ? '#DC2626' : c.textMuted, marginTop: 4 }}>
+              {newTitle.trim().length}/5 karakter minimal
+            </div>
+          </div>
+          <div>
+            <textarea
+              placeholder={t.forum.createContentPlaceholder}
+              value={newContent}
+              onChange={(e) => setNewContent(e.target.value)}
+              rows={5}
+              style={{
+                width: '100%',
+                padding: '10px 14px',
+                borderRadius: 8,
+                border: '1px solid ' + c.border,
+                backgroundColor: c.inputBg,
+                color: c.textPrimary,
+                fontSize: 14,
+                outline: 'none',
+                boxSizing: 'border-box',
+                resize: 'vertical',
+              }}
+            />
+            <div style={{ fontSize: 11, color: newContent.trim().length < 20 ? '#DC2626' : c.textMuted, marginTop: 4 }}>
+              {newContent.trim().length}/20 karakter minimal
+            </div>
+          </div>
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', flexDirection: isMobile ? 'column' : 'row' }}>
             <select
               value={newCategory}
@@ -240,8 +250,18 @@ export default function ForumPage() {
             <p style={{ fontSize: 13, color: '#DC2626', margin: 0 }}>{createError}</p>
           )}
           <button
-            disabled={creating || !newTitle.trim() || !newContent.trim()}
+            disabled={creating || newTitle.trim().length < 5 || newContent.trim().length < 20}
             onClick={async () => {
+              const title = newTitle.trim();
+              const content = newContent.trim();
+              if (title.length < 5) {
+                setCreateError('Judul minimal 5 karakter');
+                return;
+              }
+              if (content.length < 20) {
+                setCreateError('Konten minimal 20 karakter');
+                return;
+              }
               setCreating(true);
               setCreateError('');
               try {
@@ -249,14 +269,19 @@ export default function ForumPage() {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({
-                    title: newTitle.trim(),
-                    content: newContent.trim(),
+                    title,
+                    content,
                     category: newCategory,
                     tags: newTags.split(',').map(t => t.trim()).filter(Boolean),
                   }),
                 });
                 if (!res.ok) {
                   const json = await res.json();
+                  const details = json.details as Record<string, string[]> | undefined;
+                  if (details) {
+                    const msgs = Object.values(details).flat().filter(Boolean);
+                    if (msgs.length > 0) throw new Error(msgs.join(' · '));
+                  }
                   throw new Error(json.error || t.forum.createError);
                 }
                 setNewTitle('');
@@ -273,13 +298,13 @@ export default function ForumPage() {
             style={{
               padding: '10px 24px',
               minHeight: '44px',
-              backgroundColor: creating || !newTitle.trim() || !newContent.trim() ? c.textLight : c.primary,
+              backgroundColor: creating || newTitle.trim().length < 5 || newContent.trim().length < 20 ? c.textLight : c.primary,
               color: '#fff',
               border: 'none',
               borderRadius: 8,
               fontWeight: 600,
               fontSize: 14,
-              cursor: creating || !newTitle.trim() || !newContent.trim() ? 'not-allowed' : 'pointer',
+              cursor: creating || newTitle.trim().length < 5 || newContent.trim().length < 20 ? 'not-allowed' : 'pointer',
               alignSelf: isMobile ? 'stretch' : 'flex-end',
               width: isMobile ? '100%' : undefined,
             }}
