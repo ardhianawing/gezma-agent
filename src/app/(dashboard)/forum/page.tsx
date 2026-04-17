@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import Link from 'next/link';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
 import { useLanguage } from '@/lib/i18n';
@@ -468,9 +469,12 @@ export default function ForumPage() {
           <strong style={{ color: c.textSecondary }}>{totalThreads}</strong> {t.forum.threadCount}
         </span>
         <div style={{ display: 'flex', gap: 4 }}>
-          {[1, 2, 3, '...', 32].map((page, idx) => (
+          {Array.from(
+            { length: Math.max(1, Math.min(Math.ceil(totalThreads / 20), 5)) },
+            (_, i) => i + 1
+          ).map((page) => (
             <button
-              key={idx}
+              key={page}
               style={{
                 width: 44,
                 height: 44,
@@ -483,7 +487,7 @@ export default function ForumPage() {
                 color: page === 1 ? '#fff' : c.textSecondary,
                 fontWeight: page === 1 ? 600 : 400,
                 fontSize: 13,
-                cursor: typeof page === 'number' ? 'pointer' : 'default',
+                cursor: 'pointer',
               }}
             >
               {page}
@@ -532,13 +536,16 @@ function ThreadRow({
 
   if (isMobile) {
     return (
-      <div
+      <Link
+        href={`/forum/${thread.id}`}
         style={{
           display: 'flex',
           gap: 10,
           padding: '12px 14px',
           borderBottom: `1px solid ${c.borderLight}`,
           backgroundColor: rowBg,
+          textDecoration: 'none',
+          color: 'inherit',
         }}
       >
         {/* Avatar */}
@@ -624,13 +631,14 @@ function ThreadRow({
             <span>{timeAgo(thread.lastReplyAt)}</span>
           </div>
         </div>
-      </div>
+      </Link>
     );
   }
 
   // Desktop row
   return (
-    <div
+    <Link
+      href={`/forum/${thread.id}`}
       style={{
         display: 'flex',
         alignItems: 'center',
@@ -638,6 +646,8 @@ function ThreadRow({
         borderBottom: `1px solid ${c.borderLight}`,
         backgroundColor: rowBg,
         transition: 'background-color 0.15s',
+        textDecoration: 'none',
+        color: 'inherit',
       }}
       onMouseEnter={(e) => {
         if (!thread.isPinned) e.currentTarget.style.backgroundColor = c.cardBgHover;
@@ -770,6 +780,6 @@ function ThreadRow({
         <div style={{ fontSize: 12, fontWeight: 500, color: c.textSecondary }}>{thread.lastReplyBy}</div>
         <div style={{ fontSize: 11, color: c.textMuted }}>{timeAgo(thread.lastReplyAt)}</div>
       </div>
-    </div>
+    </Link>
   );
 }
