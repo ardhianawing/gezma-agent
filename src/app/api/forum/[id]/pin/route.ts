@@ -42,3 +42,30 @@ export async function PATCH(
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
   }
 }
+
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const auth = getCCAuthPayload(req);
+  if (!auth) return ccUnauthorizedResponse();
+
+  const { id } = await params;
+
+  try {
+    const thread = await prisma.forumThread.findUnique({ where: { id } });
+    if (!thread) {
+      return NextResponse.json({ error: 'Thread tidak ditemukan' }, { status: 404 });
+    }
+
+    await prisma.forumThread.update({
+      where: { id },
+      data: { deletedAt: new Date() },
+    });
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    logger.error('DELETE /api/forum/[id] error', { error: String(error) });
+    return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
+  }
+}

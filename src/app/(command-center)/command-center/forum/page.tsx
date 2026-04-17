@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { MessageSquare, Flag, Pin, Lock, Users, Eye, Trash2, ExternalLink, PinOff, Unlock } from 'lucide-react';
 
 const cc = {
@@ -159,6 +159,23 @@ export default function CCForumPage() {
   const [activeTab, setActiveTab] = useState<FilterTab>('semua');
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
+  useEffect(() => {
+    async function fetchThreads() {
+      try {
+        const res = await fetch('/api/command-center/forum');
+        if (!res.ok) return;
+        const json = await res.json();
+        if (json.data && json.data.length > 0) {
+          const dbThreads = json.data as Thread[];
+          setThreads([...dbThreads, ...MOCK_THREADS]);
+        }
+      } catch {
+        // keep mock data on failure
+      }
+    }
+    fetchThreads();
+  }, []);
+
   const stats = {
     total: threads.length,
     activeToday: threads.filter(t => t.date === '2026-04-10' || t.date === '2026-04-09').length,
@@ -174,23 +191,67 @@ export default function CCForumPage() {
     return true;
   });
 
-  const togglePin = (id: string) => {
+  const togglePin = async (id: string) => {
+    const thread = threads.find(t => t.id === id);
+    if (!thread) return;
+    const newPinned = thread.status !== 'pinned';
+
     setThreads(prev => prev.map(t => {
       if (t.id !== id) return t;
-      return { ...t, status: t.status === 'pinned' ? 'active' : 'pinned' };
+      return { ...t, status: newPinned ? 'pinned' : 'active' };
     }));
+
+    try {
+      const res = await fetch(`/api/forum/${id}/pin`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isPinned: newPinned }),
+      });
+      if (!res.ok) throw new Error('pin failed');
+    } catch {
+      setThreads(prev => prev.map(t => {
+        if (t.id !== id) return t;
+        return { ...t, status: newPinned ? 'active' : 'pinned' };
+      }));
+    }
   };
 
-  const toggleLock = (id: string) => {
+  const toggleLock = async (id: string) => {
+    const thread = threads.find(t => t.id === id);
+    if (!thread) return;
+    const newLocked = thread.status !== 'locked';
+
     setThreads(prev => prev.map(t => {
       if (t.id !== id) return t;
-      return { ...t, status: t.status === 'locked' ? 'active' : 'locked' };
+      return { ...t, status: newLocked ? 'locked' : 'active' };
     }));
+
+    try {
+      const res = await fetch(`/api/forum/${id}/pin`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isLocked: newLocked }),
+      });
+      if (!res.ok) throw new Error('lock failed');
+    } catch {
+      setThreads(prev => prev.map(t => {
+        if (t.id !== id) return t;
+        return { ...t, status: newLocked ? 'active' : 'locked' };
+      }));
+    }
   };
 
-  const deleteThread = (id: string) => {
+  const deleteThread = async (id: string) => {
+    const backup = threads;
     setThreads(prev => prev.filter(t => t.id !== id));
     setDeleteConfirm(null);
+
+    try {
+      const res = await fetch(`/api/forum/${id}/pin`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('delete failed');
+    } catch {
+      setThreads(backup);
+    }
   };
 
   const statCards = [
