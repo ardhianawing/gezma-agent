@@ -98,6 +98,44 @@ export default function ForumDetailPage({ params }: { params: Promise<{ id: stri
     fetchThread();
   }, [id]);
 
+  const handleSubmitReply = async () => {
+    if (replyText.trim().length < 3) return;
+    setSubmittingReply(true);
+    setReplyError('');
+    try {
+      const res = await fetch(`/api/forum/${id}/replies`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: replyText.trim() }),
+      });
+      if (!res.ok) {
+        const json = await res.json().catch(() => ({}));
+        throw new Error(json.error || 'Gagal mengirim balasan');
+      }
+      const newReply = await res.json();
+      setReplies((prev) => [
+        ...prev,
+        {
+          id: newReply.id,
+          author: newReply.authorName,
+          avatar: newReply.authorAvatar,
+          badge: newReply.authorBadge || undefined,
+          content: newReply.content,
+          createdAt: newReply.createdAt,
+          likes: 0,
+        },
+      ]);
+      setReplyText('');
+      if (thread) {
+        setThread({ ...thread, replyCount: thread.replyCount + 1 });
+      }
+    } catch (err) {
+      setReplyError(err instanceof Error ? err.message : 'Gagal mengirim balasan');
+    } finally {
+      setSubmittingReply(false);
+    }
+  };
+
   if (loading) {
     return (
       <div style={{ padding: '60px 20px', textAlign: 'center' }}>
@@ -310,58 +348,76 @@ export default function ForumDetailPage({ params }: { params: Promise<{ id: stri
         </div>
       </div>
 
-      {/* Reply form placeholder */}
-      <div
-        style={{
-          backgroundColor: c.cardBg,
-          borderRadius: '12px',
-          border: `1px solid ${c.border}`,
-          padding: isMobile ? '16px' : '20px',
-        }}
-      >
-        <h3 style={{ fontSize: '15px', fontWeight: '600', color: c.textPrimary, margin: '0 0 12px 0' }}>
-          Write Reply
-        </h3>
-        <textarea
-          value={replyText}
-          onChange={(e) => setReplyText(e.target.value)}
-          placeholder="Write your reply here..."
+      {/* Reply form */}
+      {thread.isLocked ? (
+        <div
           style={{
-            width: '100%',
-            minHeight: '100px',
-            padding: '12px',
-            fontSize: '14px',
+            backgroundColor: c.cardBg,
+            borderRadius: '12px',
             border: `1px solid ${c.border}`,
-            borderRadius: '8px',
-            backgroundColor: c.pageBg,
-            color: c.textPrimary,
-            resize: 'vertical',
-            fontFamily: 'inherit',
-            boxSizing: 'border-box',
+            padding: isMobile ? '16px' : '20px',
+            textAlign: 'center',
           }}
-        />
-        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '12px' }}>
-          <button
-            disabled
-            style={{
-              padding: '10px 20px',
-              fontSize: '14px',
-              fontWeight: '500',
-              backgroundColor: c.primary,
-              color: 'white',
-              border: 'none',
-              borderRadius: '8px',
-              cursor: 'not-allowed',
-              opacity: 0.5,
-            }}
-          >
-            {t.forum.createSubmit}
-          </button>
+        >
+          <p style={{ fontSize: '14px', color: c.textMuted, margin: 0 }}>
+            {t.forum.replyLocked}
+          </p>
         </div>
-        <p style={{ fontSize: '12px', color: c.textMuted, margin: '8px 0 0 0' }}>
-          Reply feature will be available in the next update.
-        </p>
-      </div>
+      ) : (
+        <div
+          style={{
+            backgroundColor: c.cardBg,
+            borderRadius: '12px',
+            border: `1px solid ${c.border}`,
+            padding: isMobile ? '16px' : '20px',
+          }}
+        >
+          <h3 style={{ fontSize: '15px', fontWeight: '600', color: c.textPrimary, margin: '0 0 12px 0' }}>
+            {t.forum.replyTitle}
+          </h3>
+          <textarea
+            value={replyText}
+            onChange={(e) => setReplyText(e.target.value)}
+            placeholder={t.forum.replyPlaceholder}
+            style={{
+              width: '100%',
+              minHeight: '100px',
+              padding: '12px',
+              fontSize: '14px',
+              border: `1px solid ${c.border}`,
+              borderRadius: '8px',
+              backgroundColor: c.pageBg,
+              color: c.textPrimary,
+              resize: 'vertical',
+              fontFamily: 'inherit',
+              boxSizing: 'border-box',
+            }}
+          />
+          {replyError && (
+            <p style={{ fontSize: '13px', color: '#DC2626', margin: '8px 0 0 0' }}>{replyError}</p>
+          )}
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '12px' }}>
+            <button
+              disabled={submittingReply || replyText.trim().length < 3}
+              onClick={handleSubmitReply}
+              style={{
+                padding: '10px 20px',
+                minHeight: '44px',
+                fontSize: '14px',
+                fontWeight: '500',
+                backgroundColor: submittingReply || replyText.trim().length < 3 ? c.textLight : c.primary,
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                cursor: submittingReply || replyText.trim().length < 3 ? 'not-allowed' : 'pointer',
+                width: isMobile ? '100%' : 'auto',
+              }}
+            >
+              {submittingReply ? t.forum.replyLoading : t.forum.replySubmit}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

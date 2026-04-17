@@ -832,6 +832,12 @@ export const en = {
     empty: 'No threads found.',
     replyUnit: 'replies',
     viewUnit: 'views',
+    replyTitle: 'Write Reply',
+    replyPlaceholder: 'Write your reply here...',
+    replySubmit: 'Submit Reply',
+    replyLoading: 'Submitting...',
+    replyError: 'Failed to submit reply',
+    replyLocked: 'This thread is locked. Cannot reply.',
   },
 
   // Academy

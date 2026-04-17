@@ -834,6 +834,12 @@ export const id: Translations = {
     empty: 'Tidak ada thread ditemukan.',
     replyUnit: 'balas',
     viewUnit: 'lihat',
+    replyTitle: 'Tulis Balasan',
+    replyPlaceholder: 'Tulis balasan di sini...',
+    replySubmit: 'Kirim Balasan',
+    replyLoading: 'Mengirim...',
+    replyError: 'Gagal mengirim balasan',
+    replyLocked: 'Thread ini sudah dikunci. Tidak bisa membalas.',
   },
 
   // Academy
