@@ -23,6 +23,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.9,
     },
     {
+      url: `${baseUrl}/komunitas`,
+      lastModified: now,
+      changeFrequency: 'daily',
+      priority: 0.9,
+    },
+    {
       url: `${baseUrl}/help`,
       lastModified: now,
       changeFrequency: 'monthly',
@@ -70,5 +76,33 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
-  return [...staticPages, ...categoryPages, ...newsPages];
+  // Forum category pages
+  const forumCategories = ['review', 'regulasi', 'operasional', 'sharing', 'scam', 'tanya'];
+  const forumCategoryPages: MetadataRoute.Sitemap = forumCategories.map(cat => ({
+    url: `${baseUrl}/komunitas?category=${cat}`,
+    lastModified: now,
+    changeFrequency: 'daily' as const,
+    priority: 0.7,
+  }));
+
+  // Dynamic forum threads
+  let forumPages: MetadataRoute.Sitemap = [];
+  try {
+    const threads = await prisma.forumThread.findMany({
+      where: { deletedAt: null },
+      select: { id: true, updatedAt: true, createdAt: true },
+      orderBy: { createdAt: 'desc' },
+      take: 500,
+    });
+    forumPages = threads.map(thread => ({
+      url: `${baseUrl}/komunitas/${thread.id}`,
+      lastModified: thread.updatedAt || thread.createdAt || now,
+      changeFrequency: 'weekly' as const,
+      priority: 0.6,
+    }));
+  } catch {
+    // DB unavailable — sitemap still works with static pages
+  }
+
+  return [...staticPages, ...categoryPages, ...newsPages, ...forumCategoryPages, ...forumPages];
 }
