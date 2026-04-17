@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useTheme } from '@/lib/theme';
 import { useResponsive } from '@/lib/hooks/use-responsive';
 import { useLanguage } from '@/lib/i18n';
+import { useToast } from '@/components/ui/toast';
 import {
   forumCategories,
   ForumCategory,
@@ -43,6 +44,7 @@ export default function ForumPage() {
   const { c } = useTheme();
   const { isMobile } = useResponsive();
   const { t } = useLanguage();
+  const { addToast } = useToast();
 
   const [activeCategory, setActiveCategory] = useState<ForumCategory>('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -255,11 +257,15 @@ export default function ForumPage() {
               const title = newTitle.trim();
               const content = newContent.trim();
               if (title.length < 5) {
-                setCreateError('Judul minimal 5 karakter');
+                const msg = `Judul terlalu pendek (${title.length}/5 karakter minimal)`;
+                setCreateError(msg);
+                addToast({ type: 'warning', title: 'Judul kurang panjang', description: msg });
                 return;
               }
               if (content.length < 20) {
-                setCreateError('Konten minimal 20 karakter');
+                const msg = `Konten terlalu pendek (${content.length}/20 karakter minimal)`;
+                setCreateError(msg);
+                addToast({ type: 'warning', title: 'Konten kurang panjang', description: msg });
                 return;
               }
               setCreating(true);
@@ -289,8 +295,11 @@ export default function ForumPage() {
                 setNewTags('');
                 setShowCreateForm(false);
                 fetchThreads();
+                addToast({ type: 'success', title: 'Thread berhasil dibuat', description: 'Thread kamu sudah tampil di forum.' });
               } catch (err) {
-                setCreateError(err instanceof Error ? err.message : t.forum.createError);
+                const msg = err instanceof Error ? err.message : t.forum.createError;
+                setCreateError(msg);
+                addToast({ type: 'error', title: 'Gagal membuat thread', description: msg });
               } finally {
                 setCreating(false);
               }
