@@ -51,9 +51,16 @@ export default function KomunitasLayout({ children }: { children: React.ReactNod
           }}>
             <span style={{
               fontSize: 22,
-              fontWeight: 700,
+              fontWeight: 800,
               letterSpacing: '-0.02em',
-              color: '#0A0A0A',
+              color: '#F60000',
+            }}>
+              GEZMA
+            </span>
+            <span style={{
+              fontSize: 14,
+              fontWeight: 500,
+              color: '#737373',
             }}>
               Komunitas
             </span>
