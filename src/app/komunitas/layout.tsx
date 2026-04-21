@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export const metadata: Metadata = {
   title: {
@@ -49,21 +50,14 @@ export default function KomunitasLayout({ children }: { children: React.ReactNod
             alignItems: 'center',
             gap: 8,
           }}>
-            <span style={{
-              fontSize: 22,
-              fontWeight: 800,
-              letterSpacing: '-0.02em',
-              color: '#F60000',
-            }}>
-              GEZMA
-            </span>
-            <span style={{
-              fontSize: 14,
-              fontWeight: 500,
-              color: '#737373',
-            }}>
-              Komunitas
-            </span>
+            <Image
+              src="/gezma-forum-logo.png"
+              alt="GEZMA Forum"
+              width={100}
+              height={40}
+              style={{ objectFit: 'contain' }}
+              priority
+            />
           </Link>
           <nav style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
             <Link href="/berita" style={{
